@@ -1,0 +1,3795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 12: Claude Code Advanced -- Subagents, Plugins, and Hooks | Claude AI Training</title>
+<style>
+/* ============================================
+   CSS CUSTOM PROPERTIES & DESIGN SYSTEM
+   Premium Edition with 3-layer shadows, spring
+   transitions, gradient headings, deep dark mode
+   ============================================ */
+:root {
+  --primary: #7C3AED;
+  --primary-light: #A78BFA;
+  --primary-dark: #5B21B6;
+  --accent: #06B6D4;
+  --accent-light: #22D3EE;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  --bg: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --bg-code: #F1F5F9;
+  --text: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --border: #E2E8F0;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04), 0 0px 0px rgba(124,58,237,0);
+  --shadow-lg: 0 4px 12px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.06), 0 0 0 rgba(124,58,237,0);
+  --shadow-glow: 0 4px 12px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.06), 0 0 24px rgba(124,58,237,0.12);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --transition: 0.2s ease;
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --sidebar-width: 280px;
+  --content-max: 800px;
+}
+
+[data-theme="dark"] {
+  --bg: #0B0F1A;
+  --bg-card: #141926;
+  --bg-code: #1A2030;
+  --text: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --border: #1E293B;
+  --shadow: 0 1px 3px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.2), 0 0 0 rgba(124,58,237,0);
+  --shadow-lg: 0 4px 12px rgba(0,0,0,0.4), 0 12px 32px rgba(0,0,0,0.3), 0 0 0 rgba(124,58,237,0);
+  --shadow-glow: 0 4px 12px rgba(0,0,0,0.4), 0 12px 32px rgba(0,0,0,0.3), 0 0 32px rgba(124,58,237,0.15);
+}
+
+/* ============================================
+   REDUCED MOTION
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  html { scroll-behavior: auto; }
+}
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 24px;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  min-height: 100vh;
+  transition: background var(--transition), color var(--transition);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   THEME TOGGLE
+   ============================================ */
+.theme-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: all 0.3s var(--spring);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+.theme-toggle:hover {
+  box-shadow: var(--shadow-glow);
+  transform: scale(1.1);
+}
+
+/* ============================================
+   SIDEBAR
+   ============================================ */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  z-index: 900;
+  transition: transform 0.3s ease, background var(--transition);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.sidebar-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+  margin-bottom: 12px;
+  transition: color var(--transition);
+}
+.sidebar-back:hover { color: var(--primary-dark); }
+
+.sidebar-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.sidebar-module-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.sidebar-nav {
+  padding: 12px 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.sidebar-section {
+  margin-bottom: 4px;
+}
+
+.sidebar-section-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 20px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  text-align: left;
+  transition: color var(--transition);
+}
+.sidebar-section-toggle:hover { color: var(--text); }
+.sidebar-section-toggle .chevron {
+  transition: transform 0.2s ease;
+  font-size: 0.65rem;
+}
+.sidebar-section-toggle.collapsed .chevron {
+  transform: rotate(-90deg);
+}
+
+.sidebar-links {
+  list-style: none;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.sidebar-links.collapsed {
+  max-height: 0 !important;
+}
+
+.sidebar-link {
+  display: block;
+  padding: 7px 20px 7px 32px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: all var(--transition);
+  line-height: 1.4;
+}
+.sidebar-link:hover {
+  color: var(--text);
+  background: var(--bg);
+}
+.sidebar-link.active {
+  color: var(--primary);
+  border-left-color: var(--primary);
+  background: rgba(124, 58, 237, 0.05);
+  font-weight: 600;
+}
+[data-theme="dark"] .sidebar-link.active {
+  background: rgba(124, 58, 237, 0.12);
+}
+
+.sidebar-progress {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sidebar-progress-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.sidebar-progress-track {
+  height: 6px;
+  background: var(--bg-code);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.sidebar-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 3px;
+  transition: width 0.5s ease;
+  width: 0%;
+}
+
+/* Hamburger button (mobile) */
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1001;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+  transition: all var(--transition);
+}
+.hamburger span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--text);
+  margin: 4px auto;
+  transition: all 0.3s ease;
+  border-radius: 1px;
+}
+.hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(4px, 4px); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(4px, -4px); }
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 899;
+}
+
+/* ============================================
+   MAIN CONTENT
+   ============================================ */
+.main-content {
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+  transition: margin var(--transition);
+}
+
+.content-wrapper {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 40px 32px 80px;
+}
+
+/* Module Header */
+.module-header {
+  margin-bottom: 48px;
+}
+.module-header .breadcrumb {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+.module-header .breadcrumb a {
+  color: var(--primary);
+  text-decoration: none;
+}
+.module-header .breadcrumb a:hover { text-decoration: underline; }
+
+.module-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.module-badge .number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.module-badge .label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.module-header h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.module-header .description {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 640px;
+}
+
+.module-meta {
+  display: flex;
+  gap: 16px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.module-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  background: var(--bg-code);
+  padding: 6px 14px;
+  border-radius: 20px;
+}
+
+/* ============================================
+   SECTIONS
+   ============================================ */
+.section {
+  margin-bottom: 56px;
+  scroll-margin-top: 24px;
+}
+
+.section-heading {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+  line-height: 1.3;
+}
+
+.section h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-top: 32px;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.section h4 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-top: 24px;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.section p {
+  margin-bottom: 16px;
+  color: var(--text-secondary);
+}
+
+.section ul, .section ol {
+  margin-bottom: 16px;
+  padding-left: 24px;
+}
+.section li {
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+}
+.section li strong {
+  color: var(--text);
+}
+
+/* ============================================
+   CODE BLOCKS
+   ============================================ */
+.code-block {
+  background: #1E293B;
+  color: #E2E8F0;
+  border-radius: var(--radius-sm);
+  padding: 20px 24px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  overflow-x: auto;
+  position: relative;
+  margin: 16px 0 20px;
+  tab-size: 2;
+}
+.code-block .code-label {
+  position: absolute;
+  top: 8px;
+  left: 16px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #64748B;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+.code-block.has-label {
+  padding-top: 36px;
+}
+.code-block .copy-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: #94A3B8;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  transition: all var(--transition);
+}
+.code-block .copy-btn:hover { background: rgba(255,255,255,0.2); color: white; }
+.code-block .copy-btn.copied { background: var(--success); color: white; }
+
+/* Syntax highlighting classes */
+.kw { color: #C084FC; }
+.str { color: #6EE7B7; }
+.fn { color: #7DD3FC; }
+.cm { color: #64748B; }
+.num { color: #FDBA74; }
+.op { color: #FCA5A5; }
+.type { color: #67E8F9; }
+.param { color: #FDE68A; }
+.prop { color: #F0ABFC; }
+.punc { color: #94A3B8; }
+.tool-name { color: #FCA5A5; font-weight: 600; }
+.output { color: #64748B; font-style: italic; }
+.path { color: #FDBA74; }
+.flag { color: #67E8F9; }
+
+/* Inline code */
+code {
+  background: var(--bg-code);
+  color: var(--primary);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.88em;
+}
+[data-theme="dark"] code {
+  background: #1E293B;
+}
+.code-block code {
+  background: none;
+  color: inherit;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+  white-space: pre-wrap;
+  display: block;
+}
+
+/* ============================================
+   CALLOUT BOXES
+   ============================================ */
+.callout {
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  margin: 20px 0;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.callout-icon {
+  flex-shrink: 0;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+.callout-content { flex: 1; }
+.callout-content p { margin-bottom: 6px; color: inherit; }
+.callout-content p:last-child { margin-bottom: 0; }
+
+.callout.info {
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  color: #1E40AF;
+}
+.callout.tip {
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  color: #166534;
+}
+.callout.warning {
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  color: #92400E;
+}
+.callout.important {
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  color: #991B1B;
+}
+
+[data-theme="dark"] .callout.info {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: #93C5FD;
+}
+[data-theme="dark"] .callout.tip {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #6EE7B7;
+}
+[data-theme="dark"] .callout.warning {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #FCD34D;
+}
+[data-theme="dark"] .callout.important {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #FCA5A5;
+}
+
+/* ============================================
+   ACCENT CARDS with ::before gradient bars
+   ============================================ */
+.accent-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin: 24px 0;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s var(--spring), box-shadow 0.3s var(--spring), transform 0.3s var(--spring);
+}
+.accent-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.accent-card:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+}
+.accent-card h4 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.accent-card p {
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+.accent-card p:last-child { margin-bottom: 0; }
+.accent-card ul {
+  padding-left: 20px;
+  margin-bottom: 12px;
+}
+.accent-card li {
+  margin-bottom: 6px;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+}
+
+/* ============================================
+   COMPARISON TABLE
+   ============================================ */
+.comparison-table-wrapper {
+  overflow-x: auto;
+  margin: 20px 0;
+}
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.comparison-table th {
+  background: var(--primary);
+  color: white;
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+.comparison-table th:first-child {
+  border-radius: var(--radius-sm) 0 0 0;
+}
+.comparison-table th:last-child {
+  border-radius: 0 var(--radius-sm) 0 0;
+}
+.comparison-table td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+.comparison-table tr:nth-child(even) td {
+  background: var(--bg);
+}
+.comparison-table tr:last-child td:first-child {
+  border-radius: 0 0 0 var(--radius-sm);
+}
+.comparison-table tr:last-child td:last-child {
+  border-radius: 0 0 var(--radius-sm) 0;
+}
+
+/* ============================================
+   STEP-BY-STEP
+   ============================================ */
+.step-list {
+  counter-reset: step-counter;
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+.step-item {
+  counter-increment: step-counter;
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: border-color 0.3s var(--spring), box-shadow 0.3s var(--spring);
+}
+.step-item:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow);
+}
+.step-item::before {
+  content: counter(step-counter);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+.step-content h4 {
+  margin-top: 0;
+  margin-bottom: 6px;
+}
+.step-content p {
+  margin-bottom: 8px;
+}
+
+/* ============================================
+   INTERACTIVE: SUBAGENT ORCHESTRATOR
+   ============================================ */
+.orchestrator-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  position: relative;
+  overflow: hidden;
+}
+.orchestrator-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+}
+
+.orch-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin: 24px 0;
+}
+.orch-parent-row {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+.orch-arrows-row {
+  display: flex;
+  justify-content: center;
+  gap: 80px;
+  margin-bottom: 8px;
+  min-height: 40px;
+  align-items: center;
+}
+.orch-arrow {
+  width: 2px;
+  height: 40px;
+  background: var(--border);
+  position: relative;
+  transition: background 0.4s ease;
+}
+.orch-arrow.active {
+  background: var(--primary);
+}
+.orch-arrow.active::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: -4px;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 8px solid var(--primary);
+}
+.orch-arrow.returning {
+  background: var(--success);
+}
+.orch-arrow.returning::after {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: -4px;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 8px solid var(--success);
+}
+.orch-children-row {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.orch-agent-box {
+  width: 180px;
+  padding: 16px;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  text-align: center;
+  transition: all 0.4s var(--spring);
+  cursor: pointer;
+  user-select: none;
+}
+.orch-agent-box.parent {
+  width: 220px;
+  border-color: var(--primary-light);
+  background: rgba(124, 58, 237, 0.05);
+}
+[data-theme="dark"] .orch-agent-box.parent {
+  background: rgba(124, 58, 237, 0.12);
+}
+.orch-agent-box.idle { border-color: var(--border); }
+.orch-agent-box.running {
+  border-color: var(--accent);
+  box-shadow: 0 0 16px rgba(6, 182, 212, 0.2);
+}
+.orch-agent-box.complete {
+  border-color: var(--success);
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.2);
+}
+.orch-agent-box.parent.running {
+  border-color: var(--primary);
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.25);
+}
+.orch-agent-box.parent.complete {
+  border-color: var(--success);
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.2);
+}
+
+.orch-agent-name {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.orch-agent-status {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+}
+.orch-agent-status.idle { color: var(--text-muted); }
+.orch-agent-status.running { color: var(--accent); }
+.orch-agent-status.complete { color: var(--success); }
+
+.orch-agent-meter {
+  height: 4px;
+  background: var(--bg-code);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+.orch-agent-meter-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 2px;
+  transition: width 0.3s ease;
+  width: 0%;
+}
+.orch-agent-tools {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.orch-details {
+  margin-top: 20px;
+  padding: 20px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  display: none;
+}
+.orch-details.show { display: block; }
+.orch-details h4 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 1rem;
+  color: var(--text);
+}
+.orch-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.orch-detail-item {
+  font-size: 0.85rem;
+}
+.orch-detail-label {
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+.orch-detail-value {
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.orch-timing {
+  text-align: center;
+  margin-top: 16px;
+  padding: 12px 16px;
+  background: rgba(124, 58, 237, 0.05);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  display: none;
+}
+.orch-timing.show { display: block; }
+.orch-timing strong { color: var(--primary); }
+
+[data-theme="dark"] .orch-timing {
+  background: rgba(124, 58, 237, 0.12);
+}
+
+.orch-controls {
+  text-align: center;
+  margin-top: 20px;
+}
+.sim-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s var(--spring);
+}
+.sim-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow);
+}
+.sim-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ============================================
+   INTERACTIVE: PLUGIN FILE EXPLORER
+   ============================================ */
+.file-explorer {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin: 32px 0;
+  overflow: hidden;
+  position: relative;
+}
+.file-explorer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent), var(--success));
+}
+
+.file-explorer-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.file-explorer-header h3 {
+  margin: 0 0 4px;
+  font-size: 1rem;
+}
+.file-explorer-header p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.file-explorer-body {
+  display: flex;
+  min-height: 400px;
+}
+
+.file-tree {
+  width: 280px;
+  min-width: 280px;
+  border-right: 1px solid var(--border);
+  padding: 16px 0;
+  overflow-y: auto;
+}
+
+.file-tree-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px 6px 16px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  transition: all var(--transition);
+  user-select: none;
+}
+.file-tree-item:hover {
+  background: var(--bg);
+  color: var(--text);
+}
+.file-tree-item.active {
+  background: rgba(124, 58, 237, 0.08);
+  color: var(--primary);
+  font-weight: 600;
+}
+.file-tree-item.dir {
+  font-weight: 600;
+  color: var(--text);
+  cursor: default;
+}
+.file-tree-icon {
+  flex-shrink: 0;
+  font-size: 0.9rem;
+  width: 20px;
+  text-align: center;
+}
+.file-tree-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-preview {
+  flex: 1;
+  padding: 20px 24px;
+  overflow: auto;
+}
+.file-preview-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-style: italic;
+}
+.file-preview-header {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+.file-preview-content {
+  background: #1E293B;
+  color: #E2E8F0;
+  border-radius: var(--radius-sm);
+  padding: 20px 24px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
+
+/* ============================================
+   INTERACTIVE: HOOK DEBUGGER
+   ============================================ */
+.hook-debugger {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  position: relative;
+  overflow: hidden;
+}
+.hook-debugger::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--warning), var(--error));
+}
+
+.hook-presets {
+  display: flex;
+  gap: 8px;
+  margin: 16px 0;
+  flex-wrap: wrap;
+}
+.hook-preset-btn {
+  padding: 6px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.3s var(--spring);
+}
+.hook-preset-btn:hover {
+  border-color: var(--primary-light);
+  color: var(--primary);
+  transform: translateY(-1px);
+}
+.hook-preset-btn.active {
+  background: rgba(124, 58, 237, 0.1);
+  border-color: var(--primary);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.hook-editor {
+  margin: 16px 0;
+}
+.hook-editor textarea {
+  width: 100%;
+  min-height: 200px;
+  background: #1E293B;
+  color: #E2E8F0;
+  border: 1px solid #334155;
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  line-height: 1.7;
+  resize: vertical;
+  outline: none;
+  transition: border-color var(--transition);
+}
+.hook-editor textarea:focus {
+  border-color: var(--primary);
+}
+
+.hook-result {
+  margin-top: 16px;
+  padding: 16px 20px;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: none;
+}
+.hook-result.show { display: flex; align-items: center; gap: 10px; }
+.hook-result.blocks {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: var(--error);
+}
+.hook-result.allows {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: var(--success);
+}
+.hook-result.allows-safety {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: var(--warning);
+}
+.hook-result-icon {
+  font-size: 1.2rem;
+}
+.hook-result-detail {
+  font-weight: 400;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* ============================================
+   INTERACTIVE: PLUGIN BUILDER WIZARD
+   ============================================ */
+.wizard-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  position: relative;
+  overflow: hidden;
+}
+.wizard-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--success), var(--accent));
+}
+
+.wizard-steps {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 24px;
+}
+.wizard-step-indicator {
+  flex: 1;
+  height: 4px;
+  background: var(--bg-code);
+  border-radius: 2px;
+  transition: background 0.3s ease;
+}
+.wizard-step-indicator.active {
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+}
+.wizard-step-indicator.done {
+  background: var(--success);
+}
+
+.wizard-step-labels {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 24px;
+}
+.wizard-step-label {
+  flex: 1;
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  transition: color var(--transition);
+}
+.wizard-step-label.active { color: var(--primary); }
+.wizard-step-label.done { color: var(--success); }
+
+.wizard-panel {
+  display: none;
+  min-height: 300px;
+}
+.wizard-panel.active { display: block; }
+
+.wizard-form-group {
+  margin-bottom: 20px;
+}
+.wizard-form-group label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.wizard-form-group input[type="text"] {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  color: var(--text);
+  outline: none;
+  transition: border-color var(--transition);
+  font-family: inherit;
+}
+.wizard-form-group input[type="text"]:focus {
+  border-color: var(--primary);
+}
+.wizard-form-group .hint {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.wizard-checkbox-group {
+  margin-bottom: 16px;
+}
+.wizard-checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.wizard-checkbox-item:hover {
+  border-color: var(--primary-light);
+}
+.wizard-checkbox-item.checked {
+  border-color: var(--primary);
+  background: rgba(124, 58, 237, 0.05);
+}
+[data-theme="dark"] .wizard-checkbox-item.checked {
+  background: rgba(124, 58, 237, 0.12);
+}
+.wizard-checkbox-item input[type="checkbox"] {
+  accent-color: var(--primary);
+  width: 16px;
+  height: 16px;
+}
+.wizard-checkbox-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text);
+}
+.wizard-checkbox-desc {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.wizard-sub-input {
+  margin-top: 8px;
+  margin-left: 26px;
+  padding: 8px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  display: none;
+}
+.wizard-sub-input.show { display: block; }
+.wizard-sub-input input[type="text"] {
+  width: 100%;
+  padding: 6px 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.82rem;
+  color: var(--text);
+  outline: none;
+  font-family: inherit;
+}
+.wizard-sub-input input[type="text"]:focus {
+  border-color: var(--primary);
+}
+.wizard-sub-input label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.wizard-preview-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.wizard-preview-tree {
+  background: #1E293B;
+  color: #E2E8F0;
+  border-radius: var(--radius-sm);
+  padding: 20px 24px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  line-height: 1.8;
+  white-space: pre;
+  overflow-x: auto;
+}
+.wizard-preview-json {
+  background: #1E293B;
+  color: #E2E8F0;
+  border-radius: var(--radius-sm);
+  padding: 20px 24px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
+
+.wizard-nav {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 24px;
+}
+.wizard-btn {
+  padding: 10px 24px;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s var(--spring);
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-secondary);
+}
+.wizard-btn:hover {
+  border-color: var(--primary-light);
+  color: var(--text);
+  transform: translateY(-1px);
+}
+.wizard-btn.primary {
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  border-color: transparent;
+}
+.wizard-btn.primary:hover {
+  box-shadow: var(--shadow-glow);
+}
+.wizard-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ============================================
+   END-OF-MODULE QUIZ
+   ============================================ */
+.final-quiz {
+  background: var(--bg-card);
+  border: 2px solid var(--primary-light);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+}
+.final-quiz h3 {
+  margin-top: 0;
+}
+
+.final-quiz-question {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.final-quiz-question .fq-number {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+.final-quiz-question .fq-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+.fq-options { list-style: none; padding: 0; }
+.fq-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 14px;
+  margin-bottom: 4px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.25s var(--spring);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  border: 2px solid transparent;
+}
+.fq-option:hover {
+  background: rgba(124, 58, 237, 0.05);
+  border-color: rgba(124, 58, 237, 0.15);
+  transform: translateX(4px);
+}
+.fq-option input[type="radio"] {
+  accent-color: var(--primary);
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+.fq-option.selected-correct {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: var(--success);
+  color: #059669;
+}
+.fq-option.selected-wrong {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: var(--error);
+  color: var(--error);
+}
+.fq-option.reveal-correct {
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #059669;
+  font-weight: 600;
+}
+[data-theme="dark"] .fq-option.selected-correct { color: #6EE7B7; }
+[data-theme="dark"] .fq-option.selected-wrong { color: #FCA5A5; }
+[data-theme="dark"] .fq-option.reveal-correct { color: #6EE7B7; }
+
+.final-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 32px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s var(--spring);
+  margin-top: 8px;
+}
+.final-submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow);
+}
+.final-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.final-result {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: var(--radius-sm);
+  display: none;
+}
+.final-result.show { display: block; }
+.final-result.pass {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.final-result.fail {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.final-result h4 {
+  margin-top: 0;
+  margin-bottom: 6px;
+  font-size: 1.1rem;
+}
+.final-result p {
+  margin-bottom: 0;
+  font-size: 0.95rem;
+}
+.final-result.pass h4 { color: var(--success); }
+.final-result.fail h4 { color: var(--warning); }
+
+/* ============================================
+   NAVIGATION FOOTER
+   ============================================ */
+.module-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 16px;
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 2px solid var(--border);
+}
+.nav-link {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: all 0.3s var(--spring);
+  min-width: 0;
+  flex: 1;
+  max-width: 50%;
+}
+.nav-link:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+}
+.nav-link.next { align-items: flex-end; text-align: right; }
+.nav-link .nav-dir {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--primary);
+}
+.nav-link .nav-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 1024px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .hamburger {
+    display: flex;
+  }
+  .sidebar-overlay.show {
+    display: block;
+  }
+  .main-content {
+    margin-left: 0;
+  }
+  .theme-toggle {
+    right: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .file-explorer-body {
+    flex-direction: column;
+  }
+  .file-tree {
+    width: 100%;
+    min-width: unset;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    max-height: 200px;
+  }
+  .wizard-preview-body {
+    grid-template-columns: 1fr;
+  }
+  .orch-children-row {
+    flex-direction: column;
+    align-items: center;
+  }
+  .orch-arrows-row {
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+  }
+  .orch-arrow {
+    width: 40px;
+    height: 2px;
+  }
+  .orch-details-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .content-wrapper {
+    padding: 24px 16px 60px;
+  }
+  .module-header h1 {
+    font-size: 1.6rem;
+  }
+  .section-heading {
+    font-size: 1.3rem;
+  }
+  .module-nav {
+    flex-direction: column;
+  }
+  .nav-link {
+    max-width: 100%;
+  }
+  .nav-link.next {
+    align-items: flex-start;
+    text-align: left;
+  }
+  .orchestrator-container,
+  .file-explorer,
+  .hook-debugger,
+  .wizard-container,
+  .final-quiz {
+    padding: 20px;
+  }
+}
+
+/* ============================================
+   SCROLLBAR STYLING
+   ============================================ */
+.sidebar::-webkit-scrollbar,
+.code-block::-webkit-scrollbar,
+.file-preview::-webkit-scrollbar,
+.file-tree::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.sidebar::-webkit-scrollbar-track,
+.code-block::-webkit-scrollbar-track,
+.file-preview::-webkit-scrollbar-track,
+.file-tree::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+.code-block::-webkit-scrollbar-thumb,
+.file-preview::-webkit-scrollbar-thumb,
+.file-tree::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.section {
+  animation: fadeInUp 0.4s ease both;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 8px rgba(124,58,237,0.15); }
+  50% { box-shadow: 0 0 20px rgba(124,58,237,0.35); }
+}
+
+/* Key concept highlight */
+.key-concept {
+  display: inline-block;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(6, 182, 212, 0.1));
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  color: var(--primary);
+}
+[data-theme="dark"] .key-concept {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(6, 182, 212, 0.15));
+  border-color: rgba(124, 58, 237, 0.35);
+}
+</style>
+</head>
+<body>
+<!-- ============================================
+     THEME TOGGLE
+     ============================================ -->
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+  <span id="themeIcon">&#9790;</span>
+</button>
+
+<!-- ============================================
+     HAMBURGER (mobile)
+     ============================================ -->
+<button class="hamburger" id="hamburger" aria-label="Toggle sidebar">
+  <span></span>
+  <span></span>
+  <span></span>
+</button>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ============================================
+     SIDEBAR
+     ============================================ -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="../index.html" class="sidebar-back">&larr; Back to Hub</a>
+    <div class="sidebar-title">Module 12</div>
+    <div class="sidebar-module-name">Claude Code Advanced</div>
+  </div>
+
+  <div class="sidebar-nav">
+    <!-- Section: Subagents -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="subagents">
+        Subagents <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-subagents">
+        <li><a href="#subagent-pattern" class="sidebar-link" data-target="subagent-pattern">The Subagent Pattern</a></li>
+        <li><a href="#subagent-orchestrator" class="sidebar-link" data-target="subagent-orchestrator">Orchestration Visualizer</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Plugins -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="plugins">
+        Plugins <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-plugins">
+        <li><a href="#plugin-architecture" class="sidebar-link" data-target="plugin-architecture">Plugin Architecture</a></li>
+        <li><a href="#plugin-explorer" class="sidebar-link" data-target="plugin-explorer">Plugin File Explorer</a></li>
+        <li><a href="#building-plugins" class="sidebar-link" data-target="building-plugins">Building Your First Plugin</a></li>
+        <li><a href="#plugin-builder" class="sidebar-link" data-target="plugin-builder">Plugin Builder Wizard</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Hooks -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="hooks">
+        Hooks <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-hooks">
+        <li><a href="#hook-lifecycle" class="sidebar-link" data-target="hook-lifecycle">Hook Lifecycle</a></li>
+        <li><a href="#stop-hook" class="sidebar-link" data-target="stop-hook">The Stop Hook Pattern</a></li>
+        <li><a href="#hook-debugger" class="sidebar-link" data-target="hook-debugger">Hook Debugger</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Skills & Quiz -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="skills-quiz">
+        Skills &amp; Quiz <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-skills-quiz">
+        <li><a href="#skills-packaging" class="sidebar-link" data-target="skills-packaging">Skills Packaging</a></li>
+        <li><a href="#final-quiz" class="sidebar-link" data-target="final-quiz">End-of-Module Quiz</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sidebar-progress">
+    <div class="sidebar-progress-label">Module Progress</div>
+    <div class="sidebar-progress-track">
+      <div class="sidebar-progress-fill" id="sidebarProgressFill"></div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================
+     MAIN CONTENT
+     ============================================ -->
+<main class="main-content">
+  <div class="content-wrapper">
+
+    <!-- Module Header -->
+    <header class="module-header">
+      <div class="breadcrumb">
+        <a href="../index.html">Training Hub</a> &raquo; Module 12
+      </div>
+      <div class="module-badge">
+        <span class="number">12</span>
+        <span class="label">Advanced</span>
+      </div>
+      <h1>Claude Code Advanced: Subagents, Plugins, and Hooks</h1>
+      <p class="description">
+        Master the advanced patterns that unlock the full power of Claude Code -- spawning independent subagents for parallel research, building reusable plugins for your team, and orchestrating automated workflows with lifecycle hooks.
+      </p>
+      <div class="module-meta">
+        <span class="module-meta-item">&#9201; ~90 min</span>
+        <span class="module-meta-item">&#128218; Advanced</span>
+        <span class="module-meta-item">&#127919; 4 Interactive Exercises</span>
+        <span class="module-meta-item">&#128101; Developers &amp; Architects</span>
+      </div>
+    </header>
+
+    <!-- ========================================
+         SECTION 1: THE SUBAGENT PATTERN
+         ======================================== -->
+    <section class="section" id="subagent-pattern">
+      <h2 class="section-heading">1. The Subagent Pattern</h2>
+
+      <p>
+        A <span class="key-concept">subagent</span> is an independent Claude instance spawned by the main (parent) agent. When the parent encounters a complex research task or needs to isolate verbose work, it delegates to a subagent that gets its own fresh context window. The parent continues only with the concise summary the subagent returns -- not the full transcript of everything the subagent did.
+      </p>
+
+      <p>
+        This is one of the most powerful patterns in Claude Code because it lets you <strong>keep your main context lean</strong> while still doing deep, thorough analysis across large codebases.
+      </p>
+
+      <h3>How Subagents Work</h3>
+
+      <p>The subagent lifecycle follows a clear sequence:</p>
+
+      <ol>
+        <li><strong>Parent spawns subagent</strong> -- the parent provides a detailed prompt describing the task, but the subagent receives <em>no parent history</em>.</li>
+        <li><strong>Subagent gets a fresh context window</strong> -- it starts clean, with access to all standard tools (Read, Grep, Glob, Bash, etc.) but none of the parent's conversation.</li>
+        <li><strong>Subagent works independently</strong> -- it reads files, searches code, runs commands, and reasons through the problem. This may consume thousands of tokens.</li>
+        <li><strong>Subagent returns a summary</strong> -- when complete, it produces a concise result that flows back to the parent.</li>
+        <li><strong>Parent continues with only the summary</strong> -- all the verbose tool calls, file contents, and intermediate reasoning from the subagent stay in the subagent's context, not the parent's.</li>
+      </ol>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>Key insight:</strong> Think of subagents as "disposable researchers." You send them on a mission, they come back with findings, and then their context is discarded. This is exactly what you want for tasks that would otherwise fill your main context with noise.</p>
+        </div>
+      </div>
+
+      <h3>When to Use Subagents</h3>
+
+      <p>Subagents shine in specific scenarios where context isolation provides real value:</p>
+
+      <div class="accent-card">
+        <h4>Exploring a Large Codebase</h4>
+        <p>When you need to understand how authentication works across 50+ files, a subagent can read, search, and map the entire auth flow without polluting your main context with every file it reads.</p>
+      </div>
+
+      <div class="accent-card">
+        <h4>Parallel Tasks</h4>
+        <p>Launch 3 subagents simultaneously -- one to analyze the database layer, one to map API endpoints, and one to review test coverage. Each works independently, and you get three focused summaries instead of a massive serial exploration.</p>
+      </div>
+
+      <div class="accent-card">
+        <h4>Specialized Analysis</h4>
+        <p>Architecture reviews, security audits, and test generation are all perfect subagent tasks. Give the subagent a focused mandate ("Review all SQL queries for injection vulnerabilities") and get back a structured report.</p>
+      </div>
+
+      <div class="accent-card">
+        <h4>Verbose Operations</h4>
+        <p>Build output, large file analysis, log parsing -- anything that generates huge amounts of text that you need processed but not stored in your main conversation.</p>
+      </div>
+
+      <h3>Anti-Patterns: When NOT to Use Subagents</h3>
+
+      <div class="callout warning">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Avoid these common mistakes:</strong></p>
+        </div>
+      </div>
+
+      <ul>
+        <li><strong>Simple file reads</strong> -- If you just need to read one or two files, using a subagent is overkill. The overhead of spawning a new context is not worth it for trivial tasks.</li>
+        <li><strong>Insufficient context in the prompt</strong> -- The subagent has no access to your conversation history. If you send it on a mission without enough detail ("go look at the auth code"), it will waste time figuring out what you already know.</li>
+        <li><strong>Too many parallel agents</strong> -- While 2-3 parallel subagents can be very effective, launching 10+ leads to diminishing returns. Each agent needs to independently orient itself, and the coordination overhead grows.</li>
+        <li><strong>Tasks requiring conversation continuity</strong> -- If the task requires back-and-forth dialogue or iterative refinement with the user, a subagent cannot do that. It runs to completion and returns.</li>
+      </ul>
+
+      <h3>Example: Spawning a Subagent</h3>
+
+      <p>When you ask Claude Code to research something complex, it may use the Agent tool like this:</p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Agent Tool Call</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm">// Parent's internal tool call:</span>
+<span class="fn">Agent</span>(<span class="str">"Research the authentication flow in this codebase.
+Map out every file involved in the auth process:
+- Where are credentials validated?
+- How are sessions managed?
+- What middleware handles token verification?
+- Are there any security concerns?
+
+Return a structured summary with file paths and findings."</span>)
+
+<span class="cm">// Subagent works independently -- reads 30+ files, greps for patterns,</span>
+<span class="cm">// traces imports -- all in its own context window.</span>
+
+<span class="cm">// Parent receives only this summary:</span>
+<span class="output">Authentication Flow Summary:
+- Entry point: src/middleware/auth.ts (verifyToken middleware)
+- Token validation: src/services/jwt.ts (RS256 with key rotation)
+- Session store: src/services/session.ts (Redis-backed, 24h TTL)
+- User lookup: src/models/user.ts -> src/db/queries/auth.sql
+- 3 security concerns identified:
+  1. No rate limiting on /api/login endpoint
+  2. Refresh tokens stored in localStorage (XSS risk)
+  3. Missing CSRF protection on session cookie</span></code></div>
+
+      <p>
+        The parent now has a clean, actionable summary. It never saw the 30+ file reads, the grep searches, or the intermediate reasoning. That is the power of subagents.
+      </p>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 1: SUBAGENT ORCHESTRATOR
+         ======================================== -->
+    <section class="section" id="subagent-orchestrator">
+      <h2 class="section-heading">Interactive: Subagent Orchestration Visualizer</h2>
+
+      <p>
+        Watch how a parent agent coordinates three subagents in parallel. Click <strong>Run Simulation</strong> to see the orchestration in action, then click on any agent box to view its details.
+      </p>
+
+      <div class="orchestrator-container">
+        <h3 style="margin-top:0;margin-bottom:4px;">Parallel Research Orchestration</h3>
+        <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:20px;">Parent spawns 3 subagents to analyze different parts of the codebase simultaneously</p>
+
+        <div class="orch-grid">
+          <!-- Parent row -->
+          <div class="orch-parent-row">
+            <div class="orch-agent-box parent idle" id="orch-parent" onclick="showOrchDetails('parent')">
+              <div class="orch-agent-name">Coordinator</div>
+              <div class="orch-agent-status idle" id="orch-parent-status">Idle</div>
+              <div class="orch-agent-meter"><div class="orch-agent-meter-fill" id="orch-parent-meter"></div></div>
+              <div class="orch-agent-tools" id="orch-parent-tools">Tools used: 0</div>
+            </div>
+          </div>
+
+          <!-- Arrows row -->
+          <div class="orch-arrows-row">
+            <div class="orch-arrow" id="orch-arrow-0"></div>
+            <div class="orch-arrow" id="orch-arrow-1"></div>
+            <div class="orch-arrow" id="orch-arrow-2"></div>
+          </div>
+
+          <!-- Children row -->
+          <div class="orch-children-row">
+            <div class="orch-agent-box idle" id="orch-child-0" onclick="showOrchDetails('child-0')">
+              <div class="orch-agent-name">DB Explorer</div>
+              <div class="orch-agent-status idle" id="orch-child-0-status">Idle</div>
+              <div class="orch-agent-meter"><div class="orch-agent-meter-fill" id="orch-child-0-meter"></div></div>
+              <div class="orch-agent-tools" id="orch-child-0-tools">Tools used: 0</div>
+            </div>
+            <div class="orch-agent-box idle" id="orch-child-1" onclick="showOrchDetails('child-1')">
+              <div class="orch-agent-name">API Analyzer</div>
+              <div class="orch-agent-status idle" id="orch-child-1-status">Idle</div>
+              <div class="orch-agent-meter"><div class="orch-agent-meter-fill" id="orch-child-1-meter"></div></div>
+              <div class="orch-agent-tools" id="orch-child-1-tools">Tools used: 0</div>
+            </div>
+            <div class="orch-agent-box idle" id="orch-child-2" onclick="showOrchDetails('child-2')">
+              <div class="orch-agent-name">Test Generator</div>
+              <div class="orch-agent-status idle" id="orch-child-2-status">Idle</div>
+              <div class="orch-agent-meter"><div class="orch-agent-meter-fill" id="orch-child-2-meter"></div></div>
+              <div class="orch-agent-tools" id="orch-child-2-tools">Tools used: 0</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Details panel -->
+        <div class="orch-details" id="orchDetails">
+          <h4 id="orchDetailsTitle">Agent Details</h4>
+          <div class="orch-details-grid" id="orchDetailsGrid"></div>
+        </div>
+
+        <!-- Timing -->
+        <div class="orch-timing" id="orchTiming">
+          <strong>Total: 45s</strong> | Sequential would be: 2min 15s | <strong>Speedup: 3x</strong>
+        </div>
+
+        <!-- Controls -->
+        <div class="orch-controls">
+          <button class="sim-btn" id="orchRunBtn" onclick="runOrchSimulation()">&#9654; Run Simulation</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 2: PLUGIN ARCHITECTURE
+         ======================================== -->
+    <section class="section" id="plugin-architecture">
+      <h2 class="section-heading">2. Plugin Architecture</h2>
+
+      <p>
+        <span class="key-concept">Plugins</span> are packaged extensions that add commands, agents, skills, and hooks to Claude Code. They let you encapsulate domain-specific knowledge and workflows into shareable, versioned packages that your entire team can use.
+      </p>
+
+      <p>
+        A plugin is just a directory with a specific structure. There is no build step, no compilation, no package manager required. You create the files, point Claude Code at the directory, and it picks up everything automatically.
+      </p>
+
+      <h3>Plugin Directory Structure</h3>
+
+      <div class="code-block has-label">
+        <span class="code-label">Directory Structure</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>my-plugin/
+<span class="path">  .claude-plugin/</span>
+<span class="path">    plugin.json</span>           <span class="cm"># Plugin metadata and configuration</span>
+<span class="path">  commands/</span>
+<span class="path">    deploy.md</span>              <span class="cm"># Slash command: /deploy</span>
+<span class="path">    rollback.md</span>            <span class="cm"># Slash command: /rollback</span>
+<span class="path">  agents/</span>
+<span class="path">    code-reviewer.md</span>       <span class="cm"># Custom agent definition</span>
+<span class="path">  skills/</span>
+<span class="path">    SKILL.md</span>               <span class="cm"># Domain knowledge and patterns</span>
+<span class="path">  hooks/</span>
+<span class="path">    pre-commit-check.sh</span>    <span class="cm"># Lifecycle hook script</span></code></div>
+
+      <h3>plugin.json Anatomy</h3>
+
+      <p>
+        The <code>plugin.json</code> file is the heart of your plugin. It declares metadata, lists all components, and configures how the plugin integrates with Claude Code.
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">plugin.json</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>{
+  <span class="prop">"name"</span>: <span class="str">"deployment-toolkit"</span>,
+  <span class="prop">"version"</span>: <span class="str">"1.0.0"</span>,
+  <span class="prop">"description"</span>: <span class="str">"Production deployment commands and safety checks"</span>,
+  <span class="prop">"author"</span>: <span class="str">"Platform Team"</span>,
+  <span class="prop">"commands"</span>: [
+    {
+      <span class="prop">"name"</span>: <span class="str">"deploy"</span>,
+      <span class="prop">"description"</span>: <span class="str">"Deploy to staging or production"</span>,
+      <span class="prop">"file"</span>: <span class="str">"commands/deploy.md"</span>
+    },
+    {
+      <span class="prop">"name"</span>: <span class="str">"rollback"</span>,
+      <span class="prop">"description"</span>: <span class="str">"Rollback to a previous version"</span>,
+      <span class="prop">"file"</span>: <span class="str">"commands/rollback.md"</span>
+    }
+  ],
+  <span class="prop">"agents"</span>: [
+    {
+      <span class="prop">"name"</span>: <span class="str">"deploy-validator"</span>,
+      <span class="prop">"description"</span>: <span class="str">"Validates deployment readiness"</span>,
+      <span class="prop">"file"</span>: <span class="str">"agents/deploy-validator.md"</span>
+    }
+  ]
+}</code></div>
+
+      <h3>How to Install Plugins</h3>
+
+      <p>Plugins can be loaded in several ways:</p>
+
+      <ul>
+        <li><strong>Local development:</strong> Use the <code>--plugin-dir</code> flag when launching Claude Code:<br><code>claude --plugin-dir ./my-plugin</code></li>
+        <li><strong>Persistent installation:</strong> Copy the plugin directory to <code>~/.claude/plugins/</code></li>
+        <li><strong>Project-level:</strong> Add a <code>.claude/plugins/</code> directory in your repository root</li>
+      </ul>
+
+      <div class="callout info">
+        <span class="callout-icon">&#128712;</span>
+        <div class="callout-content">
+          <p><strong>Pro tip:</strong> During development, use <code>--plugin-dir</code> so you can iterate quickly. Once stable, commit the plugin to your repo's <code>.claude/plugins/</code> directory so every team member gets it automatically.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 2: PLUGIN FILE EXPLORER
+         ======================================== -->
+    <section class="section" id="plugin-explorer">
+      <h2 class="section-heading">Interactive: Plugin File Explorer</h2>
+
+      <p>
+        Explore the directory structure of a real-world <strong>deployment-toolkit</strong> plugin. Click on any file in the tree to preview its contents.
+      </p>
+
+      <div class="file-explorer">
+        <div class="file-explorer-header">
+          <h3>deployment-toolkit/</h3>
+          <p>A production deployment plugin with commands, agents, skills, and hooks</p>
+        </div>
+        <div class="file-explorer-body">
+          <div class="file-tree" id="fileTree"></div>
+          <div class="file-preview" id="filePreview">
+            <div class="file-preview-placeholder">
+              Select a file from the tree to preview its contents
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 3: BUILDING YOUR FIRST PLUGIN
+         ======================================== -->
+    <section class="section" id="building-plugins">
+      <h2 class="section-heading">3. Building Your First Plugin</h2>
+
+      <p>
+        Let us walk through building a plugin from scratch. We will create a <strong>code-quality</strong> plugin that adds a <code>/lint</code> command and a code review agent.
+      </p>
+
+      <div class="step-list">
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Create the directory structure</h4>
+            <p>Set up the standard plugin scaffold with all component directories:</p>
+            <div class="code-block has-label">
+              <span class="code-label">Terminal</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>mkdir -p code-quality/.claude-plugin
+mkdir -p code-quality/commands
+mkdir -p code-quality/agents
+mkdir -p code-quality/skills</code></div>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Write plugin.json with metadata</h4>
+            <p>Define your plugin's identity and list its components:</p>
+            <div class="code-block has-label">
+              <span class="code-label">code-quality/.claude-plugin/plugin.json</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>{
+  <span class="prop">"name"</span>: <span class="str">"code-quality"</span>,
+  <span class="prop">"version"</span>: <span class="str">"1.0.0"</span>,
+  <span class="prop">"description"</span>: <span class="str">"Code quality tools: linting, review, and best practices"</span>,
+  <span class="prop">"commands"</span>: [
+    {
+      <span class="prop">"name"</span>: <span class="str">"lint"</span>,
+      <span class="prop">"description"</span>: <span class="str">"Run linters and report issues"</span>,
+      <span class="prop">"file"</span>: <span class="str">"commands/lint.md"</span>
+    }
+  ],
+  <span class="prop">"agents"</span>: [
+    {
+      <span class="prop">"name"</span>: <span class="str">"code-reviewer"</span>,
+      <span class="prop">"description"</span>: <span class="str">"Reviews code for quality and best practices"</span>,
+      <span class="prop">"file"</span>: <span class="str">"agents/code-reviewer.md"</span>
+    }
+  ]
+}</code></div>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Create a command (markdown file with instructions)</h4>
+            <p>Commands are markdown files that instruct Claude on what to do when the user types the slash command:</p>
+            <div class="code-block has-label">
+              <span class="code-label">code-quality/commands/lint.md</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm"># /lint Command</span>
+
+When the user runs /lint, perform these steps:
+
+1. Detect the project type by checking for:
+   - package.json (Node.js) -> run `npx eslint .`
+   - pyproject.toml or setup.py (Python) -> run `ruff check .`
+   - Cargo.toml (Rust) -> run `cargo clippy`
+   - go.mod (Go) -> run `golangci-lint run`
+
+2. Parse the linter output and categorize issues:
+   - **Errors**: Must be fixed before merge
+   - **Warnings**: Should be addressed
+   - **Style**: Nice to have
+
+3. Present a summary table with file, line, severity,
+   and description for each issue.
+
+4. Offer to auto-fix what can be auto-fixed.</code></div>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Create a skill (SKILL.md with domain knowledge)</h4>
+            <p>Skills provide persistent domain knowledge that Claude can reference:</p>
+            <div class="code-block has-label">
+              <span class="code-label">code-quality/skills/SKILL.md</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm">---</span>
+<span class="prop">trigger</span>: <span class="str">"when reviewing code quality or discussing best practices"</span>
+<span class="prop">context</span>: <span class="str">"fork"</span>
+<span class="cm">---</span>
+
+<span class="cm"># Code Quality Best Practices</span>
+
+## Principles
+- Functions should do one thing and do it well
+- Prefer explicit over implicit
+- Names should reveal intent
+- Comments explain WHY, not WHAT
+- Tests should be independent and deterministic
+
+## Review Checklist
+- [ ] No unused imports or variables
+- [ ] Error handling for all async operations
+- [ ] Input validation on all public APIs
+- [ ] No hardcoded secrets or credentials
+- [ ] Consistent naming conventions
+- [ ] No console.log / print statements in production code</code></div>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Test locally with --plugin-dir</h4>
+            <p>Point Claude Code at your plugin directory to test it:</p>
+            <div class="code-block has-label">
+              <span class="code-label">Terminal</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm"># Launch Claude Code with your plugin loaded</span>
+claude <span class="flag">--plugin-dir</span> ./code-quality
+
+<span class="cm"># Now you can use the command:</span>
+> /lint
+
+<span class="cm"># The code-reviewer agent is also available</span></code></div>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Share with your team</h4>
+            <p>Once your plugin works, share it by committing to your repo:</p>
+            <div class="code-block has-label">
+              <span class="code-label">Terminal</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm"># Move to your project's plugin directory</span>
+cp -r code-quality/ .claude/plugins/code-quality/
+
+<span class="cm"># Commit so all team members get it</span>
+git add .claude/plugins/code-quality/
+git commit -m <span class="str">"Add code-quality plugin for linting and review"</span></code></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 3: PLUGIN BUILDER WIZARD
+         ======================================== -->
+    <section class="section" id="plugin-builder">
+      <h2 class="section-heading">Interactive: Plugin Builder Wizard</h2>
+
+      <p>
+        Build your own plugin configuration interactively. Fill in the metadata, choose your components, and see the generated structure in real time.
+      </p>
+
+      <div class="wizard-container">
+        <h3 style="margin-top:0;margin-bottom:16px;">Plugin Builder</h3>
+
+        <!-- Step indicators -->
+        <div class="wizard-steps">
+          <div class="wizard-step-indicator active" id="wizStep0"></div>
+          <div class="wizard-step-indicator" id="wizStep1"></div>
+          <div class="wizard-step-indicator" id="wizStep2"></div>
+        </div>
+        <div class="wizard-step-labels">
+          <div class="wizard-step-label active" id="wizLabel0">1. Metadata</div>
+          <div class="wizard-step-label" id="wizLabel1">2. Components</div>
+          <div class="wizard-step-label" id="wizLabel2">3. Preview</div>
+        </div>
+
+        <!-- Step 1: Metadata -->
+        <div class="wizard-panel active" id="wizPanel0">
+          <div class="wizard-form-group">
+            <label for="wizPluginName">Plugin Name</label>
+            <input type="text" id="wizPluginName" placeholder="e.g., my-awesome-plugin" value="my-plugin" oninput="updateWizardPreview()">
+            <div class="hint">Lowercase, hyphenated. This becomes the directory name.</div>
+          </div>
+          <div class="wizard-form-group">
+            <label for="wizPluginVersion">Version</label>
+            <input type="text" id="wizPluginVersion" placeholder="e.g., 1.0.0" value="1.0.0" oninput="updateWizardPreview()">
+          </div>
+          <div class="wizard-form-group">
+            <label for="wizPluginDesc">Description</label>
+            <input type="text" id="wizPluginDesc" placeholder="What does this plugin do?" value="" oninput="updateWizardPreview()">
+          </div>
+        </div>
+
+        <!-- Step 2: Components -->
+        <div class="wizard-panel" id="wizPanel1">
+          <p style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:16px;">Select which components to include in your plugin:</p>
+
+          <div class="wizard-checkbox-group">
+            <div class="wizard-checkbox-item" onclick="toggleWizCheckbox(this, 'commands')">
+              <input type="checkbox" id="wizCheckCommands">
+              <div>
+                <div class="wizard-checkbox-label">Commands</div>
+                <div class="wizard-checkbox-desc">Slash commands users can invoke (e.g., /deploy)</div>
+              </div>
+            </div>
+            <div class="wizard-sub-input" id="wizSubCommands">
+              <label for="wizCommandName">Command Name</label>
+              <input type="text" id="wizCommandName" placeholder="e.g., deploy" value="deploy" oninput="updateWizardPreview()">
+            </div>
+
+            <div class="wizard-checkbox-item" onclick="toggleWizCheckbox(this, 'agents')">
+              <input type="checkbox" id="wizCheckAgents">
+              <div>
+                <div class="wizard-checkbox-label">Agents</div>
+                <div class="wizard-checkbox-desc">Custom agent personalities with specialized instructions</div>
+              </div>
+            </div>
+            <div class="wizard-sub-input" id="wizSubAgents">
+              <label for="wizAgentName">Agent Name</label>
+              <input type="text" id="wizAgentName" placeholder="e.g., code-reviewer" value="code-reviewer" oninput="updateWizardPreview()">
+            </div>
+
+            <div class="wizard-checkbox-item" onclick="toggleWizCheckbox(this, 'skills')">
+              <input type="checkbox" id="wizCheckSkills">
+              <div>
+                <div class="wizard-checkbox-label">Skills</div>
+                <div class="wizard-checkbox-desc">Domain knowledge files (SKILL.md) for specialized expertise</div>
+              </div>
+            </div>
+            <div class="wizard-sub-input" id="wizSubSkills" style="display:none;">
+              <label>Skills use SKILL.md convention -- no additional configuration needed.</label>
+            </div>
+
+            <div class="wizard-checkbox-item" onclick="toggleWizCheckbox(this, 'hooks')">
+              <input type="checkbox" id="wizCheckHooks">
+              <div>
+                <div class="wizard-checkbox-label">Hooks</div>
+                <div class="wizard-checkbox-desc">Lifecycle scripts (PreToolUse, PostToolUse, Stop)</div>
+              </div>
+            </div>
+            <div class="wizard-sub-input" id="wizSubHooks">
+              <label for="wizHookName">Hook Script Name</label>
+              <input type="text" id="wizHookName" placeholder="e.g., pre-check.sh" value="pre-check.sh" oninput="updateWizardPreview()">
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3: Preview -->
+        <div class="wizard-panel" id="wizPanel2">
+          <p style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:16px;">Here is your generated plugin structure:</p>
+          <div class="wizard-preview-body">
+            <div>
+              <div style="font-size:0.78rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:8px;">Directory Tree</div>
+              <div class="wizard-preview-tree" id="wizPreviewTree"></div>
+            </div>
+            <div>
+              <div style="font-size:0.78rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:8px;">plugin.json</div>
+              <div class="wizard-preview-json" id="wizPreviewJson"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="wizard-nav">
+          <button class="wizard-btn" id="wizPrevBtn" onclick="wizardNav(-1)" disabled>Back</button>
+          <button class="wizard-btn primary" id="wizNextBtn" onclick="wizardNav(1)">Next</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 4: HOOK LIFECYCLE
+         ======================================== -->
+    <section class="section" id="hook-lifecycle">
+      <h2 class="section-heading">4. Hook Lifecycle</h2>
+
+      <p>
+        <span class="key-concept">Hooks</span> are shell commands that run at specific lifecycle points during a Claude Code session. They let you intercept, validate, or modify Claude's behavior without changing the AI's instructions.
+      </p>
+
+      <p>
+        Think of hooks like git hooks but for AI interactions. They are your safety net and your automation layer.
+      </p>
+
+      <h3>Hook Types</h3>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Hook Type</th>
+              <th>When It Runs</th>
+              <th>Use Case</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>PreToolUse</strong></td>
+              <td>Before Claude uses any tool</td>
+              <td>Block dangerous operations, validate parameters</td>
+            </tr>
+            <tr>
+              <td><strong>PostToolUse</strong></td>
+              <td>After a tool completes</td>
+              <td>Validate output, transform results, log actions</td>
+            </tr>
+            <tr>
+              <td><strong>Stop</strong></td>
+              <td>When Claude wants to end the session</td>
+              <td>Check if work is actually complete, force continuation</td>
+            </tr>
+            <tr>
+              <td><strong>Notification</strong></td>
+              <td>On specific events</td>
+              <td>Monitoring, Slack alerts, audit logging</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Hook Configuration</h3>
+
+      <p>Hooks are configured in your <code>settings.json</code> file. Each hook specifies a matcher (which tool or event to intercept) and a command to run:</p>
+
+      <div class="code-block has-label">
+        <span class="code-label">settings.json</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>{
+  <span class="prop">"hooks"</span>: {
+    <span class="prop">"PreToolUse"</span>: [
+      {
+        <span class="prop">"matcher"</span>: <span class="str">"Bash"</span>,
+        <span class="prop">"command"</span>: <span class="str">"./hooks/check-safety.sh $TOOL_INPUT"</span>
+      },
+      {
+        <span class="prop">"matcher"</span>: <span class="str">"Write"</span>,
+        <span class="prop">"command"</span>: <span class="str">"./hooks/check-write-target.sh $TOOL_INPUT"</span>
+      }
+    ],
+    <span class="prop">"PostToolUse"</span>: [
+      {
+        <span class="prop">"matcher"</span>: <span class="str">"Edit"</span>,
+        <span class="prop">"command"</span>: <span class="str">"./hooks/validate-format.sh $TOOL_INPUT"</span>
+      }
+    ],
+    <span class="prop">"Stop"</span>: [
+      {
+        <span class="prop">"command"</span>: <span class="str">"./hooks/check-completion.sh"</span>
+      }
+    ]
+  }
+}</code></div>
+
+      <h3>Hook Exit Codes</h3>
+
+      <p>The exit code of your hook script determines what happens next:</p>
+
+      <ul>
+        <li><strong>Exit code 0</strong> -- Allow the action. The tool call proceeds (PreToolUse) or the session ends (Stop).</li>
+        <li><strong>Non-zero exit code</strong> -- Block the action. The tool call is prevented (PreToolUse) or Claude is forced to continue (Stop).</li>
+      </ul>
+
+      <h3>Real-World Hook Examples</h3>
+
+      <div class="accent-card">
+        <h4>PreToolUse: Prevent Deletion of Production Files</h4>
+        <p>Block any Bash command that attempts to <code>rm</code> files in protected directories:</p>
+        <div class="code-block has-label">
+          <span class="code-label">hooks/check-safety.sh</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm">#!/bin/bash</span>
+<span class="cm"># Block dangerous delete operations</span>
+TOOL_INPUT=<span class="str">"$1"</span>
+
+<span class="kw">if</span> echo <span class="str">"$TOOL_INPUT"</span> | grep -qE <span class="str">'rm\s+(-rf?\s+)?(/prod|/production|/live)'</span>; <span class="kw">then</span>
+  echo <span class="str">"BLOCKED: Cannot delete production files"</span> >&amp;2
+  <span class="kw">exit</span> <span class="num">1</span>
+<span class="kw">fi</span>
+
+<span class="kw">exit</span> <span class="num">0</span></code></div>
+      </div>
+
+      <div class="accent-card">
+        <h4>PostToolUse: Validate Code Formatting After Edits</h4>
+        <p>After every Edit tool call, run the formatter to check if the result is properly formatted:</p>
+        <div class="code-block has-label">
+          <span class="code-label">hooks/validate-format.sh</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm">#!/bin/bash</span>
+<span class="cm"># Check formatting after each edit</span>
+FILE_PATH=<span class="str">"$1"</span>
+
+<span class="kw">if</span> [[ <span class="str">"$FILE_PATH"</span> == *.py ]]; <span class="kw">then</span>
+  ruff format --check <span class="str">"$FILE_PATH"</span> 2>/dev/null
+<span class="kw">elif</span> [[ <span class="str">"$FILE_PATH"</span> == *.ts ]] || [[ <span class="str">"$FILE_PATH"</span> == *.tsx ]]; <span class="kw">then</span>
+  npx prettier --check <span class="str">"$FILE_PATH"</span> 2>/dev/null
+<span class="kw">fi</span></code></div>
+      </div>
+
+      <div class="accent-card">
+        <h4>Stop: Check If All Tests Pass</h4>
+        <p>Prevent the session from ending until the test suite is green:</p>
+        <div class="code-block has-label">
+          <span class="code-label">hooks/check-tests.sh</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm">#!/bin/bash</span>
+<span class="cm"># Don't let Claude stop until tests pass</span>
+npm test --silent 2>/dev/null
+<span class="kw">if</span> [ $? -ne <span class="num">0</span> ]; <span class="kw">then</span>
+  echo <span class="str">"Tests are still failing. Keep working."</span> >&amp;2
+  <span class="kw">exit</span> <span class="num">1</span>
+<span class="kw">fi</span>
+
+<span class="kw">exit</span> <span class="num">0</span></code></div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 5: THE STOP HOOK PATTERN
+         ======================================== -->
+    <section class="section" id="stop-hook">
+      <h2 class="section-heading">5. The Stop Hook Pattern</h2>
+
+      <p>
+        The <span class="key-concept">Stop Hook</span> is arguably the most powerful pattern in Claude Code's hook system. It transforms Claude from a single-turn tool into a multi-phase workflow engine.
+      </p>
+
+      <h3>How It Works</h3>
+
+      <p>The pattern is elegantly simple:</p>
+
+      <ol>
+        <li><strong>Claude finishes a phase of work</strong> and signals that it wants to stop.</li>
+        <li><strong>The Stop hook reads a state file</strong> (e.g., <code>.jumpstarter-state.json</code>) to check the workflow progress.</li>
+        <li><strong>If more phases remain</strong>, the hook exits non-zero -- Claude continues working on the next phase.</li>
+        <li><strong>If all phases are complete</strong>, the hook exits 0 -- Claude stops normally.</li>
+      </ol>
+
+      <h3>State File Anatomy</h3>
+
+      <p>The state file tracks where Claude is in a multi-phase workflow:</p>
+
+      <div class="code-block has-label">
+        <span class="code-label">.jumpstarter-state.json</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>{
+  <span class="prop">"current_phase"</span>: <span class="num">3</span>,
+  <span class="prop">"total_phases"</span>: <span class="num">7</span>,
+  <span class="prop">"completed"</span>: [<span class="str">"scaffold"</span>, <span class="str">"backend"</span>, <span class="str">"frontend"</span>],
+  <span class="prop">"remaining"</span>: [<span class="str">"api"</span>, <span class="str">"tests"</span>, <span class="str">"qa"</span>, <span class="str">"deploy"</span>],
+  <span class="prop">"max_iterations"</span>: <span class="num">50</span>,
+  <span class="prop">"iteration_count"</span>: <span class="num">12</span>
+}</code></div>
+
+      <h3>The Stop Hook Script</h3>
+
+      <div class="code-block has-label">
+        <span class="code-label">hooks/check-completion.sh</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm">#!/bin/bash</span>
+<span class="cm"># Stop hook: check if all phases are complete</span>
+
+STATE_FILE=<span class="str">".jumpstarter-state.json"</span>
+
+<span class="cm"># If no state file, allow stop</span>
+<span class="kw">if</span> [ ! -f <span class="str">"$STATE_FILE"</span> ]; <span class="kw">then</span>
+  <span class="kw">exit</span> <span class="num">0</span>
+<span class="kw">fi</span>
+
+<span class="cm"># Read state values</span>
+CURRENT=$(python3 -c <span class="str">"import json; print(json.load(open('$STATE_FILE'))['current_phase'])"</span>)
+TOTAL=$(python3 -c <span class="str">"import json; print(json.load(open('$STATE_FILE'))['total_phases'])"</span>)
+ITERATION=$(python3 -c <span class="str">"import json; print(json.load(open('$STATE_FILE'))['iteration_count'])"</span>)
+MAX_ITER=$(python3 -c <span class="str">"import json; print(json.load(open('$STATE_FILE'))['max_iterations'])"</span>)
+
+<span class="cm"># Safety: always stop if max iterations reached</span>
+<span class="kw">if</span> [ <span class="str">"$ITERATION"</span> -ge <span class="str">"$MAX_ITER"</span> ]; <span class="kw">then</span>
+  echo <span class="str">"Max iterations reached ($ITERATION/$MAX_ITER). Allowing stop."</span>
+  <span class="kw">exit</span> <span class="num">0</span>
+<span class="kw">fi</span>
+
+<span class="cm"># If more phases remain, keep going</span>
+<span class="kw">if</span> [ <span class="str">"$CURRENT"</span> -lt <span class="str">"$TOTAL"</span> ]; <span class="kw">then</span>
+  echo <span class="str">"Phase $CURRENT of $TOTAL complete. Continue to next phase."</span> >&amp;2
+  <span class="kw">exit</span> <span class="num">1</span>
+<span class="kw">fi</span>
+
+<span class="cm"># All phases complete</span>
+echo <span class="str">"All $TOTAL phases complete!"</span>
+<span class="kw">exit</span> <span class="num">0</span></code></div>
+
+      <div class="callout important">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Critical safety measure:</strong> Always include a <code>max_iterations</code> check. Without it, a bug in your phase logic could create an infinite loop where Claude never stops. The max_iterations guard ensures the session will eventually end regardless of the state.</p>
+        </div>
+      </div>
+
+      <h3>Use Cases for the Stop Hook Pattern</h3>
+
+      <ul>
+        <li><strong>Multi-phase code generation</strong> -- Scaffold, then implement backend, then frontend, then tests, then QA, then docs</li>
+        <li><strong>Batch processing</strong> -- Process 100 files one by one, checking progress in the state file</li>
+        <li><strong>Iterative refinement</strong> -- Keep refining code until quality metrics pass or max iterations are reached</li>
+        <li><strong>Pipeline execution</strong> -- Run a sequence of CI-like stages, each building on the previous one</li>
+      </ul>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 3: HOOK DEBUGGER
+         ======================================== -->
+    <section class="section" id="hook-debugger">
+      <h2 class="section-heading">Interactive: Hook Debugger</h2>
+
+      <p>
+        Edit the state JSON below and click <strong>Run Stop Hook</strong> to see how the hook evaluates the state. Try the preset scenarios or modify the values yourself.
+      </p>
+
+      <div class="hook-debugger">
+        <h3 style="margin-top:0;margin-bottom:4px;">Stop Hook Simulator</h3>
+        <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:16px;">Paste or edit the state file JSON, then run the hook to see the result</p>
+
+        <div class="hook-presets">
+          <button class="hook-preset-btn active" onclick="loadHookPreset(0)">Mid-workflow</button>
+          <button class="hook-preset-btn" onclick="loadHookPreset(1)">Almost Done</button>
+          <button class="hook-preset-btn" onclick="loadHookPreset(2)">Safety Limit</button>
+        </div>
+
+        <div class="hook-editor">
+          <textarea id="hookStateEditor" spellcheck="false"></textarea>
+        </div>
+
+        <button class="sim-btn" onclick="runHookSimulation()">&#9654; Run Stop Hook</button>
+
+        <div class="hook-result" id="hookResult">
+          <span class="hook-result-icon" id="hookResultIcon"></span>
+          <div>
+            <div id="hookResultText"></div>
+            <div class="hook-result-detail" id="hookResultDetail"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 6: SKILLS PACKAGING AND SHARING
+         ======================================== -->
+    <section class="section" id="skills-packaging">
+      <h2 class="section-heading">6. Skills Packaging and Sharing</h2>
+
+      <p>
+        <span class="key-concept">Skills</span> are reusable knowledge files that give Claude specialized expertise. Unlike commands (which define actions) or agents (which define personalities), skills define <strong>what Claude knows</strong> about a specific domain.
+      </p>
+
+      <h3>SKILL.md Best Practices</h3>
+
+      <p>A well-written skill file has these key characteristics:</p>
+
+      <div class="accent-card">
+        <h4>Clear Trigger Description</h4>
+        <p>The frontmatter <code>trigger</code> field tells Claude when to apply this skill. Be specific:</p>
+        <ul>
+          <li>Good: <code>"when writing database migration scripts for PostgreSQL"</code></li>
+          <li>Bad: <code>"when working with databases"</code> (too broad)</li>
+        </ul>
+      </div>
+
+      <div class="accent-card">
+        <h4>Specific Instructions</h4>
+        <p>The skill body should contain concrete patterns, templates, and rules -- not vague guidelines. Include:</p>
+        <ul>
+          <li>Code templates with placeholders</li>
+          <li>Naming conventions specific to your team</li>
+          <li>Error handling patterns you expect</li>
+          <li>Testing requirements</li>
+        </ul>
+      </div>
+
+      <div class="accent-card">
+        <h4>Context Management</h4>
+        <p>Use <code>context: fork</code> in the frontmatter to run the skill in an isolated subagent context. This is essential for skills that might consume lots of tokens during execution -- it keeps your main conversation clean.</p>
+      </div>
+
+      <h3>Operations Directory</h3>
+
+      <p>For skills that need supporting files (SQL templates, config examples, reference docs), use an <code>operations/</code> directory alongside the SKILL.md:</p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Directory Structure</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>skills/
+<span class="path">  SKILL.md</span>                    <span class="cm"># Main skill definition</span>
+<span class="path">  operations/</span>
+<span class="path">    migration-template.sql</span>    <span class="cm"># SQL template for migrations</span>
+<span class="path">    rollback-template.sql</span>     <span class="cm"># SQL template for rollbacks</span>
+<span class="path">    naming-conventions.md</span>     <span class="cm"># Reference doc for naming rules</span></code></div>
+
+      <h3>Example: Database Migration Skill</h3>
+
+      <div class="code-block has-label">
+        <span class="code-label">skills/SKILL.md</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm">---</span>
+<span class="prop">trigger</span>: <span class="str">"when creating database migrations or modifying schema"</span>
+<span class="prop">context</span>: <span class="str">"fork"</span>
+<span class="cm">---</span>
+
+<span class="cm"># Database Migration Skill</span>
+
+## Rules
+1. Every migration MUST have a corresponding rollback
+2. Use timestamped filenames: YYYYMMDD_HHMMSS_description.sql
+3. Never use DROP TABLE in production -- use soft deletes
+4. Always add NOT NULL constraints with DEFAULT values
+5. Create indexes for any column used in WHERE or JOIN
+
+## Migration Template
+See operations/migration-template.sql for the standard format.
+
+## Testing Requirements
+- Run migration forward AND backward before committing
+- Verify with: `psql -f migration.sql && psql -f rollback.sql`
+- Check for data loss with: SELECT COUNT(*) before and after</code></div>
+
+      <h3>Sharing Skills</h3>
+
+      <p>Skills can be shared through several channels:</p>
+
+      <ul>
+        <li><strong>Git repository</strong> -- Commit skills to a shared repo. Team members clone and point their config at the skills directory.</li>
+        <li><strong>Plugin bundling</strong> -- Package skills inside a plugin for one-click installation.</li>
+        <li><strong>npm/pip packages</strong> -- For larger organizations, publish skills as packages with versioning and dependency management.</li>
+      </ul>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>Team strategy:</strong> Start with a shared git repo of skills. As patterns stabilize, graduate them into versioned plugins. This gives you the fastest iteration cycle while building toward a mature plugin ecosystem.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         END-OF-MODULE QUIZ
+         ======================================== -->
+    <section class="section" id="final-quiz">
+      <h2 class="section-heading">End-of-Module Quiz</h2>
+
+      <p>
+        Test your understanding of subagents, plugins, and hooks. You need at least 6 out of 8 correct to pass.
+      </p>
+
+      <div class="final-quiz">
+        <h3>Module 12 Assessment</h3>
+        <p style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:24px;">Answer all 8 questions, then submit to see your results.</p>
+
+        <div id="finalQuizQuestions"></div>
+
+        <button class="final-submit-btn" id="finalSubmitBtn" disabled onclick="submitFinalQuiz()">
+          Submit Answers
+        </button>
+
+        <div class="final-result" id="finalResult">
+          <h4 id="finalResultTitle"></h4>
+          <p id="finalResultText"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         NAVIGATION FOOTER
+         ======================================== -->
+    <nav class="module-nav">
+      <a href="11-code-deep-dive.html" class="nav-link prev">
+        <span class="nav-dir">&larr; Previous</span>
+        <span class="nav-title">Module 11: Claude Code Deep Dive</span>
+      </a>
+      <a href="13-cowork-mastery.html" class="nav-link next">
+        <span class="nav-dir">Next &rarr;</span>
+        <span class="nav-title">Module 13: Cowork Mastery</span>
+      </a>
+    </nav>
+
+  </div>
+</main>
+
+<!-- ============================================
+     JAVASCRIPT
+     ============================================ -->
+<script>
+(function() {
+  'use strict';
+
+  // ==========================================
+  // THEME TOGGLE
+  // ==========================================
+  var themeToggle = document.getElementById('themeToggle');
+  var themeIcon = document.getElementById('themeIcon');
+  var currentTheme = localStorage.getItem('claude-training-theme') || 'light';
+
+  function applyTheme(theme) {
+    if (theme === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      themeIcon.innerHTML = '&#9728;';
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+      themeIcon.innerHTML = '&#9790;';
+    }
+    localStorage.setItem('claude-training-theme', theme);
+  }
+
+  applyTheme(currentTheme);
+
+  themeToggle.addEventListener('click', function() {
+    currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    applyTheme(currentTheme);
+  });
+
+  // ==========================================
+  // HAMBURGER & SIDEBAR
+  // ==========================================
+  var hamburger = document.getElementById('hamburger');
+  var sidebar = document.getElementById('sidebar');
+  var overlay = document.getElementById('sidebarOverlay');
+
+  hamburger.addEventListener('click', function() {
+    sidebar.classList.toggle('open');
+    hamburger.classList.toggle('open');
+    overlay.classList.toggle('show');
+  });
+
+  overlay.addEventListener('click', function() {
+    sidebar.classList.remove('open');
+    hamburger.classList.remove('open');
+    overlay.classList.remove('show');
+  });
+
+  // ==========================================
+  // SIDEBAR SECTION TOGGLES
+  // ==========================================
+  var sectionToggles = document.querySelectorAll('.sidebar-section-toggle');
+  sectionToggles.forEach(function(toggle) {
+    toggle.addEventListener('click', function() {
+      var sectionName = this.getAttribute('data-section');
+      var linksEl = document.getElementById('nav-' + sectionName);
+      if (!linksEl) return;
+
+      var isCollapsed = this.classList.contains('collapsed');
+      if (isCollapsed) {
+        this.classList.remove('collapsed');
+        linksEl.classList.remove('collapsed');
+        linksEl.style.maxHeight = linksEl.scrollHeight + 'px';
+      } else {
+        this.classList.add('collapsed');
+        linksEl.style.maxHeight = linksEl.scrollHeight + 'px';
+        requestAnimationFrame(function() {
+          linksEl.classList.add('collapsed');
+        });
+      }
+    });
+
+    // Initialize open
+    var sectionName = toggle.getAttribute('data-section');
+    var linksEl = document.getElementById('nav-' + sectionName);
+    if (linksEl) {
+      linksEl.style.maxHeight = linksEl.scrollHeight + 'px';
+    }
+  });
+
+  // ==========================================
+  // SCROLL SPY
+  // ==========================================
+  var sidebarLinks = document.querySelectorAll('.sidebar-link');
+  var sectionElements = [];
+
+  sidebarLinks.forEach(function(link) {
+    var targetId = link.getAttribute('data-target');
+    var targetEl = document.getElementById(targetId);
+    if (targetEl) {
+      sectionElements.push({ id: targetId, el: targetEl, link: link });
+    }
+  });
+
+  function updateScrollspy() {
+    var scrollY = window.scrollY + 100;
+    var active = null;
+
+    for (var i = sectionElements.length - 1; i >= 0; i--) {
+      if (sectionElements[i].el.offsetTop <= scrollY) {
+        active = sectionElements[i];
+        break;
+      }
+    }
+
+    sidebarLinks.forEach(function(l) { l.classList.remove('active'); });
+    if (active) {
+      active.link.classList.add('active');
+    }
+
+    updateSidebarProgress();
+  }
+
+  var scrollTimer = null;
+  window.addEventListener('scroll', function() {
+    if (scrollTimer) return;
+    scrollTimer = setTimeout(function() {
+      scrollTimer = null;
+      updateScrollspy();
+    }, 50);
+  });
+  updateScrollspy();
+
+  // Close mobile sidebar on link click
+  sidebarLinks.forEach(function(link) {
+    link.addEventListener('click', function() {
+      if (window.innerWidth <= 1024) {
+        sidebar.classList.remove('open');
+        hamburger.classList.remove('open');
+        overlay.classList.remove('show');
+      }
+    });
+  });
+
+  // ==========================================
+  // SIDEBAR PROGRESS
+  // ==========================================
+  function updateSidebarProgress() {
+    var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    var scrolled = window.scrollY;
+    var pct = docHeight > 0 ? Math.min(100, (scrolled / docHeight) * 100) : 0;
+
+    var fill = document.getElementById('sidebarProgressFill');
+    if (fill) {
+      fill.style.width = pct + '%';
+    }
+  }
+
+  // ==========================================
+  // COPY TO CLIPBOARD
+  // ==========================================
+  window.copyCode = function(btn) {
+    var block = btn.closest('.code-block');
+    var codeEl = block.cloneNode(true);
+    var labelEl = codeEl.querySelector('.code-label');
+    var btnEl = codeEl.querySelector('.copy-btn');
+    if (labelEl) labelEl.remove();
+    if (btnEl) btnEl.remove();
+
+    var text = codeEl.textContent.trim();
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function() {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(function() {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      }).catch(function() {
+        btn.textContent = 'Failed';
+        setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+      });
+    } else {
+      // Fallback for older browsers
+      var textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+      } catch (e) {
+        btn.textContent = 'Failed';
+      }
+      document.body.removeChild(textarea);
+      setTimeout(function() {
+        btn.textContent = 'Copy';
+        btn.classList.remove('copied');
+      }, 2000);
+    }
+  };
+
+  // ==========================================
+  // INTERACTIVE 1: SUBAGENT ORCHESTRATOR
+  // ==========================================
+  var orchAgentData = {
+    parent: {
+      name: 'Coordinator',
+      prompt: 'Analyze the codebase architecture by delegating research to specialized subagents. Spawn parallel agents for database layer, API layer, and test coverage. Synthesize their findings into a unified architecture report.',
+      tools: ['Agent (x3)', 'Read (x2)'],
+      contextUsed: 15,
+      result: 'Architecture report: 3-tier system with PostgreSQL backend, Express API (47 endpoints), and React frontend. Test coverage: 67%. Key concerns: no API versioning, missing auth on 3 endpoints, no database connection pooling.'
+    },
+    'child-0': {
+      name: 'DB Explorer',
+      prompt: 'Map the entire database layer. Find all models, migrations, query files, and connection configuration. Identify the ORM used, document all tables and relationships, and flag any concerns about query performance or schema design.',
+      tools: ['Glob (x4)', 'Read (x12)', 'Grep (x6)'],
+      contextUsed: 72,
+      result: 'Database: PostgreSQL via Prisma ORM. 14 tables, 8 relations. Migrations: 23 files (all applied). Concerns: N+1 queries in user.posts resolver, missing index on orders.created_at, no connection pooling configured.'
+    },
+    'child-1': {
+      name: 'API Analyzer',
+      prompt: 'Map all API endpoints in the codebase. For each endpoint, document the HTTP method, path, authentication requirement, request/response types, and any middleware. Flag endpoints missing authentication or input validation.',
+      tools: ['Grep (x8)', 'Read (x15)', 'Glob (x3)'],
+      contextUsed: 85,
+      result: '47 API endpoints found across 12 route files. 44 authenticated, 3 missing auth: GET /health, POST /webhooks/stripe, GET /api/public/catalog. 6 endpoints missing input validation. No rate limiting configured.'
+    },
+    'child-2': {
+      name: 'Test Generator',
+      prompt: 'Analyze the test suite. Calculate coverage by module, identify untested critical paths, and list the testing frameworks and patterns used. Flag any test anti-patterns like shared mutable state or non-deterministic assertions.',
+      tools: ['Glob (x3)', 'Read (x10)', 'Bash (x2)', 'Grep (x5)'],
+      contextUsed: 63,
+      result: 'Test framework: Jest + Supertest. 156 tests across 28 files. Coverage: 67% overall (auth: 89%, models: 72%, routes: 54%, utils: 91%). Untested: payment processing, email service, file upload. Anti-pattern: 3 tests share database state.'
+    }
+  };
+
+  var orchSimRunning = false;
+  var orchSelectedAgent = null;
+
+  function resetOrchVisual() {
+    var ids = ['parent', 'child-0', 'child-1', 'child-2'];
+    ids.forEach(function(id) {
+      var box = document.getElementById('orch-' + id);
+      box.className = id === 'parent' ? 'orch-agent-box parent idle' : 'orch-agent-box idle';
+      document.getElementById('orch-' + id + '-status').textContent = 'Idle';
+      document.getElementById('orch-' + id + '-status').className = 'orch-agent-status idle';
+      document.getElementById('orch-' + id + '-meter').style.width = '0%';
+      document.getElementById('orch-' + id + '-tools').textContent = 'Tools used: 0';
+    });
+    for (var a = 0; a < 3; a++) {
+      var arrow = document.getElementById('orch-arrow-' + a);
+      arrow.className = 'orch-arrow';
+    }
+    document.getElementById('orchDetails').classList.remove('show');
+    document.getElementById('orchTiming').classList.remove('show');
+  }
+
+  function setAgentState(id, state, toolCount, meterPct) {
+    var box = document.getElementById('orch-' + id);
+    var statusEl = document.getElementById('orch-' + id + '-status');
+    var meterEl = document.getElementById('orch-' + id + '-meter');
+    var toolsEl = document.getElementById('orch-' + id + '-tools');
+
+    var baseClass = id === 'parent' ? 'orch-agent-box parent' : 'orch-agent-box';
+    box.className = baseClass + ' ' + state;
+    statusEl.textContent = state.charAt(0).toUpperCase() + state.slice(1);
+    statusEl.className = 'orch-agent-status ' + state;
+    meterEl.style.width = meterPct + '%';
+    toolsEl.textContent = 'Tools used: ' + toolCount;
+  }
+
+  window.runOrchSimulation = function() {
+    if (orchSimRunning) return;
+    orchSimRunning = true;
+    document.getElementById('orchRunBtn').disabled = true;
+    resetOrchVisual();
+
+    // Phase 1: Parent activates (0ms)
+    setTimeout(function() {
+      setAgentState('parent', 'running', 0, 10);
+    }, 300);
+
+    // Phase 2: Parent spawns children (800ms)
+    setTimeout(function() {
+      setAgentState('parent', 'running', 1, 15);
+      for (var a = 0; a < 3; a++) {
+        document.getElementById('orch-arrow-' + a).classList.add('active');
+      }
+    }, 800);
+
+    // Phase 3: Children start (staggered 1200, 1500, 1800ms)
+    setTimeout(function() {
+      setAgentState('child-0', 'running', 2, 10);
+    }, 1200);
+    setTimeout(function() {
+      setAgentState('child-1', 'running', 1, 8);
+    }, 1500);
+    setTimeout(function() {
+      setAgentState('child-2', 'running', 1, 5);
+    }, 1800);
+
+    // Phase 4: Children progress
+    setTimeout(function() { setAgentState('child-0', 'running', 8, 35); }, 2200);
+    setTimeout(function() { setAgentState('child-1', 'running', 5, 25); }, 2400);
+    setTimeout(function() { setAgentState('child-2', 'running', 4, 20); }, 2600);
+
+    setTimeout(function() { setAgentState('child-0', 'running', 16, 60); }, 3000);
+    setTimeout(function() { setAgentState('child-1', 'running', 12, 50); }, 3200);
+    setTimeout(function() { setAgentState('child-2', 'running', 10, 42); }, 3400);
+
+    setTimeout(function() { setAgentState('child-0', 'running', 20, 85); }, 3800);
+    setTimeout(function() { setAgentState('child-1', 'running', 18, 70); }, 4000);
+    setTimeout(function() { setAgentState('child-2', 'running', 16, 65); }, 4200);
+
+    // Phase 5: Children complete (staggered)
+    setTimeout(function() {
+      setAgentState('child-0', 'complete', 22, 100);
+      document.getElementById('orch-arrow-0').className = 'orch-arrow returning';
+    }, 4600);
+
+    setTimeout(function() {
+      setAgentState('child-2', 'complete', 20, 100);
+      document.getElementById('orch-arrow-2').className = 'orch-arrow returning';
+    }, 5200);
+
+    setTimeout(function() {
+      setAgentState('child-1', 'complete', 26, 100);
+      document.getElementById('orch-arrow-1').className = 'orch-arrow returning';
+    }, 5800);
+
+    // Phase 6: Parent synthesizes
+    setTimeout(function() {
+      setAgentState('parent', 'running', 4, 50);
+    }, 6200);
+
+    setTimeout(function() {
+      setAgentState('parent', 'running', 5, 80);
+    }, 6800);
+
+    // Phase 7: Complete
+    setTimeout(function() {
+      setAgentState('parent', 'complete', 5, 100);
+      document.getElementById('orchTiming').classList.add('show');
+      orchSimRunning = false;
+      document.getElementById('orchRunBtn').disabled = false;
+      document.getElementById('orchRunBtn').innerHTML = '&#8634; Reset & Run Again';
+    }, 7400);
+  };
+
+  window.showOrchDetails = function(agentId) {
+    var data = orchAgentData[agentId];
+    if (!data) return;
+
+    orchSelectedAgent = agentId;
+    var detailsEl = document.getElementById('orchDetails');
+    var titleEl = document.getElementById('orchDetailsTitle');
+    var gridEl = document.getElementById('orchDetailsGrid');
+
+    titleEl.textContent = data.name + ' -- Details';
+
+    var html = '';
+    html += '<div class="orch-detail-item">';
+    html += '<div class="orch-detail-label">System Prompt</div>';
+    html += '<div class="orch-detail-value">' + data.prompt + '</div>';
+    html += '</div>';
+    html += '<div class="orch-detail-item">';
+    html += '<div class="orch-detail-label">Tools Used</div>';
+    html += '<div class="orch-detail-value">' + data.tools.join(', ') + '</div>';
+    html += '</div>';
+    html += '<div class="orch-detail-item">';
+    html += '<div class="orch-detail-label">Context Window Usage</div>';
+    html += '<div class="orch-detail-value">' + data.contextUsed + '% consumed</div>';
+    html += '</div>';
+    html += '<div class="orch-detail-item">';
+    html += '<div class="orch-detail-label">Result Returned</div>';
+    html += '<div class="orch-detail-value">' + data.result + '</div>';
+    html += '</div>';
+
+    gridEl.innerHTML = html;
+    detailsEl.classList.add('show');
+  };
+
+  // ==========================================
+  // INTERACTIVE 2: PLUGIN FILE EXPLORER
+  // ==========================================
+  var pluginFiles = {
+    'plugin.json': {
+      path: '.claude-plugin/plugin.json',
+      icon: '{ }',
+      indent: 2,
+      isFile: true,
+      content: '{\n  "name": "deployment-toolkit",\n  "version": "1.0.0",\n  "description": "Production deployment commands, validators, and safety checks",\n  "author": "Platform Engineering Team",\n  "commands": [\n    {\n      "name": "deploy",\n      "description": "Deploy to staging or production with safety checks",\n      "file": "commands/deploy.md"\n    },\n    {\n      "name": "rollback",\n      "description": "Rollback to a previous deployment version",\n      "file": "commands/rollback.md"\n    }\n  ],\n  "agents": [\n    {\n      "name": "deploy-validator",\n      "description": "Validates deployment readiness before pushing",\n      "file": "agents/deploy-validator.md"\n    }\n  ]\n}'
+    },
+    'deploy.md': {
+      path: 'commands/deploy.md',
+      icon: '&#9776;',
+      indent: 2,
+      isFile: true,
+      content: '# /deploy Command\n\nWhen the user runs /deploy, follow this procedure:\n\n## Pre-flight Checks\n1. Verify the current branch is clean (no uncommitted changes)\n2. Run the test suite: `npm test`\n3. Check for any TODO or FIXME in changed files\n4. Verify environment variables are set\n\n## Environment Selection\nAsk the user which environment to deploy to:\n- **staging** - Deploy to staging.example.com\n- **production** - Deploy to app.example.com (requires confirmation)\n\n## Deployment Steps\n1. Build the project: `npm run build`\n2. Run database migrations if needed\n3. Deploy using: `./scripts/deploy.sh [environment]`\n4. Run smoke tests against the deployed environment\n5. Report deployment status\n\n## Rollback\nIf smoke tests fail, automatically trigger /rollback.\n\n## Safety Rules\n- NEVER deploy to production without running tests first\n- ALWAYS create a git tag before production deployments\n- REQUIRE explicit "yes" confirmation for production'
+    },
+    'rollback.md': {
+      path: 'commands/rollback.md',
+      icon: '&#9776;',
+      indent: 2,
+      isFile: true,
+      content: '# /rollback Command\n\nWhen the user runs /rollback, follow this procedure:\n\n## Identify Current Version\n1. Check the current deployment tag: `git describe --tags`\n2. List the last 5 deployment tags for selection\n3. Show the diff between current and previous version\n\n## Rollback Steps\n1. Confirm the target version with the user\n2. Run: `./scripts/rollback.sh [version-tag]`\n3. Verify the rollback completed:\n   - Check application health endpoint\n   - Run smoke tests\n   - Verify database compatibility\n\n## Post-Rollback\n1. Notify the team via configured channels\n2. Create an incident report if this was unplanned\n3. Log the rollback event\n\n## Safety Rules\n- NEVER rollback more than 3 versions without explicit approval\n- ALWAYS verify database migration compatibility before rollback\n- If rollback fails, escalate immediately'
+    },
+    'deploy-validator.md': {
+      path: 'agents/deploy-validator.md',
+      icon: '&#9881;',
+      indent: 2,
+      isFile: true,
+      content: '# Deploy Validator Agent\n\nYou are a deployment readiness validator. Your job is to\nthoroughly check that a codebase is safe to deploy.\n\n## Validation Checks\n\n### 1. Code Quality\n- Run linters and verify zero errors\n- Check for debug/console statements\n- Verify no hardcoded secrets or API keys\n\n### 2. Test Coverage\n- Run the full test suite\n- Verify coverage meets minimum threshold (80%)\n- Check that all critical paths have tests\n\n### 3. Dependencies\n- Check for known vulnerabilities: `npm audit`\n- Verify all dependencies are pinned\n- No deprecated packages in use\n\n### 4. Configuration\n- Environment variables documented\n- No staging/dev configs in production build\n- Feature flags properly configured\n\n### 5. Database\n- Migrations are reversible\n- No destructive schema changes without approval\n- Backup verification\n\n## Output Format\nProvide a deployment readiness report with:\n- PASS/FAIL status for each check\n- Blocking issues (must fix before deploy)\n- Warnings (should fix but not blocking)\n- Overall GO/NO-GO recommendation'
+    },
+    'SKILL.md': {
+      path: 'skills/SKILL.md',
+      icon: '&#9733;',
+      indent: 2,
+      isFile: true,
+      content: '---\ntrigger: "when discussing deployments, infrastructure, or CI/CD"\ncontext: "fork"\n---\n\n# Deployment Infrastructure Knowledge\n\n## Architecture\n- Cloud provider: AWS (us-east-1, us-west-2)\n- Orchestration: ECS Fargate with ALB\n- Database: RDS PostgreSQL (Multi-AZ)\n- Cache: ElastiCache Redis\n- CDN: CloudFront\n\n## Deployment Strategy\n- Blue/green deployments via ECS\n- Canary releases for high-risk changes\n- Automatic rollback on health check failure\n\n## Naming Conventions\n- Services: {team}-{service}-{env}\n- Databases: {service}-db-{env}\n- S3 buckets: {company}-{service}-{purpose}-{env}\n\n## Runbook References\n- Incident response: docs/runbooks/incident.md\n- Scaling: docs/runbooks/scaling.md\n- Database failover: docs/runbooks/db-failover.md'
+    },
+    'pre-deploy-check.sh': {
+      path: 'hooks/pre-deploy-check.sh',
+      icon: '&#9881;',
+      indent: 2,
+      isFile: true,
+      content: '#!/bin/bash\n# Pre-deployment safety check hook\n# Runs before any deployment command\n\nset -e\n\necho "Running pre-deployment checks..."\n\n# Check 1: Verify we are on an allowed branch\nCURRENT_BRANCH=$(git branch --show-current)\nif [[ "$CURRENT_BRANCH" != "main" && "$CURRENT_BRANCH" != "release/"* ]]; then\n  echo "ERROR: Deployments only allowed from main or release/* branches" >&2\n  echo "Current branch: $CURRENT_BRANCH" >&2\n  exit 1\nfi\n\n# Check 2: No uncommitted changes\nif ! git diff-index --quiet HEAD --; then\n  echo "ERROR: Uncommitted changes detected. Commit or stash first." >&2\n  exit 1\nfi\n\n# Check 3: Branch is up to date with remote\ngit fetch origin "$CURRENT_BRANCH" --quiet\nLOCAL=$(git rev-parse HEAD)\nREMOTE=$(git rev-parse "origin/$CURRENT_BRANCH")\nif [ "$LOCAL" != "$REMOTE" ]; then\n  echo "ERROR: Local branch is not up to date with remote." >&2\n  exit 1\nfi\n\necho "All pre-deployment checks passed!"\nexit 0'
+    }
+  };
+
+  function renderFileTree() {
+    var treeEl = document.getElementById('fileTree');
+    var html = '';
+
+    // Root
+    html += '<div class="file-tree-item dir"><span class="file-tree-icon">&#128193;</span><span class="file-tree-name">deployment-toolkit/</span></div>';
+
+    // .claude-plugin/
+    html += '<div class="file-tree-item dir" style="padding-left:32px"><span class="file-tree-icon">&#128193;</span><span class="file-tree-name">.claude-plugin/</span></div>';
+    html += '<div class="file-tree-item" style="padding-left:48px" onclick="previewFile(\'plugin.json\')"><span class="file-tree-icon">{ }</span><span class="file-tree-name">plugin.json</span></div>';
+
+    // commands/
+    html += '<div class="file-tree-item dir" style="padding-left:32px"><span class="file-tree-icon">&#128193;</span><span class="file-tree-name">commands/</span></div>';
+    html += '<div class="file-tree-item" style="padding-left:48px" onclick="previewFile(\'deploy.md\')"><span class="file-tree-icon">&#128196;</span><span class="file-tree-name">deploy.md</span></div>';
+    html += '<div class="file-tree-item" style="padding-left:48px" onclick="previewFile(\'rollback.md\')"><span class="file-tree-icon">&#128196;</span><span class="file-tree-name">rollback.md</span></div>';
+
+    // agents/
+    html += '<div class="file-tree-item dir" style="padding-left:32px"><span class="file-tree-icon">&#128193;</span><span class="file-tree-name">agents/</span></div>';
+    html += '<div class="file-tree-item" style="padding-left:48px" onclick="previewFile(\'deploy-validator.md\')"><span class="file-tree-icon">&#128196;</span><span class="file-tree-name">deploy-validator.md</span></div>';
+
+    // skills/
+    html += '<div class="file-tree-item dir" style="padding-left:32px"><span class="file-tree-icon">&#128193;</span><span class="file-tree-name">skills/</span></div>';
+    html += '<div class="file-tree-item" style="padding-left:48px" onclick="previewFile(\'SKILL.md\')"><span class="file-tree-icon">&#128196;</span><span class="file-tree-name">SKILL.md</span></div>';
+
+    // hooks/
+    html += '<div class="file-tree-item dir" style="padding-left:32px"><span class="file-tree-icon">&#128193;</span><span class="file-tree-name">hooks/</span></div>';
+    html += '<div class="file-tree-item" style="padding-left:48px" onclick="previewFile(\'pre-deploy-check.sh\')"><span class="file-tree-icon">&#128196;</span><span class="file-tree-name">pre-deploy-check.sh</span></div>';
+
+    treeEl.innerHTML = html;
+  }
+
+  window.previewFile = function(fileKey) {
+    var file = pluginFiles[fileKey];
+    if (!file) return;
+
+    // Update active state
+    var items = document.querySelectorAll('.file-tree-item:not(.dir)');
+    items.forEach(function(item) { item.classList.remove('active'); });
+    // Find the clicked item
+    items.forEach(function(item) {
+      var nameEl = item.querySelector('.file-tree-name');
+      if (nameEl && nameEl.textContent === fileKey) {
+        item.classList.add('active');
+      }
+    });
+
+    var previewEl = document.getElementById('filePreview');
+    var html = '';
+    html += '<div class="file-preview-header">' + file.path + '</div>';
+    html += '<div class="file-preview-content">' + escapeHtml(file.content) + '</div>';
+    previewEl.innerHTML = html;
+  };
+
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.appendChild(document.createTextNode(str));
+    return div.innerHTML;
+  }
+
+  renderFileTree();
+
+  // ==========================================
+  // INTERACTIVE 3: HOOK DEBUGGER
+  // ==========================================
+  var hookPresets = [
+    {
+      name: 'Mid-workflow',
+      state: {
+        current_phase: 3,
+        total_phases: 7,
+        completed: ['scaffold', 'backend', 'frontend'],
+        remaining: ['api', 'tests', 'qa', 'deploy'],
+        max_iterations: 50,
+        iteration_count: 12
+      }
+    },
+    {
+      name: 'Almost Done',
+      state: {
+        current_phase: 6,
+        total_phases: 7,
+        completed: ['scaffold', 'backend', 'frontend', 'api', 'tests', 'qa'],
+        remaining: ['deploy'],
+        max_iterations: 50,
+        iteration_count: 38
+      }
+    },
+    {
+      name: 'Safety Limit',
+      state: {
+        current_phase: 4,
+        total_phases: 7,
+        completed: ['scaffold', 'backend', 'frontend', 'api'],
+        remaining: ['tests', 'qa', 'deploy'],
+        max_iterations: 50,
+        iteration_count: 50
+      }
+    }
+  ];
+
+  var hookActivePreset = 0;
+
+  function loadHookState(presetIndex) {
+    var editor = document.getElementById('hookStateEditor');
+    editor.value = JSON.stringify(hookPresets[presetIndex].state, null, 2);
+
+    // Update preset button states
+    var btns = document.querySelectorAll('.hook-preset-btn');
+    btns.forEach(function(btn, i) {
+      btn.classList.toggle('active', i === presetIndex);
+    });
+
+    hookActivePreset = presetIndex;
+
+    // Hide previous result
+    document.getElementById('hookResult').classList.remove('show');
+    document.getElementById('hookResult').className = 'hook-result';
+  }
+
+  window.loadHookPreset = function(index) {
+    loadHookState(index);
+  };
+
+  window.runHookSimulation = function() {
+    var editor = document.getElementById('hookStateEditor');
+    var resultEl = document.getElementById('hookResult');
+    var iconEl = document.getElementById('hookResultIcon');
+    var textEl = document.getElementById('hookResultText');
+    var detailEl = document.getElementById('hookResultDetail');
+
+    var state;
+    try {
+      state = JSON.parse(editor.value);
+    } catch (e) {
+      resultEl.className = 'hook-result show blocks';
+      iconEl.innerHTML = '&#9888;';
+      textEl.textContent = 'Invalid JSON: ' + e.message;
+      detailEl.textContent = 'Fix the JSON syntax and try again.';
+      return;
+    }
+
+    var currentPhase = parseInt(state.current_phase) || 0;
+    var totalPhases = parseInt(state.total_phases) || 0;
+    var iterationCount = parseInt(state.iteration_count) || 0;
+    var maxIterations = parseInt(state.max_iterations) || 50;
+
+    // Evaluate logic matching the actual stop hook script
+    if (iterationCount >= maxIterations) {
+      resultEl.className = 'hook-result show allows-safety';
+      iconEl.innerHTML = '&#9888;';
+      textEl.textContent = 'Hook ALLOWS stop: Max iterations reached (' + iterationCount + '/' + maxIterations + ')';
+      detailEl.textContent = 'Safety limit triggered. The session ends regardless of remaining phases. Exit code: 0';
+    } else if (currentPhase < totalPhases) {
+      var remaining = totalPhases - currentPhase;
+      resultEl.className = 'hook-result show blocks';
+      iconEl.innerHTML = '&#10060;';
+      textEl.textContent = 'Hook BLOCKS stop: More phases remaining';
+      detailEl.textContent = 'Phase ' + currentPhase + ' of ' + totalPhases + ' complete. ' + remaining + ' phase(s) left. Iteration ' + iterationCount + '/' + maxIterations + '. Exit code: 1 (non-zero = continue)';
+    } else {
+      resultEl.className = 'hook-result show allows';
+      iconEl.innerHTML = '&#9989;';
+      textEl.textContent = 'Hook ALLOWS stop: All phases complete!';
+      detailEl.textContent = 'All ' + totalPhases + ' phases finished in ' + iterationCount + ' iterations. Exit code: 0';
+    }
+  };
+
+  // Initialize first preset
+  loadHookState(0);
+
+  // ==========================================
+  // INTERACTIVE 4: PLUGIN BUILDER WIZARD
+  // ==========================================
+  var wizCurrentStep = 0;
+  var wizTotalSteps = 3;
+  var wizComponents = {
+    commands: false,
+    agents: false,
+    skills: false,
+    hooks: false
+  };
+
+  window.toggleWizCheckbox = function(itemEl, component) {
+    var checkbox = itemEl.querySelector('input[type="checkbox"]');
+    checkbox.checked = !checkbox.checked;
+    wizComponents[component] = checkbox.checked;
+
+    if (checkbox.checked) {
+      itemEl.classList.add('checked');
+    } else {
+      itemEl.classList.remove('checked');
+    }
+
+    // Show/hide sub-inputs
+    var subEl = document.getElementById('wizSub' + component.charAt(0).toUpperCase() + component.slice(1));
+    if (subEl) {
+      if (checkbox.checked) {
+        subEl.classList.add('show');
+      } else {
+        subEl.classList.remove('show');
+      }
+    }
+
+    updateWizardPreview();
+  };
+
+  function updateWizardSteps() {
+    for (var i = 0; i < wizTotalSteps; i++) {
+      var indicator = document.getElementById('wizStep' + i);
+      var label = document.getElementById('wizLabel' + i);
+      var panel = document.getElementById('wizPanel' + i);
+
+      indicator.className = 'wizard-step-indicator';
+      label.className = 'wizard-step-label';
+      panel.className = 'wizard-panel';
+
+      if (i < wizCurrentStep) {
+        indicator.classList.add('done');
+        label.classList.add('done');
+      } else if (i === wizCurrentStep) {
+        indicator.classList.add('active');
+        label.classList.add('active');
+        panel.classList.add('active');
+      }
+    }
+
+    document.getElementById('wizPrevBtn').disabled = wizCurrentStep === 0;
+    var nextBtn = document.getElementById('wizNextBtn');
+    if (wizCurrentStep === wizTotalSteps - 1) {
+      nextBtn.textContent = 'Done';
+      nextBtn.disabled = true;
+    } else {
+      nextBtn.textContent = 'Next';
+      nextBtn.disabled = false;
+    }
+  }
+
+  window.wizardNav = function(direction) {
+    var newStep = wizCurrentStep + direction;
+    if (newStep < 0 || newStep >= wizTotalSteps) return;
+    wizCurrentStep = newStep;
+    updateWizardSteps();
+
+    if (wizCurrentStep === 2) {
+      updateWizardPreview();
+    }
+  };
+
+  window.updateWizardPreview = function() {
+    var name = document.getElementById('wizPluginName').value || 'my-plugin';
+    var version = document.getElementById('wizPluginVersion').value || '1.0.0';
+    var desc = document.getElementById('wizPluginDesc').value || '';
+
+    // Build tree
+    var tree = name + '/\n';
+    tree += '  .claude-plugin/\n';
+    tree += '    plugin.json\n';
+
+    if (wizComponents.commands) {
+      var cmdName = document.getElementById('wizCommandName').value || 'my-command';
+      tree += '  commands/\n';
+      tree += '    ' + cmdName + '.md\n';
+    }
+    if (wizComponents.agents) {
+      var agentName = document.getElementById('wizAgentName').value || 'my-agent';
+      tree += '  agents/\n';
+      tree += '    ' + agentName + '.md\n';
+    }
+    if (wizComponents.skills) {
+      tree += '  skills/\n';
+      tree += '    SKILL.md\n';
+    }
+    if (wizComponents.hooks) {
+      var hookName = document.getElementById('wizHookName').value || 'pre-check.sh';
+      tree += '  hooks/\n';
+      tree += '    ' + hookName + '\n';
+    }
+
+    document.getElementById('wizPreviewTree').textContent = tree;
+
+    // Build JSON
+    var json = {
+      name: name,
+      version: version,
+      description: desc
+    };
+
+    if (wizComponents.commands) {
+      var cmdNameVal = document.getElementById('wizCommandName').value || 'my-command';
+      json.commands = [
+        {
+          name: cmdNameVal,
+          description: 'TODO: Add description',
+          file: 'commands/' + cmdNameVal + '.md'
+        }
+      ];
+    }
+    if (wizComponents.agents) {
+      var agentNameVal = document.getElementById('wizAgentName').value || 'my-agent';
+      json.agents = [
+        {
+          name: agentNameVal,
+          description: 'TODO: Add description',
+          file: 'agents/' + agentNameVal + '.md'
+        }
+      ];
+    }
+
+    document.getElementById('wizPreviewJson').textContent = JSON.stringify(json, null, 2);
+  };
+
+  updateWizardSteps();
+  updateWizardPreview();
+
+  // ==========================================
+  // END-OF-MODULE QUIZ
+  // ==========================================
+  var FINAL_QUIZ_KEY = 'claude-training-module-12';
+
+  var finalQuizData = [
+    {
+      question: 'What is the primary benefit of using subagents for codebase research?',
+      options: [
+        'They are faster than reading files directly',
+        'They get a fresh context window, keeping verbose research isolated from your main session',
+        'They can access files that the main agent cannot',
+        'They use a different AI model'
+      ],
+      correct: 1
+    },
+    {
+      question: "In a plugin's directory structure, where does the plugin.json file go?",
+      options: [
+        'In the root directory',
+        'In .claude-plugin/plugin.json',
+        'In commands/plugin.json',
+        'In ~/.claude/plugin.json'
+      ],
+      correct: 1
+    },
+    {
+      question: 'What happens when a PreToolUse hook exits with a non-zero code?',
+      options: [
+        'The tool runs anyway but logs a warning',
+        'The tool call is blocked and Claude must try a different approach',
+        'Claude Code crashes',
+        'The hook is permanently disabled'
+      ],
+      correct: 1
+    },
+    {
+      question: 'In the Stop Hook pattern, what prevents an infinite loop?',
+      options: [
+        'Claude automatically stops after 100 iterations',
+        'A max_iterations field in the state file, checked by the hook',
+        'The user must press Ctrl+C',
+        'Hooks can only run 10 times'
+      ],
+      correct: 1
+    },
+    {
+      question: 'When should you NOT use a subagent?',
+      options: [
+        'When researching a large codebase',
+        'When running parallel analysis tasks',
+        'When reading a single small file',
+        'When generating tests for multiple modules'
+      ],
+      correct: 2
+    },
+    {
+      question: 'What does context: fork do in a SKILL.md frontmatter?',
+      options: [
+        'Creates a git fork of the repository',
+        'Runs the skill in an isolated sub-agent context',
+        'Splits the context window in half',
+        'Enables multi-user collaboration on the skill'
+      ],
+      correct: 1
+    },
+    {
+      question: 'How do you install a plugin for local testing?',
+      options: [
+        'npm install the-plugin',
+        'Run claude --plugin-dir ./path-to-plugin',
+        'Copy it to /usr/local/plugins/',
+        'Add it to package.json'
+      ],
+      correct: 1
+    },
+    {
+      question: 'What is a PostToolUse hook best used for?',
+      options: [
+        'Blocking dangerous tool calls before they execute',
+        'Validating or transforming tool results after they complete',
+        'Sending notifications to Slack',
+        'Speeding up tool execution'
+      ],
+      correct: 1
+    }
+  ];
+
+  var finalQuizSelections = [];
+  var finalQuizSubmitted = false;
+
+  for (var fqi = 0; fqi < finalQuizData.length; fqi++) {
+    finalQuizSelections.push(null);
+  }
+
+  function renderFinalQuiz() {
+    var container = document.getElementById('finalQuizQuestions');
+    var html = '';
+
+    for (var i = 0; i < finalQuizData.length; i++) {
+      var q = finalQuizData[i];
+      html += '<div class="final-quiz-question" data-fq="' + i + '">';
+      html += '<div class="fq-number">Question ' + (i + 1) + ' of ' + finalQuizData.length + '</div>';
+      html += '<div class="fq-text">' + q.question + '</div>';
+      html += '<ul class="fq-options">';
+
+      for (var j = 0; j < q.options.length; j++) {
+        html += '<li class="fq-option" data-fq-val="' + j + '" onclick="selectFinalOption(' + i + ', this)">';
+        html += '<input type="radio" name="fq-' + i + '" value="' + j + '">';
+        html += '<span>' + q.options[j] + '</span>';
+        html += '</li>';
+      }
+
+      html += '</ul>';
+      html += '</div>';
+    }
+
+    container.innerHTML = html;
+  }
+
+  window.selectFinalOption = function(qIdx, el) {
+    if (finalQuizSubmitted) return;
+
+    var parentQ = el.closest('.final-quiz-question');
+    parentQ.querySelectorAll('.fq-option').forEach(function(opt) {
+      opt.querySelector('input').checked = false;
+      opt.style.background = '';
+    });
+
+    el.querySelector('input').checked = true;
+    finalQuizSelections[qIdx] = parseInt(el.getAttribute('data-fq-val'));
+
+    var allAnswered = finalQuizSelections.every(function(s) { return s !== null; });
+    document.getElementById('finalSubmitBtn').disabled = !allAnswered;
+  };
+
+  window.submitFinalQuiz = function() {
+    if (finalQuizSubmitted) return;
+    finalQuizSubmitted = true;
+
+    var score = 0;
+
+    for (var idx = 0; idx < finalQuizSelections.length; idx++) {
+      var sel = finalQuizSelections[idx];
+      var correctIdx = finalQuizData[idx].correct;
+      var questionEl = document.querySelector('.final-quiz-question[data-fq="' + idx + '"]');
+      var options = questionEl.querySelectorAll('.fq-option');
+
+      for (var oi = 0; oi < options.length; oi++) {
+        var opt = options[oi];
+        var val = parseInt(opt.getAttribute('data-fq-val'));
+        opt.style.pointerEvents = 'none';
+
+        if (val === correctIdx) {
+          if (sel === val) {
+            opt.classList.add('selected-correct');
+            score++;
+          } else {
+            opt.classList.add('reveal-correct');
+          }
+        } else if (val === sel) {
+          opt.classList.add('selected-wrong');
+        }
+      }
+    }
+
+    var result = document.getElementById('finalResult');
+    var title = document.getElementById('finalResultTitle');
+    var text = document.getElementById('finalResultText');
+
+    result.classList.add('show');
+
+    if (score >= 6) {
+      result.classList.add('pass');
+      result.classList.remove('fail');
+      title.textContent = 'Passed! ' + score + ' / 8 correct';
+      text.textContent = 'Excellent work! You have demonstrated a strong understanding of Claude Code\'s advanced features -- subagents, plugins, and hooks. Your progress has been saved. Move on to Module 13 to continue your training.';
+    } else {
+      result.classList.add('fail');
+      result.classList.remove('pass');
+      title.textContent = score + ' / 8 correct -- Review needed';
+      text.textContent = 'You need at least 6 correct answers to pass. Review the sections above, paying close attention to the interactive exercises. The subagent pattern, hook exit codes, and plugin structure are key areas to revisit.';
+    }
+
+    var progressData = {
+      score: score,
+      total: 8,
+      completed: score >= 6,
+      timestamp: new Date().toISOString()
+    };
+    localStorage.setItem(FINAL_QUIZ_KEY, JSON.stringify(progressData));
+
+    document.getElementById('finalSubmitBtn').disabled = true;
+    document.getElementById('finalSubmitBtn').textContent = 'Submitted';
+  };
+
+  renderFinalQuiz();
+
+  // ==========================================
+  // LOAD EXISTING PROGRESS
+  // ==========================================
+  function loadExistingProgress() {
+    var saved = localStorage.getItem(FINAL_QUIZ_KEY);
+    if (saved) {
+      try {
+        var data = JSON.parse(saved);
+        if (data.completed) {
+          var fill = document.getElementById('sidebarProgressFill');
+          if (fill) {
+            fill.style.width = '100%';
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+  }
+  loadExistingProgress();
+
+})();
+</script>
+</body>
+</html>

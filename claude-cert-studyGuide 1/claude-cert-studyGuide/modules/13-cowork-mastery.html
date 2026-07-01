@@ -1,0 +1,3643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 13: Cowork Mastery | Claude AI Training</title>
+<style>
+/* ============================================
+   CSS CUSTOM PROPERTIES & DESIGN SYSTEM
+   Premium Upgrades Applied:
+   1. 3-layer shadows
+   2. radius 16/10px
+   3. spring transitions
+   4. gradient h1
+   5. Inter font
+   6. deep dark mode #0B0F1A/#141926
+   7. reduced-motion
+   8. antialiased
+   9. accent cards
+   10. depth hover on buttons
+   ============================================ */
+:root {
+  --primary: #7C3AED;
+  --primary-light: #A78BFA;
+  --primary-dark: #5B21B6;
+  --accent: #06B6D4;
+  --accent-light: #22D3EE;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  --bg: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --bg-code: #F1F5F9;
+  --text: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --border: #E2E8F0;
+  /* 3-layer shadows (upgrade 1) */
+  --shadow: 0 1px 2px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+  --shadow-lg: 0 4px 6px rgba(0,0,0,0.05), 0 10px 20px rgba(0,0,0,0.08), 0 20px 40px rgba(0,0,0,0.04);
+  --shadow-xl: 0 8px 12px rgba(0,0,0,0.06), 0 20px 40px rgba(0,0,0,0.1), 0 40px 80px rgba(0,0,0,0.06);
+  /* radius 16/10px (upgrade 2) */
+  --radius: 16px;
+  --radius-sm: 10px;
+  --radius-xs: 6px;
+  /* spring transitions (upgrade 3) */
+  --transition: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --transition-smooth: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --sidebar-width: 280px;
+  --content-max: 820px;
+}
+
+/* deep dark mode #0B0F1A/#141926 (upgrade 6) */
+[data-theme="dark"] {
+  --bg: #0B0F1A;
+  --bg-card: #141926;
+  --bg-code: #141926;
+  --text: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --border: #1E293B;
+  --shadow: 0 1px 2px rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.2);
+  --shadow-lg: 0 4px 6px rgba(0,0,0,0.3), 0 10px 20px rgba(0,0,0,0.35), 0 20px 40px rgba(0,0,0,0.2);
+  --shadow-xl: 0 8px 12px rgba(0,0,0,0.3), 0 20px 40px rgba(0,0,0,0.4), 0 40px 80px rgba(0,0,0,0.3);
+}
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 24px;
+}
+
+/* antialiased (upgrade 8) + Inter font (upgrade 5) */
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  min-height: 100vh;
+  transition: background var(--transition-smooth), color var(--transition-smooth);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* reduced-motion (upgrade 7) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================
+   THEME TOGGLE
+   ============================================ */
+.theme-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: all var(--transition);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+.theme-toggle:hover {
+  box-shadow: var(--shadow-lg);
+  transform: scale(1.08) translateY(-2px);
+}
+
+/* ============================================
+   SIDEBAR
+   ============================================ */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  z-index: 900;
+  transition: transform 0.3s ease, background var(--transition-smooth);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.sidebar-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+  margin-bottom: 12px;
+  transition: color var(--transition-smooth);
+}
+.sidebar-back:hover { color: var(--primary-dark); }
+
+.sidebar-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.sidebar-module-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.sidebar-nav {
+  padding: 12px 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.sidebar-section {
+  margin-bottom: 4px;
+}
+
+.sidebar-section-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 20px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  text-align: left;
+  transition: color var(--transition-smooth);
+}
+.sidebar-section-toggle:hover { color: var(--text); }
+.sidebar-section-toggle .chevron {
+  transition: transform 0.2s ease;
+  font-size: 0.65rem;
+}
+.sidebar-section-toggle.collapsed .chevron {
+  transform: rotate(-90deg);
+}
+
+.sidebar-links {
+  list-style: none;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.sidebar-links.collapsed {
+  max-height: 0 !important;
+}
+
+.sidebar-link {
+  display: block;
+  padding: 7px 20px 7px 32px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: all var(--transition-smooth);
+  line-height: 1.4;
+}
+.sidebar-link:hover {
+  color: var(--text);
+  background: var(--bg);
+}
+.sidebar-link.active {
+  color: var(--primary);
+  border-left-color: var(--primary);
+  background: rgba(124, 58, 237, 0.05);
+  font-weight: 600;
+}
+[data-theme="dark"] .sidebar-link.active {
+  background: rgba(124, 58, 237, 0.12);
+}
+
+.sidebar-progress {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sidebar-progress-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.sidebar-progress-track {
+  height: 6px;
+  background: var(--bg-code);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.sidebar-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 3px;
+  transition: width 0.5s ease;
+  width: 0%;
+}
+
+/* Hamburger button (mobile) */
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1001;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+  transition: all var(--transition-smooth);
+}
+.hamburger span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--text);
+  margin: 4px auto;
+  transition: all 0.3s ease;
+  border-radius: 1px;
+}
+.hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(4px, 4px); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(4px, -4px); }
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 899;
+}
+
+/* ============================================
+   MAIN CONTENT
+   ============================================ */
+.main-content {
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+  transition: margin var(--transition-smooth);
+}
+
+.content-wrapper {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 40px 32px 80px;
+}
+
+/* Module Header */
+.module-header {
+  margin-bottom: 48px;
+}
+.module-header .breadcrumb {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+.module-header .breadcrumb a {
+  color: var(--primary);
+  text-decoration: none;
+}
+.module-header .breadcrumb a:hover { text-decoration: underline; }
+
+.module-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.module-badge .number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.module-badge .label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* gradient h1 (upgrade 4) */
+.module-header h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.module-header .description {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 640px;
+}
+
+.module-meta {
+  display: flex;
+  gap: 16px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.module-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  background: var(--bg-code);
+  padding: 6px 14px;
+  border-radius: 20px;
+}
+
+/* ============================================
+   SECTIONS
+   ============================================ */
+.section {
+  margin-bottom: 56px;
+  scroll-margin-top: 24px;
+}
+
+.section-heading {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+  line-height: 1.3;
+}
+
+.section h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-top: 32px;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.section h4 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-top: 24px;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.section p {
+  margin-bottom: 16px;
+  color: var(--text-secondary);
+}
+
+.section ul, .section ol {
+  margin-bottom: 16px;
+  padding-left: 24px;
+}
+.section li {
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+}
+.section li strong {
+  color: var(--text);
+}
+
+/* ============================================
+   CODE BLOCKS
+   ============================================ */
+.code-block {
+  background: #1E293B;
+  color: #E2E8F0;
+  border-radius: var(--radius-sm);
+  padding: 20px 24px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  overflow-x: auto;
+  position: relative;
+  margin: 16px 0 20px;
+  tab-size: 2;
+}
+.code-block .code-label {
+  position: absolute;
+  top: 8px;
+  left: 16px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #64748B;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+.code-block.has-label {
+  padding-top: 36px;
+}
+.code-block .copy-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: #94A3B8;
+  padding: 6px 12px;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  transition: all var(--transition-smooth);
+}
+.code-block .copy-btn:hover { background: rgba(255,255,255,0.2); color: white; }
+.code-block .copy-btn.copied { background: var(--success); color: white; }
+
+/* Syntax highlighting */
+.kw { color: #C084FC; }
+.str { color: #6EE7B7; }
+.fn { color: #7DD3FC; }
+.cm { color: #64748B; }
+.num { color: #FDBA74; }
+.op { color: #FCA5A5; }
+.type { color: #67E8F9; }
+.param { color: #FDE68A; }
+.prop { color: #F0ABFC; }
+.punc { color: #94A3B8; }
+
+/* Inline code */
+code {
+  background: var(--bg-code);
+  color: var(--primary);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.88em;
+}
+[data-theme="dark"] code {
+  background: #1E293B;
+}
+.code-block code {
+  background: none;
+  color: inherit;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+  white-space: pre-wrap;
+  display: block;
+}
+
+/* ============================================
+   CALLOUT BOXES
+   ============================================ */
+.callout {
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  margin: 20px 0;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.callout-icon {
+  flex-shrink: 0;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+.callout-content { flex: 1; }
+.callout-content p { margin-bottom: 6px; color: inherit; }
+.callout-content p:last-child { margin-bottom: 0; }
+
+.callout.info {
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  color: #1E40AF;
+}
+.callout.tip {
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  color: #166534;
+}
+.callout.warning {
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  color: #92400E;
+}
+.callout.important {
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  color: #991B1B;
+}
+
+[data-theme="dark"] .callout.info {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: #93C5FD;
+}
+[data-theme="dark"] .callout.tip {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #6EE7B7;
+}
+[data-theme="dark"] .callout.warning {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #FCD34D;
+}
+[data-theme="dark"] .callout.important {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #FCA5A5;
+}
+
+/* ============================================
+   ACCENT CARDS (upgrade 9)
+   ============================================ */
+.accent-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin: 24px 0;
+  position: relative;
+  overflow: hidden;
+  transition: border-color var(--transition-smooth), box-shadow var(--transition-smooth), transform var(--transition);
+}
+.accent-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+}
+.accent-card:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+.accent-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.accent-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, rgba(124,58,237,0.1), rgba(6,182,212,0.1));
+}
+[data-theme="dark"] .accent-card-icon {
+  background: linear-gradient(135deg, rgba(124,58,237,0.25), rgba(6,182,212,0.2));
+}
+.accent-card-header h4 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text);
+}
+.accent-card p {
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+.accent-card ul {
+  padding-left: 20px;
+  margin-bottom: 12px;
+}
+.accent-card li {
+  margin-bottom: 6px;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+}
+
+/* ============================================
+   COMPARISON TABLE
+   ============================================ */
+.comparison-table-wrapper {
+  overflow-x: auto;
+  margin: 20px 0;
+  border-radius: var(--radius-sm);
+}
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.comparison-table th {
+  background: var(--primary);
+  color: white;
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+.comparison-table th:first-child {
+  border-radius: var(--radius-sm) 0 0 0;
+}
+.comparison-table th:last-child {
+  border-radius: 0 var(--radius-sm) 0 0;
+}
+.comparison-table td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+.comparison-table tr:nth-child(even) td {
+  background: var(--bg);
+}
+.comparison-table tr:last-child td:first-child {
+  border-radius: 0 0 0 var(--radius-sm);
+}
+.comparison-table tr:last-child td:last-child {
+  border-radius: 0 0 var(--radius-sm) 0;
+}
+
+/* ============================================
+   STEP-BY-STEP
+   ============================================ */
+.step-list {
+  counter-reset: step-counter;
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+.step-item {
+  counter-increment: step-counter;
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: border-color var(--transition-smooth), box-shadow var(--transition-smooth);
+}
+.step-item:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow);
+}
+.step-item::before {
+  content: counter(step-counter);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+.step-content h4 {
+  margin-top: 0;
+  margin-bottom: 6px;
+}
+.step-content p {
+  margin-bottom: 8px;
+}
+
+/* ============================================
+   ROI CALCULATOR (Interactive 1)
+   ============================================ */
+.roi-calc {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  position: relative;
+  overflow: hidden;
+}
+.roi-calc::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--success), var(--accent));
+}
+.roi-calc h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.roi-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.roi-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.roi-field label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.roi-field .roi-field-hint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: -2px;
+}
+.roi-field input[type="number"],
+.roi-field input[type="text"] {
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition: border-color var(--transition-smooth);
+  width: 100%;
+}
+.roi-field input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.roi-slider-field {
+  grid-column: 1 / -1;
+}
+.roi-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.roi-slider-row input[type="range"] {
+  flex: 1;
+  accent-color: var(--primary);
+  height: 6px;
+}
+.roi-slider-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+  min-width: 60px;
+  text-align: right;
+}
+
+.roi-results {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.roi-result-card {
+  padding: 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  text-align: center;
+}
+.roi-result-card .roi-result-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+.roi-result-card .roi-result-value {
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+.roi-result-card.highlight {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(6, 182, 212, 0.08));
+  border-color: rgba(16, 185, 129, 0.3);
+}
+[data-theme="dark"] .roi-result-card.highlight {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(6, 182, 212, 0.12));
+}
+.roi-result-card .positive { color: var(--success); }
+.roi-result-card .negative { color: var(--error); }
+.roi-result-card .neutral { color: var(--text); }
+
+/* ROI Bar Chart */
+.roi-chart {
+  margin-top: 24px;
+  padding: 20px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+}
+.roi-chart h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  margin-top: 0;
+  color: var(--text);
+}
+.roi-bar-group {
+  margin-bottom: 12px;
+}
+.roi-bar-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+.roi-bar-track {
+  width: 100%;
+  height: 28px;
+  background: var(--bg-card);
+  border-radius: var(--radius-xs);
+  overflow: hidden;
+  position: relative;
+  border: 1px solid var(--border);
+}
+.roi-bar-fill {
+  height: 100%;
+  border-radius: var(--radius-xs);
+  transition: width 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: white;
+  white-space: nowrap;
+  min-width: 2px;
+}
+.roi-bar-fill.cost { background: linear-gradient(90deg, #EF4444, #F87171); }
+.roi-bar-fill.value { background: linear-gradient(90deg, #10B981, #34D399); }
+.roi-bar-fill.roi { background: linear-gradient(90deg, var(--primary), var(--accent)); }
+
+.roi-delta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 12px;
+  background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(6,182,212,0.08));
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(16,185,129,0.2);
+}
+.roi-delta .roi-delta-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.roi-delta .roi-delta-value {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--success);
+}
+[data-theme="dark"] .roi-delta {
+  background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(6,182,212,0.12));
+}
+
+/* ============================================
+   GOVERNANCE BUILDER (Interactive 2)
+   ============================================ */
+.gov-builder {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  position: relative;
+  overflow: hidden;
+}
+.gov-builder::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--warning));
+}
+.gov-builder h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+/* Steps indicator */
+.gov-steps-bar {
+  display: flex;
+  margin-bottom: 28px;
+  gap: 4px;
+}
+.gov-step-indicator {
+  flex: 1;
+  text-align: center;
+  padding: 10px 8px;
+  border-radius: var(--radius-xs);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all var(--transition-smooth);
+}
+.gov-step-indicator.active {
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  border-color: var(--primary);
+}
+.gov-step-indicator.completed {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--success);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.gov-step-panel {
+  display: none;
+  animation: fadeInUp 0.3s ease both;
+}
+.gov-step-panel.active {
+  display: block;
+}
+
+.gov-checkbox-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 16px 0;
+}
+.gov-checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  transition: all var(--transition-smooth);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+.gov-checkbox-item:hover {
+  border-color: var(--primary-light);
+  background: rgba(124, 58, 237, 0.03);
+}
+.gov-checkbox-item.checked {
+  border-color: var(--primary);
+  background: rgba(124, 58, 237, 0.08);
+  color: var(--primary);
+}
+.gov-checkbox-item input[type="checkbox"] {
+  accent-color: var(--primary);
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+/* Usage policy lists */
+.gov-policy-section {
+  margin-bottom: 20px;
+}
+.gov-policy-section h4 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+.gov-policy-tag-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.gov-policy-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: default;
+}
+.gov-policy-tag.approved {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.gov-policy-tag.restricted {
+  background: rgba(245, 158, 11, 0.12);
+  color: #B45309;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.gov-policy-tag.prohibited {
+  background: rgba(239, 68, 68, 0.12);
+  color: #DC2626;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+[data-theme="dark"] .gov-policy-tag.approved { color: #6EE7B7; }
+[data-theme="dark"] .gov-policy-tag.restricted { color: #FCD34D; }
+[data-theme="dark"] .gov-policy-tag.prohibited { color: #FCA5A5; }
+
+.gov-policy-tag .remove-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.1);
+  border: none;
+  color: inherit;
+  font-size: 0.7rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+}
+.gov-policy-tag .remove-tag:hover {
+  background: rgba(0,0,0,0.2);
+}
+
+.gov-add-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.gov-add-row select,
+.gov-add-row input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.88rem;
+  font-family: inherit;
+}
+.gov-add-row select:focus,
+.gov-add-row input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+.gov-add-btn {
+  padding: 8px 16px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-xs);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+.gov-add-btn:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+/* Data classification matrix */
+.gov-class-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 16px 0;
+}
+.gov-class-item {
+  padding: 12px 16px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+}
+.gov-class-item label {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.gov-class-item select {
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg-card);
+  color: var(--text);
+  font-size: 0.85rem;
+  font-family: inherit;
+}
+
+/* Policy preview */
+.gov-preview {
+  margin-top: 24px;
+  padding: 24px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  max-height: 500px;
+  overflow-y: auto;
+  position: relative;
+}
+.gov-preview h4 {
+  color: var(--text);
+  margin-top: 16px;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+}
+.gov-preview h4:first-child {
+  margin-top: 0;
+}
+.gov-preview .policy-header {
+  font-weight: 700;
+  color: var(--primary);
+  font-size: 1rem;
+  margin-bottom: 4px;
+}
+.gov-preview .policy-date {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+.gov-preview ul {
+  padding-left: 20px;
+  margin-bottom: 10px;
+}
+.gov-preview li {
+  margin-bottom: 4px;
+}
+.gov-preview table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0;
+  font-size: 0.82rem;
+}
+.gov-preview table th {
+  text-align: left;
+  padding: 6px 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  font-weight: 600;
+  color: var(--text);
+}
+.gov-preview table td {
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+}
+
+.gov-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 10px 24px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.gov-copy-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+.gov-copy-btn.copied {
+  background: var(--success);
+}
+
+.gov-nav-btns {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+.gov-nav-btn {
+  padding: 10px 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  background: var(--bg-card);
+  color: var(--text);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.gov-nav-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-1px);
+}
+.gov-nav-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+.gov-nav-btn.primary {
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  border-color: var(--primary);
+}
+.gov-nav-btn.primary:hover {
+  color: white;
+  box-shadow: var(--shadow);
+}
+
+/* ============================================
+   FINAL QUIZ
+   ============================================ */
+.final-quiz {
+  background: var(--bg-card);
+  border: 2px solid var(--primary-light);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+}
+.final-quiz h3 {
+  margin-top: 0;
+}
+
+.final-quiz-question {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.final-quiz-question .fq-number {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+.final-quiz-question .fq-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+.fq-options { list-style: none; padding: 0; }
+.fq-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 12px;
+  margin-bottom: 4px;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+.fq-option:hover { background: rgba(124, 58, 237, 0.05); }
+.fq-option input[type="radio"] {
+  accent-color: var(--primary);
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+.fq-option.selected-correct {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+.fq-option.selected-wrong {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+}
+.fq-option.reveal-correct {
+  background: rgba(16, 185, 129, 0.08);
+  color: #059669;
+  font-weight: 600;
+}
+[data-theme="dark"] .fq-option.selected-correct { color: #6EE7B7; }
+[data-theme="dark"] .fq-option.selected-wrong { color: #FCA5A5; }
+[data-theme="dark"] .fq-option.reveal-correct { color: #6EE7B7; }
+
+/* depth hover on submit button (upgrade 10) */
+.final-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 32px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  margin-top: 8px;
+}
+.final-submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
+}
+.final-submit-btn:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow);
+}
+.final-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.final-result {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: var(--radius-sm);
+  display: none;
+}
+.final-result.show { display: block; }
+.final-result.pass {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.final-result.fail {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.final-result h4 {
+  margin-top: 0;
+  margin-bottom: 6px;
+  font-size: 1.1rem;
+}
+.final-result p {
+  margin-bottom: 0;
+  font-size: 0.95rem;
+}
+.final-result.pass h4 { color: var(--success); }
+.final-result.fail h4 { color: var(--warning); }
+
+/* ============================================
+   NAVIGATION FOOTER
+   ============================================ */
+.module-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 16px;
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 2px solid var(--border);
+}
+.nav-link {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: all var(--transition);
+  min-width: 0;
+  flex: 1;
+  max-width: 50%;
+}
+.nav-link:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow);
+  transform: translateY(-2px);
+}
+.nav-link.next { align-items: flex-end; text-align: right; }
+.nav-link .nav-dir {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--primary);
+}
+.nav-link .nav-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================
+   KEY CONCEPT HIGHLIGHT
+   ============================================ */
+.key-concept {
+  display: inline-block;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(6, 182, 212, 0.1));
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  color: var(--primary);
+}
+[data-theme="dark"] .key-concept {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(6, 182, 212, 0.15));
+  border-color: rgba(124, 58, 237, 0.35);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 1024px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .hamburger {
+    display: flex;
+  }
+  .sidebar-overlay.show {
+    display: block;
+  }
+  .main-content {
+    margin-left: 0;
+  }
+  .theme-toggle {
+    right: 16px;
+  }
+}
+
+@media (max-width: 640px) {
+  .content-wrapper {
+    padding: 24px 16px 60px;
+  }
+  .module-header h1 {
+    font-size: 1.6rem;
+  }
+  .section-heading {
+    font-size: 1.3rem;
+  }
+  .roi-inputs {
+    grid-template-columns: 1fr;
+  }
+  .roi-results {
+    grid-template-columns: 1fr;
+  }
+  .gov-checkbox-grid {
+    grid-template-columns: 1fr;
+  }
+  .gov-class-grid {
+    grid-template-columns: 1fr;
+  }
+  .module-nav {
+    flex-direction: column;
+  }
+  .nav-link {
+    max-width: 100%;
+  }
+  .nav-link.next {
+    align-items: flex-start;
+    text-align: left;
+  }
+  .gov-steps-bar {
+    flex-direction: column;
+  }
+}
+
+/* ============================================
+   SCROLLBAR STYLING
+   ============================================ */
+.sidebar::-webkit-scrollbar,
+.code-block::-webkit-scrollbar,
+.gov-preview::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.sidebar::-webkit-scrollbar-track,
+.code-block::-webkit-scrollbar-track,
+.gov-preview::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+.code-block::-webkit-scrollbar-thumb,
+.gov-preview::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.section {
+  animation: fadeInUp 0.4s ease both;
+}
+
+/* ============================================
+   ADOPTION CURVE VISUAL
+   ============================================ */
+.adoption-curve {
+  padding: 24px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  margin: 20px 0;
+  text-align: center;
+}
+.adoption-curve-bars {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 6px;
+  height: 120px;
+  margin-bottom: 12px;
+}
+.adoption-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 1;
+  max-width: 120px;
+}
+.adoption-bar-fill {
+  width: 100%;
+  border-radius: var(--radius-xs) var(--radius-xs) 0 0;
+  transition: height 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  min-height: 4px;
+}
+.adoption-bar-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-top: 6px;
+  text-align: center;
+  line-height: 1.2;
+}
+.adoption-bar-pct {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+</style>
+</head>
+<body>
+<!-- ============================================
+     THEME TOGGLE
+     ============================================ -->
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+  <span id="themeIcon">&#9790;</span>
+</button>
+
+<!-- ============================================
+     HAMBURGER (mobile)
+     ============================================ -->
+<button class="hamburger" id="hamburger" aria-label="Toggle sidebar">
+  <span></span>
+  <span></span>
+  <span></span>
+</button>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ============================================
+     SIDEBAR
+     ============================================ -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="../index.html" class="sidebar-back">&larr; Back to Hub</a>
+    <div class="sidebar-title">Module 13</div>
+    <div class="sidebar-module-name">Cowork Mastery</div>
+  </div>
+
+  <div class="sidebar-nav">
+    <!-- Section: Strategy -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="strategy">
+        Strategy <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-strategy">
+        <li><a href="#deployment-strategy" class="sidebar-link" data-target="deployment-strategy">Deployment Strategy</a></li>
+        <li><a href="#prompt-library" class="sidebar-link" data-target="prompt-library">Team Prompt Library</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Governance -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="governance">
+        Governance <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-governance">
+        <li><a href="#governance-framework" class="sidebar-link" data-target="governance-framework">Governance Framework</a></li>
+        <li><a href="#measuring-roi" class="sidebar-link" data-target="measuring-roi">Measuring ROI</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: People -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="people">
+        People <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-people">
+        <li><a href="#change-management" class="sidebar-link" data-target="change-management">Change Management</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Exercises -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="exercises">
+        Exercises <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-exercises">
+        <li><a href="#roi-calculator" class="sidebar-link" data-target="roi-calculator">ROI Calculator</a></li>
+        <li><a href="#governance-builder" class="sidebar-link" data-target="governance-builder">Policy Builder</a></li>
+        <li><a href="#final-quiz" class="sidebar-link" data-target="final-quiz">End-of-Module Quiz</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sidebar-progress">
+    <div class="sidebar-progress-label">Module Progress</div>
+    <div class="sidebar-progress-track">
+      <div class="sidebar-progress-fill" id="sidebarProgressFill"></div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================
+     MAIN CONTENT
+     ============================================ -->
+<main class="main-content">
+  <div class="content-wrapper">
+
+    <!-- Module Header -->
+    <header class="module-header">
+      <div class="breadcrumb">
+        <a href="../index.html">Training Hub</a> &raquo; Module 13
+      </div>
+      <div class="module-badge">
+        <span class="number">13</span>
+        <span class="label">Enterprise</span>
+      </div>
+      <h1>Cowork Mastery: Enterprise Team Workflows</h1>
+      <p class="description">
+        Learn how to plan, deploy, and govern Claude at the enterprise level. This module covers
+        deployment strategy, prompt libraries, governance frameworks, ROI measurement, and change
+        management -- everything leaders and architects need to drive successful AI adoption.
+      </p>
+      <div class="module-meta">
+        <span class="module-meta-item">&#9201; ~45 min</span>
+        <span class="module-meta-item">&#127891; Intermediate</span>
+        <span class="module-meta-item">&#127970; Leaders &amp; Architects</span>
+        <span class="module-meta-item">&#127919; 2 Interactive Exercises</span>
+      </div>
+    </header>
+
+    <!-- ========================================
+         SECTION 1: ENTERPRISE DEPLOYMENT STRATEGY
+         ======================================== -->
+    <section class="section" id="deployment-strategy">
+      <h2 class="section-heading">1. Enterprise Deployment Strategy</h2>
+
+      <p>
+        Rolling out Claude across an organization is not a flip-the-switch event. It is a
+        <span class="key-concept">phased journey</span> that requires planning, infrastructure
+        readiness, and executive alignment. Get the deployment strategy right, and you will see
+        adoption accelerate organically. Get it wrong, and you will face resistance, security
+        concerns, and wasted investment.
+      </p>
+
+      <h3>Phased Rollout Approach</h3>
+
+      <p>
+        The most successful enterprise deployments follow a three-phase model that progressively
+        broadens access while continuously validating outcomes.
+      </p>
+
+      <div class="step-list">
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Phase 1: Pilot (Weeks 1--4)</h4>
+            <p>
+              Select 10--25 enthusiastic volunteers across 2--3 departments. Choose people who are
+              already curious about AI and willing to provide candid feedback. Give them access,
+              baseline training, and a structured feedback form. Track time-to-first-value (how
+              quickly each person finds a genuinely useful workflow).
+            </p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Phase 2: Department Rollout (Weeks 5--12)</h4>
+            <p>
+              Based on pilot learnings, expand to full departments. Assign a
+              <strong>department champion</strong> in each group who runs weekly office hours,
+              collects use cases, and escalates issues. Establish the governance framework
+              (covered in Section 3) before this phase begins.
+            </p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Phase 3: Organization-Wide (Weeks 13+)</h4>
+            <p>
+              Open access to the entire organization. By now you have a library of proven
+              use cases, trained champions in every department, and a governance framework
+              that leadership trusts. The focus shifts from adoption to optimization and
+              advanced use cases.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <h3>SSO Integration</h3>
+
+      <p>
+        Enterprise identity management is non-negotiable. Claude supports integration with
+        corporate identity providers through industry-standard protocols.
+      </p>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Protocol</th>
+              <th>Best For</th>
+              <th>Key Consideration</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>SAML 2.0</strong></td>
+              <td>Large enterprises with existing SAML IdPs (Okta, Azure AD, OneLogin)</td>
+              <td>Mature standard; ensure attribute mapping covers department and role</td>
+            </tr>
+            <tr>
+              <td><strong>OIDC</strong></td>
+              <td>Modern cloud-native organizations using OAuth-based flows</td>
+              <td>Supports refresh tokens; simpler to configure than SAML</td>
+            </tr>
+            <tr>
+              <td><strong>SCIM</strong></td>
+              <td>Automated user provisioning and deprovisioning</td>
+              <td>Pair with SAML or OIDC for complete lifecycle management</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-icon">&#128712;</span>
+        <div class="callout-content">
+          <p><strong>SSO Tip:</strong> Always require SSO for enterprise deployments. It ensures
+          that when an employee leaves the organization, their Claude access is revoked
+          automatically through your IdP. Never rely on manual account deactivation.</p>
+        </div>
+      </div>
+
+      <h3>Data Residency</h3>
+
+      <p>
+        Understanding where conversation data is stored and processed is critical for
+        regulatory compliance. Key considerations include:
+      </p>
+
+      <ul>
+        <li><strong>Regional processing:</strong> Conversations may be processed in specific
+          geographic regions depending on your Anthropic plan and configuration</li>
+        <li><strong>Retention policies:</strong> Configure how long conversation logs are retained
+          and when they are automatically purged</li>
+        <li><strong>Data sovereignty:</strong> For regulated industries, ensure that data never
+          leaves approved jurisdictions (EU, US, specific country requirements)</li>
+        <li><strong>Encryption:</strong> Verify encryption at rest (AES-256) and in transit (TLS 1.3)
+          meets your organization's requirements</li>
+      </ul>
+
+      <h3>Network Considerations</h3>
+
+      <p>
+        In corporate environments with strict network controls, plan for the following:
+      </p>
+
+      <ul>
+        <li><strong>Proxy configuration:</strong> Claude API calls must route through corporate
+          proxies; configure the <code>HTTPS_PROXY</code> environment variable</li>
+        <li><strong>Firewall rules:</strong> Allowlist the required Anthropic API endpoints
+          (<code>api.anthropic.com</code>) and any CDN domains</li>
+        <li><strong>VPN considerations:</strong> Test Claude performance on split-tunnel and
+          full-tunnel VPN configurations; latency can impact the interactive experience</li>
+        <li><strong>Rate limiting:</strong> Coordinate with your network team to ensure API
+          rate limits are not inadvertently imposed by corporate infrastructure</li>
+      </ul>
+
+      <h3>Success Metrics for Deployment</h3>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Metric</th>
+              <th>Target (Phase 1)</th>
+              <th>Target (Phase 3)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Adoption rate</td>
+              <td>80% of pilot group active weekly</td>
+              <td>60%+ of eligible employees active monthly</td>
+            </tr>
+            <tr>
+              <td>Time to first value</td>
+              <td>Under 2 days from account creation</td>
+              <td>Under 1 day (improved onboarding)</td>
+            </tr>
+            <tr>
+              <td>Repeat usage</td>
+              <td>70% use Claude 3+ times per week</td>
+              <td>50%+ use Claude daily</td>
+            </tr>
+            <tr>
+              <td>Net Promoter Score</td>
+              <td>+30 among pilot participants</td>
+              <td>+40 organization-wide</td>
+            </tr>
+            <tr>
+              <td>Support tickets</td>
+              <td>Fewer than 2 per user per month</td>
+              <td>Fewer than 0.5 per user per month</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 2: BUILDING A TEAM PROMPT LIBRARY
+         ======================================== -->
+    <section class="section" id="prompt-library">
+      <h2 class="section-heading">2. Building a Team Prompt Library</h2>
+
+      <p>
+        When each team member writes their own prompts from scratch, you get inconsistent quality,
+        duplicated effort, and no institutional learning. A
+        <span class="key-concept">centralized prompt library</span> solves all three problems.
+      </p>
+
+      <h3>Why Centralized Prompts Matter</h3>
+
+      <ul>
+        <li><strong>Consistency:</strong> Every team member gets the same high-quality starting
+          point, reducing variance in output quality</li>
+        <li><strong>Reusability:</strong> A prompt refined once benefits everyone; no one reinvents
+          the wheel</li>
+        <li><strong>Institutional knowledge:</strong> When an expert leaves, their best prompts
+          stay in the library</li>
+        <li><strong>Measurability:</strong> Centralized prompts can be tracked, scored, and improved
+          based on actual usage data</li>
+      </ul>
+
+      <h3>Prompt Library Structure</h3>
+
+      <p>
+        Organize prompts by business function, and include metadata that helps users discover the
+        right prompt for their task.
+      </p>
+
+      <div class="accent-card">
+        <div class="accent-card-header">
+          <div class="accent-card-icon">&#128218;</div>
+          <h4>Recommended Metadata Fields</h4>
+        </div>
+        <div class="comparison-table-wrapper">
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th>Field</th>
+                <th>Example</th>
+                <th>Purpose</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Category</strong></td>
+                <td>Sales / Outreach</td>
+                <td>Discovery and filtering</td>
+              </tr>
+              <tr>
+                <td><strong>Author</strong></td>
+                <td>Jane Smith, Sales Ops</td>
+                <td>Accountability and questions</td>
+              </tr>
+              <tr>
+                <td><strong>Version</strong></td>
+                <td>2.3</td>
+                <td>Track changes over time</td>
+              </tr>
+              <tr>
+                <td><strong>Tested Against</strong></td>
+                <td>Claude 3.5 Sonnet</td>
+                <td>Know when to re-validate</td>
+              </tr>
+              <tr>
+                <td><strong>Quality Score</strong></td>
+                <td>4.2 / 5.0 (18 reviews)</td>
+                <td>Surface the best prompts</td>
+              </tr>
+              <tr>
+                <td><strong>Use Count</strong></td>
+                <td>342 uses this month</td>
+                <td>Identify most valuable prompts</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <h3>Category Examples by Department</h3>
+
+      <ul>
+        <li><strong>Sales:</strong> Prospect research, cold email drafting, objection handling scripts,
+          competitive analysis summaries</li>
+        <li><strong>Marketing:</strong> Blog post outlines, social media copy, campaign briefs, SEO
+          keyword analysis</li>
+        <li><strong>Engineering:</strong> Code review checklists, architecture decision records,
+          incident postmortem templates, documentation generation</li>
+        <li><strong>HR:</strong> Job description writing, interview question generation,
+          onboarding material creation, policy summaries</li>
+        <li><strong>Legal:</strong> Contract clause analysis, regulatory change summaries,
+          compliance checklist generation, NDA review preparation</li>
+      </ul>
+
+      <h3>Quality Review Process</h3>
+
+      <p>
+        Not every prompt deserves a place in the shared library. Implement a lightweight review
+        process to maintain quality.
+      </p>
+
+      <div class="step-list">
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Author Creates Prompt with Test Cases</h4>
+            <p>
+              The author writes the prompt, includes at least 3 test inputs with expected outputs,
+              and documents any known limitations or edge cases.
+            </p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Peer Review Validates Against Diverse Inputs</h4>
+            <p>
+              A colleague from the same department tests the prompt with real-world inputs that
+              the author did not anticipate. They check for hallucinations, formatting issues,
+              and edge case behavior.
+            </p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Manager Approves for Team Distribution</h4>
+            <p>
+              The department lead confirms the prompt aligns with team standards and does not
+              include sensitive information. They assign a category and initial quality score.
+            </p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Periodic Audit for Accuracy and Relevance</h4>
+            <p>
+              Every quarter, review the library's most-used and least-used prompts. Archive
+              outdated prompts, update prompts affected by model changes, and surface new
+              high-performers.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>Version control tip:</strong> Store your prompt library in a Git repository.
+          Each prompt is a Markdown file with YAML frontmatter for metadata. This gives you
+          version history, diff-based reviews, and branch-based experimentation for free.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 3: GOVERNANCE FRAMEWORK
+         ======================================== -->
+    <section class="section" id="governance-framework">
+      <h2 class="section-heading">3. Governance Framework</h2>
+
+      <p>
+        Governance is what separates a responsible enterprise deployment from a free-for-all.
+        A well-designed framework protects the organization while keeping AI accessible
+        to the people who need it.
+      </p>
+
+      <h3>Usage Policies</h3>
+
+      <p>
+        Define clear boundaries for what Claude should and should not be used for. Ambiguity
+        leads to either over-caution (people avoid using the tool entirely) or misuse.
+      </p>
+
+      <div class="accent-card">
+        <div class="accent-card-header">
+          <div class="accent-card-icon" style="background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(6,182,212,0.1));">&#9989;</div>
+          <h4>Approved Uses</h4>
+        </div>
+        <ul>
+          <li>Drafting and editing written content (emails, reports, documentation)</li>
+          <li>Research and summarization of public or internal information</li>
+          <li>Data analysis and pattern identification</li>
+          <li>Brainstorming and ideation sessions</li>
+          <li>Code generation, review, and debugging</li>
+          <li>Translation and localization assistance</li>
+        </ul>
+      </div>
+
+      <div class="accent-card">
+        <div class="accent-card-header">
+          <div class="accent-card-icon" style="background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(251,191,36,0.1));">&#9888;</div>
+          <h4>Restricted Uses (Require Human Expert Review)</h4>
+        </div>
+        <ul>
+          <li>Legal opinion drafting -- must be reviewed by licensed attorney before distribution</li>
+          <li>Financial advice or projections -- must be validated by qualified financial analyst</li>
+          <li>Medical or clinical content -- must be reviewed by licensed healthcare professional</li>
+          <li>Customer-facing communications -- must pass brand voice review before sending</li>
+          <li>Regulatory filings -- must be cross-checked against current regulations</li>
+        </ul>
+      </div>
+
+      <div class="accent-card">
+        <div class="accent-card-header">
+          <div class="accent-card-icon" style="background: linear-gradient(135deg, rgba(239,68,68,0.15), rgba(248,113,113,0.1));">&#128683;</div>
+          <h4>Prohibited Uses</h4>
+        </div>
+        <ul>
+          <li>Generating credentials, passwords, or security tokens</li>
+          <li>Accessing restricted systems or databases through Claude</li>
+          <li>Processing personally identifiable information (PII) without authorization</li>
+          <li>Making autonomous decisions with material business impact</li>
+          <li>Circumventing established approval workflows</li>
+        </ul>
+      </div>
+
+      <h3>Content Classification</h3>
+
+      <p>
+        Map your organization's data classification scheme to Claude usage guidelines. Not all
+        data should be used in conversations.
+      </p>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Classification</th>
+              <th>Examples</th>
+              <th>Claude Policy</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Public</strong></td>
+              <td>Marketing materials, published research, public docs</td>
+              <td>Unrestricted use</td>
+            </tr>
+            <tr>
+              <td><strong>Internal</strong></td>
+              <td>Meeting notes, project plans, internal wikis</td>
+              <td>Permitted with enterprise plan (data not used for training)</td>
+            </tr>
+            <tr>
+              <td><strong>Confidential</strong></td>
+              <td>Financial reports, strategic plans, customer data</td>
+              <td>Requires data handling agreement; anonymize where possible</td>
+            </tr>
+            <tr>
+              <td><strong>Restricted</strong></td>
+              <td>PII, PHI, trade secrets, credentials</td>
+              <td>Prohibited in conversations; use only anonymized/synthetic data</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Audit and Compliance</h3>
+
+      <p>
+        Enterprise deployments require auditable records of AI usage. Configure your audit
+        infrastructure to capture the right signals.
+      </p>
+
+      <h4>Audit Log Fields</h4>
+
+      <div class="code-block has-label">
+        <span class="code-label">Audit Log Schema</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="punc">{</span>
+  <span class="str">"timestamp"</span><span class="punc">:</span> <span class="str">"2025-03-15T14:32:00Z"</span><span class="punc">,</span>
+  <span class="str">"user_id"</span><span class="punc">:</span> <span class="str">"jsmith@company.com"</span><span class="punc">,</span>
+  <span class="str">"department"</span><span class="punc">:</span> <span class="str">"engineering"</span><span class="punc">,</span>
+  <span class="str">"model"</span><span class="punc">:</span> <span class="str">"claude-sonnet-4"</span><span class="punc">,</span>
+  <span class="str">"input_tokens"</span><span class="punc">:</span> <span class="num">1250</span><span class="punc">,</span>
+  <span class="str">"output_tokens"</span><span class="punc">:</span> <span class="num">3400</span><span class="punc">,</span>
+  <span class="str">"data_classification"</span><span class="punc">:</span> <span class="str">"internal"</span><span class="punc">,</span>
+  <span class="str">"use_category"</span><span class="punc">:</span> <span class="str">"code_review"</span><span class="punc">,</span>
+  <span class="str">"session_id"</span><span class="punc">:</span> <span class="str">"sess_a1b2c3d4"</span>
+<span class="punc">}</span></code></div>
+
+      <h4>Compliance Mapping</h4>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Framework</th>
+              <th>Requirement</th>
+              <th>How Claude Addresses It</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>SOC 2</strong></td>
+              <td>Audit logs for all system access</td>
+              <td>Comprehensive API logging with user attribution</td>
+            </tr>
+            <tr>
+              <td><strong>HIPAA</strong></td>
+              <td>Protected health information safeguards</td>
+              <td>Enterprise data handling agreement; no training on customer data</td>
+            </tr>
+            <tr>
+              <td><strong>GDPR</strong></td>
+              <td>Data residency and right to deletion</td>
+              <td>Regional processing options; conversation deletion API</td>
+            </tr>
+            <tr>
+              <td><strong>PCI-DSS</strong></td>
+              <td>Cardholder data protection</td>
+              <td>Prohibited use policy for payment card data</td>
+            </tr>
+            <tr>
+              <td><strong>FedRAMP</strong></td>
+              <td>Federal data processing standards</td>
+              <td>Government-specific deployment options (consult Anthropic sales)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4>Review Cadence</h4>
+
+      <ul>
+        <li><strong>Monthly:</strong> Usage metrics review -- who is using Claude, how much,
+          and for what categories</li>
+        <li><strong>Quarterly:</strong> Policy review -- are the approved/restricted/prohibited
+          lists still appropriate? Any new use cases to add?</li>
+        <li><strong>Annually:</strong> Full compliance audit -- review all governance documents,
+          update for regulatory changes, re-train all users on policy updates</li>
+      </ul>
+
+      <div class="callout warning">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Common pitfall:</strong> Do not wait until after deployment to build your
+          governance framework. The framework should be in place before Phase 2 (department
+          rollout) begins. Retrofitting governance onto a live deployment is significantly
+          harder than deploying governance alongside the tool.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 2: GOVERNANCE POLICY BUILDER
+         ======================================== -->
+    <section class="section" id="governance-builder">
+      <h2 class="section-heading">Governance Policy Builder</h2>
+
+      <p>
+        Use this interactive tool to build a governance policy document for your organization.
+        Work through the three steps to define compliance requirements, usage policies, and
+        data classification rules. The policy document updates in real-time as you make selections.
+      </p>
+
+      <div class="gov-builder" id="govBuilder">
+        <h3>Build Your Governance Policy</h3>
+
+        <!-- Steps indicator -->
+        <div class="gov-steps-bar">
+          <div class="gov-step-indicator active" id="govStepInd1" onclick="goToGovStep(1)">Step 1: Compliance</div>
+          <div class="gov-step-indicator" id="govStepInd2" onclick="goToGovStep(2)">Step 2: Usage Policies</div>
+          <div class="gov-step-indicator" id="govStepInd3" onclick="goToGovStep(3)">Step 3: Data Classification</div>
+        </div>
+
+        <!-- Step 1: Compliance Requirements -->
+        <div class="gov-step-panel active" id="govStep1">
+          <h4>Select applicable compliance frameworks</h4>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 12px;">
+            Choose all frameworks your organization must comply with. This will determine
+            audit requirements in the generated policy.
+          </p>
+          <div class="gov-checkbox-grid" id="complianceCheckboxes">
+            <label class="gov-checkbox-item" onclick="toggleGovCheckbox(this)">
+              <input type="checkbox" value="HIPAA"> HIPAA
+            </label>
+            <label class="gov-checkbox-item" onclick="toggleGovCheckbox(this)">
+              <input type="checkbox" value="SOC 2"> SOC 2
+            </label>
+            <label class="gov-checkbox-item" onclick="toggleGovCheckbox(this)">
+              <input type="checkbox" value="GDPR"> GDPR
+            </label>
+            <label class="gov-checkbox-item" onclick="toggleGovCheckbox(this)">
+              <input type="checkbox" value="PCI-DSS"> PCI-DSS
+            </label>
+            <label class="gov-checkbox-item" onclick="toggleGovCheckbox(this)">
+              <input type="checkbox" value="FedRAMP"> FedRAMP
+            </label>
+            <label class="gov-checkbox-item" onclick="toggleGovCheckbox(this)">
+              <input type="checkbox" value="None"> None / Other
+            </label>
+          </div>
+        </div>
+
+        <!-- Step 2: Usage Policies -->
+        <div class="gov-step-panel" id="govStep2">
+          <h4>Define usage policies by category</h4>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 16px;">
+            Add items to each category using the dropdown or type a custom entry. Click the X
+            on any tag to remove it.
+          </p>
+
+          <div class="gov-policy-section">
+            <h4 style="color: var(--success);">Approved Uses</h4>
+            <div class="gov-policy-tag-group" id="approvedTags"></div>
+            <div class="gov-add-row">
+              <select id="approvedSelect">
+                <option value="">Select or type below...</option>
+                <option value="Drafting emails and reports">Drafting emails and reports</option>
+                <option value="Research and summarization">Research and summarization</option>
+                <option value="Data analysis">Data analysis</option>
+                <option value="Brainstorming and ideation">Brainstorming and ideation</option>
+                <option value="Code generation and review">Code generation and review</option>
+                <option value="Translation assistance">Translation assistance</option>
+                <option value="Meeting notes summarization">Meeting notes summarization</option>
+                <option value="Documentation generation">Documentation generation</option>
+              </select>
+              <input type="text" id="approvedCustom" placeholder="Or type custom...">
+              <button class="gov-add-btn" onclick="addPolicyTag('approved')">Add</button>
+            </div>
+          </div>
+
+          <div class="gov-policy-section">
+            <h4 style="color: var(--warning);">Restricted Uses (Require Review)</h4>
+            <div class="gov-policy-tag-group" id="restrictedTags"></div>
+            <div class="gov-add-row">
+              <select id="restrictedSelect">
+                <option value="">Select or type below...</option>
+                <option value="Legal opinion drafting">Legal opinion drafting</option>
+                <option value="Financial advice">Financial advice</option>
+                <option value="Medical/clinical content">Medical/clinical content</option>
+                <option value="Customer-facing communications">Customer-facing communications</option>
+                <option value="Regulatory filings">Regulatory filings</option>
+                <option value="External presentations">External presentations</option>
+                <option value="Press release drafting">Press release drafting</option>
+              </select>
+              <input type="text" id="restrictedCustom" placeholder="Or type custom...">
+              <button class="gov-add-btn" onclick="addPolicyTag('restricted')">Add</button>
+            </div>
+          </div>
+
+          <div class="gov-policy-section">
+            <h4 style="color: var(--error);">Prohibited Uses</h4>
+            <div class="gov-policy-tag-group" id="prohibitedTags"></div>
+            <div class="gov-add-row">
+              <select id="prohibitedSelect">
+                <option value="">Select or type below...</option>
+                <option value="Generating credentials or passwords">Generating credentials or passwords</option>
+                <option value="Accessing restricted systems">Accessing restricted systems</option>
+                <option value="Processing PII without authorization">Processing PII without authorization</option>
+                <option value="Autonomous business decisions">Autonomous business decisions</option>
+                <option value="Circumventing approval workflows">Circumventing approval workflows</option>
+                <option value="Storing sensitive data in prompts">Storing sensitive data in prompts</option>
+              </select>
+              <input type="text" id="prohibitedCustom" placeholder="Or type custom...">
+              <button class="gov-add-btn" onclick="addPolicyTag('prohibited')">Add</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3: Data Classification -->
+        <div class="gov-step-panel" id="govStep3">
+          <h4>Map data types to classification levels</h4>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 16px;">
+            For each type of data your organization handles, select the appropriate classification
+            level. This determines how each data type may be used with Claude.
+          </p>
+          <div class="gov-class-grid">
+            <div class="gov-class-item">
+              <label>Customer Data</label>
+              <select id="classCustomer" onchange="updateGovPreview()">
+                <option value="Public">Public</option>
+                <option value="Internal">Internal</option>
+                <option value="Confidential" selected>Confidential</option>
+                <option value="Restricted">Restricted</option>
+              </select>
+            </div>
+            <div class="gov-class-item">
+              <label>Financial Records</label>
+              <select id="classFinancial" onchange="updateGovPreview()">
+                <option value="Public">Public</option>
+                <option value="Internal">Internal</option>
+                <option value="Confidential" selected>Confidential</option>
+                <option value="Restricted">Restricted</option>
+              </select>
+            </div>
+            <div class="gov-class-item">
+              <label>Internal Documents</label>
+              <select id="classInternal" onchange="updateGovPreview()">
+                <option value="Public">Public</option>
+                <option value="Internal" selected>Internal</option>
+                <option value="Confidential">Confidential</option>
+                <option value="Restricted">Restricted</option>
+              </select>
+            </div>
+            <div class="gov-class-item">
+              <label>Public Information</label>
+              <select id="classPublic" onchange="updateGovPreview()">
+                <option value="Public" selected>Public</option>
+                <option value="Internal">Internal</option>
+                <option value="Confidential">Confidential</option>
+                <option value="Restricted">Restricted</option>
+              </select>
+            </div>
+            <div class="gov-class-item">
+              <label>Employee Records</label>
+              <select id="classEmployee" onchange="updateGovPreview()">
+                <option value="Public">Public</option>
+                <option value="Internal">Internal</option>
+                <option value="Confidential">Confidential</option>
+                <option value="Restricted" selected>Restricted</option>
+              </select>
+            </div>
+            <div class="gov-class-item">
+              <label>Source Code</label>
+              <select id="classSourceCode" onchange="updateGovPreview()">
+                <option value="Public">Public</option>
+                <option value="Internal" selected>Internal</option>
+                <option value="Confidential">Confidential</option>
+                <option value="Restricted">Restricted</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation buttons -->
+        <div class="gov-nav-btns">
+          <button class="gov-nav-btn" id="govPrevBtn" onclick="changeGovStep(-1)" disabled>Previous</button>
+          <button class="gov-nav-btn primary" id="govNextBtn" onclick="changeGovStep(1)">Next Step</button>
+        </div>
+
+        <!-- Policy preview (always visible) -->
+        <div class="gov-preview" id="govPreview">
+          <div class="policy-header">AI Usage Governance Policy</div>
+          <div class="policy-date" id="govPolicyDate"></div>
+          <div id="govPreviewContent">
+            <p><em>Make selections above to generate your policy document...</em></p>
+          </div>
+        </div>
+
+        <button class="gov-copy-btn" id="govCopyBtn" onclick="copyGovPolicy()">Copy Policy to Clipboard</button>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 4: MEASURING ROI
+         ======================================== -->
+    <section class="section" id="measuring-roi">
+      <h2 class="section-heading">4. Measuring ROI</h2>
+
+      <p>
+        Executives will ask one question more than any other: "Is this investment paying off?"
+        A rigorous ROI framework transforms anecdotes ("Claude saved me hours!") into
+        <span class="key-concept">board-ready data</span> that justifies continued investment.
+      </p>
+
+      <h3>Quantitative Metrics</h3>
+
+      <ul>
+        <li><strong>Time saved per task:</strong> Measure before-and-after completion times for
+          common tasks (e.g., writing a code review went from 45 min to 15 min)</li>
+        <li><strong>Tasks completed per day:</strong> Track productivity increases at the individual
+          and team level</li>
+        <li><strong>Error reduction rate:</strong> Compare defect rates, revision cycles, or
+          rework frequency before and after AI adoption</li>
+        <li><strong>Cost per task:</strong> Calculate the fully-loaded cost of performing a task
+          manually versus with Claude assistance</li>
+      </ul>
+
+      <h3>Qualitative Metrics</h3>
+
+      <ul>
+        <li><strong>Employee satisfaction:</strong> Run an NPS survey specifically for AI tools
+          every quarter</li>
+        <li><strong>Quality ratings:</strong> Have managers or peers rate the quality of
+          AI-assisted work on a 1--5 scale</li>
+        <li><strong>Innovation index:</strong> Count the number of new, previously-unimagined
+          use cases that teams discover organically</li>
+      </ul>
+
+      <h3>The ROI Formula</h3>
+
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm">// Monthly ROI Calculation</span>
+<span class="kw">Monthly Value</span> <span class="op">=</span> <span class="param">Time Saved (hours)</span> <span class="op">*</span> <span class="param">Avg Hourly Rate</span>
+<span class="kw">Monthly Cost</span>  <span class="op">=</span> <span class="param">Claude Licenses</span> <span class="op">+</span> <span class="param">Admin Overhead</span>
+<span class="kw">Monthly Net</span>   <span class="op">=</span> <span class="kw">Monthly Value</span> <span class="op">-</span> <span class="kw">Monthly Cost</span>
+
+<span class="cm">// Annual ROI with Training Investment</span>
+<span class="kw">Annual Net ROI</span> <span class="op">=</span> <span class="punc">(</span><span class="kw">Monthly Net</span> <span class="op">*</span> <span class="num">12</span><span class="punc">)</span> <span class="op">-</span> <span class="param">Training Investment</span>
+<span class="kw">ROI %</span>          <span class="op">=</span> <span class="kw">Annual Net ROI</span> <span class="op">/</span> <span class="param">Total Annual Cost</span> <span class="op">*</span> <span class="num">100</span></code></div>
+
+      <h3>Reporting Cadence</h3>
+
+      <ul>
+        <li><strong>Monthly dashboards:</strong> Usage metrics, cost tracking, top use cases by
+          department</li>
+        <li><strong>Quarterly executive reviews:</strong> ROI summary, trend analysis, strategic
+          recommendations</li>
+        <li><strong>Annual business case refresh:</strong> Full cost-benefit analysis with
+          year-over-year comparisons</li>
+      </ul>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>Measurement tip:</strong> Start collecting baseline data <em>before</em>
+          the pilot begins. Without a "before" measurement, you cannot quantify the "after"
+          improvement. Ask pilot participants to time themselves on 3--5 representative tasks
+          during the week before they get Claude access.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 1: ROI CALCULATOR
+         ======================================== -->
+    <section class="section" id="roi-calculator">
+      <h2 class="section-heading">ROI Calculator</h2>
+
+      <p>
+        Use the calculator below to estimate the return on investment for your Claude deployment.
+        Adjust the inputs to match your organization's profile and see the results update in
+        real-time.
+      </p>
+
+      <div class="roi-calc" id="roiCalc">
+        <h3>Calculate Your ROI</h3>
+
+        <div class="roi-inputs">
+          <div class="roi-field">
+            <label for="roiTeamSize">Team Size</label>
+            <input type="number" id="roiTeamSize" min="1" max="500" value="25" oninput="updateROI()">
+            <span class="roi-field-hint">Number of Claude users (1--500)</span>
+          </div>
+
+          <div class="roi-field">
+            <label for="roiHourlyRate">Average Hourly Rate ($)</label>
+            <input type="number" id="roiHourlyRate" min="10" max="500" value="75" oninput="updateROI()">
+            <span class="roi-field-hint">Fully-loaded employee cost per hour</span>
+          </div>
+
+          <div class="roi-field roi-slider-field">
+            <label>Estimated Time Saved Per Person Per Day</label>
+            <div class="roi-slider-row">
+              <input type="range" id="roiTimeSaved" min="0" max="40" value="10" oninput="updateROI()">
+              <span class="roi-slider-value" id="roiTimeSavedValue">1.0 hrs</span>
+            </div>
+            <span class="roi-field-hint">Drag the slider (0 to 4 hours)</span>
+          </div>
+
+          <div class="roi-field">
+            <label for="roiMonthlyCost">Monthly Claude Cost Per Seat ($)</label>
+            <input type="number" id="roiMonthlyCost" min="0" max="500" value="30" oninput="updateROI()">
+            <span class="roi-field-hint">License cost per user per month</span>
+          </div>
+
+          <div class="roi-field">
+            <label for="roiTrainingCost">Training Investment Per Person ($)</label>
+            <input type="number" id="roiTrainingCost" min="0" max="10000" value="500" oninput="updateROI()">
+            <span class="roi-field-hint">One-time training and onboarding cost</span>
+          </div>
+        </div>
+
+        <!-- Results Grid -->
+        <div class="roi-results">
+          <div class="roi-result-card">
+            <div class="roi-result-label">Monthly Time Savings</div>
+            <div class="roi-result-value neutral" id="roiMonthlyHours">550 hours</div>
+          </div>
+          <div class="roi-result-card">
+            <div class="roi-result-label">Monthly Value of Time Saved</div>
+            <div class="roi-result-value positive" id="roiMonthlyValue">$41,250</div>
+          </div>
+          <div class="roi-result-card">
+            <div class="roi-result-label">Monthly Claude Cost</div>
+            <div class="roi-result-value negative" id="roiMonthlyCostResult">$750</div>
+          </div>
+          <div class="roi-result-card highlight">
+            <div class="roi-result-label">Monthly Net ROI</div>
+            <div class="roi-result-value positive" id="roiMonthlyNet">$40,500</div>
+          </div>
+          <div class="roi-result-card highlight">
+            <div class="roi-result-label">Annual Net ROI</div>
+            <div class="roi-result-value positive" id="roiAnnualNet">$473,500</div>
+          </div>
+          <div class="roi-result-card">
+            <div class="roi-result-label">Break-Even Timeline</div>
+            <div class="roi-result-value neutral" id="roiBreakEven">0.3 months</div>
+          </div>
+          <div class="roi-result-card">
+            <div class="roi-result-label">Training Investment</div>
+            <div class="roi-result-value negative" id="roiTrainingTotal">$12,500</div>
+          </div>
+          <div class="roi-result-card highlight">
+            <div class="roi-result-label">ROI Percentage</div>
+            <div class="roi-result-value positive" id="roiPercentage">1,894%</div>
+          </div>
+        </div>
+
+        <!-- Bar Chart -->
+        <div class="roi-chart">
+          <h4>Annual Cost vs. Value Comparison</h4>
+          <div class="roi-bar-group">
+            <div class="roi-bar-label">Total Annual Cost</div>
+            <div class="roi-bar-track">
+              <div class="roi-bar-fill cost" id="roiBarCost" style="width: 5%;"></div>
+            </div>
+          </div>
+          <div class="roi-bar-group">
+            <div class="roi-bar-label">Total Annual Value</div>
+            <div class="roi-bar-track">
+              <div class="roi-bar-fill value" id="roiBarValue" style="width: 95%;"></div>
+            </div>
+          </div>
+          <div class="roi-delta">
+            <span class="roi-delta-label">Net Annual ROI:</span>
+            <span class="roi-delta-value" id="roiDeltaValue">$473,500</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 5: CHANGE MANAGEMENT
+         ======================================== -->
+    <section class="section" id="change-management">
+      <h2 class="section-heading">5. Change Management</h2>
+
+      <p>
+        Technology adoption is ultimately a people problem. Even the best AI tool fails if the
+        people it is meant to help resist using it. Effective change management bridges the gap
+        between having the tool and having the tool create value.
+      </p>
+
+      <h3>The Adoption Curve</h3>
+
+      <p>
+        Every organization follows a predictable adoption curve when introducing new technology.
+        Understanding where each group sits helps you tailor your approach.
+      </p>
+
+      <div class="adoption-curve">
+        <div class="adoption-curve-bars">
+          <div class="adoption-bar">
+            <span class="adoption-bar-pct">2.5%</span>
+            <div class="adoption-bar-fill" style="height: 25px; background: linear-gradient(180deg, #7C3AED, #A78BFA);"></div>
+            <span class="adoption-bar-label">Innovators</span>
+          </div>
+          <div class="adoption-bar">
+            <span class="adoption-bar-pct">13.5%</span>
+            <div class="adoption-bar-fill" style="height: 55px; background: linear-gradient(180deg, #06B6D4, #22D3EE);"></div>
+            <span class="adoption-bar-label">Early Adopters</span>
+          </div>
+          <div class="adoption-bar">
+            <span class="adoption-bar-pct">34%</span>
+            <div class="adoption-bar-fill" style="height: 100px; background: linear-gradient(180deg, #10B981, #34D399);"></div>
+            <span class="adoption-bar-label">Early Majority</span>
+          </div>
+          <div class="adoption-bar">
+            <span class="adoption-bar-pct">34%</span>
+            <div class="adoption-bar-fill" style="height: 100px; background: linear-gradient(180deg, #F59E0B, #FBBF24);"></div>
+            <span class="adoption-bar-label">Late Majority</span>
+          </div>
+          <div class="adoption-bar">
+            <span class="adoption-bar-pct">16%</span>
+            <div class="adoption-bar-fill" style="height: 65px; background: linear-gradient(180deg, #94A3B8, #CBD5E1);"></div>
+            <span class="adoption-bar-label">Laggards</span>
+          </div>
+        </div>
+      </div>
+
+      <h3>The Champion Program</h3>
+
+      <p>
+        Champions are your secret weapon for crossing the chasm from Early Adopters to Early
+        Majority. They are power users who volunteer (or are recruited) to evangelize AI within
+        their teams.
+      </p>
+
+      <div class="accent-card">
+        <div class="accent-card-header">
+          <div class="accent-card-icon">&#127942;</div>
+          <h4>Champion Responsibilities</h4>
+        </div>
+        <ul>
+          <li><strong>Weekly office hours:</strong> Dedicated time when teammates can ask questions
+            and get live help with Claude</li>
+          <li><strong>Use case collection:</strong> Document new workflows their team discovers
+            and submit the best ones to the prompt library</li>
+          <li><strong>Mentoring:</strong> Pair with reluctant team members to walk them through
+            their first real-world task</li>
+          <li><strong>Feedback escalation:</strong> Collect pain points and feature requests,
+            consolidate them, and present to the AI governance team</li>
+          <li><strong>Success storytelling:</strong> Share wins at team meetings and in Slack
+            channels to build social proof</li>
+        </ul>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-icon">&#128712;</span>
+        <div class="callout-content">
+          <p><strong>Champion selection:</strong> Look for people who are enthusiastic but also
+          credible. The best champion is not always the most technically advanced person --
+          it is the person their teammates trust and naturally turn to for help.</p>
+        </div>
+      </div>
+
+      <h3>Common Objections and Responses</h3>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Objection</th>
+              <th>Response</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>"AI will replace my job"</td>
+              <td>AI augments your work -- you do more, not less. People who use AI tools are more
+                productive and more valuable, not less. The risk is in <em>not</em> adopting the tool.</td>
+            </tr>
+            <tr>
+              <td>"I don't trust AI output"</td>
+              <td>Human review is always required. Claude drafts, you finalize. Think of it as a
+                fast first draft that you refine with your expertise.</td>
+            </tr>
+            <tr>
+              <td>"It's too complicated"</td>
+              <td>Start with one use case -- just one. Master it, see the value, then expand.
+                Most people find their stride within a week.</td>
+            </tr>
+            <tr>
+              <td>"I don't have time to learn"</td>
+              <td>The learning investment is 1--2 hours. The time you save within the first week
+                more than pays that back. Our champions can walk you through it.</td>
+            </tr>
+            <tr>
+              <td>"What about data privacy?"</td>
+              <td>Our governance framework ensures data is classified and protected. Enterprise
+                conversations are not used for model training. We have addressed this at the
+                policy level.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Training Rollout Strategy</h3>
+
+      <div class="step-list">
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Group Training Sessions</h4>
+            <p>
+              Start with live, instructor-led sessions (60--90 minutes) that cover the basics,
+              demonstrate 3--5 real use cases relevant to the audience, and include hands-on
+              practice time.
+            </p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Self-Paced Modules</h4>
+            <p>
+              Provide training modules (like this one) that people can work through on their
+              own schedule. Include quizzes to verify comprehension and track completion.
+            </p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Office Hours</h4>
+            <p>
+              Champions host weekly drop-in sessions where anyone can ask questions, share
+              challenges, or get help with a specific task. These become less frequent as
+              competence grows.
+            </p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Advanced Workshops</h4>
+            <p>
+              For power users who want to go deeper: prompt engineering, multi-turn workflows,
+              API integration, custom tool building, and automation patterns.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <h3>Feedback Loops</h3>
+
+      <p>
+        Continuous improvement requires continuous feedback. Establish multiple channels:
+      </p>
+
+      <ul>
+        <li><strong>Monthly pulse surveys:</strong> 3--5 questions on satisfaction, blockers,
+          and feature requests (keep it short to maximize response rate)</li>
+        <li><strong>Feature request board:</strong> A shared Kanban board where anyone can
+          submit and vote on improvement ideas</li>
+        <li><strong>Bug reporting:</strong> A dedicated channel for reporting unexpected behavior,
+          hallucinations, or policy violations</li>
+        <li><strong>Success story channel:</strong> A Slack channel or internal blog where people
+          share wins -- these are gold for building momentum</li>
+      </ul>
+
+      <div class="callout important">
+        <span class="callout-icon">&#10071;</span>
+        <div class="callout-content">
+          <p><strong>Critical success factor:</strong> Executive sponsorship. If leaders visibly
+          use Claude and talk about it, adoption follows. If leaders delegate AI to "the tech
+          team," adoption stalls. The single strongest predictor of successful enterprise AI
+          adoption is visible executive usage.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         END-OF-MODULE QUIZ
+         ======================================== -->
+    <section class="section" id="final-quiz">
+      <h2 class="section-heading">End-of-Module Quiz</h2>
+
+      <p>
+        Test your understanding of enterprise Claude deployment, governance, and change management.
+        You need at least 3 out of 4 correct to pass.
+      </p>
+
+      <div class="final-quiz" id="finalQuizContainer">
+        <h3>Module 13 Assessment</h3>
+
+        <!-- Question 1 -->
+        <div class="final-quiz-question" data-fq="0">
+          <div class="fq-number">Question 1 of 4</div>
+          <div class="fq-text">What is the recommended approach for enterprise Claude deployment?</div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-val="a" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="a"> Deploy to everyone simultaneously
+            </li>
+            <li class="fq-option" data-fq-val="b" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="b"> Start with a pilot group, then expand by department
+            </li>
+            <li class="fq-option" data-fq-val="c" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="c"> Only allow executives to use it first
+            </li>
+            <li class="fq-option" data-fq-val="d" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="d"> Wait until the entire organization requests it
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="final-quiz-question" data-fq="1">
+          <div class="fq-number">Question 2 of 4</div>
+          <div class="fq-text">In an ROI calculation for Claude adoption, which metric typically has the highest impact?</div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-val="a" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="a"> Reduction in Claude API costs
+            </li>
+            <li class="fq-option" data-fq-val="b" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="b"> Time saved per employee multiplied by their hourly rate
+            </li>
+            <li class="fq-option" data-fq-val="c" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="c"> Number of conversations per day
+            </li>
+            <li class="fq-option" data-fq-val="d" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="d"> Model selection optimization
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="final-quiz-question" data-fq="2">
+          <div class="fq-number">Question 3 of 4</div>
+          <div class="fq-text">What should a governance framework's "restricted uses" category include?</div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-val="a" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="a"> Tasks that Claude cannot do at all
+            </li>
+            <li class="fq-option" data-fq-val="b" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="b"> Tasks that require human expert review before acting on Claude's output
+            </li>
+            <li class="fq-option" data-fq-val="c" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="c"> Tasks reserved for executives only
+            </li>
+            <li class="fq-option" data-fq-val="d" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="d"> Tasks that are too expensive to run
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 4 -->
+        <div class="final-quiz-question" data-fq="3">
+          <div class="fq-number">Question 4 of 4</div>
+          <div class="fq-text">What is a "champion program" in the context of Claude adoption?</div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-val="a" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="a"> A competition to see who uses Claude the most
+            </li>
+            <li class="fq-option" data-fq-val="b" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="b"> Identifying power users who mentor others and drive adoption in their teams
+            </li>
+            <li class="fq-option" data-fq-val="c" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="c"> A certification program for advanced users
+            </li>
+            <li class="fq-option" data-fq-val="d" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="d"> A customer success program from Anthropic
+            </li>
+          </ul>
+        </div>
+
+        <button class="final-submit-btn" id="finalSubmitBtn" onclick="submitFinalQuiz()" disabled>
+          Submit Answers
+        </button>
+
+        <div class="final-result" id="finalResult">
+          <h4 id="finalResultTitle"></h4>
+          <p id="finalResultText"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         NAVIGATION FOOTER
+         ======================================== -->
+    <nav class="module-nav">
+      <a href="12-code-advanced.html" class="nav-link prev">
+        <span class="nav-dir">&larr; Previous</span>
+        <span class="nav-title">Module 12: Claude Code Advanced</span>
+      </a>
+      <a href="20-api-fundamentals.html" class="nav-link next">
+        <span class="nav-dir">Next &rarr;</span>
+        <span class="nav-title">Module 20: Claude API Fundamentals</span>
+      </a>
+    </nav>
+
+  </div>
+</main>
+
+<!-- ============================================
+     JAVASCRIPT (ES5 COMPATIBLE)
+     ============================================ -->
+<script>
+(function() {
+  'use strict';
+
+  // ==========================================
+  // THEME MANAGEMENT
+  // ==========================================
+  var THEME_KEY = 'claude-training-theme';
+
+  function getTheme() {
+    return localStorage.getItem(THEME_KEY) || 'light';
+  }
+
+  function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem(THEME_KEY, theme);
+    var icon = document.getElementById('themeIcon');
+    if (icon) {
+      icon.textContent = theme === 'dark' ? '\u2600' : '\u263E';
+    }
+  }
+
+  // Initialize theme
+  setTheme(getTheme());
+
+  document.getElementById('themeToggle').addEventListener('click', function() {
+    var current = getTheme();
+    setTheme(current === 'dark' ? 'light' : 'dark');
+  });
+
+  // ==========================================
+  // SIDEBAR MOBILE TOGGLE
+  // ==========================================
+  var hamburger = document.getElementById('hamburger');
+  var sidebar = document.getElementById('sidebar');
+  var overlay = document.getElementById('sidebarOverlay');
+
+  function toggleSidebar() {
+    var isOpen = sidebar.classList.contains('open');
+    sidebar.classList.toggle('open');
+    hamburger.classList.toggle('open');
+    if (isOpen) {
+      overlay.classList.remove('show');
+    } else {
+      overlay.classList.add('show');
+    }
+  }
+
+  hamburger.addEventListener('click', toggleSidebar);
+  overlay.addEventListener('click', toggleSidebar);
+
+  // ==========================================
+  // SIDEBAR SECTION COLLAPSING
+  // ==========================================
+  var sectionToggles = document.querySelectorAll('.sidebar-section-toggle');
+  for (var t = 0; t < sectionToggles.length; t++) {
+    (function(btn) {
+      btn.addEventListener('click', function() {
+        var sectionName = this.getAttribute('data-section');
+        var linksList = document.getElementById('nav-' + sectionName);
+        var isCollapsed = this.classList.contains('collapsed');
+
+        if (isCollapsed) {
+          this.classList.remove('collapsed');
+          linksList.classList.remove('collapsed');
+          linksList.style.maxHeight = linksList.scrollHeight + 'px';
+        } else {
+          this.classList.add('collapsed');
+          linksList.style.maxHeight = linksList.scrollHeight + 'px';
+          linksList.offsetHeight; // Force reflow
+          linksList.classList.add('collapsed');
+        }
+      });
+
+      // Initialize: set max-height so transitions work
+      var sectionName = btn.getAttribute('data-section');
+      var linksList = document.getElementById('nav-' + sectionName);
+      if (linksList) {
+        linksList.style.maxHeight = linksList.scrollHeight + 'px';
+      }
+    })(sectionToggles[t]);
+  }
+
+  // ==========================================
+  // SCROLLSPY
+  // ==========================================
+  var sidebarLinks = document.querySelectorAll('.sidebar-link');
+  var sections = [];
+
+  for (var s = 0; s < sidebarLinks.length; s++) {
+    var targetId = sidebarLinks[s].getAttribute('data-target');
+    var section = document.getElementById(targetId);
+    if (section) {
+      sections.push({ el: section, link: sidebarLinks[s], id: targetId });
+    }
+  }
+
+  function updateScrollspy() {
+    var scrollPos = window.scrollY + 100;
+    var active = null;
+
+    for (var i = sections.length - 1; i >= 0; i--) {
+      if (sections[i].el.offsetTop <= scrollPos) {
+        active = sections[i];
+        break;
+      }
+    }
+
+    for (var j = 0; j < sidebarLinks.length; j++) {
+      sidebarLinks[j].classList.remove('active');
+    }
+    if (active) {
+      active.link.classList.add('active');
+    }
+
+    updateSidebarProgress();
+  }
+
+  var scrollTimer = null;
+  window.addEventListener('scroll', function() {
+    if (scrollTimer) return;
+    scrollTimer = setTimeout(function() {
+      scrollTimer = null;
+      updateScrollspy();
+    }, 50);
+  });
+  updateScrollspy();
+
+  // Close mobile sidebar on link click
+  for (var sl = 0; sl < sidebarLinks.length; sl++) {
+    sidebarLinks[sl].addEventListener('click', function() {
+      if (window.innerWidth <= 1024) {
+        sidebar.classList.remove('open');
+        hamburger.classList.remove('open');
+        overlay.classList.remove('show');
+      }
+    });
+  }
+
+  // ==========================================
+  // SIDEBAR PROGRESS
+  // ==========================================
+  function updateSidebarProgress() {
+    var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    var scrolled = window.scrollY;
+    var pct = docHeight > 0 ? Math.min(100, (scrolled / docHeight) * 100) : 0;
+
+    var fill = document.getElementById('sidebarProgressFill');
+    if (fill) {
+      fill.style.width = pct + '%';
+    }
+  }
+
+  // ==========================================
+  // COPY TO CLIPBOARD
+  // ==========================================
+  window.copyCode = function(btn) {
+    var block = btn.closest('.code-block');
+    var codeEl = block.cloneNode(true);
+    var labelEl = codeEl.querySelector('.code-label');
+    var btnEl = codeEl.querySelector('.copy-btn');
+    if (labelEl) labelEl.remove();
+    if (btnEl) btnEl.remove();
+
+    var text = codeEl.textContent.trim();
+
+    navigator.clipboard.writeText(text).then(function() {
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() {
+        btn.textContent = 'Copy';
+        btn.classList.remove('copied');
+      }, 2000);
+    }).catch(function() {
+      btn.textContent = 'Failed';
+      setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+    });
+  };
+
+  // ==========================================
+  // ROI CALCULATOR
+  // ==========================================
+  function formatCurrency(num) {
+    if (num < 0) {
+      return '-$' + Math.abs(Math.round(num)).toLocaleString();
+    }
+    return '$' + Math.round(num).toLocaleString();
+  }
+
+  window.updateROI = function() {
+    var teamSize = parseInt(document.getElementById('roiTeamSize').value) || 1;
+    var hourlyRate = parseInt(document.getElementById('roiHourlyRate').value) || 0;
+    var timeSavedRaw = parseInt(document.getElementById('roiTimeSaved').value) || 0;
+    var timeSavedHours = timeSavedRaw / 10; // Slider goes 0-40, representing 0.0-4.0 hours
+    var monthlyCostPerSeat = parseInt(document.getElementById('roiMonthlyCost').value) || 0;
+    var trainingCostPerPerson = parseInt(document.getElementById('roiTrainingCost').value) || 0;
+
+    // Update slider display
+    document.getElementById('roiTimeSavedValue').textContent = timeSavedHours.toFixed(1) + ' hrs';
+
+    // Calculations
+    var workDays = 22;
+    var monthlyHoursSaved = teamSize * timeSavedHours * workDays;
+    var monthlyValueSaved = monthlyHoursSaved * hourlyRate;
+    var monthlyClaudeCost = teamSize * monthlyCostPerSeat;
+    var monthlyNetROI = monthlyValueSaved - monthlyClaudeCost;
+    var trainingInvestment = teamSize * trainingCostPerPerson;
+    var annualNetROI = (monthlyNetROI * 12) - trainingInvestment;
+    var totalAnnualCost = (monthlyClaudeCost * 12) + trainingInvestment;
+    var breakEvenMonths = monthlyNetROI > 0 ? trainingInvestment / monthlyNetROI : Infinity;
+    var roiPercentage = totalAnnualCost > 0 ? (annualNetROI / totalAnnualCost) * 100 : 0;
+
+    // Update result cards
+    document.getElementById('roiMonthlyHours').textContent = Math.round(monthlyHoursSaved).toLocaleString() + ' hours';
+    document.getElementById('roiMonthlyValue').textContent = formatCurrency(monthlyValueSaved);
+    document.getElementById('roiMonthlyCostResult').textContent = formatCurrency(monthlyClaudeCost);
+    document.getElementById('roiMonthlyNet').textContent = formatCurrency(monthlyNetROI);
+    document.getElementById('roiAnnualNet').textContent = formatCurrency(annualNetROI);
+    document.getElementById('roiTrainingTotal').textContent = formatCurrency(trainingInvestment);
+
+    // Break-even
+    var breakEvenEl = document.getElementById('roiBreakEven');
+    if (breakEvenMonths === Infinity || monthlyNetROI <= 0) {
+      breakEvenEl.textContent = 'N/A';
+      breakEvenEl.className = 'roi-result-value negative';
+    } else {
+      breakEvenEl.textContent = breakEvenMonths.toFixed(1) + ' months';
+      breakEvenEl.className = 'roi-result-value ' + (breakEvenMonths <= 3 ? 'positive' : 'neutral');
+    }
+
+    // ROI percentage
+    var roiPctEl = document.getElementById('roiPercentage');
+    if (totalAnnualCost <= 0) {
+      roiPctEl.textContent = 'N/A';
+      roiPctEl.className = 'roi-result-value neutral';
+    } else {
+      roiPctEl.textContent = Math.round(roiPercentage).toLocaleString() + '%';
+      roiPctEl.className = 'roi-result-value ' + (roiPercentage > 0 ? 'positive' : 'negative');
+    }
+
+    // Color classes for monthly net
+    var monthlyNetEl = document.getElementById('roiMonthlyNet');
+    monthlyNetEl.className = 'roi-result-value ' + (monthlyNetROI >= 0 ? 'positive' : 'negative');
+
+    var annualNetEl = document.getElementById('roiAnnualNet');
+    annualNetEl.className = 'roi-result-value ' + (annualNetROI >= 0 ? 'positive' : 'negative');
+
+    // Update bar chart
+    var annualValue = monthlyValueSaved * 12;
+    var maxBarValue = Math.max(annualValue, totalAnnualCost, 1);
+
+    var costBarPct = Math.max(2, (totalAnnualCost / maxBarValue) * 100);
+    var valueBarPct = Math.max(2, (annualValue / maxBarValue) * 100);
+
+    var costBar = document.getElementById('roiBarCost');
+    var valueBar = document.getElementById('roiBarValue');
+
+    costBar.style.width = costBarPct + '%';
+    costBar.textContent = costBarPct > 10 ? formatCurrency(totalAnnualCost) : '';
+
+    valueBar.style.width = valueBarPct + '%';
+    valueBar.textContent = valueBarPct > 10 ? formatCurrency(annualValue) : '';
+
+    // Delta
+    var deltaEl = document.getElementById('roiDeltaValue');
+    deltaEl.textContent = formatCurrency(annualNetROI);
+    deltaEl.style.color = annualNetROI >= 0 ? 'var(--success)' : 'var(--error)';
+  };
+
+  // Initialize ROI
+  updateROI();
+
+  // ==========================================
+  // GOVERNANCE POLICY BUILDER
+  // ==========================================
+  var govCurrentStep = 1;
+  var govPolicyData = {
+    compliance: [],
+    approved: [],
+    restricted: [],
+    prohibited: [],
+    classification: {}
+  };
+
+  // Set initial date
+  var today = new Date();
+  var dateStr = today.getFullYear() + '-' +
+    String(today.getMonth() + 1).padStart(2, '0') + '-' +
+    String(today.getDate()).padStart(2, '0');
+  var dateEl = document.getElementById('govPolicyDate');
+  if (dateEl) {
+    dateEl.textContent = 'Effective Date: ' + dateStr;
+  }
+
+  window.toggleGovCheckbox = function(label) {
+    var checkbox = label.querySelector('input[type="checkbox"]');
+    // The click already toggles the checkbox, so read the state
+    setTimeout(function() {
+      if (checkbox.checked) {
+        label.classList.add('checked');
+        if (govPolicyData.compliance.indexOf(checkbox.value) === -1) {
+          govPolicyData.compliance.push(checkbox.value);
+        }
+      } else {
+        label.classList.remove('checked');
+        var idx = govPolicyData.compliance.indexOf(checkbox.value);
+        if (idx > -1) {
+          govPolicyData.compliance.splice(idx, 1);
+        }
+      }
+      updateGovPreview();
+    }, 10);
+  };
+
+  window.addPolicyTag = function(category) {
+    var selectEl = document.getElementById(category + 'Select');
+    var customEl = document.getElementById(category + 'Custom');
+    var value = customEl.value.trim() || selectEl.value;
+
+    if (!value) return;
+
+    // Prevent duplicates
+    if (govPolicyData[category].indexOf(value) > -1) {
+      customEl.value = '';
+      selectEl.selectedIndex = 0;
+      return;
+    }
+
+    govPolicyData[category].push(value);
+    renderPolicyTags(category);
+    updateGovPreview();
+
+    // Reset inputs
+    customEl.value = '';
+    selectEl.selectedIndex = 0;
+  };
+
+  function renderPolicyTags(category) {
+    var container = document.getElementById(category + 'Tags');
+    var html = '';
+    for (var i = 0; i < govPolicyData[category].length; i++) {
+      var tag = govPolicyData[category][i];
+      html += '<span class="gov-policy-tag ' + category + '">';
+      html += tag;
+      html += ' <button class="remove-tag" onclick="removePolicyTag(\'' + category + '\',' + i + ')">x</button>';
+      html += '</span>';
+    }
+    container.innerHTML = html;
+  }
+
+  window.removePolicyTag = function(category, idx) {
+    govPolicyData[category].splice(idx, 1);
+    renderPolicyTags(category);
+    updateGovPreview();
+  };
+
+  window.goToGovStep = function(step) {
+    govCurrentStep = step;
+    updateGovStepUI();
+  };
+
+  window.changeGovStep = function(dir) {
+    var newStep = govCurrentStep + dir;
+    if (newStep < 1 || newStep > 3) return;
+    govCurrentStep = newStep;
+    updateGovStepUI();
+  };
+
+  function updateGovStepUI() {
+    // Update step indicators
+    for (var i = 1; i <= 3; i++) {
+      var ind = document.getElementById('govStepInd' + i);
+      var panel = document.getElementById('govStep' + i);
+      ind.classList.remove('active', 'completed');
+      panel.classList.remove('active');
+
+      if (i === govCurrentStep) {
+        ind.classList.add('active');
+        panel.classList.add('active');
+      } else if (i < govCurrentStep) {
+        ind.classList.add('completed');
+      }
+    }
+
+    // Update nav buttons
+    document.getElementById('govPrevBtn').disabled = (govCurrentStep === 1);
+    var nextBtn = document.getElementById('govNextBtn');
+    if (govCurrentStep === 3) {
+      nextBtn.textContent = 'Done';
+      nextBtn.onclick = function() { /* Stay on step 3 */ };
+    } else {
+      nextBtn.textContent = 'Next Step';
+      nextBtn.onclick = function() { changeGovStep(1); };
+    }
+  }
+
+  window.updateGovPreview = function() {
+    // Gather classification data
+    govPolicyData.classification = {
+      'Customer Data': (document.getElementById('classCustomer') || {}).value || 'Confidential',
+      'Financial Records': (document.getElementById('classFinancial') || {}).value || 'Confidential',
+      'Internal Documents': (document.getElementById('classInternal') || {}).value || 'Internal',
+      'Public Information': (document.getElementById('classPublic') || {}).value || 'Public',
+      'Employee Records': (document.getElementById('classEmployee') || {}).value || 'Restricted',
+      'Source Code': (document.getElementById('classSourceCode') || {}).value || 'Internal'
+    };
+
+    var html = '';
+
+    // Compliance section
+    if (govPolicyData.compliance.length > 0) {
+      html += '<h4>1. Compliance Requirements</h4>';
+      html += '<p>This policy addresses requirements for the following frameworks:</p>';
+      html += '<ul>';
+      for (var c = 0; c < govPolicyData.compliance.length; c++) {
+        var framework = govPolicyData.compliance[c];
+        html += '<li><strong>' + framework + '</strong>';
+        if (framework === 'HIPAA') html += ' -- Protected health information safeguards required';
+        if (framework === 'SOC 2') html += ' -- Audit logging for all system access required';
+        if (framework === 'GDPR') html += ' -- Data residency and right-to-deletion compliance required';
+        if (framework === 'PCI-DSS') html += ' -- Payment card data must never be included in conversations';
+        if (framework === 'FedRAMP') html += ' -- Federal data processing standards must be met';
+        if (framework === 'None') html += ' -- No specific compliance framework selected';
+        html += '</li>';
+      }
+      html += '</ul>';
+    }
+
+    // Usage policy table
+    var hasUsageData = govPolicyData.approved.length > 0 ||
+                       govPolicyData.restricted.length > 0 ||
+                       govPolicyData.prohibited.length > 0;
+
+    if (hasUsageData) {
+      html += '<h4>2. Usage Policies</h4>';
+      html += '<table>';
+      html += '<tr><th>Category</th><th>Items</th></tr>';
+
+      if (govPolicyData.approved.length > 0) {
+        html += '<tr><td><strong>Approved</strong></td><td>';
+        html += govPolicyData.approved.join(', ');
+        html += '</td></tr>';
+      }
+      if (govPolicyData.restricted.length > 0) {
+        html += '<tr><td><strong>Restricted</strong></td><td>';
+        html += govPolicyData.restricted.join(', ');
+        html += '</td></tr>';
+      }
+      if (govPolicyData.prohibited.length > 0) {
+        html += '<tr><td><strong>Prohibited</strong></td><td>';
+        html += govPolicyData.prohibited.join(', ');
+        html += '</td></tr>';
+      }
+      html += '</table>';
+
+      if (govPolicyData.restricted.length > 0) {
+        html += '<p><strong>Note:</strong> All restricted uses require review and approval by a qualified human expert before the AI-generated output is acted upon or distributed.</p>';
+      }
+    }
+
+    // Data handling
+    html += '<h4>3. Data Handling Requirements</h4>';
+    html += '<table>';
+    html += '<tr><th>Data Type</th><th>Classification</th><th>Claude Policy</th></tr>';
+    var classKeys = ['Customer Data', 'Financial Records', 'Internal Documents', 'Public Information', 'Employee Records', 'Source Code'];
+    var policyMap = {
+      'Public': 'Unrestricted use permitted',
+      'Internal': 'Permitted with enterprise plan; data not used for training',
+      'Confidential': 'Requires data handling agreement; anonymize where possible',
+      'Restricted': 'Prohibited in conversations; use only anonymized/synthetic data'
+    };
+    for (var k = 0; k < classKeys.length; k++) {
+      var key = classKeys[k];
+      var level = govPolicyData.classification[key] || 'Internal';
+      html += '<tr><td>' + key + '</td><td>' + level + '</td><td>' + (policyMap[level] || '') + '</td></tr>';
+    }
+    html += '</table>';
+
+    // Audit requirements
+    if (govPolicyData.compliance.length > 0 && govPolicyData.compliance.indexOf('None') === -1) {
+      html += '<h4>4. Audit Requirements</h4>';
+      html += '<p>Based on selected compliance frameworks, the following audit controls are required:</p>';
+      html += '<ul>';
+      html += '<li>All Claude API interactions must be logged with user attribution, timestamp, model used, and token count</li>';
+
+      for (var a = 0; a < govPolicyData.compliance.length; a++) {
+        var fw = govPolicyData.compliance[a];
+        if (fw === 'SOC 2') html += '<li>SOC 2: Quarterly audit log review; annual external audit</li>';
+        if (fw === 'HIPAA') html += '<li>HIPAA: PHI must never appear in conversations; access logs retained for 6 years</li>';
+        if (fw === 'GDPR') html += '<li>GDPR: Data subject access requests must be supported; conversation deletion within 30 days of request</li>';
+        if (fw === 'PCI-DSS') html += '<li>PCI-DSS: Cardholder data prohibited in all AI interactions; quarterly compliance scans</li>';
+        if (fw === 'FedRAMP') html += '<li>FedRAMP: Government-authorized deployment environment required; continuous monitoring</li>';
+      }
+      html += '</ul>';
+
+      html += '<h4>5. Review Cadence</h4>';
+      html += '<ul>';
+      html += '<li><strong>Monthly:</strong> Usage metrics review (active users, token consumption, cost)</li>';
+      html += '<li><strong>Quarterly:</strong> Policy review and update; compliance spot-check</li>';
+      html += '<li><strong>Annually:</strong> Full compliance audit; policy refresh; user re-training</li>';
+      html += '</ul>';
+    }
+
+    if (!html) {
+      html = '<p><em>Make selections above to generate your policy document...</em></p>';
+    }
+
+    document.getElementById('govPreviewContent').innerHTML = html;
+  };
+
+  // Initialize preview
+  updateGovPreview();
+
+  window.copyGovPolicy = function() {
+    var preview = document.getElementById('govPreview');
+    var text = preview.textContent || preview.innerText;
+    var btn = document.getElementById('govCopyBtn');
+
+    navigator.clipboard.writeText(text.trim()).then(function() {
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() {
+        btn.textContent = 'Copy Policy to Clipboard';
+        btn.classList.remove('copied');
+      }, 2000);
+    }).catch(function() {
+      btn.textContent = 'Copy failed';
+      setTimeout(function() { btn.textContent = 'Copy Policy to Clipboard'; }, 2000);
+    });
+  };
+
+  // ==========================================
+  // FINAL QUIZ
+  // ==========================================
+  var FINAL_QUIZ_KEY = 'claude-training-module-13';
+
+  var finalQuizData = [
+    { question: "What is the recommended approach for enterprise Claude deployment?", options: ["Deploy to everyone simultaneously", "Start with a pilot group, then expand by department", "Only allow executives to use it first", "Wait until the entire organization requests it"], correct: 1 },
+    { question: "In an ROI calculation for Claude adoption, which metric typically has the highest impact?", options: ["Reduction in Claude API costs", "Time saved per employee multiplied by their hourly rate", "Number of conversations per day", "Model selection optimization"], correct: 1 },
+    { question: "What should a governance framework's 'restricted uses' category include?", options: ["Tasks that Claude can't do at all", "Tasks that require human expert review before acting on Claude's output", "Tasks reserved for executives only", "Tasks that are too expensive to run"], correct: 1 },
+    { question: "What is a 'champion program' in the context of Claude adoption?", options: ["A competition to see who uses Claude the most", "Identifying power users who mentor others and drive adoption in their teams", "A certification program for advanced users", "A customer success program from Anthropic"], correct: 1 }
+  ];
+
+  var finalQuizAnswers = ['b', 'b', 'b', 'b'];
+  var finalQuizSelections = [null, null, null, null];
+  var finalQuizSubmitted = false;
+
+  window.selectFinalOption = function(qIdx, el) {
+    if (finalQuizSubmitted) return;
+
+    // Deselect siblings
+    var parentQ = el.closest('.final-quiz-question');
+    var options = parentQ.querySelectorAll('.fq-option');
+    for (var i = 0; i < options.length; i++) {
+      options[i].querySelector('input').checked = false;
+      options[i].style.background = '';
+    }
+
+    // Select this one
+    el.querySelector('input').checked = true;
+    finalQuizSelections[qIdx] = el.getAttribute('data-fq-val');
+
+    // Enable submit if all answered
+    var allAnswered = true;
+    for (var j = 0; j < finalQuizSelections.length; j++) {
+      if (finalQuizSelections[j] === null) {
+        allAnswered = false;
+        break;
+      }
+    }
+    document.getElementById('finalSubmitBtn').disabled = !allAnswered;
+  };
+
+  window.submitFinalQuiz = function() {
+    if (finalQuizSubmitted) return;
+    finalQuizSubmitted = true;
+
+    var score = 0;
+
+    for (var idx = 0; idx < finalQuizSelections.length; idx++) {
+      var sel = finalQuizSelections[idx];
+      var questionEl = document.querySelector('.final-quiz-question[data-fq="' + idx + '"]');
+      var options = questionEl.querySelectorAll('.fq-option');
+
+      for (var o = 0; o < options.length; o++) {
+        var opt = options[o];
+        var val = opt.getAttribute('data-fq-val');
+        opt.style.pointerEvents = 'none';
+
+        if (val === finalQuizAnswers[idx]) {
+          if (sel === val) {
+            opt.classList.add('selected-correct');
+            score++;
+          } else {
+            opt.classList.add('reveal-correct');
+          }
+        } else if (val === sel) {
+          opt.classList.add('selected-wrong');
+        }
+      }
+    }
+
+    // Show result
+    var result = document.getElementById('finalResult');
+    var title = document.getElementById('finalResultTitle');
+    var text = document.getElementById('finalResultText');
+
+    result.classList.add('show');
+
+    if (score >= 3) {
+      result.classList.add('pass');
+      result.classList.remove('fail');
+      title.textContent = 'Passed! ' + score + ' / 4 correct';
+      text.textContent = 'Excellent work! You understand the essentials of enterprise Claude deployment, governance, and change management. Your progress has been saved. Move on to Module 20: Claude API Fundamentals to continue your training.';
+    } else {
+      result.classList.add('fail');
+      result.classList.remove('pass');
+      title.textContent = score + ' / 4 correct -- Review needed';
+      text.textContent = 'You need at least 3 correct answers to pass. Review the material above, paying special attention to the phased deployment approach, ROI measurement, and governance concepts, then try again.';
+    }
+
+    // Save progress
+    var progressData = {
+      score: score,
+      total: 4,
+      completed: score >= 3,
+      timestamp: new Date().toISOString()
+    };
+    localStorage.setItem(FINAL_QUIZ_KEY, JSON.stringify(progressData));
+
+    // Disable submit button
+    document.getElementById('finalSubmitBtn').disabled = true;
+    document.getElementById('finalSubmitBtn').textContent = 'Submitted';
+  };
+
+  // Check for existing progress
+  function loadExistingProgress() {
+    var saved = localStorage.getItem(FINAL_QUIZ_KEY);
+    if (saved) {
+      try {
+        var data = JSON.parse(saved);
+        if (data.completed) {
+          var fill = document.getElementById('sidebarProgressFill');
+          if (fill) {
+            fill.style.width = '100%';
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+  }
+  loadExistingProgress();
+
+})();
+</script>
+</body>
+</html>

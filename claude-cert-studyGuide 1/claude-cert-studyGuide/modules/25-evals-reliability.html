@@ -1,0 +1,3944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 25: Evals &amp; Reliability | Claude AI Training</title>
+<style>
+/* ============================================
+   CSS CUSTOM PROPERTIES & DESIGN SYSTEM
+   Premium Edition with 3-layer shadows, spring
+   transitions, gradient headings, deep dark mode
+   ============================================ */
+:root {
+  --primary: #7C3AED;
+  --primary-light: #A78BFA;
+  --primary-dark: #5B21B6;
+  --accent: #06B6D4;
+  --accent-light: #22D3EE;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  --bg: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --bg-code: #F1F5F9;
+  --text: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --border: #E2E8F0;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04), 0 0px 0px rgba(124,58,237,0);
+  --shadow-lg: 0 4px 12px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.06), 0 0 0 rgba(124,58,237,0);
+  --shadow-glow: 0 4px 12px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.06), 0 0 24px rgba(124,58,237,0.12);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --transition: 0.2s ease;
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --sidebar-width: 280px;
+  --content-max: 800px;
+}
+
+[data-theme="dark"] {
+  --bg: #0B0F1A;
+  --bg-card: #141926;
+  --bg-code: #1A2030;
+  --text: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --border: #1E293B;
+  --shadow: 0 1px 3px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.2), 0 0 0 rgba(124,58,237,0);
+  --shadow-lg: 0 4px 12px rgba(0,0,0,0.4), 0 12px 32px rgba(0,0,0,0.3), 0 0 0 rgba(124,58,237,0);
+  --shadow-glow: 0 4px 12px rgba(0,0,0,0.4), 0 12px 32px rgba(0,0,0,0.3), 0 0 32px rgba(124,58,237,0.15);
+}
+
+/* ============================================
+   REDUCED MOTION
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  html { scroll-behavior: auto; }
+}
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 24px;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  min-height: 100vh;
+  transition: background var(--transition), color var(--transition);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   THEME TOGGLE
+   ============================================ */
+.theme-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: all 0.3s var(--spring);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+.theme-toggle:hover {
+  box-shadow: var(--shadow-glow);
+  transform: scale(1.1);
+}
+
+/* ============================================
+   SIDEBAR
+   ============================================ */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  z-index: 900;
+  transition: transform 0.3s var(--spring), background var(--transition);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.sidebar-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+  margin-bottom: 12px;
+  transition: color var(--transition);
+}
+.sidebar-back:hover { color: var(--primary-dark); }
+
+.sidebar-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.sidebar-module-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.sidebar-nav {
+  padding: 12px 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.sidebar-section {
+  margin-bottom: 4px;
+}
+
+.sidebar-section-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 20px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  text-align: left;
+  transition: color var(--transition);
+}
+.sidebar-section-toggle:hover { color: var(--text); }
+.sidebar-section-toggle .chevron {
+  transition: transform 0.2s ease;
+  font-size: 0.65rem;
+}
+.sidebar-section-toggle.collapsed .chevron {
+  transform: rotate(-90deg);
+}
+
+.sidebar-links {
+  list-style: none;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.sidebar-links.collapsed {
+  max-height: 0 !important;
+}
+
+.sidebar-link {
+  display: block;
+  padding: 7px 20px 7px 32px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: all var(--transition);
+  line-height: 1.4;
+}
+.sidebar-link:hover {
+  color: var(--text);
+  background: var(--bg);
+}
+.sidebar-link.active {
+  color: var(--primary);
+  border-left-color: var(--primary);
+  background: rgba(124, 58, 237, 0.05);
+  font-weight: 600;
+}
+[data-theme="dark"] .sidebar-link.active {
+  background: rgba(124, 58, 237, 0.12);
+}
+
+.sidebar-progress {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sidebar-progress-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.sidebar-progress-track {
+  height: 6px;
+  background: var(--bg-code);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.sidebar-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 3px;
+  transition: width 0.5s ease;
+  width: 0%;
+}
+
+/* Hamburger button (mobile) */
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1001;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+  transition: all var(--transition);
+}
+.hamburger span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--text);
+  margin: 4px auto;
+  transition: all 0.3s ease;
+  border-radius: 1px;
+}
+.hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(4px, 4px); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(4px, -4px); }
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 899;
+}
+
+/* ============================================
+   MAIN CONTENT
+   ============================================ */
+.main-content {
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+  transition: margin var(--transition);
+}
+
+.content-wrapper {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 40px 32px 80px;
+}
+
+/* Module Header */
+.module-header {
+  margin-bottom: 48px;
+}
+.module-header .breadcrumb {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+.module-header .breadcrumb a {
+  color: var(--primary);
+  text-decoration: none;
+}
+.module-header .breadcrumb a:hover { text-decoration: underline; }
+
+.module-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.module-badge .number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.module-badge .label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.module-header h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.module-header .description {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 640px;
+}
+
+.module-meta {
+  display: flex;
+  gap: 16px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.module-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  background: var(--bg-code);
+  padding: 6px 14px;
+  border-radius: 20px;
+}
+
+/* ============================================
+   SECTIONS
+   ============================================ */
+.section {
+  margin-bottom: 56px;
+  scroll-margin-top: 24px;
+}
+
+.section-heading {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+  line-height: 1.3;
+}
+
+.section h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-top: 32px;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.section h4 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-top: 24px;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.section p {
+  margin-bottom: 16px;
+  color: var(--text-secondary);
+}
+
+.section ul, .section ol {
+  margin-bottom: 16px;
+  padding-left: 24px;
+}
+.section li {
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+}
+.section li strong {
+  color: var(--text);
+}
+
+/* ============================================
+   CODE BLOCKS
+   ============================================ */
+.code-block {
+  background: #1E293B;
+  color: #E2E8F0;
+  border-radius: var(--radius-sm);
+  padding: 20px 24px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  overflow-x: auto;
+  position: relative;
+  margin: 16px 0 20px;
+  tab-size: 2;
+}
+.code-block .code-label {
+  position: absolute;
+  top: 8px;
+  left: 16px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #64748B;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+.code-block.has-label {
+  padding-top: 36px;
+}
+.code-block .copy-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: #94A3B8;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  transition: all var(--transition);
+}
+.code-block .copy-btn:hover { background: rgba(255,255,255,0.2); color: white; }
+.code-block .copy-btn.copied { background: var(--success); color: white; }
+
+/* Syntax highlighting classes */
+.kw { color: #C084FC; }
+.str { color: #6EE7B7; }
+.fn { color: #7DD3FC; }
+.cm { color: #64748B; }
+.num { color: #FDBA74; }
+.op { color: #FCA5A5; }
+.type { color: #67E8F9; }
+.param { color: #FDE68A; }
+.prop { color: #F0ABFC; }
+.punc { color: #94A3B8; }
+
+/* Inline code */
+code {
+  background: var(--bg-code);
+  color: var(--primary);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.88em;
+}
+[data-theme="dark"] code {
+  background: #334155;
+}
+.code-block code {
+  background: none;
+  color: inherit;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+  white-space: pre-wrap;
+  display: block;
+}
+
+/* ============================================
+   CALLOUT BOXES
+   ============================================ */
+.callout {
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  margin: 20px 0;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.callout-icon {
+  flex-shrink: 0;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+.callout-content { flex: 1; }
+.callout-content p { margin-bottom: 6px; color: inherit; }
+.callout-content p:last-child { margin-bottom: 0; }
+
+.callout.info {
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  color: #1E40AF;
+}
+.callout.tip {
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  color: #166534;
+}
+.callout.warning {
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  color: #92400E;
+}
+.callout.important {
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  color: #991B1B;
+}
+
+[data-theme="dark"] .callout.info {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: #93C5FD;
+}
+[data-theme="dark"] .callout.tip {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #6EE7B7;
+}
+[data-theme="dark"] .callout.warning {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #FCD34D;
+}
+[data-theme="dark"] .callout.important {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #FCA5A5;
+}
+
+/* ============================================
+   ACCENT CARDS with ::before gradient bars
+   ============================================ */
+.accent-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin: 24px 0;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s var(--spring), box-shadow 0.3s var(--spring), transform 0.3s var(--spring);
+}
+.accent-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.accent-card:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+}
+.accent-card h4 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.accent-card p {
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+.accent-card p:last-child { margin-bottom: 0; }
+.accent-card ul {
+  padding-left: 20px;
+  margin-bottom: 12px;
+}
+.accent-card li {
+  margin-bottom: 6px;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+}
+
+/* ============================================
+   COMPARISON TABLE
+   ============================================ */
+.comparison-table-wrapper {
+  overflow-x: auto;
+  margin: 20px 0;
+}
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.comparison-table th {
+  background: var(--primary);
+  color: white;
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+.comparison-table th:first-child {
+  border-radius: var(--radius-sm) 0 0 0;
+}
+.comparison-table th:last-child {
+  border-radius: 0 var(--radius-sm) 0 0;
+}
+.comparison-table td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+.comparison-table tr:nth-child(even) td {
+  background: var(--bg);
+}
+.comparison-table tr:last-child td:first-child {
+  border-radius: 0 0 0 var(--radius-sm);
+}
+.comparison-table tr:last-child td:last-child {
+  border-radius: 0 0 var(--radius-sm) 0;
+}
+
+/* ============================================
+   STEP-BY-STEP LIST
+   ============================================ */
+.step-list {
+  counter-reset: step-counter;
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+.step-item {
+  counter-increment: step-counter;
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: border-color 0.3s var(--spring), box-shadow 0.3s var(--spring);
+}
+.step-item:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow);
+}
+.step-item::before {
+  content: counter(step-counter);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+.step-content h4 {
+  margin-top: 0;
+  margin-bottom: 6px;
+}
+.step-content p {
+  margin-bottom: 8px;
+}
+
+/* ============================================
+   INTERACTIVE: CONTEXT WINDOW VISUALIZER
+   ============================================ */
+.context-viz {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+}
+.context-viz h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.viz-layout {
+  display: flex;
+  gap: 24px;
+  margin-top: 20px;
+}
+
+.viz-window {
+  flex: 1;
+  min-width: 0;
+}
+
+.viz-container {
+  width: 100%;
+  height: 420px;
+  background: var(--bg-code);
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--border);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.viz-block {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 10px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: white;
+  min-height: 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+  transition: all 0.3s var(--spring);
+  flex-shrink: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.viz-block.system { background: #7C3AED; }
+.viz-block.user { background: #3B82F6; }
+.viz-block.assistant { background: #10B981; }
+.viz-block.tool { background: #F59E0B; color: #1a1a1a; }
+.viz-block.file { background: #EAB308; color: #1a1a1a; }
+
+.viz-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+.viz-gauge {
+  margin-top: 12px;
+  position: relative;
+}
+.viz-gauge-track {
+  width: 100%;
+  height: 12px;
+  background: var(--bg-code);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.viz-gauge-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.4s ease, background 0.4s ease;
+  background: var(--success);
+}
+.viz-gauge-fill.amber { background: var(--warning); }
+.viz-gauge-fill.red { background: var(--error); }
+
+.viz-gauge-label {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+.viz-gauge-pct {
+  font-weight: 700;
+}
+.viz-gauge-pct.green { color: var(--success); }
+.viz-gauge-pct.amber { color: var(--warning); }
+.viz-gauge-pct.red { color: var(--error); }
+
+.viz-warning {
+  margin-top: 10px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  display: none;
+}
+.viz-warning.show { display: block; }
+.viz-warning.amber-warning {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #D97706;
+}
+.viz-warning.red-warning {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #DC2626;
+}
+[data-theme="dark"] .viz-warning.amber-warning { color: #FCD34D; }
+[data-theme="dark"] .viz-warning.red-warning { color: #FCA5A5; }
+
+.viz-controls {
+  flex-shrink: 0;
+  width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.viz-add-btn {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s var(--spring);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.viz-add-btn:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow);
+  transform: translateY(-1px);
+}
+.viz-add-btn .btn-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.viz-add-btn .btn-dot.system { background: #7C3AED; }
+.viz-add-btn .btn-dot.user { background: #3B82F6; }
+.viz-add-btn .btn-dot.file { background: #EAB308; }
+.viz-add-btn .btn-dot.tool { background: #F59E0B; }
+.viz-add-btn .btn-dot.assistant { background: #10B981; }
+
+.viz-add-btn .btn-tokens {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-left: auto;
+  font-weight: 500;
+}
+
+.viz-reset-btn {
+  padding: 8px 12px;
+  border: 1px solid var(--error);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--error);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  margin-top: 8px;
+  transition: all 0.2s var(--spring);
+}
+.viz-reset-btn:hover {
+  background: var(--error);
+  color: white;
+}
+
+/* ============================================
+   INTERACTIVE: EVAL RUBRIC BUILDER
+   ============================================ */
+.rubric-builder {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+}
+.rubric-builder h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.rubric-layout {
+  display: flex;
+  gap: 24px;
+  margin-top: 20px;
+}
+.rubric-form {
+  flex: 1;
+  min-width: 0;
+}
+.rubric-preview {
+  flex: 1;
+  min-width: 0;
+}
+
+.rubric-field {
+  margin-bottom: 16px;
+}
+.rubric-field label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.rubric-field textarea,
+.rubric-field input[type="text"] {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.9rem;
+  resize: vertical;
+  transition: border-color var(--transition);
+}
+.rubric-field textarea:focus,
+.rubric-field input[type="text"]:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.rubric-presets {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.rubric-preset-btn {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--bg);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s var(--spring);
+}
+.rubric-preset-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.rubric-preset-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.rubric-dimension {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  margin-bottom: 12px;
+  transition: border-color 0.2s var(--spring);
+}
+.rubric-dimension:hover {
+  border-color: var(--primary-light);
+}
+
+.rubric-dim-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.rubric-dim-header input {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-card);
+  color: var(--text);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.rubric-dim-header input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+.rubric-weight-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.rubric-weight-val {
+  font-weight: 700;
+  color: var(--primary);
+  min-width: 14px;
+  text-align: center;
+}
+.rubric-dim-header input[type="range"] {
+  width: 60px;
+  accent-color: var(--primary);
+  padding: 0;
+  border: none;
+  background: none;
+}
+.rubric-remove-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 2px 6px;
+  line-height: 1;
+  border-radius: 4px;
+  transition: all var(--transition);
+}
+.rubric-remove-btn:hover {
+  color: var(--error);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.rubric-scores {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.rubric-score-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.8rem;
+}
+.rubric-score-label {
+  font-weight: 700;
+  color: var(--text-muted);
+  min-width: 80px;
+  flex-shrink: 0;
+  padding-top: 4px;
+}
+.rubric-score-row input {
+  flex: 1;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+.rubric-score-row input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.rubric-add-dim-btn {
+  padding: 8px 16px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 8px;
+  transition: all 0.2s var(--spring);
+}
+.rubric-add-dim-btn:hover {
+  background: rgba(124, 58, 237, 0.05);
+  border-color: var(--primary-light);
+}
+
+/* Rubric preview table */
+.rubric-preview-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  margin-top: 12px;
+}
+.rubric-preview-table th {
+  background: var(--primary);
+  color: white;
+  padding: 8px 10px;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.rubric-preview-table th:first-child { border-radius: var(--radius-sm) 0 0 0; }
+.rubric-preview-table th:last-child { border-radius: 0 var(--radius-sm) 0 0; }
+.rubric-preview-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+  vertical-align: top;
+}
+.rubric-preview-table tr:nth-child(even) td {
+  background: var(--bg);
+}
+
+/* Rubric evaluation phase */
+.rubric-eval-phase {
+  margin-top: 24px;
+  display: none;
+}
+.rubric-eval-phase.show { display: block; }
+
+.rubric-eval-response {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.rubric-eval-response h4 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+}
+.rubric-eval-response p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+  font-style: italic;
+}
+
+.rubric-eval-scores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.rubric-eval-dim {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+.rubric-eval-dim label {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 0.78rem;
+}
+.rubric-eval-dim select {
+  padding: 3px 6px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg-card);
+  color: var(--text);
+  font-size: 0.8rem;
+}
+
+.rubric-eval-total {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--primary);
+  padding: 8px 12px;
+  background: rgba(124, 58, 237, 0.08);
+  border-radius: 6px;
+  display: inline-block;
+}
+
+.rubric-start-eval-btn {
+  padding: 10px 24px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: all 0.2s var(--spring);
+}
+.rubric-start-eval-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-glow);
+}
+
+/* ============================================
+   INTERACTIVE: CONFIDENCE CALIBRATION
+   ============================================ */
+.confidence-exercise {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+}
+.confidence-exercise h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.confidence-score-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+}
+.confidence-score-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.confidence-score-track {
+  flex: 1;
+  height: 8px;
+  background: var(--bg-code);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.confidence-score-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--success));
+  border-radius: 4px;
+  transition: width 0.4s ease;
+  width: 0%;
+}
+.confidence-score-text {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  min-width: 50px;
+  text-align: right;
+}
+
+.confidence-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  margin-bottom: 16px;
+  transition: border-color 0.3s ease;
+}
+.confidence-card.answered-correct { border-color: var(--success); }
+.confidence-card.answered-wrong { border-color: var(--error); }
+
+.confidence-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.confidence-card-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  font-weight: 700;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+
+.confidence-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.confidence-badge.high {
+  background: rgba(16, 185, 129, 0.15);
+  color: #059669;
+}
+.confidence-badge.medium {
+  background: rgba(245, 158, 11, 0.15);
+  color: #D97706;
+}
+.confidence-badge.low {
+  background: rgba(239, 68, 68, 0.15);
+  color: #DC2626;
+}
+[data-theme="dark"] .confidence-badge.high { color: #6EE7B7; }
+[data-theme="dark"] .confidence-badge.medium { color: #FCD34D; }
+[data-theme="dark"] .confidence-badge.low { color: #FCA5A5; }
+
+.confidence-response-text {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.confidence-options {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.confidence-option {
+  padding: 6px 14px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s var(--spring);
+}
+.confidence-option:hover:not(.disabled) {
+  border-color: var(--primary-light);
+  background: rgba(124, 58, 237, 0.05);
+}
+.confidence-option.correct-pick {
+  border-color: var(--success);
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+.confidence-option.wrong-pick {
+  border-color: var(--error);
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+}
+.confidence-option.show-correct {
+  border-color: var(--success);
+  background: rgba(16, 185, 129, 0.08);
+  color: #059669;
+  font-weight: 700;
+}
+.confidence-option.disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+[data-theme="dark"] .confidence-option.correct-pick { color: #6EE7B7; }
+[data-theme="dark"] .confidence-option.wrong-pick { color: #FCA5A5; }
+[data-theme="dark"] .confidence-option.show-correct { color: #6EE7B7; }
+
+.confidence-feedback {
+  margin-top: 10px;
+  font-size: 0.82rem;
+  padding: 8px 12px;
+  border-radius: 6px;
+  display: none;
+  line-height: 1.5;
+}
+.confidence-feedback.show { display: block; }
+.confidence-feedback.correct {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+.confidence-feedback.incorrect {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+}
+[data-theme="dark"] .confidence-feedback.correct { color: #6EE7B7; }
+[data-theme="dark"] .confidence-feedback.incorrect { color: #FCA5A5; }
+
+/* ============================================
+   INTERACTIVE: ERROR PROPAGATION VISUALIZER
+   ============================================ */
+.error-viz {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+}
+.error-viz h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.error-pipeline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin: 24px 0;
+  flex-wrap: wrap;
+}
+
+.error-agent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 20px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--border);
+  background: var(--bg);
+  min-width: 110px;
+  position: relative;
+  transition: all 0.4s ease;
+}
+.error-agent.ok {
+  border-color: var(--success);
+  background: rgba(16, 185, 129, 0.06);
+}
+.error-agent.error-state {
+  border-color: var(--error);
+  background: rgba(239, 68, 68, 0.1);
+}
+.error-agent.degraded {
+  border-color: var(--warning);
+  background: rgba(245, 158, 11, 0.08);
+}
+
+.error-agent-icon {
+  font-size: 1.4rem;
+}
+.error-agent-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.error-agent-status {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.error-agent-status.ok-status {
+  background: rgba(16, 185, 129, 0.15);
+  color: #059669;
+}
+.error-agent-status.error-status {
+  background: rgba(239, 68, 68, 0.15);
+  color: #DC2626;
+}
+.error-agent-status.degraded-status {
+  background: rgba(245, 158, 11, 0.15);
+  color: #D97706;
+}
+[data-theme="dark"] .error-agent-status.ok-status { color: #6EE7B7; }
+[data-theme="dark"] .error-agent-status.error-status { color: #FCA5A5; }
+[data-theme="dark"] .error-agent-status.degraded-status { color: #FCD34D; }
+
+.error-arrow {
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  padding: 0 6px;
+  transition: color 0.4s ease;
+}
+.error-arrow.error-flow { color: var(--error); }
+.error-arrow.degraded-flow { color: var(--warning); }
+
+.error-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+  align-items: center;
+}
+
+.error-inject-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+}
+.error-inject-group label {
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+}
+.error-inject-group select {
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.82rem;
+}
+
+.error-boundary-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.error-boundary-toggle input[type="checkbox"] {
+  accent-color: var(--primary);
+  width: 16px;
+  height: 16px;
+}
+
+.error-comparison {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 20px;
+}
+.error-comparison-card {
+  padding: 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.error-comparison-card h4 {
+  margin-top: 0;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+}
+.error-comparison-card p {
+  font-size: 0.82rem;
+  margin-bottom: 0;
+}
+.error-comparison-card.failure {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.2);
+}
+.error-comparison-card.failure h4 { color: var(--error); }
+.error-comparison-card.partial-success {
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.2);
+}
+.error-comparison-card.partial-success h4 { color: var(--success); }
+
+.error-run-btn {
+  padding: 8px 20px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s var(--spring);
+}
+.error-run-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-glow);
+}
+
+/* ============================================
+   INTERACTIVE: END-OF-MODULE QUIZ
+   ============================================ */
+.final-quiz {
+  background: var(--bg-card);
+  border: 2px solid var(--primary-light);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+}
+.final-quiz h3 {
+  margin-top: 0;
+}
+
+.final-quiz-question {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.final-quiz-question .fq-number {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+.final-quiz-question .fq-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+.fq-options { list-style: none; padding: 0; }
+.fq-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 12px;
+  margin-bottom: 4px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+.fq-option:hover { background: rgba(124, 58, 237, 0.05); }
+.fq-option input[type="radio"] {
+  accent-color: var(--primary);
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+.fq-option.selected-correct {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+.fq-option.selected-wrong {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+}
+.fq-option.reveal-correct {
+  background: rgba(16, 185, 129, 0.08);
+  color: #059669;
+  font-weight: 600;
+}
+[data-theme="dark"] .fq-option.selected-correct { color: #6EE7B7; }
+[data-theme="dark"] .fq-option.selected-wrong { color: #FCA5A5; }
+[data-theme="dark"] .fq-option.reveal-correct { color: #6EE7B7; }
+
+.final-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 32px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s var(--spring);
+  margin-top: 8px;
+}
+.final-submit-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-lg); }
+.final-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.final-result {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: var(--radius-sm);
+  display: none;
+}
+.final-result.show { display: block; }
+.final-result.pass {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.final-result.fail {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.final-result h4 {
+  margin-top: 0;
+  margin-bottom: 6px;
+  font-size: 1.1rem;
+}
+.final-result p {
+  margin-bottom: 0;
+  font-size: 0.95rem;
+}
+.final-result.pass h4 { color: var(--success); }
+.final-result.fail h4 { color: var(--warning); }
+
+/* ============================================
+   KEY CONCEPT HIGHLIGHT
+   ============================================ */
+.key-concept {
+  display: inline-block;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(6, 182, 212, 0.1));
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  color: var(--primary);
+}
+[data-theme="dark"] .key-concept {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(6, 182, 212, 0.15));
+  border-color: rgba(124, 58, 237, 0.35);
+}
+
+/* ============================================
+   NAVIGATION FOOTER
+   ============================================ */
+.module-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 16px;
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 2px solid var(--border);
+}
+.nav-link {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: all 0.3s var(--spring);
+  min-width: 0;
+  flex: 1;
+  max-width: 50%;
+}
+.nav-link:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+}
+.nav-link.next { align-items: flex-end; text-align: right; }
+.nav-link .nav-dir {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--primary);
+}
+.nav-link .nav-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 1024px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .hamburger {
+    display: flex;
+  }
+  .sidebar-overlay.show {
+    display: block;
+  }
+  .main-content {
+    margin-left: 0;
+  }
+  .theme-toggle {
+    right: 16px;
+  }
+  .viz-layout {
+    flex-direction: column;
+  }
+  .viz-controls {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .viz-add-btn {
+    flex: 1;
+    min-width: 140px;
+  }
+  .rubric-layout {
+    flex-direction: column;
+  }
+  .error-comparison {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .content-wrapper {
+    padding: 24px 16px 60px;
+  }
+  .module-header h1 {
+    font-size: 1.6rem;
+  }
+  .section-heading {
+    font-size: 1.3rem;
+  }
+  .module-nav {
+    flex-direction: column;
+  }
+  .nav-link {
+    max-width: 100%;
+  }
+  .nav-link.next {
+    align-items: flex-start;
+    text-align: left;
+  }
+  .error-pipeline {
+    flex-direction: column;
+  }
+  .error-arrow {
+    transform: rotate(90deg);
+  }
+  .confidence-options {
+    flex-direction: column;
+  }
+  .confidence-option {
+    text-align: center;
+  }
+}
+
+/* ============================================
+   SCROLLBAR STYLING
+   ============================================ */
+.sidebar::-webkit-scrollbar,
+.code-block::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.sidebar::-webkit-scrollbar-track,
+.code-block::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+.code-block::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.section {
+  animation: fadeInUp 0.4s ease both;
+}
+</style>
+</head>
+<body>
+<!-- ============================================
+     THEME TOGGLE
+     ============================================ -->
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+  <span id="themeIcon">&#9790;</span>
+</button>
+
+<!-- ============================================
+     HAMBURGER (mobile)
+     ============================================ -->
+<button class="hamburger" id="hamburger" aria-label="Toggle sidebar">
+  <span></span>
+  <span></span>
+  <span></span>
+</button>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ============================================
+     SIDEBAR
+     ============================================ -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="../index.html" class="sidebar-back">&larr; Back to Hub</a>
+    <div class="sidebar-title">Module 25</div>
+    <div class="sidebar-module-name">Evals &amp; Reliability</div>
+  </div>
+
+  <div class="sidebar-nav">
+    <!-- Section: Concepts -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="concepts">
+        Concepts <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-concepts">
+        <li><a href="#why-evals-matter" class="sidebar-link" data-target="why-evals-matter">Why Evaluations Matter</a></li>
+        <li><a href="#llm-as-judge" class="sidebar-link" data-target="llm-as-judge">LLM-as-Judge</a></li>
+        <li><a href="#building-eval-sets" class="sidebar-link" data-target="building-eval-sets">Building Evaluation Sets</a></li>
+        <li><a href="#context-management" class="sidebar-link" data-target="context-management">Context Management</a></li>
+        <li><a href="#escalation-confidence" class="sidebar-link" data-target="escalation-confidence">Escalation &amp; Confidence</a></li>
+        <li><a href="#error-propagation" class="sidebar-link" data-target="error-propagation">Error Propagation</a></li>
+        <li><a href="#provenance-audit" class="sidebar-link" data-target="provenance-audit">Provenance &amp; Audit Trails</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Exercises -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="exercises">
+        Exercises <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-exercises">
+        <li><a href="#context-visualizer" class="sidebar-link" data-target="context-visualizer">Context Window Visualizer</a></li>
+        <li><a href="#rubric-builder" class="sidebar-link" data-target="rubric-builder">Eval Rubric Builder</a></li>
+        <li><a href="#confidence-calibration" class="sidebar-link" data-target="confidence-calibration">Confidence Calibration</a></li>
+        <li><a href="#error-visualizer" class="sidebar-link" data-target="error-visualizer">Error Propagation Visualizer</a></li>
+        <li><a href="#final-quiz" class="sidebar-link" data-target="final-quiz">End-of-Module Quiz</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sidebar-progress">
+    <div class="sidebar-progress-label">Module Progress</div>
+    <div class="sidebar-progress-track">
+      <div class="sidebar-progress-fill" id="sidebarProgressFill"></div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================
+     MAIN CONTENT
+     ============================================ -->
+<main class="main-content">
+  <div class="content-wrapper">
+
+    <!-- Module Header -->
+    <header class="module-header">
+      <div class="breadcrumb">
+        <a href="../index.html">Training Hub</a> &raquo; Module 25
+      </div>
+      <div class="module-badge">
+        <span class="number">25</span>
+        <span class="label">Advanced</span>
+      </div>
+      <h1>Evaluations, Context Management &amp; Reliability</h1>
+      <p class="description">
+        Master the practices that separate hobby projects from production AI systems: measuring output quality with evaluations, managing your most precious resource (context), building confidence calibration, and making multi-agent pipelines resilient to failure.
+      </p>
+      <div class="module-meta">
+        <span class="module-meta-item">&#9201; ~90 min</span>
+        <span class="module-meta-item">&#128218; Advanced</span>
+        <span class="module-meta-item">&#127891; Developers &amp; Architects</span>
+        <span class="module-meta-item">&#127919; 4 Interactive Exercises</span>
+      </div>
+    </header>
+
+    <!-- ========================================
+         SECTION 1: WHY EVALUATIONS MATTER
+         ======================================== -->
+    <section class="section" id="why-evals-matter">
+      <h2 class="section-heading">1. Why Evaluations Matter</h2>
+
+      <p>
+        <strong>"If you can't measure it, you can't improve it."</strong> This principle, fundamental to every engineering discipline, is doubly true for AI systems. Without evaluations, you are flying blind -- making prompt changes based on vibes, shipping updates without knowing if they help or hurt, and discovering regressions only when users complain.
+      </p>
+
+      <p>
+        Evaluations (evals) are the foundation of a systematic approach to AI quality. They transform prompt engineering from an art into a science by providing <span class="key-concept">repeatable, quantifiable measurements</span> of your system's performance.
+      </p>
+
+      <h3>The Eval Loop</h3>
+
+      <p>
+        Every production AI system should follow this continuous improvement cycle:
+      </p>
+
+      <div class="step-list">
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Build</h4>
+            <p>Design your prompt, agent, or pipeline. Make your best educated guess at what will work based on the requirements.</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Measure</h4>
+            <p>Run your system against a curated evaluation set. Collect scores across multiple dimensions (accuracy, completeness, tone, safety).</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Improve</h4>
+            <p>Analyze where scores are weak. Revise prompts, add examples, adjust system architecture. Make targeted changes based on evidence.</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Repeat</h4>
+            <p>Run the updated system against the same eval set. Verify improvements did not introduce regressions. Continue iterating.</p>
+          </div>
+        </div>
+      </div>
+
+      <h3>Three Types of Evaluation</h3>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>How It Works</th>
+              <th>Strengths</th>
+              <th>Weaknesses</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Human evaluation</strong></td>
+              <td>Expert reviewers rate outputs against criteria</td>
+              <td>Gold standard; catches nuance and context</td>
+              <td>Expensive, slow, doesn't scale</td>
+            </tr>
+            <tr>
+              <td><strong>Automated / deterministic</strong></td>
+              <td>Regex, schema validation, exact match, keyword checks</td>
+              <td>Fast, cheap, perfectly reproducible</td>
+              <td>Only catches surface-level issues; brittle</td>
+            </tr>
+            <tr>
+              <td><strong>Model-graded (LLM-as-judge)</strong></td>
+              <td>Use Claude to evaluate Claude's output against a rubric</td>
+              <td>Scalable, nuanced, can evaluate open-ended quality</td>
+              <td>Potential bias; needs calibration against humans</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>When to Use Each Type</h3>
+
+      <ul>
+        <li><strong>Human evaluation</strong> -- Use during initial development and for periodic "ground truth" checks. Essential for high-stakes domains (medical, legal, financial).</li>
+        <li><strong>Automated/deterministic</strong> -- Use as a first line of defense for every output. Check JSON schema validity, required field presence, forbidden content patterns, response length bounds.</li>
+        <li><strong>Model-graded</strong> -- Use as your primary scaling mechanism. Run after every prompt change against your full eval set. Supplement with periodic human review to keep the judge calibrated.</li>
+      </ul>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#9889;</span>
+        <div class="callout-content">
+          <p><strong>Best practice:</strong> Use all three types in combination. Deterministic checks catch structural failures instantly. LLM-as-judge catches quality issues at scale. Human review calibrates the judge and catches what machines miss.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 2: LLM-AS-JUDGE
+         ======================================== -->
+    <section class="section" id="llm-as-judge">
+      <h2 class="section-heading">2. LLM-as-Judge</h2>
+
+      <p>
+        The most powerful innovation in AI evaluation is using a <span class="key-concept">separate Claude instance to grade outputs</span> against a structured rubric. This approach combines the nuance of human judgment with the scalability of automated evaluation.
+      </p>
+
+      <h3>Why It Works</h3>
+
+      <p>
+        Claude can assess qualities that are impossible to capture with regex or keyword matching: Is the response <em>relevant</em> to the user's actual intent? Is it <em>complete</em> without being unnecessarily verbose? Does the <em>tone</em> match the context? Is it <em>actionable</em> -- can the user actually do something with this information?
+      </p>
+
+      <h3>The Judge Prompt Anatomy</h3>
+
+      <p>
+        A well-structured judge prompt has four components: role definition, evaluation criteria with explicit scoring rubric, the response to evaluate, and output format instructions.
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Judge Prompt Template</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="kw">You are evaluating an AI assistant's response.</span>
+
+<span class="cm">Criteria:</span>
+<span class="str">- Accuracy (1-5): Are all facts correct?</span>
+<span class="str">  1 = Contains factual errors</span>
+<span class="str">  3 = Mostly correct with minor imprecisions</span>
+<span class="str">  5 = All facts verified and precise</span>
+
+<span class="str">- Completeness (1-5): Does it address all parts of the question?</span>
+<span class="str">  1 = Misses major aspects of the question</span>
+<span class="str">  3 = Addresses the main point but misses secondary aspects</span>
+<span class="str">  5 = Thoroughly addresses every part</span>
+
+<span class="str">- Clarity (1-5): Is it well-organized and easy to understand?</span>
+<span class="str">  1 = Confusing, disorganized, or overly technical</span>
+<span class="str">  3 = Understandable but could be better structured</span>
+<span class="str">  5 = Crystal clear with logical flow</span>
+
+<span class="str">- Actionability (1-5): Can the user act on this information?</span>
+<span class="str">  1 = Vague advice with no concrete next steps</span>
+<span class="str">  3 = Some actionable items but missing specifics</span>
+<span class="str">  5 = Clear, specific steps the user can take immediately</span>
+
+<span class="cm">Response to evaluate:</span>
+<span class="prop">[response]</span>
+
+<span class="kw">Provide scores and brief justification for each criterion.</span>
+<span class="kw">Format as JSON:</span>
+<span class="punc">{</span>
+  <span class="str">"accuracy"</span><span class="punc">:</span> <span class="punc">{</span> <span class="str">"score"</span><span class="punc">:</span> <span class="num">N</span><span class="punc">,</span> <span class="str">"justification"</span><span class="punc">:</span> <span class="str">"..."</span> <span class="punc">}</span><span class="punc">,</span>
+  <span class="str">"completeness"</span><span class="punc">:</span> <span class="punc">{</span> <span class="str">"score"</span><span class="punc">:</span> <span class="num">N</span><span class="punc">,</span> <span class="str">"justification"</span><span class="punc">:</span> <span class="str">"..."</span> <span class="punc">}</span><span class="punc">,</span>
+  <span class="str">"clarity"</span><span class="punc">:</span> <span class="punc">{</span> <span class="str">"score"</span><span class="punc">:</span> <span class="num">N</span><span class="punc">,</span> <span class="str">"justification"</span><span class="punc">:</span> <span class="str">"..."</span> <span class="punc">}</span><span class="punc">,</span>
+  <span class="str">"actionability"</span><span class="punc">:</span> <span class="punc">{</span> <span class="str">"score"</span><span class="punc">:</span> <span class="num">N</span><span class="punc">,</span> <span class="str">"justification"</span><span class="punc">:</span> <span class="str">"..."</span> <span class="punc">}</span>
+<span class="punc">}</span></code></div>
+
+      <h3>Best Practices</h3>
+
+      <div class="accent-card">
+        <h4>Use a Different Model Instance</h4>
+        <p>The generating instance retains its own reasoning context, making it biased toward its own output. Always use a separate instance (or a different model entirely) for evaluation. This is analogous to the principle that you should not grade your own exam.</p>
+      </div>
+
+      <div class="accent-card">
+        <h4>Include Clear Rubric Definitions</h4>
+        <p>Don't just say "rate accuracy 1-5." Define what each score level means with concrete examples. What does a "3" look like? How is it different from a "4"? Without this, the judge's scores will drift over time.</p>
+      </div>
+
+      <div class="accent-card">
+        <h4>Calibrate Against Human Judgments</h4>
+        <p>Run the judge on a sample set where you have human scores. Compare the results. If the judge consistently scores 1 point higher than humans on "completeness," adjust the rubric. Track this calibration over time.</p>
+      </div>
+
+      <div class="accent-card">
+        <h4>Track Inter-Rater Reliability</h4>
+        <p>Run the same evaluation multiple times. If the judge gives the same response a 3 on one run and a 5 on another, your rubric is too vague. Consistency (low variance across runs) is as important as accuracy (matching human scores).</p>
+      </div>
+
+      <div class="callout warning">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Watch out for self-serving bias:</strong> Claude tends to rate Claude's outputs more favorably than human experts would. Always validate your judge against a human baseline before trusting it for production decisions.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 2: EVAL RUBRIC BUILDER
+         ======================================== -->
+    <section class="section" id="rubric-builder">
+      <h2 class="section-heading">Interactive: Eval Rubric Builder</h2>
+
+      <p>
+        Design an evaluation rubric, then use it to score sample responses. See how rubric design directly affects scoring outcomes.
+      </p>
+
+      <div class="rubric-builder" id="rubricBuilderContainer">
+        <h3>Build Your Rubric</h3>
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 16px;">Choose a preset use case or create your own. Add evaluation dimensions with score definitions, then evaluate sample responses.</p>
+
+        <div class="rubric-presets">
+          <button class="rubric-preset-btn" id="presetSupport" onclick="loadRubricPreset('support')">Customer Support Quality</button>
+          <button class="rubric-preset-btn" id="presetCode" onclick="loadRubricPreset('code')">Code Review Accuracy</button>
+          <button class="rubric-preset-btn" id="presetResearch" onclick="loadRubricPreset('research')">Research Summary</button>
+        </div>
+
+        <div class="rubric-layout">
+          <div class="rubric-form">
+            <div class="rubric-field">
+              <label>Use Case Description</label>
+              <textarea id="rubricUseCase" rows="2" placeholder="Describe what you are evaluating..."></textarea>
+            </div>
+
+            <div id="rubricDimensions"></div>
+
+            <button class="rubric-add-dim-btn" onclick="addRubricDimension()">+ Add Dimension</button>
+
+            <button class="rubric-start-eval-btn" id="rubricStartEvalBtn" onclick="startRubricEval()">Evaluate Sample Responses</button>
+          </div>
+
+          <div class="rubric-preview">
+            <h4 style="margin-top: 0; margin-bottom: 8px; font-size: 0.95rem;">Live Rubric Preview</h4>
+            <div id="rubricPreviewContent">
+              <p style="color: var(--text-muted); font-size: 0.85rem; font-style: italic;">Add dimensions to see your rubric preview here.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="rubric-eval-phase" id="rubricEvalPhase">
+          <h4 style="margin-bottom: 12px;">Score These Responses</h4>
+          <div id="rubricEvalResponses"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 3: BUILDING EVALUATION SETS
+         ======================================== -->
+    <section class="section" id="building-eval-sets">
+      <h2 class="section-heading">3. Building Evaluation Sets</h2>
+
+      <p>
+        An evaluation is only as good as the data you evaluate against. Your <span class="key-concept">golden dataset</span> is the collection of representative examples that define what "good" looks like for your system.
+      </p>
+
+      <h3>Size and Composition</h3>
+
+      <p>
+        A golden dataset should contain <strong>20-50 representative examples</strong> with expected outputs. This is large enough to catch common failure modes but small enough to manually curate and maintain. Each example should include the input, the expected output (or acceptable output range), and metadata about what makes this case important.
+      </p>
+
+      <h3>Diversity Matters</h3>
+
+      <p>Your eval set must cover three categories:</p>
+
+      <ul>
+        <li><strong>Easy cases (40%)</strong> -- Common, straightforward inputs that your system should handle flawlessly. These establish your baseline accuracy.</li>
+        <li><strong>Hard cases (30%)</strong> -- Complex inputs that require multi-step reasoning, disambiguation, or domain expertise. These test your system's ceiling.</li>
+        <li><strong>Edge cases and adversarial examples (30%)</strong> -- Tricky inputs that commonly fool AI: ambiguous phrasing, contradictory context, requests that look benign but require refusal, inputs with subtle errors.</li>
+      </ul>
+
+      <h3>Eval Set Discipline</h3>
+
+      <div class="accent-card">
+        <h4>Version Your Eval Sets</h4>
+        <p>Never modify eval examples in place. Instead, create new versions (eval-set-v1, eval-set-v2) so you can track how your system's performance changes over time against a stable benchmark. If you change both the prompt and the eval set simultaneously, you cannot attribute improvements or regressions to either change.</p>
+      </div>
+
+      <div class="accent-card">
+        <h4>Regression Testing</h4>
+        <p>Every prompt change, every system architecture change, every model upgrade should be tested against your eval set before deployment. Treat your eval set like a test suite: if a change causes a score regression on 3 of 50 examples, investigate before shipping.</p>
+      </div>
+
+      <div class="accent-card">
+        <h4>A/B Testing</h4>
+        <p>When comparing two prompts, run both against the exact same eval set. Compare scores dimension by dimension. A prompt that improves accuracy by 0.5 points but drops actionability by 1.2 points is not an improvement -- it's a tradeoff you need to evaluate consciously.</p>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-icon">&#9432;</span>
+        <div class="callout-content">
+          <p><strong>Pro tip:</strong> Include adversarial examples that test specific failure modes you have discovered. If you once found that your agent gives medical advice when it shouldn't, add that exact scenario to your eval set as a regression guard.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 4: CONTEXT MANAGEMENT
+         ======================================== -->
+    <section class="section" id="context-management">
+      <h2 class="section-heading">4. Context Management</h2>
+
+      <p>
+        <strong>The context window is your most precious resource.</strong> Every token you put into the context competes with every other token for the model's attention. Overloaded context leads to missed instructions, forgotten facts, and degraded reasoning. Managing context effectively is what separates amateur prompt engineering from production-grade systems.
+      </p>
+
+      <h3>The "Lost in the Middle" Effect</h3>
+
+      <p>
+        Research has demonstrated that language models process information at the <span class="key-concept">beginning and end of long inputs</span> more reliably than information buried in the middle. This is not a minor quirk -- it is a fundamental characteristic of transformer attention mechanisms. When your context is 50,000+ tokens, information in positions 20,000-30,000 may receive significantly less attention than information in the first or last 5,000 tokens.
+      </p>
+
+      <div class="callout important">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Critical implication:</strong> Always place your most important instructions and facts at the beginning or end of your prompt. Never bury critical business rules in the middle of a long context.</p>
+        </div>
+      </div>
+
+      <h3>Progressive Summarization Risks</h3>
+
+      <p>
+        A common technique for long conversations is to summarize earlier messages. But summarization inherently loses information. Numerical values, specific dates, exact quotes, and conditional logic are particularly vulnerable to being generalized or dropped during summarization. If your workflow depends on specific facts from early in the conversation, use structured context blocks rather than relying on summaries.
+      </p>
+
+      <h3>Strategies for Context Management</h3>
+
+      <div class="accent-card">
+        <h4>Selective Injection</h4>
+        <p>Only include context that is directly relevant to the current task. Resist the temptation to dump everything into the prompt "just in case." If your agent is answering a question about shipping policies, it does not need the full product catalog in context.</p>
+      </div>
+
+      <div class="accent-card">
+        <h4>Structured Context Blocks</h4>
+        <p>For critical information that must persist across a conversation, create a dedicated "case facts" section at the top of every prompt. Format it as a clearly delimited block with labeled fields. This prevents important facts from getting lost as the conversation grows.</p>
+      </div>
+
+      <div class="code-block has-label">
+        <span class="code-label">Structured Context Block</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm">&lt;case_facts&gt;</span>
+<span class="str">Customer: Jane Smith (ID: C-4829)</span>
+<span class="str">Account tier: Enterprise</span>
+<span class="str">Issue: Invoice #INV-2024-0312 overcharged by $1,247.50</span>
+<span class="str">Resolution authority: Up to $2,000 without escalation</span>
+<span class="str">Previous contacts: 2 (both unresolved)</span>
+<span class="cm">&lt;/case_facts&gt;</span></code></div>
+
+      <div class="accent-card">
+        <h4>Tool Output Trimming</h4>
+        <p>Verbose tool results are context killers. A full <code>pytest -v</code> output might consume 8,000 tokens when all you need is "3 tests passed, 1 failed: test_auth_flow." Trim tool outputs to the relevant fields before they accumulate in context.</p>
+      </div>
+
+      <div class="accent-card">
+        <h4>The /compact Command</h4>
+        <p>In Claude Code, the <code>/compact</code> command compresses your conversation context. Use it when you notice the conversation getting long, especially before starting a new phase of work. It summarizes earlier exchanges while preserving key decisions and facts.</p>
+      </div>
+
+      <div class="accent-card">
+        <h4>Subagent Delegation</h4>
+        <p>For research-heavy tasks, delegate to a subagent with its own context window. The subagent reads 50 files, synthesizes findings, and returns a concise 300-token summary. Your main conversation never sees the 50 files, preserving context for the actual work.</p>
+      </div>
+
+      <h3>Token Budgeting</h3>
+
+      <p>
+        Treat context like a financial budget. Allocate token quotas to each component: system prompt (2,000), persistent context (1,000), conversation history (variable), tool outputs (capped). Track usage and set alerts when approaching limits. The interactive visualizer below will help you build intuition for how quickly context fills up.
+      </p>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 1: CONTEXT WINDOW VISUALIZER
+         ======================================== -->
+    <section class="section" id="context-visualizer">
+      <h2 class="section-heading">Interactive: Context Window Visualizer</h2>
+
+      <p>
+        See how quickly the 200K token context window fills up. Add different content types and watch the gauge change color as you approach capacity.
+      </p>
+
+      <div class="context-viz" id="contextVizContainer">
+        <h3>200K Token Context Window</h3>
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 4px;">Click the buttons to add content blocks. Watch how different content types consume context at different rates.</p>
+
+        <div class="viz-layout">
+          <div class="viz-window">
+            <div class="viz-container" id="vizContainer">
+              <div class="viz-empty" id="vizEmpty">Context window is empty. Add content to visualize usage.</div>
+            </div>
+
+            <div class="viz-gauge">
+              <div class="viz-gauge-track">
+                <div class="viz-gauge-fill" id="vizGaugeFill" style="width: 0%;"></div>
+              </div>
+              <div class="viz-gauge-label">
+                <span id="vizTokenCount">0 / 200,000 tokens</span>
+                <span class="viz-gauge-pct green" id="vizPct">0%</span>
+              </div>
+            </div>
+
+            <div class="viz-warning" id="vizWarningAmber">
+              Context usage above 50%. Consider using selective injection or trimming tool outputs.
+            </div>
+            <div class="viz-warning" id="vizWarningRed">
+              Context nearly full! Time to use /compact or start a new session. Critical information may be lost in the middle.
+            </div>
+          </div>
+
+          <div class="viz-controls">
+            <button class="viz-add-btn" onclick="addVizBlock('system', 'System Prompt', 500)">
+              <span class="btn-dot system"></span>
+              System Prompt
+              <span class="btn-tokens">500</span>
+            </button>
+            <button class="viz-add-btn" onclick="addVizBlock('user', 'User Message', 200)">
+              <span class="btn-dot user"></span>
+              User Message
+              <span class="btn-tokens">200</span>
+            </button>
+            <button class="viz-add-btn" onclick="addVizBlock('file', 'File Read', 0)">
+              <span class="btn-dot file"></span>
+              File Read
+              <span class="btn-tokens">800-4000</span>
+            </button>
+            <button class="viz-add-btn" onclick="addVizBlock('tool', 'Bash Output', 1500)">
+              <span class="btn-dot tool"></span>
+              Bash Output
+              <span class="btn-tokens">1500</span>
+            </button>
+            <button class="viz-add-btn" onclick="addVizBlock('assistant', 'Agent Research', 300)">
+              <span class="btn-dot assistant"></span>
+              Agent Research
+              <span class="btn-tokens">300</span>
+            </button>
+
+            <button class="viz-reset-btn" onclick="resetViz()">Reset</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 5: ESCALATION AND CONFIDENCE
+         ======================================== -->
+    <section class="section" id="escalation-confidence">
+      <h2 class="section-heading">5. Escalation and Confidence</h2>
+
+      <p>
+        One of the most important skills for an AI system is knowing when <span class="key-concept">not to answer</span>. An AI that confidently gives wrong advice is far more dangerous than one that says "I don't know" and escalates to a human.
+      </p>
+
+      <h3>When Claude Should Say "I Don't Know"</h3>
+
+      <p>
+        Not every question requires an AI-generated answer. The mark of a well-designed system is that it can recognize the boundaries of its competence and hand off gracefully.
+      </p>
+
+      <h3>Escalation Triggers</h3>
+
+      <ul>
+        <li><strong>Customer explicitly asks for a human</strong> -- Always honor this request immediately. No amount of "But I can help with that!" is acceptable. The customer's autonomy comes first.</li>
+        <li><strong>Policy gaps</strong> -- When Claude encounters a situation that the system prompt and available documentation do not address. It is better to say "I need to check with a colleague" than to invent a policy.</li>
+        <li><strong>Ambiguous situations with no clear right answer</strong> -- When two reasonable interpretations of a policy would lead to different outcomes, escalate rather than guess.</li>
+        <li><strong>High-stakes decisions requiring human accountability</strong> -- Medical diagnoses, legal advice, financial commitments, termination of service. These require a human in the loop regardless of Claude's confidence.</li>
+      </ul>
+
+      <h3>What NOT to Escalate</h3>
+
+      <p>
+        Over-escalation is as much a problem as under-escalation. If Claude escalates every question it is slightly unsure about, human reviewers get overwhelmed and the AI adds no value. Things Claude can and should handle, even with some uncertainty:
+      </p>
+
+      <ul>
+        <li>Answering factual questions from provided documentation</li>
+        <li>Standard troubleshooting steps for known issues</li>
+        <li>Generating code that follows established patterns in the codebase</li>
+        <li>Summarizing content that has been provided in context</li>
+      </ul>
+
+      <h3>Confidence Calibration</h3>
+
+      <div class="callout important">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Critical insight:</strong> Claude's self-reported confidence is poorly calibrated. When Claude says "I'm fairly confident," this does not correlate well with actual accuracy. Do not use "Are you confident?" as a reliability filter.</p>
+        </div>
+      </div>
+
+      <p>
+        Instead of relying on Claude's self-assessment, build confidence into your system design:
+      </p>
+
+      <ul>
+        <li><strong>Use explicit criteria</strong> -- Define specific conditions under which escalation should happen, not vague "if you're unsure" instructions.</li>
+        <li><strong>Provide few-shot examples</strong> -- Show Claude examples of situations that should and should not be escalated. Concrete examples are more reliable than abstract rules.</li>
+        <li><strong>Source-based confidence</strong> -- An answer backed by a specific document citation is more reliable than one from general knowledge. Build this distinction into your system.</li>
+      </ul>
+
+      <h3>Handoff Patterns</h3>
+
+      <p>
+        When escalating, provide the human reviewer with a structured summary:
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Escalation Handoff Template</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm">&lt;escalation_summary&gt;</span>
+<span class="str">Reason: Policy gap -- customer requesting exception not covered in guidelines</span>
+<span class="str">Customer: Jane Smith (Enterprise tier, 3-year relationship)</span>
+<span class="str">Request: Waive annual renewal fee ($4,800) due to service outage</span>
+<span class="str">Relevant context:</span>
+<span class="str">  - 47-hour outage affected this customer's production environment</span>
+<span class="str">  - SLA guarantees 99.9% uptime (this month: 93.4%)</span>
+<span class="str">  - No existing policy for fee waiver vs. service credit</span>
+<span class="str">Attempted resolution: Offered standard 10% service credit ($480)</span>
+<span class="str">Customer response: Rejected, requesting full fee waiver</span>
+<span class="str">My assessment: Customer request seems reasonable given SLA breach severity</span>
+<span class="cm">&lt;/escalation_summary&gt;</span></code></div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 3: CONFIDENCE CALIBRATION
+         ======================================== -->
+    <section class="section" id="confidence-calibration">
+      <h2 class="section-heading">Interactive: Confidence Calibration Exercise</h2>
+
+      <p>
+        For each Claude response below, assess whether the stated confidence level is appropriate. Is Claude well-calibrated, overconfident, or underconfident?
+      </p>
+
+      <div class="confidence-exercise" id="confidenceExercise">
+        <h3>Rate Claude's Confidence</h3>
+
+        <div class="confidence-score-bar">
+          <span class="confidence-score-label">Score:</span>
+          <div class="confidence-score-track">
+            <div class="confidence-score-fill" id="confidenceScoreFill"></div>
+          </div>
+          <span class="confidence-score-text" id="confidenceScoreText">0 / 8</span>
+        </div>
+
+        <div id="confidenceCards"></div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 6: ERROR PROPAGATION
+         ======================================== -->
+    <section class="section" id="error-propagation">
+      <h2 class="section-heading">6. Error Propagation in Multi-Agent Systems</h2>
+
+      <p>
+        In a single-agent system, errors are straightforward: something fails, you retry or report. In multi-agent pipelines, errors <span class="key-concept">cascade</span>. One agent's failure becomes corrupted input for the next agent, which produces bad output for the next, and so on. Without proper error handling, a minor failure in step 1 becomes a catastrophic failure by step 4.
+      </p>
+
+      <h3>Error Boundaries</h3>
+
+      <p>
+        Borrow from React's error boundary pattern: each agent in your pipeline should catch and handle errors at its own level. An error in the "Enrich" agent should not crash the "Extract" agent. Each agent should be able to report: what happened, what was attempted, and what partial results are available.
+      </p>
+
+      <h3>The Structured Error + Partial Results Pattern</h3>
+
+      <div class="code-block has-label">
+        <span class="code-label">Error Response Structure</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="punc">{</span>
+  <span class="str">"status"</span><span class="punc">:</span> <span class="str">"partial_failure"</span><span class="punc">,</span>
+  <span class="str">"completed_steps"</span><span class="punc">:</span> <span class="punc">[</span><span class="str">"extract"</span><span class="punc">,</span> <span class="str">"validate"</span><span class="punc">]</span><span class="punc">,</span>
+  <span class="str">"failed_step"</span><span class="punc">:</span> <span class="str">"enrich"</span><span class="punc">,</span>
+  <span class="str">"error"</span><span class="punc">:</span> <span class="punc">{</span>
+    <span class="str">"type"</span><span class="punc">:</span> <span class="str">"ServiceTimeout"</span><span class="punc">,</span>
+    <span class="str">"message"</span><span class="punc">:</span> <span class="str">"Enrichment API timed out after 30s"</span><span class="punc">,</span>
+    <span class="str">"attempted"</span><span class="punc">:</span> <span class="str">"3 retries with exponential backoff"</span>
+  <span class="punc">}</span><span class="punc">,</span>
+  <span class="str">"partial_results"</span><span class="punc">:</span> <span class="punc">{</span>
+    <span class="str">"extracted_data"</span><span class="punc">:</span> <span class="punc">{</span> <span class="cm">/* ... available data ... */</span> <span class="punc">}</span><span class="punc">,</span>
+    <span class="str">"validation_status"</span><span class="punc">:</span> <span class="str">"passed"</span>
+  <span class="punc">}</span><span class="punc">,</span>
+  <span class="str">"skipped_steps"</span><span class="punc">:</span> <span class="punc">[</span><span class="str">"store"</span><span class="punc">]</span><span class="punc">,</span>
+  <span class="str">"suggested_action"</span><span class="punc">:</span> <span class="str">"Retry enrichment or proceed with unenriched data"</span>
+<span class="punc">}</span></code></div>
+
+      <h3>Recovery Strategies</h3>
+
+      <ul>
+        <li><strong>Retry with backoff</strong> -- For transient errors (timeouts, rate limits, temporary service outages). Use exponential backoff: 1s, 2s, 4s, 8s. Set a maximum retry count.</li>
+        <li><strong>Fallback to a simpler approach</strong> -- If the enrichment API fails, use the data you already have rather than failing entirely. A response with unenriched data is better than no response.</li>
+        <li><strong>Continue with partial results</strong> -- If 4 of 5 data sources are available, produce a result with a disclaimer about missing information. Let the consumer decide if the partial result is sufficient.</li>
+        <li><strong>Escalate to human</strong> -- For unrecoverable errors that affect business-critical decisions. Include the full error context so the human reviewer can diagnose and resolve.</li>
+      </ul>
+
+      <h3>Cascade Prevention</h3>
+
+      <p>
+        Design each agent to accept degraded input gracefully. If Agent 2 expects enriched data but receives raw data (because the enrichment step failed), it should still produce a useful result rather than crashing. This requires defensive input validation and fallback behavior at every stage.
+      </p>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#9889;</span>
+        <div class="callout-content">
+          <p><strong>Design principle:</strong> Every agent should be able to run independently with degraded input and produce a partial result. If your pipeline requires every step to succeed for any output to be produced, your architecture is fragile.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 4: ERROR PROPAGATION VISUALIZER
+         ======================================== -->
+    <section class="section" id="error-visualizer">
+      <h2 class="section-heading">Interactive: Error Propagation Visualizer</h2>
+
+      <p>
+        Inject errors into a multi-agent pipeline and see how error boundaries prevent cascading failures. Toggle boundaries on and off to compare the outcomes.
+      </p>
+
+      <div class="error-viz" id="errorVizContainer">
+        <h3>Multi-Agent Pipeline</h3>
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 4px;">Select an error type for each agent, toggle error boundaries, then run the pipeline to see the effect.</p>
+
+        <div class="error-pipeline" id="errorPipeline">
+          <div class="error-agent" id="agent-extract">
+            <span class="error-agent-icon">&#128196;</span>
+            <span class="error-agent-label">Extract</span>
+            <span class="error-agent-status ok-status" id="status-extract">OK</span>
+          </div>
+          <span class="error-arrow" id="arrow-1">&#10148;</span>
+          <div class="error-agent" id="agent-validate">
+            <span class="error-agent-icon">&#9989;</span>
+            <span class="error-agent-label">Validate</span>
+            <span class="error-agent-status ok-status" id="status-validate">OK</span>
+          </div>
+          <span class="error-arrow" id="arrow-2">&#10148;</span>
+          <div class="error-agent" id="agent-enrich">
+            <span class="error-agent-icon">&#128300;</span>
+            <span class="error-agent-label">Enrich</span>
+            <span class="error-agent-status ok-status" id="status-enrich">OK</span>
+          </div>
+          <span class="error-arrow" id="arrow-3">&#10148;</span>
+          <div class="error-agent" id="agent-store">
+            <span class="error-agent-icon">&#128190;</span>
+            <span class="error-agent-label">Store</span>
+            <span class="error-agent-status ok-status" id="status-store">OK</span>
+          </div>
+        </div>
+
+        <div class="error-controls">
+          <div class="error-inject-group">
+            <label>Extract:</label>
+            <select id="errorExtract">
+              <option value="none">None</option>
+              <option value="timeout">Timeout</option>
+              <option value="invalid">Invalid Data</option>
+              <option value="down">Service Down</option>
+              <option value="permission">Permission Error</option>
+            </select>
+          </div>
+          <div class="error-inject-group">
+            <label>Validate:</label>
+            <select id="errorValidate">
+              <option value="none">None</option>
+              <option value="timeout">Timeout</option>
+              <option value="invalid">Invalid Data</option>
+              <option value="down">Service Down</option>
+              <option value="permission">Permission Error</option>
+            </select>
+          </div>
+          <div class="error-inject-group">
+            <label>Enrich:</label>
+            <select id="errorEnrich">
+              <option value="none">None</option>
+              <option value="timeout">Timeout</option>
+              <option value="invalid">Invalid Data</option>
+              <option value="down">Service Down</option>
+              <option value="permission">Permission Error</option>
+            </select>
+          </div>
+          <div class="error-inject-group">
+            <label>Store:</label>
+            <select id="errorStore">
+              <option value="none">None</option>
+              <option value="timeout">Timeout</option>
+              <option value="invalid">Invalid Data</option>
+              <option value="down">Service Down</option>
+              <option value="permission">Permission Error</option>
+            </select>
+          </div>
+
+          <div class="error-boundary-toggle">
+            <input type="checkbox" id="errorBoundaryToggle" checked>
+            <label for="errorBoundaryToggle">Error Boundaries</label>
+          </div>
+
+          <button class="error-run-btn" onclick="runErrorPipeline()">Run Pipeline</button>
+        </div>
+
+        <div class="error-comparison" id="errorComparison" style="display: none;">
+          <div class="error-comparison-card failure" id="errorNoBoundary">
+            <h4>Without Error Boundaries</h4>
+            <p id="errorNoBoundaryText"></p>
+          </div>
+          <div class="error-comparison-card partial-success" id="errorWithBoundary">
+            <h4>With Error Boundaries</h4>
+            <p id="errorWithBoundaryText"></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 7: PROVENANCE AND AUDIT TRAILS
+         ======================================== -->
+    <section class="section" id="provenance-audit">
+      <h2 class="section-heading">7. Provenance and Audit Trails</h2>
+
+      <p>
+        In production AI systems, knowing <em>what</em> the system said is only half the story. You also need to know <span class="key-concept">why it said it</span> -- which sources informed the output, what evidence supports each claim, and whether that evidence is current and reliable.
+      </p>
+
+      <h3>Information Provenance</h3>
+
+      <p>
+        Provenance means tracking the lineage of information from source to output. Every assertion in your AI's response should be traceable to a specific source: a document, a database record, a tool output, or the model's training data (in which case it should be marked as general knowledge rather than cited as fact).
+      </p>
+
+      <h3>Claim-Source Mappings</h3>
+
+      <p>
+        The gold standard for provenance is a claim-source mapping: each assertion in the output is linked to the specific evidence that supports it.
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Claim-Source Mapping Example</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm">Output:</span>
+<span class="str">"The customer's contract expires March 15, 2025 [1].</span>
+<span class="str"> Their account has been active for 3 years [2].</span>
+<span class="str"> Based on current pricing, renewal would be $48,000/year [3]."</span>
+
+<span class="cm">Sources:</span>
+<span class="prop">[1]</span> Contract document, Section 4.2, paragraph 1
+<span class="prop">[2]</span> CRM record, account_created_at: 2022-03-15
+<span class="prop">[3]</span> Pricing API response, enterprise_annual tier, retrieved 2025-01-10</code></div>
+
+      <h3>Handling Conflicting Sources</h3>
+
+      <p>
+        When sources disagree, <strong>annotate the conflict rather than silently choosing one</strong>. If the contract says the renewal price is $48,000 but the current pricing page shows $52,000, the system should surface both values and explain the discrepancy rather than presenting one as fact.
+      </p>
+
+      <div class="accent-card">
+        <h4>Temporal Data</h4>
+        <p>Always include publication dates when citing sources. A market analysis from 2021 should not be presented as current data in 2025. When using tool outputs, include the retrieval timestamp. This prevents misinterpreting stale data as current.</p>
+      </div>
+
+      <h3>Audit Trail Requirements</h3>
+
+      <p>
+        Production AI systems, especially in regulated industries, need comprehensive audit trails:
+      </p>
+
+      <ul>
+        <li><strong>Who</strong> -- Which user or system triggered the interaction</li>
+        <li><strong>What</strong> -- The complete input (prompt + context) and output</li>
+        <li><strong>When</strong> -- Timestamps for each step of the interaction</li>
+        <li><strong>Why</strong> -- The sources and reasoning chain that produced the output</li>
+        <li><strong>How</strong> -- The model version, prompt version, and system configuration used</li>
+      </ul>
+
+      <h3>Compliance Frameworks</h3>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Framework</th>
+              <th>Key Requirements</th>
+              <th>AI-Specific Considerations</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>SOC 2</strong></td>
+              <td>Access controls, change management, audit logs</td>
+              <td>Log all prompt changes; track who approved model updates; record all user interactions</td>
+            </tr>
+            <tr>
+              <td><strong>HIPAA</strong></td>
+              <td>PHI access logging, minimum necessary, breach notification</td>
+              <td>Ensure PHI is not stored in model context beyond the session; log all access to patient data via AI</td>
+            </tr>
+            <tr>
+              <td><strong>GDPR</strong></td>
+              <td>Right to explanation, data minimization, consent</td>
+              <td>Be able to explain how AI reached a decision; do not retain personal data in training or context</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-icon">&#9432;</span>
+        <div class="callout-content">
+          <p><strong>Remember:</strong> Audit trails are not just about compliance -- they are invaluable for debugging. When a user reports that the AI gave wrong advice two weeks ago, the audit trail lets you reconstruct exactly what happened: what context was available, what prompt version was active, and what the model produced.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE: END-OF-MODULE QUIZ
+         ======================================== -->
+    <section class="section" id="final-quiz">
+      <h2 class="section-heading">End-of-Module Quiz</h2>
+
+      <p>
+        Complete this quiz to finish Module 25. Your score will be saved to track your progress through the training program. You need at least 5 out of 7 to pass.
+      </p>
+
+      <div class="final-quiz" id="finalQuizContainer">
+        <h3>Module 25: Assessment</h3>
+
+        <!-- Question 1 -->
+        <div class="final-quiz-question" data-fq="0">
+          <div class="fq-number">Question 1 of 7</div>
+          <div class="fq-text">
+            What is the primary advantage of LLM-as-judge over human evaluation?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="0" data-fq-val="a" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="a"> It's always more accurate
+            </li>
+            <li class="fq-option" data-fq-idx="0" data-fq-val="b" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="b"> It's scalable and can evaluate thousands of outputs at low cost while still capturing nuanced quality
+            </li>
+            <li class="fq-option" data-fq-idx="0" data-fq-val="c" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="c"> It never makes mistakes
+            </li>
+            <li class="fq-option" data-fq-idx="0" data-fq-val="d" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="d"> It doesn't require a rubric
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="final-quiz-question" data-fq="1">
+          <div class="fq-number">Question 2 of 7</div>
+          <div class="fq-text">
+            What is the "lost in the middle" effect?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="1" data-fq-val="a" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="a"> Models forget what they said earlier in a conversation
+            </li>
+            <li class="fq-option" data-fq-idx="1" data-fq-val="b" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="b"> Models process information at the beginning and end of long inputs more reliably than the middle
+            </li>
+            <li class="fq-option" data-fq-idx="1" data-fq-val="c" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="c"> Models lose accuracy after midnight
+            </li>
+            <li class="fq-option" data-fq-idx="1" data-fq-val="d" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="d"> Models can't find files in the middle of a directory
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="final-quiz-question" data-fq="2">
+          <div class="fq-number">Question 3 of 7</div>
+          <div class="fq-text">
+            Why should you use a DIFFERENT Claude instance for evaluation than for generation?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="2" data-fq-val="a" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="a"> Different instances are faster
+            </li>
+            <li class="fq-option" data-fq-idx="2" data-fq-val="b" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="b"> The generating instance retains reasoning context, making it biased toward its own output
+            </li>
+            <li class="fq-option" data-fq-idx="2" data-fq-val="c" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="c"> Different instances use different models
+            </li>
+            <li class="fq-option" data-fq-idx="2" data-fq-val="d" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="d"> It's required by the API
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 4 -->
+        <div class="final-quiz-question" data-fq="3">
+          <div class="fq-number">Question 4 of 7</div>
+          <div class="fq-text">
+            When should Claude escalate to a human instead of answering?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="3" data-fq-val="a" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="a"> Whenever it's not 100% sure
+            </li>
+            <li class="fq-option" data-fq-idx="3" data-fq-val="b" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="b"> When the customer asks, when policy is ambiguous, or when the decision has consequences requiring human accountability
+            </li>
+            <li class="fq-option" data-fq-idx="3" data-fq-val="c" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="c"> Only when explicitly told to by the system prompt
+            </li>
+            <li class="fq-option" data-fq-idx="3" data-fq-val="d" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="d"> Never -- AI should always try to answer
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 5 -->
+        <div class="final-quiz-question" data-fq="4">
+          <div class="fq-number">Question 5 of 7</div>
+          <div class="fq-text">
+            What should a structured error response include when propagating errors in a multi-agent system?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="4" data-fq-val="a" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="a"> Just the error message
+            </li>
+            <li class="fq-option" data-fq-idx="4" data-fq-val="b" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="b"> What failed, what was attempted, partial results, and suggested alternative approaches
+            </li>
+            <li class="fq-option" data-fq-idx="4" data-fq-val="c" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="c"> A stack trace
+            </li>
+            <li class="fq-option" data-fq-idx="4" data-fq-val="d" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="d"> The full conversation history
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 6 -->
+        <div class="final-quiz-question" data-fq="5">
+          <div class="fq-number">Question 6 of 7</div>
+          <div class="fq-text">
+            How many examples should be in a golden evaluation dataset?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="5" data-fq-val="a" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="a"> 5-10 is sufficient
+            </li>
+            <li class="fq-option" data-fq-idx="5" data-fq-val="b" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="b"> 20-50 representative examples covering common cases, hard cases, and edge cases
+            </li>
+            <li class="fq-option" data-fq-idx="5" data-fq-val="c" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="c"> 1000+ for statistical significance
+            </li>
+            <li class="fq-option" data-fq-idx="5" data-fq-val="d" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="d"> It depends on the model, not the use case
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 7 -->
+        <div class="final-quiz-question" data-fq="6">
+          <div class="fq-number">Question 7 of 7</div>
+          <div class="fq-text">
+            What is claim-source mapping?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="6" data-fq-val="a" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="a"> Mapping API endpoints to their documentation
+            </li>
+            <li class="fq-option" data-fq-idx="6" data-fq-val="b" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="b"> Linking each assertion in the output to the specific source that supports it, maintaining provenance
+            </li>
+            <li class="fq-option" data-fq-idx="6" data-fq-val="c" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="c"> Mapping customer complaints to support agents
+            </li>
+            <li class="fq-option" data-fq-idx="6" data-fq-val="d" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="d"> A debugging technique for source code
+            </li>
+          </ul>
+        </div>
+
+        <button class="final-submit-btn" id="finalSubmitBtn" onclick="submitFinalQuiz()" disabled>
+          Submit Answers
+        </button>
+
+        <div class="final-result" id="finalResult">
+          <h4 id="finalResultTitle"></h4>
+          <p id="finalResultText"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         NAVIGATION FOOTER
+         ======================================== -->
+    <nav class="module-nav">
+      <a href="24-multi-agent-systems.html" class="nav-link prev">
+        <span class="nav-dir">&larr; Previous</span>
+        <span class="nav-title">Module 24: Multi-Agent Systems</span>
+      </a>
+      <a href="30-cert-domain1.html" class="nav-link next">
+        <span class="nav-dir">Next &rarr;</span>
+        <span class="nav-title">Module 30: Cert -- Agentic Architecture</span>
+      </a>
+    </nav>
+
+  </div>
+</main>
+
+<!-- ============================================
+     JAVASCRIPT
+     ============================================ -->
+<script>
+(function() {
+  'use strict';
+
+  // ==========================================
+  // THEME MANAGEMENT
+  // ==========================================
+  var THEME_KEY = 'claude-training-theme';
+
+  function getTheme() {
+    return localStorage.getItem(THEME_KEY) || 'light';
+  }
+
+  function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem(THEME_KEY, theme);
+    var icon = document.getElementById('themeIcon');
+    if (icon) {
+      icon.textContent = theme === 'dark' ? '\u2600' : '\u263E';
+    }
+  }
+
+  setTheme(getTheme());
+
+  document.getElementById('themeToggle').addEventListener('click', function() {
+    var current = getTheme();
+    setTheme(current === 'dark' ? 'light' : 'dark');
+  });
+
+  // ==========================================
+  // SIDEBAR MOBILE TOGGLE
+  // ==========================================
+  var hamburger = document.getElementById('hamburger');
+  var sidebar = document.getElementById('sidebar');
+  var overlay = document.getElementById('sidebarOverlay');
+
+  function toggleSidebar() {
+    var isOpen = sidebar.classList.contains('open');
+    sidebar.classList.toggle('open');
+    hamburger.classList.toggle('open');
+    if (isOpen) {
+      overlay.classList.remove('show');
+    } else {
+      overlay.classList.add('show');
+    }
+  }
+
+  hamburger.addEventListener('click', toggleSidebar);
+  overlay.addEventListener('click', toggleSidebar);
+
+  // ==========================================
+  // SIDEBAR SECTION COLLAPSING
+  // ==========================================
+  var sectionToggles = document.querySelectorAll('.sidebar-section-toggle');
+  for (var i = 0; i < sectionToggles.length; i++) {
+    (function(btn) {
+      btn.addEventListener('click', function() {
+        var sectionName = this.getAttribute('data-section');
+        var linksList = document.getElementById('nav-' + sectionName);
+        var isCollapsed = this.classList.contains('collapsed');
+
+        if (isCollapsed) {
+          this.classList.remove('collapsed');
+          linksList.classList.remove('collapsed');
+          linksList.style.maxHeight = linksList.scrollHeight + 'px';
+        } else {
+          this.classList.add('collapsed');
+          linksList.style.maxHeight = linksList.scrollHeight + 'px';
+          linksList.offsetHeight; // Force reflow
+          linksList.classList.add('collapsed');
+        }
+      });
+
+      var sectionName = btn.getAttribute('data-section');
+      var linksList = document.getElementById('nav-' + sectionName);
+      if (linksList) {
+        linksList.style.maxHeight = linksList.scrollHeight + 'px';
+      }
+    })(sectionToggles[i]);
+  }
+
+  // ==========================================
+  // SCROLLSPY
+  // ==========================================
+  var sidebarLinks = document.querySelectorAll('.sidebar-link');
+  var sections = [];
+
+  for (var j = 0; j < sidebarLinks.length; j++) {
+    var targetId = sidebarLinks[j].getAttribute('data-target');
+    var sectionEl = document.getElementById(targetId);
+    if (sectionEl) {
+      sections.push({ el: sectionEl, link: sidebarLinks[j], id: targetId });
+    }
+  }
+
+  function updateScrollspy() {
+    var scrollPos = window.scrollY + 100;
+    var active = null;
+
+    for (var k = sections.length - 1; k >= 0; k--) {
+      if (sections[k].el.offsetTop <= scrollPos) {
+        active = sections[k];
+        break;
+      }
+    }
+
+    for (var l = 0; l < sidebarLinks.length; l++) {
+      sidebarLinks[l].classList.remove('active');
+    }
+    if (active) {
+      active.link.classList.add('active');
+    }
+
+    updateSidebarProgress();
+  }
+
+  var scrollTimer = null;
+  window.addEventListener('scroll', function() {
+    if (scrollTimer) return;
+    scrollTimer = setTimeout(function() {
+      scrollTimer = null;
+      updateScrollspy();
+    }, 50);
+  });
+  updateScrollspy();
+
+  // Close mobile sidebar on link click
+  for (var m = 0; m < sidebarLinks.length; m++) {
+    sidebarLinks[m].addEventListener('click', function() {
+      if (window.innerWidth <= 1024) {
+        sidebar.classList.remove('open');
+        hamburger.classList.remove('open');
+        overlay.classList.remove('show');
+      }
+    });
+  }
+
+  // ==========================================
+  // SIDEBAR PROGRESS
+  // ==========================================
+  function updateSidebarProgress() {
+    var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    var scrolled = window.scrollY;
+    var pct = docHeight > 0 ? Math.min(100, (scrolled / docHeight) * 100) : 0;
+
+    var fill = document.getElementById('sidebarProgressFill');
+    if (fill) {
+      fill.style.width = pct + '%';
+    }
+  }
+
+  // ==========================================
+  // COPY TO CLIPBOARD
+  // ==========================================
+  window.copyCode = function(btn) {
+    var block = btn.closest('.code-block');
+    var codeEl = block.cloneNode(true);
+    var labelEl = codeEl.querySelector('.code-label');
+    var btnEl = codeEl.querySelector('.copy-btn');
+    if (labelEl) labelEl.remove();
+    if (btnEl) btnEl.remove();
+
+    var text = codeEl.textContent.trim();
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function() {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(function() {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      })['catch'](function() {
+        btn.textContent = 'Failed';
+        setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+      });
+    } else {
+      btn.textContent = 'Failed';
+      setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+    }
+  };
+
+  // ==========================================
+  // CONTEXT WINDOW VISUALIZER
+  // ==========================================
+  var TOTAL_CONTEXT = 200000;
+  var vizBlocks = [];
+  var vizCounter = 0;
+
+  window.addVizBlock = function(type, label, tokens) {
+    // For file reads, randomize between 800 and 4000
+    if (tokens === 0) {
+      tokens = Math.random() < 0.5 ? 800 : (800 + Math.floor(Math.random() * 3200));
+    }
+
+    vizCounter++;
+    vizBlocks.push({
+      id: vizCounter,
+      type: type,
+      label: label + ' #' + vizCounter,
+      tokens: tokens
+    });
+
+    renderViz();
+  };
+
+  window.resetViz = function() {
+    vizBlocks = [];
+    vizCounter = 0;
+    renderViz();
+  };
+
+  function renderViz() {
+    var container = document.getElementById('vizContainer');
+    var emptyEl = document.getElementById('vizEmpty');
+    var gaugeFill = document.getElementById('vizGaugeFill');
+    var tokenCount = document.getElementById('vizTokenCount');
+    var pctEl = document.getElementById('vizPct');
+    var warningAmber = document.getElementById('vizWarningAmber');
+    var warningRed = document.getElementById('vizWarningRed');
+
+    // Calculate total tokens
+    var totalTokens = 0;
+    for (var i = 0; i < vizBlocks.length; i++) {
+      totalTokens += vizBlocks[i].tokens;
+    }
+
+    var pct = Math.min(100, (totalTokens / TOTAL_CONTEXT) * 100);
+
+    // Clear container
+    var children = container.querySelectorAll('.viz-block');
+    for (var c = 0; c < children.length; c++) {
+      children[c].parentNode.removeChild(children[c]);
+    }
+
+    if (vizBlocks.length === 0) {
+      emptyEl.style.display = 'flex';
+    } else {
+      emptyEl.style.display = 'none';
+
+      // Render blocks
+      var containerHeight = 420;
+      for (var b = 0; b < vizBlocks.length; b++) {
+        var block = vizBlocks[b];
+        var blockPct = (block.tokens / TOTAL_CONTEXT) * containerHeight;
+        var minHeight = 22;
+        var blockHeight = Math.max(minHeight, blockPct);
+
+        var div = document.createElement('div');
+        div.className = 'viz-block ' + block.type;
+        div.style.height = blockHeight + 'px';
+        div.innerHTML = '<span>' + block.label + '</span><span>' + block.tokens.toLocaleString() + ' tokens</span>';
+
+        // Insert before empty element
+        container.insertBefore(div, emptyEl);
+      }
+    }
+
+    // Update gauge
+    gaugeFill.style.width = pct + '%';
+    tokenCount.textContent = totalTokens.toLocaleString() + ' / 200,000 tokens';
+    pctEl.textContent = Math.round(pct) + '%';
+
+    // Color states
+    if (pct >= 80) {
+      gaugeFill.className = 'viz-gauge-fill red';
+      pctEl.className = 'viz-gauge-pct red';
+    } else if (pct >= 50) {
+      gaugeFill.className = 'viz-gauge-fill amber';
+      pctEl.className = 'viz-gauge-pct amber';
+    } else {
+      gaugeFill.className = 'viz-gauge-fill';
+      pctEl.className = 'viz-gauge-pct green';
+    }
+
+    // Warnings
+    if (pct >= 95) {
+      warningAmber.className = 'viz-warning';
+      warningRed.className = 'viz-warning red-warning show';
+    } else if (pct >= 50) {
+      warningAmber.className = 'viz-warning amber-warning show';
+      warningRed.className = 'viz-warning';
+    } else {
+      warningAmber.className = 'viz-warning';
+      warningRed.className = 'viz-warning';
+    }
+  }
+
+  // ==========================================
+  // EVAL RUBRIC BUILDER
+  // ==========================================
+  var rubricDimensions = [];
+  var rubricDimCounter = 0;
+
+  var rubricPresets = {
+    support: {
+      useCase: 'Evaluate the quality of customer support responses for a SaaS product. Responses should be helpful, accurate, and empathetic.',
+      dimensions: [
+        { name: 'Accuracy', weight: 5, poor: 'Contains incorrect information about the product', acceptable: 'Mostly correct with minor imprecisions', excellent: 'All facts verified, cites specific documentation' },
+        { name: 'Empathy', weight: 3, poor: 'Dismissive or robotic tone', acceptable: 'Polite but generic', excellent: 'Acknowledges frustration, personalizes response' },
+        { name: 'Resolution', weight: 4, poor: 'Does not address the core issue', acceptable: 'Addresses the issue but incompletely', excellent: 'Fully resolves or provides clear next steps' }
+      ],
+      responses: [
+        'I understand this is frustrating, Jane. Looking at your account, I can see the issue with Invoice #INV-2024-0312. The overcharge of $1,247.50 was caused by a duplicate line item for the Enterprise Add-on. I have issued a credit that will appear within 3-5 business days. Is there anything else I can help with?',
+        'Your invoice is wrong. I will fix it. Check back later.',
+        'Thank you for reaching out! I can see you have a billing concern. Our billing team handles these requests. I have forwarded your case to them with reference number BT-9921. They typically respond within 48 hours. In the meantime, is there anything else I can assist you with today?'
+      ]
+    },
+    code: {
+      useCase: 'Evaluate the accuracy and helpfulness of AI-generated code review feedback. Reviews should catch real bugs and suggest improvements.',
+      dimensions: [
+        { name: 'Bug Detection', weight: 5, poor: 'Misses obvious bugs or reports false positives', acceptable: 'Catches major bugs, may miss edge cases', excellent: 'Identifies all bugs including subtle edge cases' },
+        { name: 'Explanation', weight: 3, poor: 'Vague feedback like "this looks wrong"', acceptable: 'Identifies the problem but not why it matters', excellent: 'Explains the bug, its impact, and how to fix it' },
+        { name: 'Constructiveness', weight: 4, poor: 'Only points out problems, no solutions', acceptable: 'Suggests fixes but without code examples', excellent: 'Provides specific code suggestions and alternatives' }
+      ],
+      responses: [
+        'Line 42 has a race condition: the `user_count` variable is read and incremented without a lock, so concurrent requests can produce incorrect counts. Consider wrapping lines 42-44 in a mutex, or use an atomic increment operation. This will prevent the counter from losing updates under load.',
+        'The code looks fine to me. I do not see any issues.',
+        'There might be a problem on line 42 with the counter. Also, line 15 could be better. And maybe look at the error handling.'
+      ]
+    },
+    research: {
+      useCase: 'Evaluate research summaries that synthesize information from multiple sources. Summaries should be comprehensive, balanced, and properly cited.',
+      dimensions: [
+        { name: 'Completeness', weight: 4, poor: 'Covers only one perspective or source', acceptable: 'Covers main points but misses nuances', excellent: 'Synthesizes all sources, captures key nuances' },
+        { name: 'Balance', weight: 4, poor: 'One-sided or cherry-picks evidence', acceptable: 'Includes opposing views but favors one', excellent: 'Fairly represents all perspectives with evidence' },
+        { name: 'Citations', weight: 5, poor: 'No sources cited, claims unattributed', acceptable: 'Some claims cited, others left vague', excellent: 'Every major claim linked to a specific source' }
+      ],
+      responses: [
+        'According to Smith et al. (2024), the new treatment shows a 34% improvement in outcomes [Source A]. However, Chen (2024) found only a 12% improvement in a larger cohort [Source B]. The discrepancy may be due to differences in patient selection criteria, as noted by the WHO review [Source C]. Both studies agree that side effects are minimal (<2% incidence).',
+        'The new treatment is very effective and shows great promise. Many studies have confirmed its benefits. Patients should discuss this option with their doctors.',
+        'Research shows mixed results. Some studies are positive [Source A] while others are less conclusive. More research is needed to draw definitive conclusions. The treatment appears safe based on available data.'
+      ]
+    }
+  };
+
+  window.loadRubricPreset = function(presetKey) {
+    var preset = rubricPresets[presetKey];
+    if (!preset) return;
+
+    // Update active state
+    var presetBtns = document.querySelectorAll('.rubric-preset-btn');
+    for (var p = 0; p < presetBtns.length; p++) {
+      presetBtns[p].classList.remove('active');
+    }
+    var activeId = 'preset' + presetKey.charAt(0).toUpperCase() + presetKey.slice(1);
+    var activeBtn = document.getElementById(activeId);
+    if (activeBtn) activeBtn.classList.add('active');
+
+    // Load use case
+    document.getElementById('rubricUseCase').value = preset.useCase;
+
+    // Load dimensions
+    rubricDimensions = [];
+    rubricDimCounter = 0;
+    for (var d = 0; d < preset.dimensions.length; d++) {
+      rubricDimCounter++;
+      rubricDimensions.push({
+        id: rubricDimCounter,
+        name: preset.dimensions[d].name,
+        weight: preset.dimensions[d].weight,
+        poor: preset.dimensions[d].poor,
+        acceptable: preset.dimensions[d].acceptable,
+        excellent: preset.dimensions[d].excellent
+      });
+    }
+
+    renderRubricDimensions();
+    updateRubricPreview();
+
+    // Store preset key for eval phase
+    document.getElementById('rubricBuilderContainer').setAttribute('data-preset', presetKey);
+
+    // Hide eval phase when preset changes
+    document.getElementById('rubricEvalPhase').classList.remove('show');
+  };
+
+  window.addRubricDimension = function() {
+    rubricDimCounter++;
+    rubricDimensions.push({
+      id: rubricDimCounter,
+      name: 'New Dimension',
+      weight: 3,
+      poor: '',
+      acceptable: '',
+      excellent: ''
+    });
+    renderRubricDimensions();
+    updateRubricPreview();
+  };
+
+  window.removeRubricDimension = function(id) {
+    rubricDimensions = rubricDimensions.filter(function(d) { return d.id !== id; });
+    renderRubricDimensions();
+    updateRubricPreview();
+  };
+
+  window.updateRubricDimension = function(id, field, value) {
+    for (var i = 0; i < rubricDimensions.length; i++) {
+      if (rubricDimensions[i].id === id) {
+        rubricDimensions[i][field] = value;
+        break;
+      }
+    }
+    updateRubricPreview();
+  };
+
+  function renderRubricDimensions() {
+    var container = document.getElementById('rubricDimensions');
+    var html = '';
+
+    for (var i = 0; i < rubricDimensions.length; i++) {
+      var dim = rubricDimensions[i];
+      html += '<div class="rubric-dimension" id="dim-' + dim.id + '">';
+      html += '<div class="rubric-dim-header">';
+      html += '<input type="text" value="' + escapeAttr(dim.name) + '" onchange="updateRubricDimension(' + dim.id + ', \'name\', this.value)" placeholder="Dimension name">';
+      html += '<span class="rubric-weight-label">Weight: <span class="rubric-weight-val" id="weightVal-' + dim.id + '">' + dim.weight + '</span></span>';
+      html += '<input type="range" min="1" max="5" value="' + dim.weight + '" oninput="updateRubricDimension(' + dim.id + ', \'weight\', parseInt(this.value)); document.getElementById(\'weightVal-' + dim.id + '\').textContent = this.value;">';
+      html += '<button class="rubric-remove-btn" onclick="removeRubricDimension(' + dim.id + ')" title="Remove">&times;</button>';
+      html += '</div>';
+      html += '<div class="rubric-scores">';
+      html += '<div class="rubric-score-row"><span class="rubric-score-label">1 (Poor):</span><input type="text" value="' + escapeAttr(dim.poor) + '" onchange="updateRubricDimension(' + dim.id + ', \'poor\', this.value)" placeholder="What does a poor score look like?"></div>';
+      html += '<div class="rubric-score-row"><span class="rubric-score-label">3 (Acceptable):</span><input type="text" value="' + escapeAttr(dim.acceptable) + '" onchange="updateRubricDimension(' + dim.id + ', \'acceptable\', this.value)" placeholder="What does an acceptable score look like?"></div>';
+      html += '<div class="rubric-score-row"><span class="rubric-score-label">5 (Excellent):</span><input type="text" value="' + escapeAttr(dim.excellent) + '" onchange="updateRubricDimension(' + dim.id + ', \'excellent\', this.value)" placeholder="What does an excellent score look like?"></div>';
+      html += '</div>';
+      html += '</div>';
+    }
+
+    container.innerHTML = html;
+  }
+
+  function updateRubricPreview() {
+    var container = document.getElementById('rubricPreviewContent');
+
+    if (rubricDimensions.length === 0) {
+      container.innerHTML = '<p style="color: var(--text-muted); font-size: 0.85rem; font-style: italic;">Add dimensions to see your rubric preview here.</p>';
+      return;
+    }
+
+    var html = '<table class="rubric-preview-table">';
+    html += '<thead><tr><th>Dimension</th><th>Weight</th><th>1 (Poor)</th><th>3 (OK)</th><th>5 (Excellent)</th></tr></thead>';
+    html += '<tbody>';
+
+    for (var i = 0; i < rubricDimensions.length; i++) {
+      var dim = rubricDimensions[i];
+      html += '<tr>';
+      html += '<td><strong>' + escapeHtml(dim.name) + '</strong></td>';
+      html += '<td style="text-align:center;">' + dim.weight + '</td>';
+      html += '<td>' + escapeHtml(dim.poor || '--') + '</td>';
+      html += '<td>' + escapeHtml(dim.acceptable || '--') + '</td>';
+      html += '<td>' + escapeHtml(dim.excellent || '--') + '</td>';
+      html += '</tr>';
+    }
+
+    html += '</tbody></table>';
+
+    // Show total weight
+    var totalWeight = 0;
+    for (var w = 0; w < rubricDimensions.length; w++) {
+      totalWeight += rubricDimensions[w].weight;
+    }
+    html += '<p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 10px;">Total weight points: ' + totalWeight + ' | Max possible score: ' + (totalWeight * 5) + '</p>';
+
+    container.innerHTML = html;
+  }
+
+  // Evaluation phase
+  window.startRubricEval = function() {
+    if (rubricDimensions.length === 0) {
+      return;
+    }
+
+    var presetKey = document.getElementById('rubricBuilderContainer').getAttribute('data-preset');
+    var responses = [];
+
+    if (presetKey && rubricPresets[presetKey]) {
+      responses = rubricPresets[presetKey].responses;
+    } else {
+      responses = [
+        'This is a comprehensive, well-structured response that addresses all aspects of the question with specific examples and clear recommendations.',
+        'OK. I looked at it. Seems fine.',
+        'Based on my analysis, there are several relevant factors to consider. While I cannot provide a definitive answer, the available evidence suggests that further investigation would be beneficial.'
+      ];
+    }
+
+    var evalPhase = document.getElementById('rubricEvalPhase');
+    var evalContainer = document.getElementById('rubricEvalResponses');
+    var html = '';
+
+    for (var r = 0; r < responses.length; r++) {
+      html += '<div class="rubric-eval-response" id="evalResp-' + r + '">';
+      html += '<h4>Response ' + (r + 1) + '</h4>';
+      html += '<p>"' + escapeHtml(responses[r]) + '"</p>';
+      html += '<div class="rubric-eval-scores">';
+
+      for (var d = 0; d < rubricDimensions.length; d++) {
+        var dim = rubricDimensions[d];
+        html += '<div class="rubric-eval-dim">';
+        html += '<label>' + escapeHtml(dim.name) + ':</label>';
+        html += '<select onchange="updateEvalScore(' + r + ')" id="evalScore-' + r + '-' + d + '">';
+        html += '<option value="">--</option>';
+        for (var s = 1; s <= 5; s++) {
+          html += '<option value="' + s + '">' + s + '</option>';
+        }
+        html += '</select>';
+        html += '</div>';
+      }
+
+      html += '</div>';
+      html += '<div class="rubric-eval-total" id="evalTotal-' + r + '">Weighted score: --</div>';
+      html += '</div>';
+    }
+
+    evalContainer.innerHTML = html;
+    evalPhase.classList.add('show');
+  };
+
+  window.updateEvalScore = function(responseIdx) {
+    var totalWeight = 0;
+    var weightedSum = 0;
+    var allFilled = true;
+
+    for (var d = 0; d < rubricDimensions.length; d++) {
+      var dim = rubricDimensions[d];
+      var selectEl = document.getElementById('evalScore-' + responseIdx + '-' + d);
+      var val = selectEl ? selectEl.value : '';
+
+      if (val === '') {
+        allFilled = false;
+      } else {
+        weightedSum += parseInt(val) * dim.weight;
+      }
+      totalWeight += dim.weight;
+    }
+
+    var totalEl = document.getElementById('evalTotal-' + responseIdx);
+    if (allFilled && totalWeight > 0) {
+      var maxScore = totalWeight * 5;
+      var pct = Math.round((weightedSum / maxScore) * 100);
+      totalEl.textContent = 'Weighted score: ' + weightedSum + ' / ' + maxScore + ' (' + pct + '%)';
+    } else {
+      totalEl.textContent = 'Weighted score: --';
+    }
+  };
+
+  // ==========================================
+  // CONFIDENCE CALIBRATION EXERCISE
+  // ==========================================
+  var calibrationData = [
+    {
+      response: "The capital of France is Paris.",
+      statedConfidence: "High",
+      actualCorrectness: true,
+      correctAssessment: "well-calibrated",
+      explanation: "Simple factual recall -- high confidence is appropriate."
+    },
+    {
+      response: "Based on the data, revenue will grow 15% next quarter.",
+      statedConfidence: "High",
+      actualCorrectness: false,
+      correctAssessment: "overconfident",
+      explanation: "Predictions about future financial performance can never be high confidence -- too many unknowns."
+    },
+    {
+      response: "I'm not sure, but the function might have a race condition on line 42.",
+      statedConfidence: "Low",
+      actualCorrectness: true,
+      correctAssessment: "underconfident",
+      explanation: "The analysis was correct. Claude should have been more confident given the clear evidence in the code."
+    },
+    {
+      response: "The contract expires on March 15, 2025, based on Section 4.2.",
+      statedConfidence: "High",
+      actualCorrectness: true,
+      correctAssessment: "well-calibrated",
+      explanation: "Citing a specific section of a provided document -- high confidence with a citation is appropriate."
+    },
+    {
+      response: "This medication is safe to take with aspirin.",
+      statedConfidence: "Medium",
+      actualCorrectness: false,
+      correctAssessment: "overconfident",
+      explanation: "Medical interactions require expert verification -- Claude should have escalated rather than providing medium-confidence medical advice."
+    },
+    {
+      response: "I believe the bug is in the authentication middleware, but I'd need to run the debugger to confirm.",
+      statedConfidence: "Medium",
+      actualCorrectness: true,
+      correctAssessment: "well-calibrated",
+      explanation: "Appropriate hedging for a diagnosis that hasn't been verified through testing."
+    },
+    {
+      response: "The average household income in this zip code is approximately $85,000.",
+      statedConfidence: "Medium",
+      actualCorrectness: false,
+      correctAssessment: "overconfident",
+      explanation: "Without access to current census data, specific dollar amounts should be flagged as estimates with low confidence."
+    },
+    {
+      response: "I don't have enough information to determine the root cause. I'd recommend checking the server logs from the time of the incident.",
+      statedConfidence: "Low",
+      actualCorrectness: true,
+      correctAssessment: "well-calibrated",
+      explanation: "Appropriately acknowledging insufficient information and suggesting the right next step."
+    }
+  ];
+
+  var confidenceState = {
+    answered: 0,
+    correct: 0
+  };
+
+  function renderConfidenceCards() {
+    var container = document.getElementById('confidenceCards');
+    var html = '';
+
+    var assessmentOptions = ['well-calibrated', 'overconfident', 'underconfident'];
+
+    for (var i = 0; i < calibrationData.length; i++) {
+      var item = calibrationData[i];
+      var badgeClass = item.statedConfidence.toLowerCase();
+
+      html += '<div class="confidence-card" id="conf-card-' + i + '">';
+      html += '<div class="confidence-card-header">';
+      html += '<span class="confidence-card-num">' + (i + 1) + '</span>';
+      html += '<span class="confidence-badge ' + badgeClass + '">Stated: ' + item.statedConfidence + ' Confidence</span>';
+      html += '</div>';
+      html += '<div class="confidence-response-text">"' + escapeHtml(item.response) + '"</div>';
+      html += '<div class="confidence-options">';
+
+      for (var a = 0; a < assessmentOptions.length; a++) {
+        var label = assessmentOptions[a].charAt(0).toUpperCase() + assessmentOptions[a].slice(1);
+        html += '<button class="confidence-option" data-conf-q="' + i + '" data-conf-val="' + assessmentOptions[a] + '" onclick="answerConfidence(' + i + ', \'' + assessmentOptions[a] + '\', this)">';
+        html += label;
+        html += '</button>';
+      }
+
+      html += '</div>';
+      html += '<div class="confidence-feedback" id="conf-feedback-' + i + '"></div>';
+      html += '</div>';
+    }
+
+    container.innerHTML = html;
+  }
+
+  window.answerConfidence = function(qIdx, answer, btnEl) {
+    var card = document.getElementById('conf-card-' + qIdx);
+    var feedback = document.getElementById('conf-feedback-' + qIdx);
+
+    // Prevent re-answering
+    if (card.classList.contains('answered-correct') || card.classList.contains('answered-wrong')) {
+      return;
+    }
+
+    var item = calibrationData[qIdx];
+    var isCorrect = (answer === item.correctAssessment);
+
+    confidenceState.answered++;
+
+    // Disable all options for this question
+    var options = card.querySelectorAll('.confidence-option');
+    for (var o = 0; o < options.length; o++) {
+      options[o].classList.add('disabled');
+      var optVal = options[o].getAttribute('data-conf-val');
+      if (optVal === item.correctAssessment) {
+        options[o].classList.add('show-correct');
+      }
+    }
+
+    if (isCorrect) {
+      confidenceState.correct++;
+      card.classList.add('answered-correct');
+      btnEl.classList.add('correct-pick');
+      feedback.className = 'confidence-feedback show correct';
+      feedback.textContent = 'Correct! ' + item.explanation;
+    } else {
+      card.classList.add('answered-wrong');
+      btnEl.classList.add('wrong-pick');
+      feedback.className = 'confidence-feedback show incorrect';
+      feedback.textContent = 'Not quite. ' + item.explanation;
+    }
+
+    // Update score
+    var scoreFill = document.getElementById('confidenceScoreFill');
+    var scoreText = document.getElementById('confidenceScoreText');
+    var pct = (confidenceState.correct / calibrationData.length) * 100;
+    scoreFill.style.width = pct + '%';
+    scoreText.textContent = confidenceState.correct + ' / ' + calibrationData.length;
+  };
+
+  renderConfidenceCards();
+
+  // ==========================================
+  // ERROR PROPAGATION VISUALIZER
+  // ==========================================
+  var agentNames = ['extract', 'validate', 'enrich', 'store'];
+
+  window.runErrorPipeline = function() {
+    var boundariesOn = document.getElementById('errorBoundaryToggle').checked;
+    var errors = {};
+
+    for (var i = 0; i < agentNames.length; i++) {
+      var name = agentNames[i];
+      var selectId = 'error' + name.charAt(0).toUpperCase() + name.slice(1);
+      var selectEl = document.getElementById(selectId);
+      errors[name] = selectEl ? selectEl.value : 'none';
+    }
+
+    // Find the first error
+    var firstErrorIdx = -1;
+    for (var j = 0; j < agentNames.length; j++) {
+      if (errors[agentNames[j]] !== 'none') {
+        firstErrorIdx = j;
+        break;
+      }
+    }
+
+    // Reset all agents
+    for (var r = 0; r < agentNames.length; r++) {
+      var agentEl = document.getElementById('agent-' + agentNames[r]);
+      var statusEl = document.getElementById('status-' + agentNames[r]);
+      agentEl.className = 'error-agent';
+      statusEl.className = 'error-agent-status';
+      statusEl.textContent = '';
+    }
+
+    // Reset arrows
+    for (var ar = 1; ar <= 3; ar++) {
+      var arrowEl = document.getElementById('arrow-' + ar);
+      arrowEl.className = 'error-arrow';
+    }
+
+    // No errors injected
+    if (firstErrorIdx === -1) {
+      for (var ok = 0; ok < agentNames.length; ok++) {
+        var okAgent = document.getElementById('agent-' + agentNames[ok]);
+        var okStatus = document.getElementById('status-' + agentNames[ok]);
+        okAgent.classList.add('ok');
+        okStatus.className = 'error-agent-status ok-status';
+        okStatus.textContent = 'OK';
+      }
+      for (var okAr = 1; okAr <= 3; okAr++) {
+        document.getElementById('arrow-' + okAr).className = 'error-arrow';
+      }
+      document.getElementById('errorComparison').style.display = 'none';
+      return;
+    }
+
+    // Process pipeline
+    if (boundariesOn) {
+      // With boundaries: error agent fails, downstream agents get degraded input
+      for (var bi = 0; bi < agentNames.length; bi++) {
+        var bAgentEl = document.getElementById('agent-' + agentNames[bi]);
+        var bStatusEl = document.getElementById('status-' + agentNames[bi]);
+
+        if (errors[agentNames[bi]] !== 'none') {
+          bAgentEl.classList.add('error-state');
+          bStatusEl.className = 'error-agent-status error-status';
+          bStatusEl.textContent = errors[agentNames[bi]].toUpperCase();
+        } else if (bi > firstErrorIdx) {
+          bAgentEl.classList.add('degraded');
+          bStatusEl.className = 'error-agent-status degraded-status';
+          bStatusEl.textContent = 'DEGRADED';
+        } else {
+          bAgentEl.classList.add('ok');
+          bStatusEl.className = 'error-agent-status ok-status';
+          bStatusEl.textContent = 'OK';
+        }
+
+        // Color arrows
+        if (bi > 0) {
+          var bArrow = document.getElementById('arrow-' + bi);
+          if (errors[agentNames[bi - 1]] !== 'none' || bi > firstErrorIdx) {
+            bArrow.classList.add('degraded-flow');
+          }
+        }
+      }
+    } else {
+      // Without boundaries: first error cascades to all downstream
+      for (var ni = 0; ni < agentNames.length; ni++) {
+        var nAgentEl = document.getElementById('agent-' + agentNames[ni]);
+        var nStatusEl = document.getElementById('status-' + agentNames[ni]);
+
+        if (ni < firstErrorIdx) {
+          nAgentEl.classList.add('ok');
+          nStatusEl.className = 'error-agent-status ok-status';
+          nStatusEl.textContent = 'OK';
+        } else {
+          nAgentEl.classList.add('error-state');
+          nStatusEl.className = 'error-agent-status error-status';
+          if (ni === firstErrorIdx) {
+            nStatusEl.textContent = errors[agentNames[ni]].toUpperCase();
+          } else {
+            nStatusEl.textContent = 'CASCADE';
+          }
+        }
+
+        if (ni > 0 && ni >= firstErrorIdx) {
+          var nArrow = document.getElementById('arrow-' + ni);
+          nArrow.classList.add('error-flow');
+        }
+      }
+    }
+
+    // Show comparison
+    var comparison = document.getElementById('errorComparison');
+    comparison.style.display = 'grid';
+
+    var noBoundaryText = document.getElementById('errorNoBoundaryText');
+    var withBoundaryText = document.getElementById('errorWithBoundaryText');
+
+    var failedCount = agentNames.length - firstErrorIdx;
+    var successCount = firstErrorIdx;
+
+    noBoundaryText.textContent = 'Total failure. ' + failedCount + ' of ' + agentNames.length + ' agents failed due to error cascade. Pipeline produced no usable output.';
+
+    // Count actual error agents with boundaries
+    var errorAgentCount = 0;
+    for (var ec = 0; ec < agentNames.length; ec++) {
+      if (errors[agentNames[ec]] !== 'none') {
+        errorAgentCount++;
+      }
+    }
+    var boundarySuccess = agentNames.length - errorAgentCount;
+    withBoundaryText.textContent = 'Partial results. ' + boundarySuccess + ' of ' + agentNames.length + ' agents succeeded. Downstream agents received degraded input but still produced useful output with appropriate disclaimers.';
+  };
+
+  // ==========================================
+  // FINAL QUIZ
+  // ==========================================
+  var FINAL_QUIZ_KEY = 'claude-training-module-25';
+  var TOTAL_QUESTIONS = 7;
+  var PASS_THRESHOLD = 5;
+
+  var finalQuizAnswers = ['b', 'b', 'b', 'b', 'b', 'b', 'b'];
+  var finalQuizSelections = [];
+  for (var fq = 0; fq < TOTAL_QUESTIONS; fq++) {
+    finalQuizSelections.push(null);
+  }
+  var finalQuizSubmitted = false;
+
+  window.selectFinalOption = function(qIdx, el) {
+    if (finalQuizSubmitted) return;
+
+    // Deselect siblings
+    var parentQ = el.closest('.final-quiz-question');
+    var options = parentQ.querySelectorAll('.fq-option');
+    for (var o = 0; o < options.length; o++) {
+      options[o].querySelector('input').checked = false;
+      options[o].style.background = '';
+    }
+
+    // Select this one
+    el.querySelector('input').checked = true;
+    finalQuizSelections[qIdx] = el.getAttribute('data-fq-val');
+
+    // Enable submit if all answered
+    var allAnswered = true;
+    for (var s = 0; s < finalQuizSelections.length; s++) {
+      if (finalQuizSelections[s] === null) {
+        allAnswered = false;
+        break;
+      }
+    }
+    document.getElementById('finalSubmitBtn').disabled = !allAnswered;
+  };
+
+  window.submitFinalQuiz = function() {
+    if (finalQuizSubmitted) return;
+    finalQuizSubmitted = true;
+
+    var score = 0;
+
+    for (var idx = 0; idx < finalQuizSelections.length; idx++) {
+      var sel = finalQuizSelections[idx];
+      var questionEl = document.querySelector('.final-quiz-question[data-fq="' + idx + '"]');
+      var options = questionEl.querySelectorAll('.fq-option');
+
+      for (var oi = 0; oi < options.length; oi++) {
+        var opt = options[oi];
+        var val = opt.getAttribute('data-fq-val');
+        opt.style.pointerEvents = 'none';
+
+        if (val === finalQuizAnswers[idx]) {
+          if (sel === val) {
+            opt.classList.add('selected-correct');
+            score++;
+          } else {
+            opt.classList.add('reveal-correct');
+          }
+        } else if (val === sel) {
+          opt.classList.add('selected-wrong');
+        }
+      }
+    }
+
+    // Show result
+    var result = document.getElementById('finalResult');
+    var title = document.getElementById('finalResultTitle');
+    var text = document.getElementById('finalResultText');
+
+    result.classList.add('show');
+
+    if (score >= PASS_THRESHOLD) {
+      result.classList.add('pass');
+      result.classList.remove('fail');
+      title.textContent = 'Passed! ' + score + ' / ' + TOTAL_QUESTIONS + ' correct';
+      text.textContent = 'Excellent work! You have a strong understanding of evaluations, context management, and reliability patterns. ' +
+        'Your progress has been saved. Move on to Module 30: Capstone Project to put everything together.';
+    } else {
+      result.classList.add('fail');
+      result.classList.remove('pass');
+      title.textContent = score + ' / ' + TOTAL_QUESTIONS + ' correct -- Review needed';
+      text.textContent = 'You need at least ' + PASS_THRESHOLD + ' correct answers to pass. Review the material above and try again. ' +
+        'Pay special attention to LLM-as-judge best practices, context management strategies, and error propagation patterns.';
+    }
+
+    // Save progress
+    var progressData = {
+      score: score,
+      total: TOTAL_QUESTIONS,
+      completed: score >= PASS_THRESHOLD,
+      timestamp: new Date().toISOString()
+    };
+    localStorage.setItem(FINAL_QUIZ_KEY, JSON.stringify(progressData));
+
+    // Disable submit button
+    document.getElementById('finalSubmitBtn').disabled = true;
+    document.getElementById('finalSubmitBtn').textContent = 'Submitted';
+  };
+
+  // Check for existing progress
+  function loadExistingProgress() {
+    var saved = localStorage.getItem(FINAL_QUIZ_KEY);
+    if (saved) {
+      try {
+        var data = JSON.parse(saved);
+        if (data.completed) {
+          var fill = document.getElementById('sidebarProgressFill');
+          if (fill) {
+            fill.style.width = '100%';
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+  }
+  loadExistingProgress();
+
+  // ==========================================
+  // UTILITY FUNCTIONS
+  // ==========================================
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/&/g, '&amp;')
+              .replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;')
+              .replace(/"/g, '&quot;')
+              .replace(/'/g, '&#39;');
+  }
+
+  function escapeAttr(str) {
+    if (!str) return '';
+    return str.replace(/&/g, '&amp;')
+              .replace(/"/g, '&quot;')
+              .replace(/'/g, '&#39;')
+              .replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;');
+  }
+
+})();
+</script>
+</body>
+</html>

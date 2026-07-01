@@ -1,0 +1,3630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 23: Agent SDK -- Building Agent Applications | Claude AI Training</title>
+<style>
+/* ============================================
+   CSS CUSTOM PROPERTIES & PREMIUM DESIGN SYSTEM
+   ============================================ */
+:root {
+  --primary: #7C3AED;
+  --primary-light: #A78BFA;
+  --primary-dark: #5B21B6;
+  --accent: #06B6D4;
+  --accent-light: #67E8F9;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  --bg: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --bg-code: #F1F5F9;
+  --text: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --border: #E2E8F0;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.02);
+  --shadow-lg: 0 4px 12px rgba(0,0,0,0.08), 0 16px 40px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.02);
+  --shadow-glow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04), 0 0 24px rgba(124,58,237,0.06);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --transition: 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --transition-smooth: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --sidebar-width: 280px;
+  --content-max: 800px;
+}
+
+[data-theme="dark"] {
+  --bg: #0B0F1A;
+  --bg-card: #141926;
+  --bg-code: #1A2035;
+  --text: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --border: #1E293B;
+  --shadow: 0 1px 3px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.03);
+  --shadow-lg: 0 4px 12px rgba(0,0,0,0.4), 0 16px 40px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.03);
+  --shadow-glow: 0 1px 3px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.3), 0 0 32px rgba(124,58,237,0.12);
+}
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 24px;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  min-height: 100vh;
+  transition: background var(--transition-smooth), color var(--transition-smooth);
+}
+
+/* ============================================
+   PREFERS REDUCED MOTION
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  html { scroll-behavior: auto; }
+}
+
+/* ============================================
+   THEME TOGGLE
+   ============================================ */
+.theme-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: all var(--transition);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+.theme-toggle:hover {
+  box-shadow: var(--shadow-glow);
+  transform: scale(1.08);
+}
+
+/* ============================================
+   SIDEBAR
+   ============================================ */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  z-index: 900;
+  transition: transform 0.3s ease, background var(--transition-smooth);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.sidebar-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+  margin-bottom: 12px;
+  transition: color var(--transition-smooth);
+}
+.sidebar-back:hover { color: var(--primary-dark); }
+
+.sidebar-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.sidebar-module-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.sidebar-nav {
+  padding: 12px 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.sidebar-section {
+  margin-bottom: 4px;
+}
+
+.sidebar-section-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 20px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  text-align: left;
+  transition: color var(--transition-smooth);
+}
+.sidebar-section-toggle:hover { color: var(--text); }
+.sidebar-section-toggle .chevron {
+  transition: transform 0.2s ease;
+  font-size: 0.65rem;
+}
+.sidebar-section-toggle.collapsed .chevron {
+  transform: rotate(-90deg);
+}
+
+.sidebar-links {
+  list-style: none;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.sidebar-links.collapsed {
+  max-height: 0 !important;
+}
+
+.sidebar-link {
+  display: block;
+  padding: 7px 20px 7px 32px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: all var(--transition-smooth);
+  line-height: 1.4;
+}
+.sidebar-link:hover {
+  color: var(--text);
+  background: var(--bg);
+}
+.sidebar-link.active {
+  color: var(--primary);
+  border-left-color: var(--primary);
+  background: rgba(124, 58, 237, 0.05);
+  font-weight: 600;
+}
+[data-theme="dark"] .sidebar-link.active {
+  background: rgba(124, 58, 237, 0.12);
+}
+
+.sidebar-progress {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sidebar-progress-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.sidebar-progress-track {
+  height: 6px;
+  background: var(--bg-code);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.sidebar-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 3px;
+  transition: width 0.5s ease;
+  width: 0%;
+}
+
+/* Hamburger button (mobile) */
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1001;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+  transition: all var(--transition-smooth);
+}
+.hamburger span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--text);
+  margin: 4px auto;
+  transition: all 0.3s ease;
+  border-radius: 1px;
+}
+.hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(4px, 4px); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(4px, -4px); }
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 899;
+}
+
+/* ============================================
+   MAIN CONTENT
+   ============================================ */
+.main-content {
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+  transition: margin var(--transition-smooth);
+}
+
+.content-wrapper {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 40px 32px 80px;
+}
+
+/* Module Header */
+.module-header {
+  margin-bottom: 48px;
+}
+.module-header .breadcrumb {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+.module-header .breadcrumb a {
+  color: var(--primary);
+  text-decoration: none;
+}
+.module-header .breadcrumb a:hover { text-decoration: underline; }
+
+.module-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.module-badge .number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: white;
+  font-weight: 700;
+  font-size: 0.85rem;
+  box-shadow: 0 2px 8px rgba(124,58,237,0.3);
+}
+.module-badge .label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.module-header h1 {
+  font-size: 2.4rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 50%, var(--primary-light) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.module-header .description {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 640px;
+}
+
+.module-meta {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.module-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  background: var(--bg-code);
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+}
+
+/* ============================================
+   SECTIONS
+   ============================================ */
+.section {
+  margin-bottom: 56px;
+  scroll-margin-top: 24px;
+}
+
+.section-heading {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+  line-height: 1.3;
+}
+
+.section h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-top: 32px;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.section h4 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-top: 24px;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.section p {
+  margin-bottom: 16px;
+  color: var(--text-secondary);
+}
+
+.section ul, .section ol {
+  margin-bottom: 16px;
+  padding-left: 24px;
+}
+.section li {
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+}
+.section li strong {
+  color: var(--text);
+}
+
+/* ============================================
+   CODE BLOCKS
+   ============================================ */
+.code-block {
+  background: #0F172A;
+  color: #E2E8F0;
+  border-radius: var(--radius-sm);
+  padding: 20px 24px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  line-height: 1.7;
+  overflow-x: auto;
+  position: relative;
+  margin: 16px 0 20px;
+  tab-size: 2;
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+[data-theme="dark"] .code-block {
+  background: #0D1117;
+  border-color: rgba(255,255,255,0.04);
+}
+
+.code-block .code-label {
+  position: absolute;
+  top: 8px;
+  left: 16px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #64748B;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+.code-block.has-label {
+  padding-top: 36px;
+}
+.code-block .copy-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #94A3B8;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  transition: all var(--transition-smooth);
+}
+.code-block .copy-btn:hover { background: rgba(255,255,255,0.15); color: white; }
+.code-block .copy-btn.copied { background: var(--success); color: white; border-color: var(--success); }
+
+/* Syntax highlighting classes */
+.kw { color: #C084FC; }
+.str { color: #6EE7B7; }
+.fn { color: #7DD3FC; }
+.cm { color: #546E7A; font-style: italic; }
+.num { color: #FDBA74; }
+.op { color: #FCA5A5; }
+.type { color: #67E8F9; }
+.param { color: #FDE68A; }
+.prop { color: #F0ABFC; }
+.punc { color: #94A3B8; }
+.dec { color: #FB923C; font-weight: 600; }
+.builtin { color: #7DD3FC; }
+.output { color: #64748B; }
+.path { color: #FDBA74; }
+.flag { color: #67E8F9; }
+
+/* Inline code */
+code {
+  background: var(--bg-code);
+  color: var(--primary);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.88em;
+}
+[data-theme="dark"] code {
+  background: #1E293B;
+}
+.code-block code {
+  background: none;
+  color: inherit;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+  white-space: pre-wrap;
+  display: block;
+}
+
+/* ============================================
+   CALLOUT BOXES
+   ============================================ */
+.callout {
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  margin: 20px 0;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  transition: box-shadow var(--transition-smooth);
+}
+.callout:hover {
+  box-shadow: var(--shadow);
+}
+.callout-icon {
+  flex-shrink: 0;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+.callout-content { flex: 1; }
+.callout-content p { margin-bottom: 6px; color: inherit; }
+.callout-content p:last-child { margin-bottom: 0; }
+
+.callout.info {
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  color: #1E40AF;
+}
+.callout.tip {
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  color: #166534;
+}
+.callout.warning {
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  color: #92400E;
+}
+.callout.important {
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  color: #991B1B;
+}
+
+[data-theme="dark"] .callout.info {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.25);
+  color: #93C5FD;
+}
+[data-theme="dark"] .callout.tip {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.25);
+  color: #6EE7B7;
+}
+[data-theme="dark"] .callout.warning {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.25);
+  color: #FCD34D;
+}
+[data-theme="dark"] .callout.important {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.25);
+  color: #FCA5A5;
+}
+
+/* ============================================
+   ACCENT CARDS
+   ============================================ */
+.accent-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  margin: 24px 0;
+  position: relative;
+  overflow: hidden;
+  transition: border-color var(--transition-smooth), box-shadow var(--transition-smooth), transform var(--transition);
+}
+.accent-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+}
+.accent-card:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+}
+.accent-card h4 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.accent-card p {
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+.accent-card p:last-child {
+  margin-bottom: 0;
+}
+
+/* ============================================
+   CONCEPT CARDS (with icon)
+   ============================================ */
+.concept-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 20px 0;
+}
+.concept-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  transition: border-color var(--transition-smooth), box-shadow var(--transition-smooth), transform var(--transition);
+}
+.concept-card:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+}
+.concept-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  font-size: 1.3rem;
+  margin-bottom: 12px;
+}
+.concept-card-icon.purple { background: #EDE9FE; color: #7C3AED; }
+.concept-card-icon.blue { background: #DBEAFE; color: #2563EB; }
+.concept-card-icon.green { background: #D1FAE5; color: #059669; }
+.concept-card-icon.orange { background: #FEF3C7; color: #D97706; }
+.concept-card-icon.red { background: #FEE2E2; color: #DC2626; }
+.concept-card-icon.cyan { background: #CFFAFE; color: #0891B2; }
+
+[data-theme="dark"] .concept-card-icon.purple { background: rgba(124,58,237,0.2); }
+[data-theme="dark"] .concept-card-icon.blue { background: rgba(37,99,235,0.2); }
+[data-theme="dark"] .concept-card-icon.green { background: rgba(5,150,105,0.2); }
+[data-theme="dark"] .concept-card-icon.orange { background: rgba(217,119,6,0.2); }
+[data-theme="dark"] .concept-card-icon.red { background: rgba(220,38,38,0.2); }
+[data-theme="dark"] .concept-card-icon.cyan { background: rgba(8,145,178,0.2); }
+
+.concept-card h4 {
+  margin: 0 0 6px 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.concept-card p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ============================================
+   COMPARISON TABLE
+   ============================================ */
+.comparison-table-wrapper {
+  overflow-x: auto;
+  margin: 20px 0;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+}
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.comparison-table th {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+.comparison-table th:first-child {
+  border-radius: var(--radius-sm) 0 0 0;
+}
+.comparison-table th:last-child {
+  border-radius: 0 var(--radius-sm) 0 0;
+}
+.comparison-table td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+.comparison-table tr:nth-child(even) td {
+  background: var(--bg);
+}
+.comparison-table tr:last-child td:first-child {
+  border-radius: 0 0 0 var(--radius-sm);
+}
+.comparison-table tr:last-child td:last-child {
+  border-radius: 0 0 var(--radius-sm) 0;
+}
+
+/* ============================================
+   SDK PLAYGROUND
+   ============================================ */
+.playground {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin: 32px 0;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+.playground-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+.playground-header h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.playground-tabs {
+  display: flex;
+  gap: 2px;
+  padding: 0 16px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+}
+.playground-tab {
+  padding: 10px 16px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--transition-smooth);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+.playground-tab:hover {
+  color: var(--text-secondary);
+}
+.playground-tab.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+.playground-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 380px;
+}
+.playground-code {
+  background: #0F172A;
+  padding: 20px;
+  overflow: auto;
+  position: relative;
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+[data-theme="dark"] .playground-code {
+  background: #0D1117;
+}
+.playground-code pre {
+  margin: 0;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  line-height: 1.7;
+  color: #E2E8F0;
+  white-space: pre;
+}
+.playground-code .line-numbers {
+  position: absolute;
+  top: 20px;
+  left: 12px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.78rem;
+  line-height: 1.7;
+  color: #475569;
+  text-align: right;
+  user-select: none;
+  pointer-events: none;
+}
+.playground-code.has-line-numbers {
+  padding-left: 52px;
+}
+.playground-output {
+  background: #1A1A2E;
+  padding: 20px;
+  overflow: auto;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  line-height: 1.7;
+  color: #94A3B8;
+}
+[data-theme="dark"] .playground-output {
+  background: #0A0A14;
+}
+.playground-output .output-prompt {
+  color: var(--success);
+}
+.playground-output .output-info {
+  color: var(--accent);
+}
+.playground-output .output-warn {
+  color: var(--warning);
+}
+.playground-output .output-error {
+  color: var(--error);
+}
+.playground-output .output-text {
+  color: #CBD5E1;
+}
+.playground-actions {
+  display: flex;
+  gap: 8px;
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+}
+.playground-run-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 20px;
+  background: linear-gradient(135deg, var(--success), #34D399);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+.playground-run-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16,185,129,0.3);
+}
+.playground-run-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ============================================
+   TOOL DECORATOR WORKSHOP
+   ============================================ */
+.workshop {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin: 32px 0;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+.workshop-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+.workshop-header h3 {
+  margin: 0 0 4px 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.workshop-header p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+.workshop-scenario-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+}
+.workshop-scenario-tab {
+  flex: 1;
+  padding: 12px 16px;
+  background: var(--bg);
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-smooth);
+  text-align: center;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+.workshop-scenario-tab:hover { color: var(--text-secondary); }
+.workshop-scenario-tab.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  background: var(--bg-card);
+}
+.workshop-body {
+  padding: 24px;
+}
+.workshop-prompt {
+  padding: 16px;
+  background: linear-gradient(135deg, rgba(124,58,237,0.06), rgba(6,182,212,0.06));
+  border: 1px solid rgba(124,58,237,0.15);
+  border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+  font-size: 0.9rem;
+  color: var(--text);
+  font-weight: 500;
+}
+[data-theme="dark"] .workshop-prompt {
+  background: linear-gradient(135deg, rgba(124,58,237,0.12), rgba(6,182,212,0.08));
+  border-color: rgba(124,58,237,0.25);
+}
+.workshop-editor {
+  width: 100%;
+  min-height: 220px;
+  padding: 16px;
+  background: #0F172A;
+  color: #E2E8F0;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-sm);
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  line-height: 1.7;
+  resize: vertical;
+  tab-size: 4;
+}
+[data-theme="dark"] .workshop-editor {
+  background: #0D1117;
+}
+.workshop-editor:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(124,58,237,0.15);
+}
+.workshop-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+.workshop-check-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 24px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+.workshop-check-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(124,58,237,0.3);
+}
+.workshop-reveal-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 24px;
+  background: var(--bg);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-smooth);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+.workshop-reveal-btn:hover {
+  border-color: var(--primary-light);
+  color: var(--text);
+}
+.workshop-feedback {
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: var(--radius-sm);
+  display: none;
+  font-size: 0.9rem;
+}
+.workshop-feedback.show { display: block; }
+.workshop-feedback.pass {
+  background: rgba(16,185,129,0.1);
+  border: 1px solid rgba(16,185,129,0.25);
+  color: #059669;
+}
+.workshop-feedback.fail {
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.25);
+  color: var(--error);
+}
+[data-theme="dark"] .workshop-feedback.pass { color: #6EE7B7; }
+[data-theme="dark"] .workshop-feedback.fail { color: #FCA5A5; }
+.workshop-feedback .check-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  font-size: 0.85rem;
+}
+.workshop-feedback .check-pass { color: var(--success); }
+.workshop-feedback .check-fail { color: var(--error); }
+[data-theme="dark"] .workshop-feedback .check-pass { color: #6EE7B7; }
+[data-theme="dark"] .workshop-feedback .check-fail { color: #FCA5A5; }
+
+.workshop-schema {
+  margin-top: 16px;
+  display: none;
+}
+.workshop-schema.show { display: block; }
+.workshop-schema-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+}
+
+.workshop-solution {
+  margin-top: 16px;
+  display: none;
+}
+.workshop-solution.show { display: block; }
+.workshop-solution-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+}
+
+/* ============================================
+   DECISION TREE
+   ============================================ */
+.decision-tree {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin: 32px 0;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+.decision-tree-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+.decision-tree-header h3 {
+  margin: 0 0 4px 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.decision-tree-header p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+.decision-tree-body {
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.dt-node {
+  padding: 16px 24px;
+  border-radius: var(--radius-sm);
+  text-align: center;
+  max-width: 420px;
+  width: 100%;
+  margin-bottom: 8px;
+  transition: all var(--transition-smooth);
+  font-size: 0.92rem;
+  font-weight: 500;
+}
+.dt-question {
+  background: linear-gradient(135deg, rgba(124,58,237,0.08), rgba(6,182,212,0.08));
+  border: 2px solid var(--primary-light);
+  color: var(--text);
+}
+[data-theme="dark"] .dt-question {
+  background: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(6,182,212,0.1));
+}
+.dt-question.active {
+  box-shadow: 0 0 24px rgba(124,58,237,0.2);
+  transform: scale(1.02);
+}
+.dt-options {
+  display: flex;
+  gap: 12px;
+  margin: 8px 0 16px;
+}
+.dt-option-btn {
+  flex: 1;
+  padding: 10px 16px;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+.dt-option-btn:hover {
+  border-color: var(--primary-light);
+  color: var(--primary);
+  transform: translateY(-1px);
+}
+.dt-option-btn.selected {
+  border-color: var(--primary);
+  background: rgba(124,58,237,0.08);
+  color: var(--primary);
+}
+.dt-option-btn.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+.dt-connector {
+  width: 2px;
+  height: 20px;
+  background: var(--border);
+  margin: 0 auto;
+}
+.dt-connector.active {
+  background: var(--primary);
+}
+.dt-result {
+  background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(6,182,212,0.08));
+  border: 2px solid var(--success);
+  border-radius: var(--radius-sm);
+  padding: 20px 24px;
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+  display: none;
+}
+.dt-result.show {
+  display: block;
+}
+.dt-result-mode {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--success);
+  margin-bottom: 4px;
+}
+.dt-result-explanation {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+.dt-reset-btn {
+  margin-top: 16px;
+  padding: 8px 20px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-smooth);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+.dt-reset-btn:hover {
+  border-color: var(--primary-light);
+  color: var(--text);
+}
+.dt-hidden { display: none; }
+.dt-visible { display: block; }
+.dt-flex-visible { display: flex; }
+
+/* ============================================
+   END-OF-MODULE QUIZ
+   ============================================ */
+.final-quiz {
+  background: var(--bg-card);
+  border: 2px solid var(--primary-light);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  box-shadow: var(--shadow-glow);
+}
+.final-quiz h3 {
+  margin-top: 0;
+}
+
+.final-quiz-question {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.final-quiz-question .fq-number {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+.final-quiz-question .fq-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+.fq-options { list-style: none; padding: 0; }
+.fq-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 12px;
+  margin-bottom: 4px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+.fq-option:hover { background: rgba(124, 58, 237, 0.05); }
+.fq-option input[type="radio"] {
+  accent-color: var(--primary);
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+.fq-option.selected-correct {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+.fq-option.selected-wrong {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+}
+.fq-option.reveal-correct {
+  background: rgba(16, 185, 129, 0.08);
+  color: #059669;
+  font-weight: 600;
+}
+[data-theme="dark"] .fq-option.selected-correct { color: #6EE7B7; }
+[data-theme="dark"] .fq-option.selected-wrong { color: #FCA5A5; }
+[data-theme="dark"] .fq-option.reveal-correct { color: #6EE7B7; }
+
+.final-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 32px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  margin-top: 8px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+.final-submit-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-lg); }
+.final-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.final-result {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: var(--radius-sm);
+  display: none;
+}
+.final-result.show { display: block; }
+.final-result.pass {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.final-result.fail {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.final-result h4 {
+  margin-top: 0;
+  margin-bottom: 6px;
+  font-size: 1.1rem;
+}
+.final-result p {
+  margin-bottom: 0;
+  font-size: 0.95rem;
+}
+.final-result.pass h4 { color: var(--success); }
+.final-result.fail h4 { color: var(--warning); }
+
+/* ============================================
+   NAVIGATION FOOTER
+   ============================================ */
+.module-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 16px;
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 2px solid var(--border);
+}
+.nav-link {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: all var(--transition);
+  min-width: 0;
+  flex: 1;
+  max-width: 50%;
+}
+.nav-link:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+}
+.nav-link.next { align-items: flex-end; text-align: right; }
+.nav-link .nav-dir {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--primary);
+}
+.nav-link .nav-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================
+   KEY CONCEPT HIGHLIGHT
+   ============================================ */
+.key-concept {
+  display: inline-block;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(6, 182, 212, 0.1));
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  color: var(--primary);
+}
+[data-theme="dark"] .key-concept {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(6, 182, 212, 0.15));
+  border-color: rgba(124, 58, 237, 0.35);
+}
+
+/* ============================================
+   STEP-BY-STEP
+   ============================================ */
+.step-list {
+  counter-reset: step-counter;
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+.step-item {
+  counter-increment: step-counter;
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: border-color var(--transition-smooth), box-shadow var(--transition-smooth);
+}
+.step-item:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow);
+}
+.step-item::before {
+  content: counter(step-counter);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+.step-content h4 {
+  margin-top: 0;
+  margin-bottom: 6px;
+}
+.step-content p {
+  margin-bottom: 8px;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 1024px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .hamburger {
+    display: flex;
+  }
+  .sidebar-overlay.show {
+    display: block;
+  }
+  .main-content {
+    margin-left: 0;
+  }
+  .theme-toggle {
+    right: 16px;
+  }
+  .playground-body {
+    grid-template-columns: 1fr;
+  }
+  .playground-code {
+    border-right: none;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+}
+
+@media (max-width: 640px) {
+  .content-wrapper {
+    padding: 24px 16px 60px;
+  }
+  .module-header h1 {
+    font-size: 1.6rem;
+  }
+  .section-heading {
+    font-size: 1.3rem;
+  }
+  .concept-grid {
+    grid-template-columns: 1fr;
+  }
+  .module-nav {
+    flex-direction: column;
+  }
+  .nav-link {
+    max-width: 100%;
+  }
+  .nav-link.next {
+    align-items: flex-start;
+    text-align: left;
+  }
+  .dt-options {
+    flex-direction: column;
+  }
+}
+
+/* ============================================
+   SCROLLBAR STYLING
+   ============================================ */
+.sidebar::-webkit-scrollbar,
+.code-block::-webkit-scrollbar,
+.playground-code::-webkit-scrollbar,
+.playground-output::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.sidebar::-webkit-scrollbar-track,
+.code-block::-webkit-scrollbar-track,
+.playground-code::-webkit-scrollbar-track,
+.playground-output::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+.code-block::-webkit-scrollbar-thumb,
+.playground-code::-webkit-scrollbar-thumb,
+.playground-output::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.section {
+  animation: fadeInUp 0.4s ease both;
+}
+
+@keyframes typeCursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.typing-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 1.1em;
+  background: var(--success);
+  vertical-align: text-bottom;
+  animation: typeCursor 0.8s step-end infinite;
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(124,58,237,0); }
+  50% { box-shadow: 0 0 16px 4px rgba(124,58,237,0.15); }
+}
+</style>
+</head>
+<body>
+<!-- ============================================
+     THEME TOGGLE
+     ============================================ -->
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+  <span id="themeIcon">&#9790;</span>
+</button>
+
+<!-- ============================================
+     HAMBURGER (mobile)
+     ============================================ -->
+<button class="hamburger" id="hamburger" aria-label="Toggle sidebar">
+  <span></span>
+  <span></span>
+  <span></span>
+</button>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ============================================
+     SIDEBAR
+     ============================================ -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="../index.html" class="sidebar-back">&larr; Back to Hub</a>
+    <div class="sidebar-title">Module 23</div>
+    <div class="sidebar-module-name">Agent SDK</div>
+  </div>
+
+  <div class="sidebar-nav">
+    <!-- Section: Concepts -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="concepts">
+        Concepts <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-concepts">
+        <li><a href="#what-is-agent-sdk" class="sidebar-link" data-target="what-is-agent-sdk">What is the Agent SDK?</a></li>
+        <li><a href="#query-api" class="sidebar-link" data-target="query-api">query() -- Single Exchange</a></li>
+        <li><a href="#client-api" class="sidebar-link" data-target="client-api">ClaudeSDKClient -- Multi-Turn</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Building -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="building">
+        Building <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-building">
+        <li><a href="#custom-tools" class="sidebar-link" data-target="custom-tools">Custom Tools with @tool</a></li>
+        <li><a href="#hitl-patterns" class="sidebar-link" data-target="hitl-patterns">Human-in-the-Loop</a></li>
+        <li><a href="#safety-guardrails" class="sidebar-link" data-target="safety-guardrails">Safety &amp; Guardrails</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Exercises -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="exercises">
+        Exercises <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-exercises">
+        <li><a href="#sdk-playground" class="sidebar-link" data-target="sdk-playground">SDK Code Playground</a></li>
+        <li><a href="#tool-workshop" class="sidebar-link" data-target="tool-workshop">Tool Decorator Workshop</a></li>
+        <li><a href="#permission-tree" class="sidebar-link" data-target="permission-tree">Permission Mode Decision Tree</a></li>
+        <li><a href="#final-quiz" class="sidebar-link" data-target="final-quiz">End-of-Module Quiz</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sidebar-progress">
+    <div class="sidebar-progress-label">Module Progress</div>
+    <div class="sidebar-progress-track">
+      <div class="sidebar-progress-fill" id="sidebarProgressFill"></div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================
+     MAIN CONTENT
+     ============================================ -->
+<main class="main-content">
+  <div class="content-wrapper">
+
+    <!-- Module Header -->
+    <header class="module-header">
+      <div class="breadcrumb">
+        <a href="../index.html">Training Hub</a> &raquo; Module 23
+      </div>
+      <div class="module-badge">
+        <span class="number">23</span>
+        <span class="label">Advanced</span>
+      </div>
+      <h1>Agent SDK -- Building Agent Applications</h1>
+      <p class="description">
+        Learn to build autonomous AI agents with the Claude Agent SDK. From simple one-shot queries
+        to multi-turn conversations with custom tools, permission models, and safety guardrails -- this
+        module covers everything you need to architect production agent systems.
+      </p>
+      <div class="module-meta">
+        <span class="module-meta-item">&#9201; ~90 min</span>
+        <span class="module-meta-item">&#128218; Advanced</span>
+        <span class="module-meta-item">&#127891; Developers &amp; Architects</span>
+        <span class="module-meta-item">&#127919; 4 Interactive Exercises</span>
+      </div>
+    </header>
+
+    <!-- ========================================
+         SECTION 1: WHAT IS THE AGENT SDK?
+         ======================================== -->
+    <section class="section" id="what-is-agent-sdk">
+      <h2 class="section-heading">1. What is the Agent SDK?</h2>
+
+      <p>
+        The <strong>Claude Agent SDK</strong> (<code>claude-agent-sdk</code>) is a Python framework for
+        building autonomous AI agents powered by Claude. It wraps the Claude Code CLI as a subprocess,
+        giving you <span class="key-concept">programmatic control</span> over everything Claude Code can
+        do -- reading files, writing code, running commands, and reasoning about complex tasks.
+      </p>
+
+      <p>
+        Where Claude Code is an interactive terminal experience, the Agent SDK lets you embed that same
+        power into your own Python applications, CI/CD pipelines, automation scripts, and backend services.
+        Think of it as the difference between using a calculator by hand and embedding a calculator into
+        your software.
+      </p>
+
+      <h3>Key Concepts</h3>
+
+      <div class="concept-grid">
+        <div class="concept-card">
+          <div class="concept-card-icon purple">&#9881;</div>
+          <h4>Agents</h4>
+          <p>Autonomous programs that use Claude to accomplish tasks. They can reason, plan, and execute multi-step workflows without constant human input.</p>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-icon blue">&#128295;</div>
+          <h4>Tools</h4>
+          <p>Functions your agent can call -- both built-in (Read, Write, Bash) and custom tools you define via MCP or the @tool decorator.</p>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-icon green">&#9776;</div>
+          <h4>Orchestration</h4>
+          <p>Managing multi-step workflows where the agent plans its approach, executes steps in sequence, and adapts based on results.</p>
+        </div>
+        <div class="concept-card">
+          <div class="concept-card-icon orange">&#128737;</div>
+          <h4>Guardrails</h4>
+          <p>Safety constraints and permission models that control what an agent can and cannot do, protecting against unintended side effects.</p>
+        </div>
+      </div>
+
+      <h3>Architecture Overview</h3>
+
+      <p>
+        The SDK communicates with Claude Code through a subprocess model. When you call <code>query()</code>
+        or use <code>ClaudeSDKClient</code>, the SDK spawns a Claude Code process, sends your prompt
+        and configuration, and receives structured responses. This architecture means your agent inherits
+        all of Claude Code's capabilities -- its tool suite, its context management, and its reasoning ability.
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Architecture</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>Your Python App
+    |
+    v
+claude-agent-sdk (Python)
+    |
+    v
+Claude Code CLI (subprocess)
+    |
+    v
+Claude API (Anthropic)
+    |
+    v
+Tool Execution (Read, Write, Bash, Custom MCP Tools)</code></div>
+
+      <div class="callout info">
+        <span class="callout-icon">&#9432;</span>
+        <div class="callout-content">
+          <p><strong>Prerequisite:</strong> You need Claude Code installed and authenticated before using
+          the Agent SDK. The SDK shells out to the <code>claude</code> CLI, so it must be on your PATH
+          and have a valid API key configured.</p>
+        </div>
+      </div>
+
+      <h3>Installation</h3>
+
+      <div class="code-block has-label">
+        <span class="code-label">Terminal</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm"># Install the SDK</span>
+<span class="fn">pip</span> install claude-agent-sdk
+
+<span class="cm"># Verify installation</span>
+<span class="fn">python3</span> -c <span class="str">"from claude_agent_sdk import query; print('SDK ready')"</span></code></div>
+    </section>
+
+    <!-- ========================================
+         SECTION 2: query() API
+         ======================================== -->
+    <section class="section" id="query-api">
+      <h2 class="section-heading">2. query() -- Single-Exchange Interactions</h2>
+
+      <p>
+        The <code>query()</code> function is the simplest entry point to the Agent SDK. It sends a single
+        prompt to Claude, lets the agent work (potentially using multiple tools), and returns the final
+        result. It is <span class="key-concept">stateless</span> -- each call is independent with no
+        memory of previous calls.
+      </p>
+
+      <h3>Basic Usage</h3>
+
+      <div class="code-block has-label">
+        <span class="code-label">Python</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="kw">from</span> claude_agent_sdk <span class="kw">import</span> query
+
+result = <span class="fn">query</span>(
+    prompt=<span class="str">"What files are in this directory?"</span>,
+    options={
+        <span class="str">"system_prompt"</span>: <span class="str">"You are a helpful file explorer."</span>,
+        <span class="str">"permission_mode"</span>: <span class="str">"default"</span>,
+        <span class="str">"allowed_tools"</span>: [<span class="str">"Read"</span>, <span class="str">"Glob"</span>, <span class="str">"Grep"</span>],
+        <span class="str">"cwd"</span>: <span class="str">"/path/to/project"</span>
+    }
+)
+<span class="fn">print</span>(result.text)</code></div>
+
+      <h3>Configuration Options</h3>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Option</th>
+              <th>Type</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>system_prompt</code></td>
+              <td>str</td>
+              <td>Instructions that shape the agent's behavior and personality</td>
+            </tr>
+            <tr>
+              <td><code>permission_mode</code></td>
+              <td>str</td>
+              <td>"default", "acceptEdits", or "fullAuto" -- controls what the agent can do without asking</td>
+            </tr>
+            <tr>
+              <td><code>allowed_tools</code></td>
+              <td>list</td>
+              <td>Restrict which tools the agent can use (e.g., ["Read", "Grep"])</td>
+            </tr>
+            <tr>
+              <td><code>cwd</code></td>
+              <td>str</td>
+              <td>Working directory for the agent's file operations</td>
+            </tr>
+            <tr>
+              <td><code>model</code></td>
+              <td>str</td>
+              <td>Which Claude model to use (e.g., "claude-sonnet-4-20250514")</td>
+            </tr>
+            <tr>
+              <td><code>max_turns</code></td>
+              <td>int</td>
+              <td>Maximum number of reasoning/tool-use turns before the agent must respond</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>When to Use query()</h3>
+
+      <ul>
+        <li><strong>One-shot tasks:</strong> "Analyze this log file and summarize the errors"</li>
+        <li><strong>Simple Q&A:</strong> "What version of Node.js is configured in package.json?"</li>
+        <li><strong>Script automation:</strong> Running as part of a CI/CD pipeline step</li>
+        <li><strong>Batch processing:</strong> Looping over files, applying the same analysis to each</li>
+      </ul>
+
+      <h3>Practical Example: Automated Code Review</h3>
+
+      <div class="code-block has-label">
+        <span class="code-label">Python</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="kw">from</span> claude_agent_sdk <span class="kw">import</span> query
+
+<span class="kw">def</span> <span class="fn">review_pull_request</span>(diff_text):
+    <span class="str">"""Automated code review for a pull request."""</span>
+    result = <span class="fn">query</span>(
+        prompt=<span class="str">f"Review this code diff for bugs, security issues, and style:\n\n{diff_text}"</span>,
+        options={
+            <span class="str">"system_prompt"</span>: <span class="str">"""You are a senior code reviewer. Focus on:
+1. Security vulnerabilities
+2. Logic errors
+3. Performance issues
+4. Code style consistency
+Provide specific, actionable feedback."""</span>,
+            <span class="str">"allowed_tools"</span>: [<span class="str">"Read"</span>, <span class="str">"Grep"</span>],
+            <span class="str">"max_turns"</span>: <span class="num">10</span>
+        }
+    )
+    <span class="kw">return</span> result.text</code></div>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>Pro tip:</strong> Use <code>max_turns</code> to prevent the agent from spending too
+          long on a task. For simple analysis, 5-10 turns is usually sufficient. For complex multi-file
+          tasks, you may need 20-30.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 3: ClaudeSDKClient
+         ======================================== -->
+    <section class="section" id="client-api">
+      <h2 class="section-heading">3. ClaudeSDKClient -- Multi-Turn Conversations</h2>
+
+      <p>
+        For ongoing conversations where you need to maintain state between messages,
+        <code>ClaudeSDKClient</code> provides a <span class="key-concept">stateful session</span>.
+        Unlike <code>query()</code>, the client remembers previous messages and maintains context
+        across multiple exchanges.
+      </p>
+
+      <h3>Basic Usage</h3>
+
+      <div class="code-block has-label">
+        <span class="code-label">Python</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="kw">from</span> claude_agent_sdk <span class="kw">import</span> ClaudeSDKClient
+
+client = <span class="fn">ClaudeSDKClient</span>(options={
+    <span class="str">"system_prompt"</span>: <span class="str">"You are a code review assistant."</span>,
+    <span class="str">"permission_mode"</span>: <span class="str">"acceptEdits"</span>
+})
+
+<span class="cm"># First message</span>
+response = client.<span class="fn">send_message</span>(<span class="str">"Review the auth module for security issues."</span>)
+<span class="fn">print</span>(response.text)
+
+<span class="cm"># Follow-up (maintains conversation context)</span>
+response = client.<span class="fn">send_message</span>(<span class="str">"Now check the same module for performance issues."</span>)
+<span class="fn">print</span>(response.text)
+
+<span class="cm"># Clean up</span>
+client.<span class="fn">close</span>()</code></div>
+
+      <h3>query() vs. ClaudeSDKClient</h3>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>query()</th>
+              <th>ClaudeSDKClient</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>State</strong></td>
+              <td>Stateless -- each call is independent</td>
+              <td>Stateful -- context carries between messages</td>
+            </tr>
+            <tr>
+              <td><strong>Use case</strong></td>
+              <td>One-shot tasks, automation</td>
+              <td>Interactive sessions, iterative work</td>
+            </tr>
+            <tr>
+              <td><strong>Memory</strong></td>
+              <td>No memory of previous calls</td>
+              <td>Remembers all previous messages</td>
+            </tr>
+            <tr>
+              <td><strong>Session</strong></td>
+              <td>New session every call</td>
+              <td>Persistent session with session_id</td>
+            </tr>
+            <tr>
+              <td><strong>Lifecycle</strong></td>
+              <td>Fire and forget</td>
+              <td>Requires explicit close()</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Session Management</h3>
+
+      <p>
+        Sessions can be paused and resumed using a <code>session_id</code>. This is useful for long-running
+        workflows where you need to come back to a task later, or for building interactive applications
+        where the user steps away and returns.
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Python</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm"># Create a named session</span>
+client = <span class="fn">ClaudeSDKClient</span>(options={
+    <span class="str">"system_prompt"</span>: <span class="str">"You are a refactoring assistant."</span>,
+    <span class="str">"session_id"</span>: <span class="str">"refactor-auth-module-v2"</span>
+})
+
+<span class="cm"># Do some work...</span>
+response = client.<span class="fn">send_message</span>(<span class="str">"Identify all functions that need refactoring in auth.py"</span>)
+
+<span class="cm"># Later, resume the same session</span>
+client2 = <span class="fn">ClaudeSDKClient</span>(options={
+    <span class="str">"session_id"</span>: <span class="str">"refactor-auth-module-v2"</span>,
+    <span class="str">"resume"</span>: <span class="kw">True</span>
+})
+response = client2.<span class="fn">send_message</span>(<span class="str">"Now refactor the first function you identified."</span>)</code></div>
+
+      <h3>Interrupts: Pausing for Human Input</h3>
+
+      <p>
+        The client supports <strong>interrupts</strong> -- pausing the agent mid-execution to get human
+        input before continuing. This is essential for workflows where the agent might need clarification
+        or approval at certain decision points.
+      </p>
+
+      <div class="callout warning">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Important:</strong> Always call <code>client.close()</code> when you are done with a
+          session. The SDK spawns a subprocess that will continue running if not explicitly cleaned up.
+          Use a <code>try/finally</code> block or a context manager pattern for safety.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 1: SDK CODE PLAYGROUND
+         ======================================== -->
+    <section class="section" id="sdk-playground">
+      <h2 class="section-heading">Interactive: SDK Code Playground</h2>
+
+      <p>
+        Explore the Agent SDK's APIs through these pre-built examples. Select a tab to load the code,
+        then click "Run" to see a simulated execution with realistic output.
+      </p>
+
+      <div class="playground" id="playgroundContainer">
+        <div class="playground-header">
+          <h3>Agent SDK Playground</h3>
+        </div>
+        <div class="playground-tabs" id="playgroundTabs">
+          <button class="playground-tab active" data-pg-tab="0" onclick="switchPlaygroundTab(0)">Basic query()</button>
+          <button class="playground-tab" data-pg-tab="1" onclick="switchPlaygroundTab(1)">Streaming</button>
+          <button class="playground-tab" data-pg-tab="2" onclick="switchPlaygroundTab(2)">Custom @tool</button>
+          <button class="playground-tab" data-pg-tab="3" onclick="switchPlaygroundTab(3)">ClaudeSDKClient</button>
+          <button class="playground-tab" data-pg-tab="4" onclick="switchPlaygroundTab(4)">HITL Approval</button>
+          <button class="playground-tab" data-pg-tab="5" onclick="switchPlaygroundTab(5)">Permission Modes</button>
+        </div>
+        <div class="playground-body">
+          <div class="playground-code has-line-numbers" id="playgroundCode">
+            <div class="line-numbers" id="playgroundLineNums"></div>
+            <pre id="playgroundPre"></pre>
+          </div>
+          <div class="playground-output" id="playgroundOutput">
+            <span style="color: #64748B;">Click "Run" to see the output...</span>
+          </div>
+        </div>
+        <div class="playground-actions">
+          <button class="playground-run-btn" id="playgroundRunBtn" onclick="runPlayground()">
+            &#9654; Run
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 4: CUSTOM TOOLS WITH @tool
+         ======================================== -->
+    <section class="section" id="custom-tools">
+      <h2 class="section-heading">4. Custom Tools with @tool</h2>
+
+      <p>
+        The <code>@tool</code> decorator is how you extend your agent's capabilities beyond Claude Code's
+        built-in tools. Any Python function decorated with <code>@tool</code> becomes an
+        <span class="key-concept">MCP tool</span> that the agent can discover and call during its
+        reasoning process.
+      </p>
+
+      <h3>Basic Tool Definition</h3>
+
+      <div class="code-block has-label">
+        <span class="code-label">Python</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="kw">from</span> claude_agent_sdk <span class="kw">import</span> tool
+<span class="kw">import</span> json
+
+<span class="dec">@tool</span>
+<span class="kw">def</span> <span class="fn">search_jira</span>(project_key: <span class="type">str</span>, status: <span class="type">str</span> = <span class="str">"open"</span>) -&gt; <span class="type">str</span>:
+    <span class="str">"""Search JIRA issues in a project.
+
+    Args:
+        project_key: The JIRA project key (e.g., "PROJ")
+        status: Filter by status. Options: open, in_progress, done, all
+
+    Returns:
+        JSON string of matching issues with id, title, assignee, and priority
+    """</span>
+    issues = jira_client.<span class="fn">search</span>(project_key, status)
+    <span class="kw">return</span> json.<span class="fn">dumps</span>([{
+        <span class="str">"id"</span>: i.key,
+        <span class="str">"title"</span>: i.summary,
+        <span class="str">"assignee"</span>: i.assignee,
+        <span class="str">"priority"</span>: i.priority
+    } <span class="kw">for</span> i <span class="kw">in</span> issues])</code></div>
+
+      <h3>How It Works</h3>
+
+      <p>
+        The SDK auto-generates a <strong>JSON Schema</strong> from your function's signature and docstring.
+        This schema tells Claude what the tool does, what parameters it accepts, and what it returns. The
+        quality of your docstring directly impacts how well Claude uses your tool.
+      </p>
+
+      <div class="accent-card">
+        <h4>The Anatomy of a Great @tool Function</h4>
+        <ol>
+          <li><strong>Descriptive function name</strong> -- the name itself tells Claude when to use it</li>
+          <li><strong>Type-annotated parameters</strong> -- Python type hints become JSON Schema types</li>
+          <li><strong>Default values</strong> -- optional parameters get default values</li>
+          <li><strong>Rich docstring</strong> -- first line is the tool description, Args section describes each parameter</li>
+          <li><strong>Return type hint</strong> -- tells Claude what to expect back</li>
+          <li><strong>Structured return values</strong> -- JSON strings or plain text that Claude can parse</li>
+        </ol>
+      </div>
+
+      <h3>Tool Annotations</h3>
+
+      <p>
+        Annotations provide metadata that helps the permission system make smarter decisions about when
+        to ask for human approval:
+      </p>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Annotation</th>
+              <th>Meaning</th>
+              <th>Example</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>readOnly=True</code></td>
+              <td>Tool does not modify any state -- safe to auto-approve</td>
+              <td>Database queries, API reads, search operations</td>
+            </tr>
+            <tr>
+              <td><code>destructive=True</code></td>
+              <td>Tool makes irreversible changes -- always ask for approval</td>
+              <td>Deleting records, dropping tables, revoking access</td>
+            </tr>
+            <tr>
+              <td><code>openWorld=True</code></td>
+              <td>Tool accesses external systems outside the local environment</td>
+              <td>API calls, sending emails, posting to Slack</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="code-block has-label">
+        <span class="code-label">Python</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="dec">@tool</span>(annotations={<span class="str">"readOnly"</span>: <span class="kw">True</span>})
+<span class="kw">def</span> <span class="fn">get_user_profile</span>(user_id: <span class="type">str</span>) -&gt; <span class="type">str</span>:
+    <span class="str">"""Fetch a user's profile from the database.
+
+    Args:
+        user_id: The unique user identifier
+
+    Returns:
+        JSON string with user profile data
+    """</span>
+    user = db.<span class="fn">get_user</span>(user_id)
+    <span class="kw">return</span> json.<span class="fn">dumps</span>(user.to_dict())
+
+
+<span class="dec">@tool</span>(annotations={<span class="str">"destructive"</span>: <span class="kw">True</span>})
+<span class="kw">def</span> <span class="fn">delete_user_account</span>(user_id: <span class="type">str</span>, reason: <span class="type">str</span>) -&gt; <span class="type">str</span>:
+    <span class="str">"""Permanently delete a user account. This action is irreversible.
+
+    Args:
+        user_id: The unique user identifier
+        reason: Reason for account deletion (for audit log)
+
+    Returns:
+        Confirmation message with deletion timestamp
+    """</span>
+    result = db.<span class="fn">delete_user</span>(user_id, reason)
+    <span class="kw">return</span> <span class="str">f"User {user_id} deleted at {result.timestamp}"</span></code></div>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>Best practice:</strong> Write your docstrings as if explaining the tool to a colleague
+          who has never seen your codebase. Claude uses the docstring to decide <em>when</em> and <em>how</em>
+          to call your tool. Vague docstrings lead to incorrect tool usage.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 2: TOOL DECORATOR WORKSHOP
+         ======================================== -->
+    <section class="section" id="tool-workshop">
+      <h2 class="section-heading">Interactive: Tool Decorator Workshop</h2>
+
+      <p>
+        Practice writing <code>@tool</code> decorated functions. For each scenario, write a complete
+        tool definition, then click "Check" to validate your implementation against best practices.
+      </p>
+
+      <div class="workshop" id="workshopContainer">
+        <div class="workshop-header">
+          <h3>Write Your Own @tool Functions</h3>
+          <p>Select a scenario and implement the tool. Your code will be validated for proper structure.</p>
+        </div>
+        <div class="workshop-scenario-tabs" id="workshopTabs">
+          <button class="workshop-scenario-tab active" data-ws-tab="0" onclick="switchWorkshopTab(0)">Customer Search</button>
+          <button class="workshop-scenario-tab" data-ws-tab="1" onclick="switchWorkshopTab(1)">Slack Message</button>
+          <button class="workshop-scenario-tab" data-ws-tab="2" onclick="switchWorkshopTab(2)">REST API Query</button>
+        </div>
+        <div class="workshop-body">
+          <div class="workshop-prompt" id="workshopPrompt"></div>
+          <textarea class="workshop-editor" id="workshopEditor" spellcheck="false" placeholder="Write your @tool function here..."></textarea>
+          <div class="workshop-actions">
+            <button class="workshop-check-btn" onclick="checkWorkshop()">&#10003; Check My Code</button>
+            <button class="workshop-reveal-btn" onclick="revealWorkshopSolution()">&#128065; Show Solution</button>
+          </div>
+          <div class="workshop-feedback" id="workshopFeedback"></div>
+          <div class="workshop-schema" id="workshopSchema">
+            <div class="workshop-schema-label">Auto-Generated JSON Schema</div>
+            <div class="code-block" id="workshopSchemaCode" style="margin-top:4px;"></div>
+          </div>
+          <div class="workshop-solution" id="workshopSolution">
+            <div class="workshop-solution-label">Expert Solution</div>
+            <div class="code-block" id="workshopSolutionCode" style="margin-top:4px;"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 5: HUMAN-IN-THE-LOOP
+         ======================================== -->
+    <section class="section" id="hitl-patterns">
+      <h2 class="section-heading">5. Human-in-the-Loop (HITL) Patterns</h2>
+
+      <p>
+        Fully autonomous agents are powerful, but some decisions require <span class="key-concept">human
+        judgment</span>. Human-in-the-Loop (HITL) patterns let your agent operate efficiently while
+        pausing at critical decision points for human review and approval.
+      </p>
+
+      <h3>Why HITL Matters</h3>
+
+      <ul>
+        <li><strong>High-stakes decisions:</strong> Deploying to production, deleting data, sending communications</li>
+        <li><strong>Ambiguous situations:</strong> When the agent encounters conflicting requirements</li>
+        <li><strong>Regulatory compliance:</strong> Actions that require documented human approval</li>
+        <li><strong>Learning and trust-building:</strong> Gradually expanding agent autonomy as you gain confidence</li>
+      </ul>
+
+      <h3>Interrupt Patterns</h3>
+
+      <div class="accent-card">
+        <h4>Approval Gates</h4>
+        <p>The agent pauses before executing destructive or high-impact actions. It presents what
+        it plans to do and waits for explicit human approval before proceeding.</p>
+      </div>
+
+      <div class="accent-card">
+        <h4>Confirmation Prompts</h4>
+        <p>"Are you sure you want to delete 500 records?" -- The agent detects potentially dangerous
+        operations and surfaces a confirmation dialog before continuing.</p>
+      </div>
+
+      <div class="accent-card">
+        <h4>Review Checkpoints</h4>
+        <p>The agent presents a complete plan (e.g., "I will modify 12 files in the following way...")
+        and waits for human review of the plan before executing any changes.</p>
+      </div>
+
+      <h3>Implementation with Permission Modes</h3>
+
+      <div class="code-block has-label">
+        <span class="code-label">Python</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="kw">from</span> claude_agent_sdk <span class="kw">import</span> query
+
+<span class="cm"># The system prompt instructs the agent to pause before destructive actions</span>
+result = <span class="fn">query</span>(
+    prompt=<span class="str">"Deploy the latest build to staging"</span>,
+    options={
+        <span class="str">"permission_mode"</span>: <span class="str">"default"</span>,  <span class="cm"># Will pause for confirmations</span>
+        <span class="str">"system_prompt"</span>: <span class="str">"""Before any deployment action, present your plan
+and wait for approval. Include:
+1. What will be deployed
+2. Which environment
+3. Expected impact
+4. Rollback plan"""</span>
+    }
+)</code></div>
+
+      <h3>The Permission Mode Continuum</h3>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Mode</th>
+              <th>File Edits</th>
+              <th>Shell Commands</th>
+              <th>Best For</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>"default"</code></td>
+              <td>Asks permission</td>
+              <td>Asks permission</td>
+              <td>Maximum safety, production environments</td>
+            </tr>
+            <tr>
+              <td><code>"acceptEdits"</code></td>
+              <td>Auto-approved</td>
+              <td>Asks permission</td>
+              <td>Development workflows, code generation</td>
+            </tr>
+            <tr>
+              <td><code>"fullAuto"</code></td>
+              <td>Auto-approved</td>
+              <td>Auto-approved</td>
+              <td>CI/CD pipelines with strict tool restrictions</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout important">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Critical:</strong> Never use <code>"fullAuto"</code> without also restricting
+          <code>allowed_tools</code>. An unrestricted agent in fullAuto mode can execute any shell
+          command without asking -- this is powerful but dangerous if not properly scoped.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 6: SAFETY & GUARDRAILS
+         ======================================== -->
+    <section class="section" id="safety-guardrails">
+      <h2 class="section-heading">6. Safety and Guardrails</h2>
+
+      <p>
+        Building safe agents is not optional -- it is a core architectural concern. The Agent SDK provides
+        multiple layers of safety controls that work together to create a
+        <span class="key-concept">defense-in-depth</span> strategy.
+      </p>
+
+      <h3>The Principle of Least Privilege</h3>
+
+      <p>
+        Every agent should have the minimum set of permissions needed to accomplish its task. Do not
+        give a code analysis agent the ability to write files. Do not give a documentation generator
+        access to shell commands. Restrict the tool set to exactly what is needed.
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Python</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm"># Read-only analysis agent -- cannot modify anything</span>
+result = <span class="fn">query</span>(
+    prompt=<span class="str">"Analyze this codebase for security vulnerabilities"</span>,
+    options={
+        <span class="str">"allowed_tools"</span>: [<span class="str">"Read"</span>, <span class="str">"Glob"</span>, <span class="str">"Grep"</span>],  <span class="cm"># No Write, Edit, or Bash</span>
+        <span class="str">"permission_mode"</span>: <span class="str">"default"</span>
+    }
+)</code></div>
+
+      <h3>Safety Layers</h3>
+
+      <div class="step-list">
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Permission Models</h4>
+            <p>Choose the right permission mode for your use case. Start with <code>"default"</code> and
+            only relax restrictions as you gain confidence in the agent's behavior.</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Tool Restrictions</h4>
+            <p>Use <code>allowed_tools</code> to create a whitelist of permitted tools. This is your
+            primary defense against unintended side effects.</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Sandboxing</h4>
+            <p>Run agents in containers, virtual machines, or other isolated environments. If an agent
+            goes rogue, the blast radius is contained to the sandbox.</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Monitoring and Logging</h4>
+            <p>Log every tool call, every decision, and every output. Use this audit trail for debugging,
+            compliance, and improving agent behavior over time.</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Rate Limiting</h4>
+            <p>Prevent runaway behavior by limiting the number of tool calls, the execution time, or the
+            number of files modified. The <code>max_turns</code> option is your first line of defense here.</p>
+          </div>
+        </div>
+      </div>
+
+      <h3>The "Trust but Verify" Pattern</h3>
+
+      <p>
+        This pattern balances efficiency with safety. Let the agent operate with reasonable autonomy for
+        most operations, but validate critical actions through hooks and periodic human review.
+      </p>
+
+      <div class="accent-card">
+        <h4>How It Works</h4>
+        <ol>
+          <li><strong>Agent operates with <code>acceptEdits</code></strong> -- auto-approves file changes for efficiency during development tasks</li>
+          <li><strong>PostToolUse hooks validate critical operations</strong> -- custom logic inspects tool calls for dangerous patterns (e.g., modifying production configs, running rm -rf, accessing sensitive paths)</li>
+          <li><strong>Periodic human review</strong> -- scheduled checkpoints where a human reviews the agent's recent actions and course-corrects if needed</li>
+        </ol>
+      </div>
+
+      <div class="code-block has-label">
+        <span class="code-label">Python</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm"># Example: Restrict agent + monitor output</span>
+<span class="kw">from</span> claude_agent_sdk <span class="kw">import</span> query
+<span class="kw">import</span> logging
+
+logger = logging.<span class="fn">getLogger</span>(<span class="str">"agent-audit"</span>)
+
+result = <span class="fn">query</span>(
+    prompt=<span class="str">"Refactor the database module to use connection pooling"</span>,
+    options={
+        <span class="str">"permission_mode"</span>: <span class="str">"acceptEdits"</span>,
+        <span class="str">"allowed_tools"</span>: [<span class="str">"Read"</span>, <span class="str">"Write"</span>, <span class="str">"Edit"</span>, <span class="str">"Glob"</span>, <span class="str">"Grep"</span>],
+        <span class="str">"max_turns"</span>: <span class="num">25</span>,
+        <span class="str">"cwd"</span>: <span class="str">"/app/src"</span>
+    }
+)
+
+<span class="cm"># Log the result for audit</span>
+logger.<span class="fn">info</span>(<span class="str">"Agent task completed"</span>, extra={
+    <span class="str">"result_length"</span>: <span class="fn">len</span>(result.text),
+    <span class="str">"tool_calls"</span>: result.tool_call_count,
+    <span class="str">"files_modified"</span>: result.files_modified
+})</code></div>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>Pro tip:</strong> Start every new agent project with the most restrictive configuration
+          possible. Only loosen restrictions after you have verified the agent behaves correctly in your
+          specific context. It is much safer to add permissions than to remove them after an incident.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 3: PERMISSION DECISION TREE
+         ======================================== -->
+    <section class="section" id="permission-tree">
+      <h2 class="section-heading">Interactive: Permission Mode Decision Tree</h2>
+
+      <p>
+        Not sure which permission mode to use? Walk through this interactive decision tree to get a
+        recommendation based on your specific use case. Click the answers to follow the path.
+      </p>
+
+      <div class="decision-tree" id="decisionTreeContainer">
+        <div class="decision-tree-header">
+          <h3>Choose the Right Permission Mode</h3>
+          <p>Answer each question to get a tailored recommendation for your agent's permission configuration.</p>
+        </div>
+        <div class="decision-tree-body" id="decisionTreeBody">
+          <!-- Populated by JavaScript -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         END-OF-MODULE QUIZ
+         ======================================== -->
+    <section class="section" id="final-quiz">
+      <h2 class="section-heading">End-of-Module Quiz</h2>
+
+      <p>
+        Complete this quiz to finish Module 23. Your score will be saved to track your progress
+        through the training program. You need at least 5 out of 7 to pass.
+      </p>
+
+      <div class="final-quiz" id="finalQuizContainer">
+        <h3>Module 23: Assessment</h3>
+
+        <!-- Question 1 -->
+        <div class="final-quiz-question" data-fq="0">
+          <div class="fq-number">Question 1 of 7</div>
+          <div class="fq-text">
+            What is the key difference between query() and ClaudeSDKClient?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="0" data-fq-val="a" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="a"> query() is faster
+            </li>
+            <li class="fq-option" data-fq-idx="0" data-fq-val="b" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="b"> query() is stateless (single exchange) while ClaudeSDKClient maintains conversation context across messages
+            </li>
+            <li class="fq-option" data-fq-idx="0" data-fq-val="c" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="c"> ClaudeSDKClient can only use custom tools
+            </li>
+            <li class="fq-option" data-fq-idx="0" data-fq-val="d" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="d"> There is no difference -- they are aliases
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="final-quiz-question" data-fq="1">
+          <div class="fq-number">Question 2 of 7</div>
+          <div class="fq-text">
+            What does the @tool decorator do?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="1" data-fq-val="a" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="a"> It marks a function as deprecated
+            </li>
+            <li class="fq-option" data-fq-idx="1" data-fq-val="b" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="b"> It registers a Python function as an MCP tool, auto-generating the JSON Schema from its signature and docstring
+            </li>
+            <li class="fq-option" data-fq-idx="1" data-fq-val="c" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="c"> It adds error handling to a function
+            </li>
+            <li class="fq-option" data-fq-idx="1" data-fq-val="d" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="d"> It makes a function run asynchronously
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="final-quiz-question" data-fq="2">
+          <div class="fq-number">Question 3 of 7</div>
+          <div class="fq-text">
+            Which permission_mode should you use for a fully autonomous CI/CD agent?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="2" data-fq-val="a" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="a"> "default" -- always ask for permission
+            </li>
+            <li class="fq-option" data-fq-idx="2" data-fq-val="b" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="b"> "acceptEdits" -- auto-approve edits but ask for commands
+            </li>
+            <li class="fq-option" data-fq-idx="2" data-fq-val="c" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="c"> "fullAuto" -- no confirmations, fully autonomous
+            </li>
+            <li class="fq-option" data-fq-idx="2" data-fq-val="d" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="d"> "fullAuto" but only with strict allowed_tools and PostToolUse hooks
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 4 -->
+        <div class="final-quiz-question" data-fq="3">
+          <div class="fq-number">Question 4 of 7</div>
+          <div class="fq-text">
+            What information should a @tool docstring include?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="3" data-fq-val="a" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="a"> Just the function name
+            </li>
+            <li class="fq-option" data-fq-idx="3" data-fq-val="b" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="b"> A description of what the tool does, Args section with parameter descriptions, and return value description
+            </li>
+            <li class="fq-option" data-fq-idx="3" data-fq-val="c" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="c"> Only the parameter types
+            </li>
+            <li class="fq-option" data-fq-idx="3" data-fq-val="d" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="d"> A link to external documentation
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 5 -->
+        <div class="final-quiz-question" data-fq="4">
+          <div class="fq-number">Question 5 of 7</div>
+          <div class="fq-text">
+            When should you use Human-in-the-Loop (HITL) patterns?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="4" data-fq-val="a" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="a"> For every tool call
+            </li>
+            <li class="fq-option" data-fq-idx="4" data-fq-val="b" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="b"> When the agent makes decisions with significant consequences that require human judgment
+            </li>
+            <li class="fq-option" data-fq-idx="4" data-fq-val="c" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="c"> Only for debugging
+            </li>
+            <li class="fq-option" data-fq-idx="4" data-fq-val="d" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="d"> HITL is an anti-pattern and should be avoided
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 6 -->
+        <div class="final-quiz-question" data-fq="5">
+          <div class="fq-number">Question 6 of 7</div>
+          <div class="fq-text">
+            What is the "trust but verify" pattern for agent safety?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="5" data-fq-val="a" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="a"> Never trust AI output
+            </li>
+            <li class="fq-option" data-fq-idx="5" data-fq-val="b" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="b"> Let the agent operate efficiently with acceptEdits, but validate critical operations with PostToolUse hooks and periodic human review
+            </li>
+            <li class="fq-option" data-fq-idx="5" data-fq-val="c" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="c"> Run every agent action twice and compare results
+            </li>
+            <li class="fq-option" data-fq-idx="5" data-fq-val="d" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="d"> Use only fullAuto mode with no restrictions
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 7 -->
+        <div class="final-quiz-question" data-fq="6">
+          <div class="fq-number">Question 7 of 7</div>
+          <div class="fq-text">
+            What happens if you don't specify allowed_tools in a query() call?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="6" data-fq-val="a" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="a"> No tools are available
+            </li>
+            <li class="fq-option" data-fq-idx="6" data-fq-val="b" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="b"> Only Read and Grep are available
+            </li>
+            <li class="fq-option" data-fq-idx="6" data-fq-val="c" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="c"> All standard Claude Code tools are available by default
+            </li>
+            <li class="fq-option" data-fq-idx="6" data-fq-val="d" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="d"> The call fails with an error
+            </li>
+          </ul>
+        </div>
+
+        <button class="final-submit-btn" id="finalSubmitBtn" onclick="submitFinalQuiz()" disabled>
+          Submit Answers
+        </button>
+
+        <div class="final-result" id="finalResult">
+          <h4 id="finalResultTitle"></h4>
+          <p id="finalResultText"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         NAVIGATION FOOTER
+         ======================================== -->
+    <nav class="module-nav">
+      <a href="22-tool-design-mcp.html" class="nav-link prev">
+        <span class="nav-dir">&larr; Previous</span>
+        <span class="nav-title">Module 22: Tool Design &amp; MCP</span>
+      </a>
+      <a href="24-multi-agent-systems.html" class="nav-link next">
+        <span class="nav-dir">Next &rarr;</span>
+        <span class="nav-title">Module 24: Multi-Agent Systems</span>
+      </a>
+    </nav>
+
+  </div>
+</main>
+
+<!-- ============================================
+     JAVASCRIPT
+     ============================================ -->
+<script>
+(function() {
+  'use strict';
+
+  // ==========================================
+  // THEME MANAGEMENT
+  // ==========================================
+  var THEME_KEY = 'claude-training-theme';
+
+  function getTheme() {
+    return localStorage.getItem(THEME_KEY) || 'light';
+  }
+
+  function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem(THEME_KEY, theme);
+    var icon = document.getElementById('themeIcon');
+    if (icon) {
+      icon.textContent = theme === 'dark' ? '\u2600' : '\u263E';
+    }
+  }
+
+  setTheme(getTheme());
+
+  document.getElementById('themeToggle').addEventListener('click', function() {
+    var current = getTheme();
+    setTheme(current === 'dark' ? 'light' : 'dark');
+  });
+
+  // ==========================================
+  // SIDEBAR MOBILE TOGGLE
+  // ==========================================
+  var hamburger = document.getElementById('hamburger');
+  var sidebar = document.getElementById('sidebar');
+  var overlay = document.getElementById('sidebarOverlay');
+
+  function toggleSidebar() {
+    var isOpen = sidebar.classList.contains('open');
+    sidebar.classList.toggle('open');
+    hamburger.classList.toggle('open');
+    if (isOpen) {
+      overlay.classList.remove('show');
+    } else {
+      overlay.classList.add('show');
+    }
+  }
+
+  hamburger.addEventListener('click', toggleSidebar);
+  overlay.addEventListener('click', toggleSidebar);
+
+  // ==========================================
+  // SIDEBAR SECTION COLLAPSING
+  // ==========================================
+  var sectionToggles = document.querySelectorAll('.sidebar-section-toggle');
+  for (var t = 0; t < sectionToggles.length; t++) {
+    (function(btn) {
+      btn.addEventListener('click', function() {
+        var sectionName = this.getAttribute('data-section');
+        var linksList = document.getElementById('nav-' + sectionName);
+        var isCollapsed = this.classList.contains('collapsed');
+
+        if (isCollapsed) {
+          this.classList.remove('collapsed');
+          linksList.classList.remove('collapsed');
+          linksList.style.maxHeight = linksList.scrollHeight + 'px';
+        } else {
+          this.classList.add('collapsed');
+          linksList.style.maxHeight = linksList.scrollHeight + 'px';
+          linksList.offsetHeight; // Force reflow
+          linksList.classList.add('collapsed');
+        }
+      });
+
+      var sectionName = btn.getAttribute('data-section');
+      var linksList = document.getElementById('nav-' + sectionName);
+      if (linksList) {
+        linksList.style.maxHeight = linksList.scrollHeight + 'px';
+      }
+    })(sectionToggles[t]);
+  }
+
+  // ==========================================
+  // SCROLLSPY
+  // ==========================================
+  var sidebarLinks = document.querySelectorAll('.sidebar-link');
+  var sections = [];
+
+  for (var i = 0; i < sidebarLinks.length; i++) {
+    var targetId = sidebarLinks[i].getAttribute('data-target');
+    var section = document.getElementById(targetId);
+    if (section) {
+      sections.push({ el: section, link: sidebarLinks[i], id: targetId });
+    }
+  }
+
+  function updateScrollspy() {
+    var scrollPos = window.scrollY + 100;
+    var active = null;
+
+    for (var j = sections.length - 1; j >= 0; j--) {
+      if (sections[j].el.offsetTop <= scrollPos) {
+        active = sections[j];
+        break;
+      }
+    }
+
+    for (var k = 0; k < sidebarLinks.length; k++) {
+      sidebarLinks[k].classList.remove('active');
+    }
+    if (active) {
+      active.link.classList.add('active');
+    }
+
+    updateSidebarProgress();
+  }
+
+  var scrollTimer = null;
+  window.addEventListener('scroll', function() {
+    if (scrollTimer) return;
+    scrollTimer = setTimeout(function() {
+      scrollTimer = null;
+      updateScrollspy();
+    }, 50);
+  });
+  updateScrollspy();
+
+  // Close mobile sidebar on link click
+  for (var m = 0; m < sidebarLinks.length; m++) {
+    sidebarLinks[m].addEventListener('click', function() {
+      if (window.innerWidth <= 1024) {
+        sidebar.classList.remove('open');
+        hamburger.classList.remove('open');
+        overlay.classList.remove('show');
+      }
+    });
+  }
+
+  // ==========================================
+  // SIDEBAR PROGRESS
+  // ==========================================
+  function updateSidebarProgress() {
+    var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    var scrolled = window.scrollY;
+    var pct = docHeight > 0 ? Math.min(100, (scrolled / docHeight) * 100) : 0;
+
+    var fill = document.getElementById('sidebarProgressFill');
+    if (fill) {
+      fill.style.width = pct + '%';
+    }
+  }
+
+  // ==========================================
+  // COPY TO CLIPBOARD
+  // ==========================================
+  window.copyCode = function(btn) {
+    var block = btn.closest('.code-block');
+    var codeEl = block.cloneNode(true);
+    var labelEl = codeEl.querySelector('.code-label');
+    var btnEl = codeEl.querySelector('.copy-btn');
+    if (labelEl) labelEl.remove();
+    if (btnEl) btnEl.remove();
+
+    var text = codeEl.textContent.trim();
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function() {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(function() {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      }).catch(function() {
+        btn.textContent = 'Failed';
+        setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+      });
+    } else {
+      // Fallback for older browsers
+      var textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.left = '-9999px';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+      } catch (e) {
+        btn.textContent = 'Failed';
+      }
+      document.body.removeChild(textarea);
+      setTimeout(function() {
+        btn.textContent = 'Copy';
+        btn.classList.remove('copied');
+      }, 2000);
+    }
+  };
+
+  // ==========================================
+  // SDK PLAYGROUND
+  // ==========================================
+  var playgroundExamples = [
+    {
+      title: 'Basic query()',
+      code: 'from claude_agent_sdk import query\n\nresult = query(\n    prompt="List all Python files in this project and\\\n            summarize what each one does.",\n    options={\n        "system_prompt": "You are a helpful code analyst.",\n        "allowed_tools": ["Read", "Glob", "Grep"],\n        "cwd": "/home/user/my-project",\n        "max_turns": 10\n    }\n)\n\nprint(result.text)',
+      output: [
+        { type: 'prompt', text: '$ python3 basic_query.py' },
+        { type: 'info', text: '[SDK] Spawning Claude Code subprocess...' },
+        { type: 'info', text: '[SDK] Sending prompt with 3 allowed tools...' },
+        { type: 'info', text: '[Agent] Using Glob to find *.py files...' },
+        { type: 'info', text: '[Agent] Found 8 Python files' },
+        { type: 'info', text: '[Agent] Reading main.py...' },
+        { type: 'info', text: '[Agent] Reading utils.py...' },
+        { type: 'info', text: '[Agent] Reading models.py...' },
+        { type: 'text', text: '' },
+        { type: 'text', text: 'Found 8 Python files in the project:' },
+        { type: 'text', text: '' },
+        { type: 'text', text: '1. main.py - FastAPI application entry point with' },
+        { type: 'text', text: '   route definitions and middleware setup' },
+        { type: 'text', text: '2. models.py - Pydantic models for User, Product,' },
+        { type: 'text', text: '   and Order entities' },
+        { type: 'text', text: '3. utils.py - Helper functions for date formatting,' },
+        { type: 'text', text: '   input validation, and token generation' },
+        { type: 'text', text: '4. database.py - SQLAlchemy async session management' },
+        { type: 'text', text: '5. auth.py - JWT authentication and role-based access' },
+        { type: 'text', text: '6. config.py - Environment variable loading with defaults' },
+        { type: 'text', text: '7. tests/test_api.py - API endpoint integration tests' },
+        { type: 'text', text: '8. tests/test_auth.py - Auth flow unit tests' }
+      ]
+    },
+    {
+      title: 'Streaming query()',
+      code: 'from claude_agent_sdk import query\n\n# Stream output in real-time as the agent works\nfor event in query(\n    prompt="Refactor utils.py to use dataclasses",\n    options={\n        "system_prompt": "You are a Python refactoring expert.",\n        "permission_mode": "acceptEdits",\n        "allowed_tools": ["Read", "Edit", "Glob"],\n        "cwd": "/home/user/my-project"\n    },\n    stream=True\n):\n    if event.type == "text":\n        print(event.text, end="")\n    elif event.type == "tool_use":\n        print(f"\\n[Using {event.tool}...]")\n    elif event.type == "tool_result":\n        print(f"[{event.tool} complete]")',
+      output: [
+        { type: 'prompt', text: '$ python3 streaming_query.py' },
+        { type: 'info', text: '[SDK] Streaming mode enabled...' },
+        { type: 'text', text: '' },
+        { type: 'text', text: 'I\'ll refactor utils.py to use dataclasses.' },
+        { type: 'text', text: 'Let me first read the current file.' },
+        { type: 'text', text: '' },
+        { type: 'warn', text: '[Using Read...]' },
+        { type: 'info', text: '[Read complete]' },
+        { type: 'text', text: '' },
+        { type: 'text', text: 'I can see 3 plain dict-based structures that' },
+        { type: 'text', text: 'would benefit from dataclasses. Refactoring now.' },
+        { type: 'text', text: '' },
+        { type: 'warn', text: '[Using Edit...]' },
+        { type: 'info', text: '[Edit complete]' },
+        { type: 'text', text: '' },
+        { type: 'warn', text: '[Using Edit...]' },
+        { type: 'info', text: '[Edit complete]' },
+        { type: 'text', text: '' },
+        { type: 'text', text: 'Done! Converted UserConfig, CacheEntry, and' },
+        { type: 'text', text: 'ValidationResult from plain dicts to @dataclass.' },
+        { type: 'text', text: 'Added frozen=True for immutability where safe.' }
+      ]
+    },
+    {
+      title: 'Custom @tool',
+      code: 'from claude_agent_sdk import query, tool\nimport json\n\n@tool\ndef search_jira(\n    project_key: str,\n    status: str = "open"\n) -> str:\n    """Search JIRA issues in a project.\n\n    Args:\n        project_key: The JIRA project key (e.g., "PROJ")\n        status: Filter by status: open, in_progress, done\n\n    Returns:\n        JSON string of matching issues\n    """\n    # Simulated JIRA API call\n    return json.dumps([\n        {"id": "PROJ-101", "title": "Fix login bug",\n         "priority": "high"},\n        {"id": "PROJ-102", "title": "Add dark mode",\n         "priority": "medium"}\n    ])\n\nresult = query(\n    prompt="What are the open JIRA issues for PROJ?",\n    options={\n        "tools": [search_jira],\n        "system_prompt": "Use the search_jira tool."\n    }\n)\nprint(result.text)',
+      output: [
+        { type: 'prompt', text: '$ python3 custom_tool.py' },
+        { type: 'info', text: '[SDK] Registered 1 custom tool: search_jira' },
+        { type: 'info', text: '[SDK] Generated JSON Schema for search_jira' },
+        { type: 'info', text: '[Agent] Calling search_jira(project_key="PROJ", status="open")' },
+        { type: 'info', text: '[Tool] search_jira returned 2 results' },
+        { type: 'text', text: '' },
+        { type: 'text', text: 'There are 2 open JIRA issues for project PROJ:' },
+        { type: 'text', text: '' },
+        { type: 'text', text: '1. PROJ-101: "Fix login bug" (HIGH priority)' },
+        { type: 'text', text: '   This is a high-priority bug that should be' },
+        { type: 'text', text: '   addressed first.' },
+        { type: 'text', text: '' },
+        { type: 'text', text: '2. PROJ-102: "Add dark mode" (MEDIUM priority)' },
+        { type: 'text', text: '   Feature request with medium priority.' }
+      ]
+    },
+    {
+      title: 'ClaudeSDKClient',
+      code: 'from claude_agent_sdk import ClaudeSDKClient\n\nclient = ClaudeSDKClient(options={\n    "system_prompt": "You are a code review assistant.\\\n     Remember context from previous messages.",\n    "permission_mode": "acceptEdits",\n    "cwd": "/home/user/my-project"\n})\n\n# First message\nr1 = client.send_message(\n    "Review auth.py for security issues."\n)\nprint("=== Review 1 ===")\nprint(r1.text)\n\n# Follow-up with context\nr2 = client.send_message(\n    "Now check if those issues exist in api.py too."\n)\nprint("\\n=== Review 2 ===")\nprint(r2.text)\n\nclient.close()',
+      output: [
+        { type: 'prompt', text: '$ python3 multi_turn.py' },
+        { type: 'info', text: '[SDK] Created session: sess_a8f3c2d1' },
+        { type: 'info', text: '[Agent] Reading auth.py...' },
+        { type: 'info', text: '[Agent] Analyzing for security issues...' },
+        { type: 'text', text: '' },
+        { type: 'text', text: '=== Review 1 ===' },
+        { type: 'text', text: 'Found 3 security issues in auth.py:' },
+        { type: 'text', text: '' },
+        { type: 'text', text: '1. Line 45: Password compared using == instead of' },
+        { type: 'text', text: '   hmac.compare_digest() (timing attack risk)' },
+        { type: 'text', text: '2. Line 78: JWT secret loaded from hardcoded string' },
+        { type: 'text', text: '3. Line 112: No rate limiting on login endpoint' },
+        { type: 'text', text: '' },
+        { type: 'info', text: '[Agent] Context preserved, reading api.py...' },
+        { type: 'text', text: '' },
+        { type: 'text', text: '=== Review 2 ===' },
+        { type: 'text', text: 'Checked api.py for the same 3 patterns:' },
+        { type: 'text', text: '' },
+        { type: 'text', text: '1. Timing attack: NOT present (uses auth module)' },
+        { type: 'text', text: '2. Hardcoded secrets: FOUND on line 23 (API key)' },
+        { type: 'text', text: '3. Rate limiting: FOUND -- no limits on /api/data' },
+        { type: 'info', text: '[SDK] Session closed: sess_a8f3c2d1' }
+      ]
+    },
+    {
+      title: 'HITL Approval',
+      code: 'from claude_agent_sdk import query\n\n# Agent will pause for approval before\n# destructive operations\nresult = query(\n    prompt="Deploy the latest build to staging",\n    options={\n        "permission_mode": "default",\n        "system_prompt": """\nBefore any deployment action:\n1. Present your deployment plan\n2. List all files to be deployed\n3. Wait for explicit approval\n4. Include a rollback plan\n\nNever deploy without user confirmation.\n""",\n        "allowed_tools": [\n            "Read", "Glob", "Bash"\n        ],\n        "cwd": "/home/user/my-project"\n    }\n)\nprint(result.text)',
+      output: [
+        { type: 'prompt', text: '$ python3 hitl_deploy.py' },
+        { type: 'info', text: '[SDK] Permission mode: default (will ask for confirmations)' },
+        { type: 'info', text: '[Agent] Analyzing project structure...' },
+        { type: 'info', text: '[Agent] Reading deployment config...' },
+        { type: 'text', text: '' },
+        { type: 'text', text: 'DEPLOYMENT PLAN:' },
+        { type: 'text', text: '----------------' },
+        { type: 'text', text: 'Target:     staging.myapp.com' },
+        { type: 'text', text: 'Branch:     main (commit a3f8b2c)' },
+        { type: 'text', text: 'Files:      47 changed files' },
+        { type: 'text', text: 'Downtime:   ~30 seconds (rolling restart)' },
+        { type: 'text', text: '' },
+        { type: 'warn', text: '[APPROVAL REQUIRED] Run: ./deploy.sh --env staging' },
+        { type: 'warn', text: '[Waiting for user confirmation...]' },
+        { type: 'text', text: '' },
+        { type: 'info', text: '[User approved]' },
+        { type: 'info', text: '[Agent] Executing deployment...' },
+        { type: 'text', text: '' },
+        { type: 'text', text: 'Deployment complete!' },
+        { type: 'text', text: 'Rollback command: ./deploy.sh --rollback v2.3.1' }
+      ]
+    },
+    {
+      title: 'Permission Modes',
+      code: '"""Compare permission modes side by side."""\nfrom claude_agent_sdk import query\n\nprompt = "Fix the bug in utils.py line 42"\n\n# Mode 1: default (most conservative)\nr1 = query(\n    prompt=prompt,\n    options={"permission_mode": "default"}\n)\n# Agent asks before: Read, Edit, Bash\n\n# Mode 2: acceptEdits (balanced)\nr2 = query(\n    prompt=prompt,\n    options={"permission_mode": "acceptEdits"}\n)\n# Agent auto-approves: Read, Edit\n# Agent asks before: Bash\n\n# Mode 3: fullAuto (most autonomous)\nr3 = query(\n    prompt=prompt,\n    options={\n        "permission_mode": "fullAuto",\n        "allowed_tools": [\n            "Read", "Edit", "Grep"\n        ]  # ALWAYS restrict tools with fullAuto!\n    }\n)\n# Agent auto-approves everything\n# But can only use Read, Edit, Grep',
+      output: [
+        { type: 'prompt', text: '$ python3 permission_modes.py' },
+        { type: 'text', text: '' },
+        { type: 'text', text: '--- Mode: default ---' },
+        { type: 'warn', text: '[PERMISSION] Agent wants to use Read on utils.py' },
+        { type: 'warn', text: '[PERMISSION] Agent wants to use Edit on utils.py' },
+        { type: 'warn', text: '[PERMISSION] Agent wants to run: python -m pytest' },
+        { type: 'info', text: 'Total confirmations needed: 3' },
+        { type: 'text', text: '' },
+        { type: 'text', text: '--- Mode: acceptEdits ---' },
+        { type: 'info', text: '[AUTO] Read utils.py (auto-approved)' },
+        { type: 'info', text: '[AUTO] Edit utils.py (auto-approved)' },
+        { type: 'warn', text: '[PERMISSION] Agent wants to run: python -m pytest' },
+        { type: 'info', text: 'Total confirmations needed: 1' },
+        { type: 'text', text: '' },
+        { type: 'text', text: '--- Mode: fullAuto (restricted) ---' },
+        { type: 'info', text: '[AUTO] Read utils.py (auto-approved)' },
+        { type: 'info', text: '[AUTO] Edit utils.py (auto-approved)' },
+        { type: 'error', text: '[BLOCKED] Bash not in allowed_tools' },
+        { type: 'info', text: 'Total confirmations needed: 0' },
+        { type: 'text', text: '' },
+        { type: 'text', text: 'Recommendation: Use acceptEdits for development,' },
+        { type: 'text', text: 'fullAuto+restrictions for CI/CD pipelines.' }
+      ]
+    }
+  ];
+
+  var currentPlaygroundTab = 0;
+  var playgroundRunning = false;
+
+  function renderPlaygroundCode(idx) {
+    var example = playgroundExamples[idx];
+    var lines = example.code.split('\n');
+    var lineNums = '';
+    for (var n = 1; n <= lines.length; n++) {
+      lineNums += n + '\n';
+    }
+    document.getElementById('playgroundLineNums').textContent = lineNums;
+
+    // Simple syntax highlighting
+    var highlighted = highlightPython(example.code);
+    document.getElementById('playgroundPre').innerHTML = highlighted;
+
+    // Reset output
+    document.getElementById('playgroundOutput').innerHTML =
+      '<span style="color: #64748B;">Click "Run" to see the output...</span>';
+  }
+
+  function highlightPython(code) {
+    // Escape HTML first
+    var escaped = code
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+
+    // Apply highlighting in order of precedence
+    // Triple-quoted strings
+    escaped = escaped.replace(/("""[\s\S]*?""")/g, '<span class="str">$1</span>');
+    // Comments
+    escaped = escaped.replace(/(#[^\n]*)/g, '<span class="cm">$1</span>');
+    // Single-quoted strings (but not inside comments)
+    escaped = escaped.replace(/('[^'\\]*(?:\\.[^'\\]*)*')/g, '<span class="str">$1</span>');
+    // Double-quoted strings
+    escaped = escaped.replace(/("[^"\\]*(?:\\.[^"\\]*)*")/g, '<span class="str">$1</span>');
+    // f-strings (basic)
+    escaped = escaped.replace(/(f"[^"]*")/g, '<span class="str">$1</span>');
+    // Keywords
+    escaped = escaped.replace(/\b(from|import|def|return|if|elif|else|for|in|while|try|except|finally|with|as|class|True|False|None|and|or|not|yield|async|await)\b/g, '<span class="kw">$1</span>');
+    // Decorators
+    escaped = escaped.replace(/(@\w+)/g, '<span class="dec">$1</span>');
+    // Numbers
+    escaped = escaped.replace(/\b(\d+)\b/g, '<span class="num">$1</span>');
+
+    return escaped;
+  }
+
+  window.switchPlaygroundTab = function(idx) {
+    if (playgroundRunning) return;
+    currentPlaygroundTab = idx;
+
+    var tabs = document.querySelectorAll('.playground-tab');
+    for (var t = 0; t < tabs.length; t++) {
+      tabs[t].classList.remove('active');
+      if (parseInt(tabs[t].getAttribute('data-pg-tab')) === idx) {
+        tabs[t].classList.add('active');
+      }
+    }
+
+    renderPlaygroundCode(idx);
+  };
+
+  window.runPlayground = function() {
+    if (playgroundRunning) return;
+    playgroundRunning = true;
+
+    var btn = document.getElementById('playgroundRunBtn');
+    btn.disabled = true;
+    btn.innerHTML = '&#9654; Running...';
+
+    var outputEl = document.getElementById('playgroundOutput');
+    outputEl.innerHTML = '';
+
+    var example = playgroundExamples[currentPlaygroundTab];
+    var outputLines = example.output;
+    var lineIndex = 0;
+
+    function typeNextLine() {
+      if (lineIndex >= outputLines.length) {
+        playgroundRunning = false;
+        btn.disabled = false;
+        btn.innerHTML = '&#9654; Run';
+        return;
+      }
+
+      var line = outputLines[lineIndex];
+      var span = document.createElement('div');
+      span.style.minHeight = '1.7em';
+
+      if (line.type === 'prompt') {
+        span.className = 'output-prompt';
+      } else if (line.type === 'info') {
+        span.className = 'output-info';
+      } else if (line.type === 'warn') {
+        span.className = 'output-warn';
+      } else if (line.type === 'error') {
+        span.className = 'output-error';
+      } else {
+        span.className = 'output-text';
+      }
+
+      outputEl.appendChild(span);
+
+      // Typing animation
+      var text = line.text;
+      var charIdx = 0;
+      var typeSpeed = line.type === 'prompt' ? 15 : 8;
+
+      if (text.length === 0) {
+        span.innerHTML = '&nbsp;';
+        lineIndex++;
+        setTimeout(typeNextLine, 80);
+        return;
+      }
+
+      function typeChar() {
+        if (charIdx < text.length) {
+          span.textContent += text[charIdx];
+          charIdx++;
+          setTimeout(typeChar, typeSpeed);
+        } else {
+          lineIndex++;
+          var delay = line.type === 'prompt' ? 400 : (line.type === 'info' || line.type === 'warn') ? 200 : 60;
+          setTimeout(typeNextLine, delay);
+        }
+      }
+
+      typeChar();
+      outputEl.scrollTop = outputEl.scrollHeight;
+    }
+
+    setTimeout(typeNextLine, 300);
+  };
+
+  // Initialize playground
+  renderPlaygroundCode(0);
+
+  // ==========================================
+  // TOOL DECORATOR WORKSHOP
+  // ==========================================
+  var workshopScenarios = [
+    {
+      prompt: 'Scenario: Create a tool that searches a customer database by name or email. The tool should accept a search query string and an optional field parameter ("name", "email", or "all") with "all" as the default. Return matching customers as a JSON string.',
+      solution: '@tool\ndef search_customers(query: str, field: str = "all") -> str:\n    """Search the customer database by name or email.\n\n    Args:\n        query: The search term to match against customer records\n        field: Which field to search. Options: name, email, all\n\n    Returns:\n        JSON string of matching customers with id, name, and email\n    """\n    results = db.customers.search(query, field=field)\n    return json.dumps([\n        {"id": c.id, "name": c.name, "email": c.email}\n        for c in results\n    ])',
+      schema: '{\n  "name": "search_customers",\n  "description": "Search the customer database by name or email.",\n  "input_schema": {\n    "type": "object",\n    "properties": {\n      "query": {\n        "type": "string",\n        "description": "The search term to match against customer records"\n      },\n      "field": {\n        "type": "string",\n        "description": "Which field to search. Options: name, email, all",\n        "default": "all"\n      }\n    },\n    "required": ["query"]\n  }\n}'
+    },
+    {
+      prompt: 'Scenario: Create a tool that sends Slack messages to a channel. The tool should accept a channel name (string), message text (string), and an optional boolean for whether to send as a thread reply (default False). This tool accesses an external system and modifies state.',
+      solution: '@tool(annotations={"openWorld": True})\ndef send_slack_message(\n    channel: str,\n    message: str,\n    thread_reply: bool = False\n) -> str:\n    """Send a message to a Slack channel.\n\n    Args:\n        channel: The Slack channel name (e.g., "#engineering")\n        message: The message text to send\n        thread_reply: If True, send as a thread reply to the\n                      last message in the channel\n\n    Returns:\n        Confirmation with message timestamp and channel\n    """\n    result = slack_client.post_message(\n        channel=channel,\n        text=message,\n        thread_ts=get_latest_ts(channel) if thread_reply else None\n    )\n    return f"Message sent to {channel} at {result.ts}"',
+      schema: '{\n  "name": "send_slack_message",\n  "description": "Send a message to a Slack channel.",\n  "input_schema": {\n    "type": "object",\n    "properties": {\n      "channel": {\n        "type": "string",\n        "description": "The Slack channel name (e.g., \\"#engineering\\")"\n      },\n      "message": {\n        "type": "string",\n        "description": "The message text to send"\n      },\n      "thread_reply": {\n        "type": "boolean",\n        "description": "If True, send as a thread reply",\n        "default": false\n      }\n    },\n    "required": ["channel", "message"]\n  }\n}'
+    },
+    {
+      prompt: 'Scenario: Create a tool that queries a REST API endpoint. It should accept a URL (string), HTTP method (string, default "GET"), and optional request body (string). This is a read-only tool that accesses external systems. Return the response status code and body.',
+      solution: '@tool(annotations={"readOnly": True, "openWorld": True})\ndef query_rest_api(\n    url: str,\n    method: str = "GET",\n    body: str = ""\n) -> str:\n    """Query a REST API endpoint and return the response.\n\n    Args:\n        url: The full URL to query (e.g., "https://api.example.com/users")\n        method: HTTP method to use. Options: GET, POST, PUT, DELETE\n        body: Optional JSON request body as a string\n\n    Returns:\n        JSON string with status_code and response body\n    """\n    import requests\n    resp = requests.request(\n        method=method,\n        url=url,\n        data=body if body else None,\n        headers={"Content-Type": "application/json"}\n    )\n    return json.dumps({\n        "status_code": resp.status_code,\n        "body": resp.text\n    })',
+      schema: '{\n  "name": "query_rest_api",\n  "description": "Query a REST API endpoint and return the response.",\n  "input_schema": {\n    "type": "object",\n    "properties": {\n      "url": {\n        "type": "string",\n        "description": "The full URL to query"\n      },\n      "method": {\n        "type": "string",\n        "description": "HTTP method. Options: GET, POST, PUT, DELETE",\n        "default": "GET"\n      },\n      "body": {\n        "type": "string",\n        "description": "Optional JSON request body as a string",\n        "default": ""\n      }\n    },\n    "required": ["url"]\n  }\n}'
+    }
+  ];
+
+  var currentWorkshopTab = 0;
+
+  function renderWorkshopTab(idx) {
+    var scenario = workshopScenarios[idx];
+    document.getElementById('workshopPrompt').textContent = scenario.prompt;
+    document.getElementById('workshopEditor').value = '';
+
+    // Hide feedback, schema, and solution
+    var feedback = document.getElementById('workshopFeedback');
+    feedback.className = 'workshop-feedback';
+    feedback.style.display = 'none';
+
+    var schema = document.getElementById('workshopSchema');
+    schema.className = 'workshop-schema';
+    schema.style.display = 'none';
+
+    var solution = document.getElementById('workshopSolution');
+    solution.className = 'workshop-solution';
+    solution.style.display = 'none';
+  }
+
+  window.switchWorkshopTab = function(idx) {
+    currentWorkshopTab = idx;
+
+    var tabs = document.querySelectorAll('.workshop-scenario-tab');
+    for (var t = 0; t < tabs.length; t++) {
+      tabs[t].classList.remove('active');
+      if (parseInt(tabs[t].getAttribute('data-ws-tab')) === idx) {
+        tabs[t].classList.add('active');
+      }
+    }
+
+    renderWorkshopTab(idx);
+  };
+
+  window.checkWorkshop = function() {
+    var code = document.getElementById('workshopEditor').value;
+    var scenario = workshopScenarios[currentWorkshopTab];
+    var feedback = document.getElementById('workshopFeedback');
+    var schemaContainer = document.getElementById('workshopSchema');
+    var schemaCode = document.getElementById('workshopSchemaCode');
+
+    // Validation checks
+    var checks = [
+      { label: 'Has @tool decorator', pass: /@tool/.test(code) },
+      { label: 'Has docstring (triple quotes)', pass: /"""[\s\S]+?"""/.test(code) || /'''[\s\S]+?'''/.test(code) },
+      { label: 'Has typed parameters (: str, : int, : bool, etc.)', pass: /:\s*(str|int|bool|float|list|dict|List|Dict|Optional)/.test(code) },
+      { label: 'Has return type hint (-> str, -> dict, etc.)', pass: /->\s*(str|int|bool|float|list|dict|List|Dict|None)/.test(code) },
+      { label: 'Docstring includes Args section', pass: /Args:/i.test(code) }
+    ];
+
+    var passCount = 0;
+    var html = '';
+    for (var c = 0; c < checks.length; c++) {
+      var check = checks[c];
+      if (check.pass) {
+        passCount++;
+        html += '<div class="check-item check-pass">&#10003; ' + check.label + '</div>';
+      } else {
+        html += '<div class="check-item check-fail">&#10007; ' + check.label + '</div>';
+      }
+    }
+
+    var allPassed = passCount === checks.length;
+
+    feedback.innerHTML = (allPassed ? '<strong>All checks passed!</strong> ' : '<strong>' + passCount + '/' + checks.length + ' checks passed.</strong> ') + '<br>' + html;
+    feedback.className = 'workshop-feedback show ' + (allPassed ? 'pass' : 'fail');
+    feedback.style.display = 'block';
+
+    // Show schema if all passed
+    if (allPassed) {
+      schemaCode.textContent = scenario.schema;
+      schemaContainer.className = 'workshop-schema show';
+      schemaContainer.style.display = 'block';
+    } else {
+      schemaContainer.className = 'workshop-schema';
+      schemaContainer.style.display = 'none';
+    }
+  };
+
+  window.revealWorkshopSolution = function() {
+    var scenario = workshopScenarios[currentWorkshopTab];
+    var solutionContainer = document.getElementById('workshopSolution');
+    var solutionCode = document.getElementById('workshopSolutionCode');
+
+    solutionCode.textContent = scenario.solution;
+    solutionContainer.className = 'workshop-solution show';
+    solutionContainer.style.display = 'block';
+
+    // Also show schema
+    var schemaContainer = document.getElementById('workshopSchema');
+    var schemaCode = document.getElementById('workshopSchemaCode');
+    schemaCode.textContent = scenario.schema;
+    schemaContainer.className = 'workshop-schema show';
+    schemaContainer.style.display = 'block';
+  };
+
+  // Initialize workshop
+  renderWorkshopTab(0);
+
+  // ==========================================
+  // PERMISSION MODE DECISION TREE
+  // ==========================================
+  var decisionTreeData = {
+    nodes: [
+      {
+        id: 0,
+        question: 'Does the agent modify files?',
+        options: [
+          { label: 'No', next: 1 },
+          { label: 'Yes', next: 4 }
+        ]
+      },
+      {
+        id: 1,
+        question: 'Does it run shell commands?',
+        options: [
+          { label: 'No', result: 0 },
+          { label: 'Yes', next: 2 }
+        ]
+      },
+      {
+        id: 2,
+        question: 'What kind of commands?',
+        options: [
+          { label: 'Build/test only', result: 1 },
+          { label: 'Deployment/deletion', result: 2 }
+        ]
+      },
+      {
+        id: 4,
+        question: 'Is it operating on production code?',
+        options: [
+          { label: 'No (dev/test)', result: 3 },
+          { label: 'Yes (production)', result: 4 }
+        ]
+      }
+    ],
+    results: [
+      {
+        id: 0,
+        mode: '"default" (read-only agent)',
+        explanation: 'Since the agent does not modify files or run commands, "default" is the safest choice. The agent can still use Read, Glob, and Grep to analyze your codebase. Consider restricting allowed_tools to just these three for maximum safety.'
+      },
+      {
+        id: 1,
+        mode: '"acceptEdits" with allowed commands',
+        explanation: 'For build and test commands, "acceptEdits" provides a good balance. File reads are auto-approved, but the agent will still ask before running shell commands. This prevents accidental deployments while keeping the workflow efficient.'
+      },
+      {
+        id: 2,
+        mode: '"default" with approval gates',
+        explanation: 'For deployment and deletion operations, always use "default" mode. Combine it with a system prompt that requires the agent to present a plan before any destructive action. Every command will require explicit approval, which is essential for production-impacting operations.'
+      },
+      {
+        id: 3,
+        mode: '"acceptEdits" (development mode)',
+        explanation: 'For development and test environments, "acceptEdits" gives the best developer experience. The agent can freely read and modify files, but will still ask before running shell commands. This is the sweet spot for most development workflows.'
+      },
+      {
+        id: 4,
+        mode: '"default" with strict PostToolUse hooks',
+        explanation: 'For production code, always use "default" mode with additional PostToolUse hooks that validate every file modification. Consider running the agent in a sandboxed environment and requiring human review of all changes before they are applied to the production codebase.'
+      }
+    ]
+  };
+
+  var dtState = {
+    currentNodeId: 0,
+    path: [],
+    finished: false
+  };
+
+  function renderDecisionTree() {
+    var body = document.getElementById('decisionTreeBody');
+    body.innerHTML = '';
+
+    // Render all nodes in the path
+    for (var p = 0; p < dtState.path.length; p++) {
+      var pathEntry = dtState.path[p];
+      var node = findDTNode(pathEntry.nodeId);
+
+      // Question node
+      var questionDiv = document.createElement('div');
+      questionDiv.className = 'dt-node dt-question';
+      questionDiv.textContent = node.question;
+      body.appendChild(questionDiv);
+
+      // Selected option
+      var optDiv = document.createElement('div');
+      optDiv.className = 'dt-options';
+      for (var o = 0; o < node.options.length; o++) {
+        var optBtn = document.createElement('button');
+        optBtn.className = 'dt-option-btn disabled';
+        optBtn.textContent = node.options[o].label;
+        if (o === pathEntry.selectedOption) {
+          optBtn.classList.add('selected');
+        }
+        optDiv.appendChild(optBtn);
+      }
+      body.appendChild(optDiv);
+
+      // Connector
+      var connDiv = document.createElement('div');
+      connDiv.className = 'dt-connector active';
+      body.appendChild(connDiv);
+    }
+
+    // Current active node (if not finished)
+    if (!dtState.finished) {
+      var currentNode = findDTNode(dtState.currentNodeId);
+      if (currentNode) {
+        var activeQ = document.createElement('div');
+        activeQ.className = 'dt-node dt-question active';
+        activeQ.textContent = currentNode.question;
+        body.appendChild(activeQ);
+
+        var activeOpts = document.createElement('div');
+        activeOpts.className = 'dt-options';
+        for (var a = 0; a < currentNode.options.length; a++) {
+          (function(optIndex) {
+            var btn = document.createElement('button');
+            btn.className = 'dt-option-btn';
+            btn.textContent = currentNode.options[optIndex].label;
+            btn.addEventListener('click', function() {
+              handleDTChoice(dtState.currentNodeId, optIndex);
+            });
+            activeOpts.appendChild(btn);
+          })(a);
+        }
+        body.appendChild(activeOpts);
+      }
+    }
+
+    // Result
+    if (dtState.finished) {
+      var result = dtState.result;
+      var resultDiv = document.createElement('div');
+      resultDiv.className = 'dt-result show';
+      resultDiv.innerHTML =
+        '<div class="dt-result-mode">' + escapeHtml(result.mode) + '</div>' +
+        '<div class="dt-result-explanation">' + escapeHtml(result.explanation) + '</div>';
+      body.appendChild(resultDiv);
+
+      // Reset button
+      var resetBtn = document.createElement('button');
+      resetBtn.className = 'dt-reset-btn';
+      resetBtn.textContent = 'Start Over';
+      resetBtn.addEventListener('click', function() {
+        dtState = { currentNodeId: 0, path: [], finished: false, result: null };
+        renderDecisionTree();
+      });
+      body.appendChild(resetBtn);
+    }
+  }
+
+  function findDTNode(id) {
+    for (var n = 0; n < decisionTreeData.nodes.length; n++) {
+      if (decisionTreeData.nodes[n].id === id) return decisionTreeData.nodes[n];
+    }
+    return null;
+  }
+
+  function handleDTChoice(nodeId, optionIndex) {
+    var node = findDTNode(nodeId);
+    var option = node.options[optionIndex];
+
+    dtState.path.push({ nodeId: nodeId, selectedOption: optionIndex });
+
+    if (typeof option.result !== 'undefined') {
+      // Found a result
+      dtState.finished = true;
+      dtState.result = decisionTreeData.results[option.result];
+    } else if (typeof option.next !== 'undefined') {
+      dtState.currentNodeId = option.next;
+    }
+
+    renderDecisionTree();
+  }
+
+  function escapeHtml(text) {
+    var div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  // Initialize decision tree
+  renderDecisionTree();
+
+  // ==========================================
+  // FINAL QUIZ
+  // ==========================================
+  var FINAL_QUIZ_KEY = 'claude-training-module-23';
+  var TOTAL_QUESTIONS = 7;
+  var PASS_THRESHOLD = 5;
+
+  var finalQuizAnswers = ['b', 'b', 'd', 'b', 'b', 'b', 'c'];
+  var finalQuizSelections = [];
+  for (var q = 0; q < TOTAL_QUESTIONS; q++) {
+    finalQuizSelections.push(null);
+  }
+  var finalQuizSubmitted = false;
+
+  window.selectFinalOption = function(qIdx, el) {
+    if (finalQuizSubmitted) return;
+
+    // Deselect siblings
+    var parentQ = el.closest('.final-quiz-question');
+    var options = parentQ.querySelectorAll('.fq-option');
+    for (var o = 0; o < options.length; o++) {
+      options[o].querySelector('input').checked = false;
+    }
+
+    // Select this one
+    el.querySelector('input').checked = true;
+    finalQuizSelections[qIdx] = el.getAttribute('data-fq-val');
+
+    // Enable submit if all answered
+    var allAnswered = true;
+    for (var s = 0; s < finalQuizSelections.length; s++) {
+      if (finalQuizSelections[s] === null) {
+        allAnswered = false;
+        break;
+      }
+    }
+    document.getElementById('finalSubmitBtn').disabled = !allAnswered;
+  };
+
+  window.submitFinalQuiz = function() {
+    if (finalQuizSubmitted) return;
+    finalQuizSubmitted = true;
+
+    var score = 0;
+
+    for (var idx = 0; idx < finalQuizSelections.length; idx++) {
+      var sel = finalQuizSelections[idx];
+      var questionEl = document.querySelector('.final-quiz-question[data-fq="' + idx + '"]');
+      var options = questionEl.querySelectorAll('.fq-option');
+
+      for (var oi = 0; oi < options.length; oi++) {
+        var opt = options[oi];
+        var val = opt.getAttribute('data-fq-val');
+        opt.style.pointerEvents = 'none';
+
+        if (val === finalQuizAnswers[idx]) {
+          if (sel === val) {
+            opt.classList.add('selected-correct');
+            score++;
+          } else {
+            opt.classList.add('reveal-correct');
+          }
+        } else if (val === sel) {
+          opt.classList.add('selected-wrong');
+        }
+      }
+    }
+
+    // Show result
+    var result = document.getElementById('finalResult');
+    var title = document.getElementById('finalResultTitle');
+    var text = document.getElementById('finalResultText');
+
+    result.classList.add('show');
+
+    if (score >= PASS_THRESHOLD) {
+      result.classList.add('pass');
+      result.classList.remove('fail');
+      title.textContent = 'Passed! ' + score + ' / ' + TOTAL_QUESTIONS + ' correct';
+      text.textContent = 'Excellent work! You have a strong understanding of the Agent SDK and how to build ' +
+        'safe, effective agent applications. Your progress has been saved. Move on to Module 24: MCP Servers ' +
+        'to learn about building custom tool servers.';
+    } else {
+      result.classList.add('fail');
+      result.classList.remove('pass');
+      title.textContent = score + ' / ' + TOTAL_QUESTIONS + ' correct -- Review needed';
+      text.textContent = 'You need at least ' + PASS_THRESHOLD + ' correct answers to pass. Review the material above, ' +
+        'paying special attention to the differences between query() and ClaudeSDKClient, the @tool decorator, ' +
+        'and permission modes. Then try again.';
+    }
+
+    // Save progress
+    var progressData = {
+      score: score,
+      total: TOTAL_QUESTIONS,
+      completed: score >= PASS_THRESHOLD,
+      timestamp: new Date().toISOString()
+    };
+    try {
+      localStorage.setItem(FINAL_QUIZ_KEY, JSON.stringify(progressData));
+    } catch (e) {
+      // localStorage not available
+    }
+
+    // Disable submit button
+    document.getElementById('finalSubmitBtn').disabled = true;
+    document.getElementById('finalSubmitBtn').textContent = 'Submitted';
+  };
+
+  // Check for existing progress
+  function loadExistingProgress() {
+    try {
+      var saved = localStorage.getItem(FINAL_QUIZ_KEY);
+      if (saved) {
+        var data = JSON.parse(saved);
+        if (data.completed) {
+          var fill = document.getElementById('sidebarProgressFill');
+          if (fill) {
+            fill.style.width = '100%';
+          }
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+  }
+  loadExistingProgress();
+
+})();
+</script>
+</body>
+</html>

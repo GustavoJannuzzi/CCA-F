@@ -1,0 +1,3353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 31: Cert Domain 2 &mdash; Tool Design &amp; MCP Integration (18%) | Claude AI Training</title>
+<style>
+/* ============================================
+   CSS CUSTOM PROPERTIES & DESIGN SYSTEM
+   Premium Edition: 3-layer shadows, spring transitions,
+   gradient headings, Inter font, deep dark mode
+   ============================================ */
+:root {
+  --primary: #7C3AED;
+  --primary-light: #A78BFA;
+  --primary-dark: #5B21B6;
+  --accent: #06B6D4;
+  --accent-light: #22D3EE;
+  --success: #10B981;
+  --success-light: #34D399;
+  --warning: #F59E0B;
+  --warning-light: #FBBF24;
+  --error: #EF4444;
+  --error-light: #F87171;
+  --bg: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --bg-code: #F1F5F9;
+  --text: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --border: #E2E8F0;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.02);
+  --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 16px -8px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.02);
+  --shadow-glow: 0 0 20px rgba(124,58,237,0.15), 0 10px 25px -5px rgba(0,0,0,0.1), 0 4px 12px rgba(0,0,0,0.04);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --transition: 0.2s ease;
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --sidebar-width: 280px;
+  --content-max: 800px;
+}
+
+[data-theme="dark"] {
+  --bg: #0B0F1A;
+  --bg-card: #141926;
+  --bg-code: #1A1F2E;
+  --text: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --border: #1E2740;
+  --shadow: 0 1px 3px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.03);
+  --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.5), 0 8px 16px -8px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.03);
+  --shadow-glow: 0 0 30px rgba(124,58,237,0.2), 0 10px 25px -5px rgba(0,0,0,0.5), 0 4px 12px rgba(0,0,0,0.3);
+}
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 24px;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  min-height: 100vh;
+  transition: background var(--transition), color var(--transition);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   PREFERS REDUCED MOTION
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================
+   THEME TOGGLE
+   ============================================ */
+.theme-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: all 0.35s var(--spring);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+.theme-toggle:hover {
+  box-shadow: var(--shadow-glow);
+  transform: scale(1.1);
+}
+
+/* ============================================
+   SIDEBAR
+   ============================================ */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  z-index: 900;
+  transition: transform 0.3s ease, background var(--transition);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.sidebar-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+  margin-bottom: 12px;
+  transition: color var(--transition);
+}
+.sidebar-back:hover { color: var(--primary-dark); }
+
+.sidebar-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.sidebar-module-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.sidebar-nav {
+  padding: 12px 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.sidebar-section {
+  margin-bottom: 4px;
+}
+
+.sidebar-section-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 20px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  text-align: left;
+  transition: color var(--transition);
+}
+.sidebar-section-toggle:hover { color: var(--text); }
+.sidebar-section-toggle .chevron {
+  transition: transform 0.2s ease;
+  font-size: 0.65rem;
+}
+.sidebar-section-toggle.collapsed .chevron {
+  transform: rotate(-90deg);
+}
+
+.sidebar-links {
+  list-style: none;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.sidebar-links.collapsed {
+  max-height: 0 !important;
+}
+
+.sidebar-link {
+  display: block;
+  padding: 7px 20px 7px 32px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: all var(--transition);
+  line-height: 1.4;
+}
+.sidebar-link:hover {
+  color: var(--text);
+  background: var(--bg);
+}
+.sidebar-link.active {
+  color: var(--primary);
+  border-left-color: var(--primary);
+  background: rgba(124, 58, 237, 0.05);
+  font-weight: 600;
+}
+[data-theme="dark"] .sidebar-link.active {
+  background: rgba(124, 58, 237, 0.12);
+}
+
+.sidebar-progress {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sidebar-progress-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.sidebar-progress-track {
+  height: 6px;
+  background: var(--bg-code);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.sidebar-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 3px;
+  transition: width 0.5s ease;
+  width: 0%;
+}
+
+/* Hamburger button (mobile) */
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1001;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+  transition: all var(--transition);
+}
+.hamburger span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--text);
+  margin: 4px auto;
+  transition: all 0.3s ease;
+  border-radius: 1px;
+}
+.hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(4px, 4px); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(4px, -4px); }
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 899;
+}
+
+/* ============================================
+   MAIN CONTENT
+   ============================================ */
+.main-content {
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+  transition: margin var(--transition);
+}
+
+.content-wrapper {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 40px 32px 80px;
+}
+
+/* Module Header */
+.module-header {
+  margin-bottom: 48px;
+}
+.module-header .breadcrumb {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+.module-header .breadcrumb a {
+  color: var(--primary);
+  text-decoration: none;
+}
+.module-header .breadcrumb a:hover { text-decoration: underline; }
+
+.module-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.module-badge .number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.module-badge .label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.module-header h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.module-header .description {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 640px;
+}
+
+.module-meta {
+  display: flex;
+  gap: 16px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.module-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  background: var(--bg-code);
+  padding: 6px 14px;
+  border-radius: 20px;
+}
+
+/* ============================================
+   SECTIONS
+   ============================================ */
+.section {
+  margin-bottom: 56px;
+  scroll-margin-top: 24px;
+}
+
+.section-heading {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+  line-height: 1.3;
+}
+
+.section h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-top: 32px;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.section h4 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-top: 24px;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.section p {
+  margin-bottom: 16px;
+  color: var(--text-secondary);
+}
+
+.section ul, .section ol {
+  margin-bottom: 16px;
+  padding-left: 24px;
+}
+.section li {
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+}
+.section li strong {
+  color: var(--text);
+}
+
+/* ============================================
+   CODE BLOCKS
+   ============================================ */
+.code-block {
+  background: #1E293B;
+  color: #E2E8F0;
+  border-radius: var(--radius-sm);
+  padding: 20px 24px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  overflow-x: auto;
+  position: relative;
+  margin: 16px 0 20px;
+  tab-size: 2;
+}
+.code-block .code-label {
+  position: absolute;
+  top: 8px;
+  left: 16px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #64748B;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+.code-block.has-label {
+  padding-top: 36px;
+}
+.code-block .copy-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: #94A3B8;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  transition: all var(--transition);
+}
+.code-block .copy-btn:hover { background: rgba(255,255,255,0.2); color: white; }
+.code-block .copy-btn.copied { background: var(--success); color: white; }
+
+/* Syntax highlighting */
+.kw { color: #C084FC; }
+.str { color: #6EE7B7; }
+.fn { color: #7DD3FC; }
+.cm { color: #64748B; }
+.num { color: #FDBA74; }
+.op { color: #FCA5A5; }
+.type { color: #67E8F9; }
+.param { color: #FDE68A; }
+.prop { color: #F0ABFC; }
+.punc { color: #94A3B8; }
+
+/* Inline code */
+code {
+  background: var(--bg-code);
+  color: var(--primary);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.88em;
+}
+[data-theme="dark"] code {
+  background: #334155;
+}
+.code-block code {
+  background: none;
+  color: inherit;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+  white-space: pre-wrap;
+  display: block;
+}
+
+/* ============================================
+   CALLOUT BOXES
+   ============================================ */
+.callout {
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  margin: 20px 0;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.callout-icon {
+  flex-shrink: 0;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+.callout-content { flex: 1; }
+.callout-content p { margin-bottom: 6px; color: inherit; }
+.callout-content p:last-child { margin-bottom: 0; }
+
+.callout.info {
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  color: #1E40AF;
+}
+.callout.tip {
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  color: #166534;
+}
+.callout.warning {
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  color: #92400E;
+}
+.callout.important {
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  color: #991B1B;
+}
+
+[data-theme="dark"] .callout.info {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: #93C5FD;
+}
+[data-theme="dark"] .callout.tip {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #6EE7B7;
+}
+[data-theme="dark"] .callout.warning {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #FCD34D;
+}
+[data-theme="dark"] .callout.important {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #FCA5A5;
+}
+
+/* ============================================
+   ACCENT CARDS (premium)
+   ============================================ */
+.accent-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin: 24px 0;
+  box-shadow: var(--shadow);
+  transition: transform 0.35s var(--spring), box-shadow 0.35s var(--spring), border-color 0.35s var(--spring);
+}
+.accent-card:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+}
+.accent-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.accent-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+.accent-icon.purple { background: rgba(124,58,237,0.12); color: #7C3AED; }
+.accent-icon.blue { background: rgba(59,130,246,0.12); color: #3B82F6; }
+.accent-icon.green { background: rgba(16,185,129,0.12); color: #10B981; }
+.accent-icon.orange { background: rgba(249,115,22,0.12); color: #F97316; }
+.accent-icon.red { background: rgba(239,68,68,0.12); color: #EF4444; }
+.accent-icon.cyan { background: rgba(6,182,212,0.12); color: #06B6D4; }
+
+[data-theme="dark"] .accent-icon.purple { background: rgba(124,58,237,0.2); }
+[data-theme="dark"] .accent-icon.blue { background: rgba(59,130,246,0.2); }
+[data-theme="dark"] .accent-icon.green { background: rgba(16,185,129,0.2); }
+[data-theme="dark"] .accent-icon.orange { background: rgba(249,115,22,0.2); }
+[data-theme="dark"] .accent-icon.red { background: rgba(239,68,68,0.2); }
+[data-theme="dark"] .accent-icon.cyan { background: rgba(6,182,212,0.2); }
+
+.accent-card-header h4 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text);
+}
+.accent-card-header .card-tag {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 10px;
+  background: var(--bg-code);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.accent-card p {
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+.accent-card ul {
+  padding-left: 20px;
+  margin-bottom: 12px;
+}
+.accent-card li {
+  margin-bottom: 6px;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+}
+
+/* ============================================
+   COMPARISON TABLE
+   ============================================ */
+.comparison-table-wrapper {
+  overflow-x: auto;
+  margin: 20px 0;
+}
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.comparison-table th {
+  background: var(--primary);
+  color: white;
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+.comparison-table th:first-child {
+  border-radius: var(--radius-sm) 0 0 0;
+}
+.comparison-table th:last-child {
+  border-radius: 0 var(--radius-sm) 0 0;
+}
+.comparison-table td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+.comparison-table tr:nth-child(even) td {
+  background: var(--bg);
+}
+.comparison-table tr:last-child td:first-child {
+  border-radius: 0 0 0 var(--radius-sm);
+}
+.comparison-table tr:last-child td:last-child {
+  border-radius: 0 0 var(--radius-sm) 0;
+}
+
+/* ============================================
+   WEIGHT / TASK AREA BADGE
+   ============================================ */
+.weight-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+.weight-badge.large {
+  background: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(6,182,212,0.15));
+  color: var(--primary);
+  border: 1px solid rgba(124,58,237,0.25);
+  font-size: 1.2rem;
+  padding: 10px 20px;
+}
+[data-theme="dark"] .weight-badge.large {
+  background: linear-gradient(135deg, rgba(124,58,237,0.25), rgba(6,182,212,0.2));
+  border-color: rgba(124,58,237,0.4);
+}
+
+.task-area-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.task-area-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+  transition: transform 0.35s var(--spring), box-shadow 0.35s var(--spring);
+}
+.task-area-item:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+.task-area-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  font-weight: 700;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+.task-area-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* ============================================
+   INTERACTIVE: TOOL DESCRIPTION A/B TESTER
+   ============================================ */
+.ab-tester {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  box-shadow: var(--shadow);
+}
+.ab-tester h3 { margin-top: 0; margin-bottom: 8px; }
+
+.ab-score-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 12px 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+}
+.ab-score-bar .score-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.ab-score-track {
+  flex: 1;
+  height: 8px;
+  background: var(--bg-code);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.ab-score-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--success));
+  border-radius: 4px;
+  transition: width 0.4s ease;
+  width: 0%;
+}
+.ab-score-text {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  min-width: 50px;
+  text-align: right;
+}
+
+.ab-pair {
+  margin-bottom: 24px;
+  padding: 20px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  transition: border-color 0.3s ease;
+}
+.ab-pair.correct { border-color: var(--success); }
+.ab-pair.incorrect { border-color: var(--error); }
+
+.ab-pair-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.ab-pair-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  font-weight: 700;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+.ab-pair-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.ab-choices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.ab-choice {
+  padding: 14px 16px;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+.ab-choice:hover:not(.disabled) {
+  border-color: var(--primary-light);
+  background: rgba(124, 58, 237, 0.05);
+}
+.ab-choice .ab-label {
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--primary);
+  margin-bottom: 6px;
+}
+.ab-choice.correct-answer {
+  border-color: var(--success);
+  background: rgba(16, 185, 129, 0.1);
+}
+.ab-choice.wrong-answer {
+  border-color: var(--error);
+  background: rgba(239, 68, 68, 0.08);
+}
+.ab-choice.disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+.ab-feedback {
+  margin-top: 12px;
+  font-size: 0.85rem;
+  padding: 10px 14px;
+  border-radius: 6px;
+  display: none;
+  line-height: 1.5;
+}
+.ab-feedback.show { display: block; }
+.ab-feedback.correct {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+.ab-feedback.incorrect {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+}
+[data-theme="dark"] .ab-feedback.correct { color: #6EE7B7; }
+[data-theme="dark"] .ab-feedback.incorrect { color: #FCA5A5; }
+
+/* ============================================
+   INTERACTIVE: MCP SERVER CONFIGURATOR
+   ============================================ */
+.mcp-configurator {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  box-shadow: var(--shadow);
+}
+.mcp-configurator h3 { margin-top: 0; margin-bottom: 8px; }
+
+.mcp-presets {
+  display: flex;
+  gap: 8px;
+  margin: 16px 0;
+  flex-wrap: wrap;
+}
+.mcp-preset-btn {
+  padding: 8px 16px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+.mcp-preset-btn:hover {
+  border-color: var(--primary-light);
+  color: var(--primary);
+}
+.mcp-preset-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.mcp-form {
+  display: grid;
+  gap: 16px;
+  margin: 20px 0;
+}
+.mcp-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.mcp-field label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.mcp-field input,
+.mcp-field select,
+.mcp-field textarea {
+  padding: 10px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-family: inherit;
+  transition: border-color var(--transition);
+}
+.mcp-field input:focus,
+.mcp-field select:focus,
+.mcp-field textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+.mcp-field textarea {
+  min-height: 60px;
+  resize: vertical;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.85rem;
+}
+
+.mcp-generate-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.35s var(--spring);
+}
+.mcp-generate-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-glow);
+}
+
+.mcp-output {
+  margin-top: 20px;
+  display: none;
+}
+.mcp-output.show { display: block; }
+
+/* ============================================
+   INTERACTIVE: ERROR RESPONSE DESIGNER
+   ============================================ */
+.error-designer {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  box-shadow: var(--shadow);
+}
+.error-designer h3 { margin-top: 0; margin-bottom: 8px; }
+
+.ed-scenario {
+  margin-bottom: 24px;
+  padding: 20px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.ed-scenario-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.ed-scenario-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--error);
+  color: white;
+  font-weight: 700;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+.ed-scenario-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+}
+.ed-scenario-context {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  background: var(--bg-card);
+  border-radius: 6px;
+  border-left: 3px solid var(--warning);
+}
+
+.ed-textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 12px 14px;
+  background: #1E293B;
+  color: #E2E8F0;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  resize: vertical;
+  transition: border-color var(--transition);
+}
+.ed-textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+.ed-textarea::placeholder {
+  color: #64748B;
+}
+
+.ed-check-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 10px;
+}
+.ed-check-btn:hover { opacity: 0.9; }
+
+.ed-result {
+  margin-top: 12px;
+  display: none;
+}
+.ed-result.show { display: block; }
+.ed-result-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.ed-criterion {
+  text-align: center;
+  padding: 8px 4px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.ed-criterion.pass {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--success);
+}
+.ed-criterion.fail {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+}
+.ed-score-line {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.ed-ideal {
+  margin-top: 10px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  color: var(--text-secondary);
+  display: none;
+}
+.ed-ideal.show { display: block; }
+
+/* ============================================
+   QUIZ: PRACTICE EXAM
+   ============================================ */
+.final-quiz {
+  background: var(--bg-card);
+  border: 2px solid var(--primary-light);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  box-shadow: var(--shadow-glow);
+}
+.final-quiz h3 {
+  margin-top: 0;
+}
+
+.final-quiz-question {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.final-quiz-question .fq-number {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+.final-quiz-question .fq-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+.fq-options { list-style: none; padding: 0; }
+.fq-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 12px;
+  margin-bottom: 4px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+.fq-option:hover { background: rgba(124, 58, 237, 0.05); }
+.fq-option input[type="radio"] {
+  accent-color: var(--primary);
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+.fq-option.selected-correct {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+.fq-option.selected-wrong {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+}
+.fq-option.reveal-correct {
+  background: rgba(16, 185, 129, 0.08);
+  color: #059669;
+  font-weight: 600;
+}
+[data-theme="dark"] .fq-option.selected-correct { color: #6EE7B7; }
+[data-theme="dark"] .fq-option.selected-wrong { color: #FCA5A5; }
+[data-theme="dark"] .fq-option.reveal-correct { color: #6EE7B7; }
+
+.final-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 32px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.35s var(--spring);
+  margin-top: 8px;
+}
+.final-submit-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-glow); }
+.final-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.final-result {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: var(--radius-sm);
+  display: none;
+}
+.final-result.show { display: block; }
+.final-result.pass {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.final-result.fail {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.final-result h4 {
+  margin-top: 0;
+  margin-bottom: 6px;
+  font-size: 1.1rem;
+}
+.final-result p {
+  margin-bottom: 0;
+  font-size: 0.95rem;
+}
+.final-result.pass h4 { color: var(--success); }
+.final-result.fail h4 { color: var(--warning); }
+
+/* ============================================
+   STEP-BY-STEP
+   ============================================ */
+.step-list {
+  counter-reset: step-counter;
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+.step-item {
+  counter-increment: step-counter;
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+  transition: transform 0.35s var(--spring), box-shadow 0.35s var(--spring);
+}
+.step-item:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+.step-item::before {
+  content: counter(step-counter);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+.step-content h4 {
+  margin-top: 0;
+  margin-bottom: 6px;
+}
+.step-content p {
+  margin-bottom: 8px;
+}
+
+/* ============================================
+   KEY CONCEPT HIGHLIGHT
+   ============================================ */
+.key-concept {
+  display: inline-block;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(6, 182, 212, 0.1));
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  color: var(--primary);
+}
+[data-theme="dark"] .key-concept {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(6, 182, 212, 0.15));
+  border-color: rgba(124, 58, 237, 0.35);
+}
+
+/* ============================================
+   NAVIGATION FOOTER
+   ============================================ */
+.module-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 16px;
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 2px solid var(--border);
+}
+.nav-link {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: all 0.35s var(--spring);
+  min-width: 0;
+  flex: 1;
+  max-width: 50%;
+  box-shadow: var(--shadow);
+}
+.nav-link:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+}
+.nav-link.next { align-items: flex-end; text-align: right; }
+.nav-link .nav-dir {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--primary);
+}
+.nav-link .nav-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 1024px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .hamburger {
+    display: flex;
+  }
+  .sidebar-overlay.show {
+    display: block;
+  }
+  .main-content {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .content-wrapper {
+    padding: 24px 16px 60px;
+  }
+  .module-header h1 {
+    font-size: 1.6rem;
+  }
+  .section-heading {
+    font-size: 1.3rem;
+  }
+  .ab-choices {
+    grid-template-columns: 1fr;
+  }
+  .task-area-grid {
+    grid-template-columns: 1fr;
+  }
+  .ed-result-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .module-nav {
+    flex-direction: column;
+  }
+  .nav-link {
+    max-width: 100%;
+  }
+  .nav-link.next {
+    align-items: flex-start;
+    text-align: left;
+  }
+}
+
+/* ============================================
+   SCROLLBAR STYLING
+   ============================================ */
+.sidebar::-webkit-scrollbar,
+.code-block::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.sidebar::-webkit-scrollbar-track,
+.code-block::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+.code-block::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.section {
+  animation: fadeInUp 0.4s ease both;
+}
+</style>
+</head>
+<body>
+<!-- ============================================
+     THEME TOGGLE
+     ============================================ -->
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+  <span id="themeIcon">&#9790;</span>
+</button>
+
+<!-- ============================================
+     HAMBURGER (mobile)
+     ============================================ -->
+<button class="hamburger" id="hamburger" aria-label="Toggle sidebar">
+  <span></span>
+  <span></span>
+  <span></span>
+</button>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ============================================
+     SIDEBAR
+     ============================================ -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="../index.html" class="sidebar-back">&larr; Back to Hub</a>
+    <div class="sidebar-title">Module 31</div>
+    <div class="sidebar-module-name">Cert: Tool Design &amp; MCP Integration</div>
+  </div>
+
+  <div class="sidebar-nav">
+    <!-- Section: Content -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="content">
+        Content <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-content">
+        <li><a href="#domain-overview" class="sidebar-link" data-target="domain-overview">Domain Overview (18%)</a></li>
+        <li><a href="#tool-descriptions" class="sidebar-link" data-target="tool-descriptions">Tool Description Excellence</a></li>
+        <li><a href="#error-handling" class="sidebar-link" data-target="error-handling">Error Handling Mastery</a></li>
+        <li><a href="#mcp-patterns" class="sidebar-link" data-target="mcp-patterns">MCP Server Patterns</a></li>
+        <li><a href="#builtin-tools" class="sidebar-link" data-target="builtin-tools">Built-in Tool Selection</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Interactive -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="interactive">
+        Interactive <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-interactive">
+        <li><a href="#ab-tester" class="sidebar-link" data-target="ab-tester">Tool Description A/B Tester</a></li>
+        <li><a href="#mcp-configurator" class="sidebar-link" data-target="mcp-configurator">MCP Server Configurator</a></li>
+        <li><a href="#error-designer" class="sidebar-link" data-target="error-designer">Error Response Designer</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Exam -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="exam">
+        Practice Exam <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-exam">
+        <li><a href="#practice-exam" class="sidebar-link" data-target="practice-exam">8-Question Practice Exam</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sidebar-progress">
+    <div class="sidebar-progress-label">Module Progress</div>
+    <div class="sidebar-progress-track">
+      <div class="sidebar-progress-fill" id="sidebarProgressFill"></div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================
+     MAIN CONTENT
+     ============================================ -->
+<main class="main-content">
+  <div class="content-wrapper">
+
+    <!-- Module Header -->
+    <header class="module-header">
+      <div class="breadcrumb">
+        <a href="../index.html">Training Hub</a> &raquo; Certification Prep &raquo; Module 31
+      </div>
+      <div class="module-badge">
+        <span class="number">31</span>
+        <span class="label">Certification</span>
+      </div>
+      <h1>Cert Domain 2: Tool Design &amp; MCP Integration</h1>
+      <p class="description">
+        Master the 18% of the certification exam covering tool descriptions, structured errors, MCP configuration, tool distribution, and built-in tool selection. This module provides deep-dive content, hands-on exercises, and a realistic practice exam.
+      </p>
+      <div class="module-meta">
+        <span class="module-meta-item">&#9201; ~75 min</span>
+        <span class="module-meta-item">&#9733; Expert</span>
+        <span class="module-meta-item">&#127919; 3 Interactive Exercises</span>
+        <span class="module-meta-item">&#128203; 8-Question Practice Exam</span>
+      </div>
+    </header>
+
+    <!-- ========================================
+         SECTION 1: DOMAIN OVERVIEW
+         ======================================== -->
+    <section class="section" id="domain-overview">
+      <h2 class="section-heading">1. Domain Overview</h2>
+
+      <div class="weight-badge large">18% of Exam Weight</div>
+
+      <p>
+        Domain 2 accounts for <strong>18% of your certification score</strong>, making it the third-largest domain on the exam.
+        It tests your ability to design tools that Claude can use effectively, handle errors gracefully, configure MCP servers correctly,
+        and choose the right built-in tools for each task.
+      </p>
+
+      <p>
+        The domain is divided into <strong>5 task areas</strong>, each targeting a specific competency. Understanding these areas
+        helps you allocate study time proportionally.
+      </p>
+
+      <h3>The 5 Task Areas</h3>
+
+      <div class="task-area-grid">
+        <div class="task-area-item">
+          <span class="task-area-number">1</span>
+          <span class="task-area-label">Tool Descriptions</span>
+        </div>
+        <div class="task-area-item">
+          <span class="task-area-number">2</span>
+          <span class="task-area-label">Structured Errors</span>
+        </div>
+        <div class="task-area-item">
+          <span class="task-area-number">3</span>
+          <span class="task-area-label">Tool Distribution</span>
+        </div>
+        <div class="task-area-item">
+          <span class="task-area-number">4</span>
+          <span class="task-area-label">MCP Integration</span>
+        </div>
+        <div class="task-area-item">
+          <span class="task-area-number">5</span>
+          <span class="task-area-label">Built-in Tools</span>
+        </div>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-icon">&#9432;</span>
+        <div class="callout-content">
+          <p><strong>Exam strategy:</strong> Tool description questions are the most common in this domain. If you can write excellent descriptions and identify description flaws, you'll handle roughly 40% of this domain's questions.</p>
+        </div>
+      </div>
+
+      <h3>What Makes This Domain Challenging</h3>
+
+      <p>
+        Unlike domains that test conceptual knowledge, Domain 2 is intensely <strong>practical</strong>. Exam questions present
+        you with real-world scenarios -- a tool that's being misrouted, an error response that's missing context, an MCP config
+        that's not loading -- and ask you to diagnose or fix the problem. Rote memorization won't help. You need hands-on familiarity
+        with how Claude interprets tool descriptions, how error metadata shapes retry behavior, and how MCP server scoping
+        determines which tools are available.
+      </p>
+
+      <div class="callout warning">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Common trap:</strong> Many candidates confuse "tool distribution" (project-scoped vs user-scoped) with "tool_choice" settings (auto/any/specific). The exam tests both, and they are distinct concepts. Distribution controls <em>who sees the tool</em>; tool_choice controls <em>when Claude picks it</em>.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 2: TOOL DESCRIPTION EXCELLENCE
+         ======================================== -->
+    <section class="section" id="tool-descriptions">
+      <h2 class="section-heading">2. Tool Description Excellence</h2>
+
+      <p>
+        Tool descriptions are the single most important factor in whether Claude uses a tool correctly.
+        Claude reads tool descriptions the way a developer reads API documentation -- it makes routing decisions,
+        parameter choices, and error-handling assumptions based entirely on what you write.
+      </p>
+
+      <h3>The 5 Rules of Tool Descriptions</h3>
+
+      <p>
+        Every tool description should answer these 5 questions. Missing any one of them creates an opportunity
+        for misrouting or misuse.
+      </p>
+
+      <div class="accent-card">
+        <div class="accent-card-header">
+          <div class="accent-icon purple">1</div>
+          <h4>What the Tool Does</h4>
+          <span class="card-tag">Identity</span>
+        </div>
+        <p>
+          Start with a clear, one-sentence statement of the tool's purpose. Use active voice. Be specific about the
+          domain it operates in. Avoid generic language like "handles data" or "manages resources."
+        </p>
+        <div class="code-block has-label">
+          <span class="code-label">Good vs Bad</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm">// Bad: vague, could be anything</span>
+<span class="str">"Manages customer data"</span>
+
+<span class="cm">// Good: specific domain + action</span>
+<span class="str">"Retrieves a customer's billing history from Stripe,</span>
+<span class="str"> returning a list of invoices with amounts, dates,</span>
+<span class="str"> and payment status."</span></code></div>
+      </div>
+
+      <div class="accent-card">
+        <div class="accent-card-header">
+          <div class="accent-icon blue">2</div>
+          <h4>When to Use It</h4>
+          <span class="card-tag">Routing</span>
+        </div>
+        <p>
+          Explicitly state the conditions under which this tool should be selected. This is the most common source
+          of misrouting -- Claude cannot differentiate between two similar tools if the "when" is ambiguous.
+        </p>
+        <div class="code-block has-label">
+          <span class="code-label">Example</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="str">"Use this tool when the user asks about past payments,</span>
+<span class="str"> invoice history, or billing charges. Do NOT use for</span>
+<span class="str"> updating payment methods -- use update_payment_method</span>
+<span class="str"> instead."</span></code></div>
+      </div>
+
+      <div class="accent-card">
+        <div class="accent-card-header">
+          <div class="accent-icon green">3</div>
+          <h4>Input Format &amp; Constraints</h4>
+          <span class="card-tag">Parameters</span>
+        </div>
+        <p>
+          Document each parameter's type, format, valid range, and any special encoding requirements.
+          JSON Schema handles type validation, but Claude needs human-readable context for semantic correctness.
+        </p>
+        <div class="code-block has-label">
+          <span class="code-label">Parameter Description</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="str">"customer_id: The Stripe customer ID (starts with</span>
+<span class="str"> 'cus_'). Required. If the user provides an email</span>
+<span class="str"> instead, use lookup_customer first."</span>
+
+<span class="str">"date_range: ISO 8601 date range. Max span is 12</span>
+<span class="str"> months. If not provided, defaults to last 30 days."</span></code></div>
+      </div>
+
+      <div class="accent-card">
+        <div class="accent-card-header">
+          <div class="accent-icon orange">4</div>
+          <h4>Output Shape</h4>
+          <span class="card-tag">Response</span>
+        </div>
+        <p>
+          Describe what the tool returns, including the structure, key fields, and any pagination behavior.
+          Claude needs this to plan its next steps before the tool even runs.
+        </p>
+        <div class="code-block has-label">
+          <span class="code-label">Output Description</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="str">"Returns { invoices: Invoice[], hasMore: boolean,</span>
+<span class="str"> cursor: string }. Each Invoice includes id, amount</span>
+<span class="str"> (in cents), currency, status ('paid'|'open'|'void'),</span>
+<span class="str"> and created_at. Results are paginated; pass cursor</span>
+<span class="str"> to get the next page."</span></code></div>
+      </div>
+
+      <div class="accent-card">
+        <div class="accent-card-header">
+          <div class="accent-icon red">5</div>
+          <h4>Edge Cases &amp; Gotchas</h4>
+          <span class="card-tag">Safety</span>
+        </div>
+        <p>
+          Document known failure modes, rate limits, and surprising behaviors. This is what separates
+          a "good enough" description from an excellent one.
+        </p>
+        <div class="code-block has-label">
+          <span class="code-label">Edge Cases</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="str">"Returns an empty array (not an error) if the customer</span>
+<span class="str"> has no billing history. Rate-limited to 100 requests</span>
+<span class="str"> per minute. If the customer was deleted, returns</span>
+<span class="str"> { error: 'customer_archived' } -- this is NOT a</span>
+<span class="str"> permission error; suggest the user contact support."</span></code></div>
+      </div>
+
+      <h3>Common Pitfalls</h3>
+
+      <div class="callout important">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Ambiguous descriptions cause misrouting.</strong> When two tools have overlapping descriptions,
+          Claude picks the one whose description best matches the user's phrasing -- not the one you intended.
+          The fix is always to sharpen the "when to use" section, adding explicit negative constraints ("do NOT use for...").</p>
+        </div>
+      </div>
+
+      <p>
+        <strong>System prompt keyword sensitivity:</strong> Claude gives higher weight to keywords that appear in both the system
+        prompt and a tool description. If your system prompt says "always verify customer identity before billing lookups,"
+        and your <code>get_billing_history</code> tool description mentions "customer identity verification," Claude will
+        route to it more aggressively. This is useful when intentional, dangerous when accidental.
+      </p>
+
+      <h4>Renaming and Splitting Tools</h4>
+
+      <p>
+        Sometimes the best fix for misrouting is not editing the description but <strong>renaming</strong> or
+        <strong>splitting</strong> the tool. A tool named <code>manage_customer</code> that handles both reads and writes
+        is inherently ambiguous. Splitting it into <code>get_customer_profile</code> and <code>update_customer_profile</code>
+        gives Claude two distinct routing targets. The exam frequently tests this pattern -- look for questions where the
+        "fix" involves restructuring the tool surface rather than editing the description.
+      </p>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Pitfall</th>
+              <th>Symptom</th>
+              <th>Fix</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Vague description</strong></td>
+              <td>Claude uses the tool for unrelated tasks</td>
+              <td>Add "when to use" and negative constraints</td>
+            </tr>
+            <tr>
+              <td><strong>Missing output shape</strong></td>
+              <td>Claude calls the tool but can't parse the response</td>
+              <td>Document return fields and types</td>
+            </tr>
+            <tr>
+              <td><strong>Overlapping tools</strong></td>
+              <td>Claude alternates between two tools for the same task</td>
+              <td>Differentiate "when" sections or merge tools</td>
+            </tr>
+            <tr>
+              <td><strong>Overloaded tool</strong></td>
+              <td>Claude passes wrong parameters for the sub-action</td>
+              <td>Split into single-purpose tools</td>
+            </tr>
+            <tr>
+              <td><strong>Missing edge cases</strong></td>
+              <td>Claude retries on valid empty results, thinking it failed</td>
+              <td>Document empty/null as valid outcomes</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 3: ERROR HANDLING MASTERY
+         ======================================== -->
+    <section class="section" id="error-handling">
+      <h2 class="section-heading">3. Error Handling Mastery</h2>
+
+      <p>
+        The exam expects you to design error responses that give Claude enough context to decide its next step
+        without human intervention. A bare <code>{"error": "failed"}</code> is the worst possible response -- Claude
+        cannot determine if it should retry, try a different tool, or inform the user.
+      </p>
+
+      <h3>Error Taxonomy</h3>
+
+      <p>
+        Every error belongs to one of four categories. Knowing the category determines the correct response strategy.
+      </p>
+
+      <div class="accent-card">
+        <div class="accent-card-header">
+          <div class="accent-icon orange">&#8635;</div>
+          <h4>Transient Errors</h4>
+          <span class="card-tag">Retryable</span>
+        </div>
+        <p>
+          Temporary failures caused by network issues, rate limits, or service unavailability. Claude should
+          retry after a delay, ideally with exponential backoff.
+        </p>
+        <ul>
+          <li>HTTP 429 (Too Many Requests)</li>
+          <li>HTTP 503 (Service Unavailable)</li>
+          <li>Network timeouts</li>
+          <li>Database connection pool exhaustion</li>
+        </ul>
+      </div>
+
+      <div class="accent-card">
+        <div class="accent-card-header">
+          <div class="accent-icon red">&#10007;</div>
+          <h4>Validation Errors</h4>
+          <span class="card-tag">Fix Input</span>
+        </div>
+        <p>
+          The tool was called with invalid parameters. Claude should fix the input and retry -- never retry
+          with the same parameters.
+        </p>
+        <ul>
+          <li>Missing required field</li>
+          <li>Invalid format (e.g., email without @)</li>
+          <li>Value out of range</li>
+          <li>Type mismatch</li>
+        </ul>
+      </div>
+
+      <div class="accent-card">
+        <div class="accent-card-header">
+          <div class="accent-icon blue">&#9432;</div>
+          <h4>Business Logic Errors</h4>
+          <span class="card-tag">Inform User</span>
+        </div>
+        <p>
+          The request is technically valid but violates a business rule. Claude should explain the constraint
+          to the user and suggest alternatives.
+        </p>
+        <ul>
+          <li>Insufficient account balance</li>
+          <li>Duplicate record already exists</li>
+          <li>Feature not available on the user's plan</li>
+          <li>Approval required from a different role</li>
+        </ul>
+      </div>
+
+      <div class="accent-card">
+        <div class="accent-card-header">
+          <div class="accent-icon purple">&#128274;</div>
+          <h4>Permission Errors</h4>
+          <span class="card-tag">Escalate</span>
+        </div>
+        <p>
+          The caller lacks authorization. Claude should not retry and should inform the user about the required
+          permissions. Never expose internal authorization details.
+        </p>
+        <ul>
+          <li>HTTP 401 (Unauthorized) / 403 (Forbidden)</li>
+          <li>Expired or revoked tokens</li>
+          <li>IP restriction blocks</li>
+          <li>Role-based access control denials</li>
+        </ul>
+      </div>
+
+      <h3>Structured Error Metadata</h3>
+
+      <p>
+        The exam tests your ability to construct error responses with <strong>5 key metadata fields</strong>.
+        Each field serves a specific purpose in Claude's decision-making loop.
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Ideal Error Response</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>{
+  <span class="prop">"isError"</span>: <span class="kw">true</span>,
+  <span class="prop">"errorCategory"</span>: <span class="str">"validation"</span>,
+  <span class="prop">"isRetryable"</span>: <span class="kw">false</span>,
+  <span class="prop">"description"</span>: <span class="str">"The customer_id 'usr_123' is not a valid</span>
+    <span class="str">Stripe customer ID. Stripe customer IDs start</span>
+    <span class="str">with 'cus_'. Did you mean to use lookup_customer</span>
+    <span class="str">with the user ID first?"</span>,
+  <span class="prop">"recoveryGuidance"</span>: <span class="str">"Call lookup_customer with the</span>
+    <span class="str">user ID to get the Stripe customer ID, then</span>
+    <span class="str">retry this call."</span>
+}</code></div>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Field</th>
+              <th>Type</th>
+              <th>Purpose</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>isError</code></td>
+              <td>boolean</td>
+              <td>Distinguishes errors from valid empty results</td>
+            </tr>
+            <tr>
+              <td><code>errorCategory</code></td>
+              <td>string enum</td>
+              <td>Routes Claude to the correct recovery strategy</td>
+            </tr>
+            <tr>
+              <td><code>isRetryable</code></td>
+              <td>boolean</td>
+              <td>Tells Claude whether retrying with the same input makes sense</td>
+            </tr>
+            <tr>
+              <td><code>description</code></td>
+              <td>string</td>
+              <td>Human-readable explanation that Claude can relay to the user</td>
+            </tr>
+            <tr>
+              <td><code>recoveryGuidance</code></td>
+              <td>string</td>
+              <td>Specific next steps Claude should take to resolve the issue</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Local vs Propagated Errors</h3>
+
+      <p>
+        <strong>Local errors</strong> occur within the tool itself (bad input, failed database query). These should be
+        returned as structured error responses to Claude with full metadata.
+      </p>
+
+      <p>
+        <strong>Propagated errors</strong> come from downstream services (a third-party API returns 500). The tool should
+        catch these, translate them into the structured format, and add context about which downstream service failed. Never
+        pass raw third-party error messages to Claude -- they often contain internal details that confuse rather than help.
+      </p>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>Exam tip:</strong> A frequent question pattern asks you to distinguish between an <em>access failure</em>
+          and a <em>valid empty result</em>. For example, a search tool returning zero results is not an error -- it's
+          <code>{"isError": false, "results": []}</code>. But a search tool returning 403 because the user lacks access
+          IS an error -- <code>{"isError": true, "errorCategory": "permission"}</code>. The <code>isError</code> flag
+          is the critical discriminator.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 4: MCP SERVER PATTERNS
+         ======================================== -->
+    <section class="section" id="mcp-patterns">
+      <h2 class="section-heading">4. MCP Server Patterns</h2>
+
+      <p>
+        The <span class="key-concept">Model Context Protocol (MCP)</span> standardizes how Claude connects to external tools
+        and data sources. The exam tests your understanding of MCP configuration, scoping, and server selection.
+      </p>
+
+      <h3>Project vs User Configuration</h3>
+
+      <p>
+        MCP servers can be registered at two levels, and the exam frequently tests which level is appropriate
+        for a given scenario.
+      </p>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Aspect</th>
+              <th>Project: <code>.mcp.json</code></th>
+              <th>User: <code>~/.claude.json</code></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Location</strong></td>
+              <td>Project root directory</td>
+              <td>User's home directory</td>
+            </tr>
+            <tr>
+              <td><strong>Scope</strong></td>
+              <td>Available to all team members working on this project</td>
+              <td>Available only to this user, across all projects</td>
+            </tr>
+            <tr>
+              <td><strong>Version controlled</strong></td>
+              <td>Yes -- committed to the repository</td>
+              <td>No -- personal configuration</td>
+            </tr>
+            <tr>
+              <td><strong>Best for</strong></td>
+              <td>Project-specific databases, internal APIs, domain tools</td>
+              <td>Personal productivity tools, private API keys, global utilities</td>
+            </tr>
+            <tr>
+              <td><strong>Env variables</strong></td>
+              <td>Expanded at runtime from the user's environment</td>
+              <td>Same expansion behavior</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Configuration Structure</h3>
+
+      <div class="code-block has-label">
+        <span class="code-label">.mcp.json (Project level)</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>{
+  <span class="prop">"mcpServers"</span>: {
+    <span class="prop">"database"</span>: {
+      <span class="prop">"command"</span>: <span class="str">"npx"</span>,
+      <span class="prop">"args"</span>: [<span class="str">"-y"</span>, <span class="str">"@modelcontextprotocol/server-postgres"</span>],
+      <span class="prop">"env"</span>: {
+        <span class="prop">"DATABASE_URL"</span>: <span class="str">"${DB_CONNECTION_STRING}"</span>
+      }
+    },
+    <span class="prop">"github"</span>: {
+      <span class="prop">"command"</span>: <span class="str">"npx"</span>,
+      <span class="prop">"args"</span>: [<span class="str">"-y"</span>, <span class="str">"@modelcontextprotocol/server-github"</span>],
+      <span class="prop">"env"</span>: {
+        <span class="prop">"GITHUB_TOKEN"</span>: <span class="str">"${GITHUB_TOKEN}"</span>
+      }
+    }
+  }
+}</code></div>
+
+      <p>
+        <strong>Environment variable expansion:</strong> The <code>${VARIABLE_NAME}</code> syntax is resolved at runtime
+        from the current shell environment. This means sensitive values like tokens never appear in the config file --
+        only variable references. The exam tests whether you can identify when env expansion will fail (e.g., the variable
+        is not set in the user's environment).
+      </p>
+
+      <h3>Tool Description Enhancement</h3>
+
+      <p>
+        MCP servers often provide minimal tool descriptions. You can enhance them by wrapping the server's tools
+        in your own MCP server or by adding description overrides in your configuration. The exam tests this as a
+        strategy for improving tool routing when using community MCP servers.
+      </p>
+
+      <h3>Community Servers vs Custom Servers</h3>
+
+      <div class="accent-card">
+        <div class="accent-card-header">
+          <div class="accent-icon cyan">&#127760;</div>
+          <h4>When to Use Community Servers</h4>
+        </div>
+        <ul>
+          <li>Standard protocols with well-defined schemas (PostgreSQL, GitHub, Slack)</li>
+          <li>Read-heavy operations where built-in descriptions are adequate</li>
+          <li>Rapid prototyping -- get something working in minutes</li>
+          <li>The community server has strong maintenance and issue tracking</li>
+        </ul>
+      </div>
+
+      <div class="accent-card">
+        <div class="accent-card-header">
+          <div class="accent-icon purple">&#128295;</div>
+          <h4>When to Build Custom Servers</h4>
+        </div>
+        <ul>
+          <li>Proprietary internal APIs with domain-specific semantics</li>
+          <li>You need enhanced tool descriptions for better routing</li>
+          <li>Complex authorization flows (multi-tenant, row-level security)</li>
+          <li>You want to expose <strong>resources</strong> alongside tools to reduce exploratory calls</li>
+        </ul>
+      </div>
+
+      <h3>Exposing Resources to Reduce Exploratory Calls</h3>
+
+      <p>
+        MCP resources are read-only data that Claude can access without calling a tool. By exposing schema definitions,
+        enum lists, or configuration values as resources, you eliminate the need for Claude to make "discovery" tool calls
+        just to understand the data model.
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Resource Example</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm">// Instead of Claude calling get_table_schema("users")</span>
+<span class="cm">// every time, expose it as a resource:</span>
+{
+  <span class="prop">"resources"</span>: [
+    {
+      <span class="prop">"uri"</span>: <span class="str">"schema://tables/users"</span>,
+      <span class="prop">"name"</span>: <span class="str">"Users Table Schema"</span>,
+      <span class="prop">"description"</span>: <span class="str">"Column definitions for the users table"</span>,
+      <span class="prop">"mimeType"</span>: <span class="str">"application/json"</span>
+    }
+  ]
+}</code></div>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>Exam tip:</strong> Questions about reducing token usage in multi-step workflows frequently have "expose data as MCP resources" as the correct answer. Resources are loaded once into context, while tool calls consume tokens on every invocation.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 5: BUILT-IN TOOL SELECTION
+         ======================================== -->
+    <section class="section" id="builtin-tools">
+      <h2 class="section-heading">5. Built-in Tool Selection</h2>
+
+      <p>
+        Claude Code ships with 7 built-in tools. The exam tests your ability to choose the right tool for
+        a given task and to combine them in efficient multi-step workflows.
+      </p>
+
+      <h3>Decision Tree: Grep vs Glob vs Read</h3>
+
+      <p>
+        These three tools form the core of codebase understanding. Choosing the wrong one wastes context tokens
+        and adds unnecessary latency.
+      </p>
+
+      <div class="accent-card">
+        <div class="accent-card-header">
+          <div class="accent-icon green">&#128269;</div>
+          <h4>Grep -- Search Inside Files</h4>
+          <span class="card-tag">Content Search</span>
+        </div>
+        <p>
+          Use when you need to find files containing specific text, patterns, or code constructs.
+          Returns matching lines with file paths and line numbers.
+        </p>
+        <ul>
+          <li><strong>Best for:</strong> "Find all files that import X," "Where is function Y defined?"</li>
+          <li><strong>Supports:</strong> Full regex, file type filtering, glob filtering, context lines</li>
+          <li><strong>Output modes:</strong> files_with_matches (default), content, count</li>
+        </ul>
+      </div>
+
+      <div class="accent-card">
+        <div class="accent-card-header">
+          <div class="accent-icon orange">&#128193;</div>
+          <h4>Glob -- Find Files by Name</h4>
+          <span class="card-tag">File Discovery</span>
+        </div>
+        <p>
+          Use when you need to find files by their name, extension, or path pattern.
+          Returns matching file paths sorted by modification time.
+        </p>
+        <ul>
+          <li><strong>Best for:</strong> "Find all .tsx files in src/," "Is there a config.yaml?"</li>
+          <li><strong>Supports:</strong> Standard glob patterns (**, *, ?)</li>
+          <li><strong>Does NOT search:</strong> Inside file contents</li>
+        </ul>
+      </div>
+
+      <div class="accent-card">
+        <div class="accent-card-header">
+          <div class="accent-icon blue">&#128196;</div>
+          <h4>Read -- View File Contents</h4>
+          <span class="card-tag">File Viewing</span>
+        </div>
+        <p>
+          Use when you need to see the actual content of a known file. Supports offset/limit
+          for large files and can read images, PDFs, and notebooks.
+        </p>
+        <ul>
+          <li><strong>Best for:</strong> "Show me line 42 of main.py," "What does the config look like?"</li>
+          <li><strong>Supports:</strong> Line offset/limit, PDF page ranges, image viewing</li>
+          <li><strong>Caution:</strong> Reading large files without offset/limit wastes tokens</li>
+        </ul>
+      </div>
+
+      <h3>Edit vs Read+Write</h3>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Use Case</th>
+              <th>Tool</th>
+              <th>Why</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Change one function signature</td>
+              <td><strong>Edit</strong></td>
+              <td>Surgical replacement, no risk of destroying unrelated code</td>
+            </tr>
+            <tr>
+              <td>Rename a variable everywhere in one file</td>
+              <td><strong>Edit</strong> (replace_all)</td>
+              <td>Atomic rename with a single tool call</td>
+            </tr>
+            <tr>
+              <td>Create a brand new file</td>
+              <td><strong>Write</strong></td>
+              <td>File does not exist yet; Edit requires an existing file</td>
+            </tr>
+            <tr>
+              <td>Complete file rewrite (80%+ changed)</td>
+              <td><strong>Read then Write</strong></td>
+              <td>When most lines change, a full rewrite is cleaner than many edits</td>
+            </tr>
+            <tr>
+              <td>Add 3 lines to the middle of a file</td>
+              <td><strong>Edit</strong></td>
+              <td>Targeted insertion; Write would need to reproduce the entire file</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Incremental Codebase Understanding</h3>
+
+      <p>
+        The most token-efficient workflow for understanding unfamiliar code follows a three-step pattern.
+        The exam frequently presents scenarios where the <em>wrong</em> ordering wastes context.
+      </p>
+
+      <ol class="step-list">
+        <li class="step-item">
+          <div class="step-content">
+            <h4>Grep -- Find entry points</h4>
+            <p>Start with a targeted Grep for the function name, class name, or error message.
+            This gives you file paths and line numbers without loading full file contents.</p>
+          </div>
+        </li>
+        <li class="step-item">
+          <div class="step-content">
+            <h4>Read -- Examine key files</h4>
+            <p>Use Read with offset/limit to view only the relevant sections of the files Grep identified.
+            Avoid reading entire files when you only need 20 lines around the match.</p>
+          </div>
+        </li>
+        <li class="step-item">
+          <div class="step-content">
+            <h4>Trace imports -- Follow the chain</h4>
+            <p>Use Grep again to trace imports and dependencies from the files you've read.
+            This builds understanding incrementally rather than loading everything at once.</p>
+          </div>
+        </li>
+      </ol>
+
+      <div class="callout warning">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Anti-pattern:</strong> Reading every file in a directory "just in case" before doing anything. This fills the context window with irrelevant code. Always start with Grep to narrow down which files matter.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 1: TOOL DESCRIPTION A/B TESTER
+         ======================================== -->
+    <section class="section" id="ab-tester">
+      <h2 class="section-heading">Interactive: Tool Description A/B Tester</h2>
+
+      <p>
+        For each pair, choose the better tool description. After selecting, you'll see which one
+        wins and why, based on the 5 rules of tool descriptions.
+      </p>
+
+      <div class="ab-tester">
+        <h3>Which description is better?</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 8px;">Rate 6 pairs. Your score tracks how well you can spot description quality.</p>
+
+        <div class="ab-score-bar">
+          <span class="score-label">Score</span>
+          <div class="ab-score-track">
+            <div class="ab-score-fill" id="abScoreFill"></div>
+          </div>
+          <span class="ab-score-text" id="abScoreText">0 / 6</span>
+        </div>
+
+        <div id="abPairsContainer"></div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 2: MCP SERVER CONFIGURATOR
+         ======================================== -->
+    <section class="section" id="mcp-configurator">
+      <h2 class="section-heading">Interactive: MCP Server Configurator</h2>
+
+      <p>
+        Build an MCP server configuration interactively. Choose a preset or fill in custom values,
+        then generate the <code>.mcp.json</code> configuration.
+      </p>
+
+      <div class="mcp-configurator">
+        <h3>MCP Server Builder</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 4px;">Start from a preset or build from scratch.</p>
+
+        <div class="mcp-presets">
+          <button class="mcp-preset-btn" onclick="loadMcpPreset('database')">Database (PostgreSQL)</button>
+          <button class="mcp-preset-btn" onclick="loadMcpPreset('github')">GitHub API</button>
+          <button class="mcp-preset-btn" onclick="loadMcpPreset('knowledge')">Internal Knowledge Base</button>
+          <button class="mcp-preset-btn" onclick="loadMcpPreset('custom')">Custom (Blank)</button>
+        </div>
+
+        <div class="mcp-form">
+          <div class="mcp-field">
+            <label for="mcpName">Server Name</label>
+            <input type="text" id="mcpName" placeholder="e.g., my-database" />
+          </div>
+          <div class="mcp-field">
+            <label for="mcpTransport">Transport</label>
+            <select id="mcpTransport">
+              <option value="stdio">stdio (local process)</option>
+              <option value="http">HTTP (remote server)</option>
+            </select>
+          </div>
+          <div class="mcp-field">
+            <label for="mcpCommand">Command</label>
+            <input type="text" id="mcpCommand" placeholder="e.g., npx" />
+          </div>
+          <div class="mcp-field">
+            <label for="mcpArgs">Arguments (comma-separated)</label>
+            <input type="text" id="mcpArgs" placeholder="e.g., -y, @modelcontextprotocol/server-postgres" />
+          </div>
+          <div class="mcp-field">
+            <label for="mcpEnv">Environment Variables (KEY=value, one per line)</label>
+            <textarea id="mcpEnv" placeholder="DATABASE_URL=${DB_CONNECTION_STRING}&#10;API_KEY=${MY_API_KEY}"></textarea>
+          </div>
+          <div class="mcp-field">
+            <label for="mcpTools">Tools Provided (comma-separated)</label>
+            <input type="text" id="mcpTools" placeholder="e.g., query, list_tables, describe_table" />
+          </div>
+          <div class="mcp-field">
+            <label for="mcpResources">Resources Provided (comma-separated URIs)</label>
+            <input type="text" id="mcpResources" placeholder="e.g., schema://tables/users, schema://tables/orders" />
+          </div>
+        </div>
+
+        <button class="mcp-generate-btn" onclick="generateMcpConfig()">Generate .mcp.json</button>
+
+        <div class="mcp-output" id="mcpOutput">
+          <div class="code-block has-label">
+            <span class="code-label">.mcp.json</span>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <code><span id="mcpOutputCode"></span></code>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 3: ERROR RESPONSE DESIGNER
+         ======================================== -->
+    <section class="section" id="error-designer">
+      <h2 class="section-heading">Interactive: Error Response Designer</h2>
+
+      <p>
+        For each scenario, write a JSON error response. Click "Check" to see how your response scores
+        across 5 criteria: isError flag, error category, retryable flag, descriptive message, and recovery guidance.
+      </p>
+
+      <div class="error-designer">
+        <h3>Design Error Responses</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 16px;">
+          Write JSON error responses for 5 real-world scenarios. Each is scored on 5 criteria.
+        </p>
+
+        <div id="edScenariosContainer"></div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         PRACTICE EXAM (8 Questions)
+         ======================================== -->
+    <section class="section" id="practice-exam">
+      <h2 class="section-heading">Practice Exam: Domain 2</h2>
+
+      <p>
+        This 8-question practice exam simulates the certification format for the Tool Design &amp; MCP Integration domain.
+        You need at least 6 correct to pass. Your score is saved to <code>localStorage</code>.
+      </p>
+
+      <div class="final-quiz">
+        <h3>Domain 2 Practice Exam</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 20px;">8 questions -- 6 correct to pass. Answer all questions before submitting.</p>
+
+        <!-- Question 1 -->
+        <div class="final-quiz-question" data-fq="0">
+          <div class="fq-number">Question 1 of 8</div>
+          <div class="fq-text">
+            A team reports that Claude frequently calls the <code>search_documents</code> tool when users ask about document <em>metadata</em> (author, creation date), even though a separate <code>get_document_metadata</code> tool exists. What is the most likely cause and best fix?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="0" data-fq-val="a" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="a"> The search_documents tool is too slow, so Claude avoids get_document_metadata
+            </li>
+            <li class="fq-option" data-fq-idx="0" data-fq-val="b" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="b"> The search_documents description lacks negative constraints; add "Do NOT use for metadata lookups -- use get_document_metadata for author, dates, or properties"
+            </li>
+            <li class="fq-option" data-fq-idx="0" data-fq-val="c" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="c"> Delete the search_documents tool and merge its functionality into get_document_metadata
+            </li>
+            <li class="fq-option" data-fq-idx="0" data-fq-val="d" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="d"> Set tool_choice to force get_document_metadata
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="final-quiz-question" data-fq="1">
+          <div class="fq-number">Question 2 of 8</div>
+          <div class="fq-text">
+            A tool returns <code>{"error": "Rate limit exceeded"}</code> without any metadata. Claude retries 5 times and then tells the user the feature is broken. What structured error response would fix this behavior?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="1" data-fq-val="a" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="a"> <code>{"isError": true, "errorCategory": "transient", "isRetryable": true, "description": "Rate limit exceeded. Wait 30 seconds before retrying.", "recoveryGuidance": "Retry after a 30-second delay."}</code>
+            </li>
+            <li class="fq-option" data-fq-idx="1" data-fq-val="b" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="b"> <code>{"error": "Rate limit exceeded", "retry": true}</code>
+            </li>
+            <li class="fq-option" data-fq-idx="1" data-fq-val="c" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="c"> <code>{"isError": true, "errorCategory": "permission", "isRetryable": false}</code>
+            </li>
+            <li class="fq-option" data-fq-idx="1" data-fq-val="d" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="d"> Simply increase the rate limit on the server side
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="final-quiz-question" data-fq="2">
+          <div class="fq-number">Question 3 of 8</div>
+          <div class="fq-text">
+            You want the entire development team to have access to a PostgreSQL MCP server, but each developer has their own database credentials stored in environment variables. Where should the MCP configuration go?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="2" data-fq-val="a" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="a"> Each developer's <code>~/.claude.json</code> with hardcoded credentials
+            </li>
+            <li class="fq-option" data-fq-idx="2" data-fq-val="b" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="b"> The project's <code>.mcp.json</code> using <code>${DB_CONNECTION_STRING}</code> environment variable expansion
+            </li>
+            <li class="fq-option" data-fq-idx="2" data-fq-val="c" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="c"> A shared <code>~/.claude.json</code> on a network drive
+            </li>
+            <li class="fq-option" data-fq-idx="2" data-fq-val="d" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="d"> Hardcode the connection string directly in <code>.mcp.json</code>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 4 -->
+        <div class="final-quiz-question" data-fq="3">
+          <div class="fq-number">Question 4 of 8</div>
+          <div class="fq-text">
+            You need to find where the <code>calculateTax</code> function is defined in a large TypeScript project, then understand how it works. Which tool sequence is most token-efficient?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="3" data-fq-val="a" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="a"> Read every .ts file in the project, then search for the function
+            </li>
+            <li class="fq-option" data-fq-idx="3" data-fq-val="b" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="b"> Glob for *.ts files, then Read each one
+            </li>
+            <li class="fq-option" data-fq-idx="3" data-fq-val="c" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="c"> Grep for "calculateTax" to find the definition file/line, then Read with offset/limit to examine just that section, then Grep for imports to trace dependencies
+            </li>
+            <li class="fq-option" data-fq-idx="3" data-fq-val="d" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="d"> Use the Agent tool to search the entire codebase
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 5 -->
+        <div class="final-quiz-question" data-fq="4">
+          <div class="fq-number">Question 5 of 8</div>
+          <div class="fq-text">
+            In a multi-agent system, a sub-agent's tool returns an error. What should the sub-agent do with the error before passing results back to the orchestrator?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="4" data-fq-val="a" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="a"> Pass the raw error directly to the orchestrator without modification
+            </li>
+            <li class="fq-option" data-fq-idx="4" data-fq-val="b" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="b"> Silently ignore the error and return an empty result
+            </li>
+            <li class="fq-option" data-fq-idx="4" data-fq-val="c" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="c"> Attempt local recovery if possible; if not, translate the error into the structured format with context about what the sub-agent was trying to do, then return it to the orchestrator
+            </li>
+            <li class="fq-option" data-fq-idx="4" data-fq-val="d" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="d"> Retry the tool call indefinitely until it succeeds
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 6 -->
+        <div class="final-quiz-question" data-fq="5">
+          <div class="fq-number">Question 6 of 8</div>
+          <div class="fq-text">
+            A database MCP server requires Claude to call <code>get_table_schema</code> before every query to understand the columns. This wastes tokens on repeated schema lookups. What is the best optimization?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="5" data-fq-val="a" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="a"> Cache the schema in a CLAUDE.md file
+            </li>
+            <li class="fq-option" data-fq-idx="5" data-fq-val="b" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="b"> Expose table schemas as MCP resources so they are loaded into context once, eliminating repeated tool calls
+            </li>
+            <li class="fq-option" data-fq-idx="5" data-fq-val="c" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="c"> Remove the get_table_schema tool entirely
+            </li>
+            <li class="fq-option" data-fq-idx="5" data-fq-val="d" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="d"> Hardcode all column names into the tool descriptions
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 7 -->
+        <div class="final-quiz-question" data-fq="6">
+          <div class="fq-number">Question 7 of 8</div>
+          <div class="fq-text">
+            A developer configures an MCP server in their personal <code>~/.claude.json</code> for a project-specific internal API. A new team member joins and cannot access the tool. What is the root cause?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="6" data-fq-val="a" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="a"> The new team member's Claude Code version is outdated
+            </li>
+            <li class="fq-option" data-fq-idx="6" data-fq-val="b" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="b"> The MCP server is in user-level config (<code>~/.claude.json</code>) instead of project-level (<code>.mcp.json</code>), so only the original developer has it
+            </li>
+            <li class="fq-option" data-fq-idx="6" data-fq-val="c" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="c"> MCP servers cannot be shared between team members
+            </li>
+            <li class="fq-option" data-fq-idx="6" data-fq-val="d" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="d"> The API requires a VPN connection
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 8 -->
+        <div class="final-quiz-question" data-fq="7">
+          <div class="fq-number">Question 8 of 8</div>
+          <div class="fq-text">
+            You want Claude to <em>always</em> use a specific verification tool before executing any write operation, regardless of what the user asks. What is the best approach?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="7" data-fq-val="a" onclick="selectFinalOption(7, this)">
+              <input type="radio" name="fq7" value="a"> Set <code>tool_choice</code> to the verification tool for all API calls
+            </li>
+            <li class="fq-option" data-fq-idx="7" data-fq-val="b" onclick="selectFinalOption(7, this)">
+              <input type="radio" name="fq7" value="b"> Include an instruction in the system prompt AND add "Must call verify_permissions first" to every write tool's description
+            </li>
+            <li class="fq-option" data-fq-idx="7" data-fq-val="c" onclick="selectFinalOption(7, this)">
+              <input type="radio" name="fq7" value="c"> Remove all write tools and only provide the verification tool
+            </li>
+            <li class="fq-option" data-fq-idx="7" data-fq-val="d" onclick="selectFinalOption(7, this)">
+              <input type="radio" name="fq7" value="d"> Hope that Claude figures it out from context
+            </li>
+          </ul>
+        </div>
+
+        <button class="final-submit-btn" id="finalSubmitBtn" onclick="submitFinalQuiz()" disabled>
+          Submit Answers
+        </button>
+
+        <div class="final-result" id="finalResult">
+          <h4 id="finalResultTitle"></h4>
+          <p id="finalResultText"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         NAVIGATION FOOTER
+         ======================================== -->
+    <nav class="module-nav">
+      <a href="30-cert-domain1.html" class="nav-link prev">
+        <span class="nav-dir">&larr; Previous</span>
+        <span class="nav-title">Module 30: Cert Domain 1</span>
+      </a>
+      <a href="32-cert-domain3.html" class="nav-link next">
+        <span class="nav-dir">Next &rarr;</span>
+        <span class="nav-title">Module 32: Cert Domain 3 &mdash; Config &amp; Workflows</span>
+      </a>
+    </nav>
+
+  </div>
+</main>
+
+<!-- ============================================
+     JAVASCRIPT
+     ============================================ -->
+<script>
+(function() {
+  'use strict';
+
+  // ==========================================
+  // THEME MANAGEMENT
+  // ==========================================
+  var THEME_KEY = 'claude-training-theme';
+
+  function getTheme() {
+    return localStorage.getItem(THEME_KEY) || 'light';
+  }
+
+  function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem(THEME_KEY, theme);
+    var icon = document.getElementById('themeIcon');
+    if (icon) {
+      icon.textContent = theme === 'dark' ? '\u2600' : '\u263E';
+    }
+  }
+
+  setTheme(getTheme());
+
+  document.getElementById('themeToggle').addEventListener('click', function() {
+    var current = getTheme();
+    setTheme(current === 'dark' ? 'light' : 'dark');
+  });
+
+  // ==========================================
+  // SIDEBAR MOBILE TOGGLE
+  // ==========================================
+  var hamburger = document.getElementById('hamburger');
+  var sidebar = document.getElementById('sidebar');
+  var overlay = document.getElementById('sidebarOverlay');
+
+  function toggleSidebar() {
+    var isOpen = sidebar.classList.contains('open');
+    sidebar.classList.toggle('open');
+    hamburger.classList.toggle('open');
+    if (isOpen) {
+      overlay.classList.remove('show');
+    } else {
+      overlay.classList.add('show');
+    }
+  }
+
+  hamburger.addEventListener('click', toggleSidebar);
+  overlay.addEventListener('click', toggleSidebar);
+
+  // ==========================================
+  // SIDEBAR SECTION COLLAPSING
+  // ==========================================
+  var sectionToggles = document.querySelectorAll('.sidebar-section-toggle');
+  for (var t = 0; t < sectionToggles.length; t++) {
+    (function(btn) {
+      btn.addEventListener('click', function() {
+        var sectionName = this.getAttribute('data-section');
+        var linksList = document.getElementById('nav-' + sectionName);
+        var isCollapsed = this.classList.contains('collapsed');
+
+        if (isCollapsed) {
+          this.classList.remove('collapsed');
+          linksList.classList.remove('collapsed');
+          linksList.style.maxHeight = linksList.scrollHeight + 'px';
+        } else {
+          this.classList.add('collapsed');
+          linksList.style.maxHeight = linksList.scrollHeight + 'px';
+          linksList.offsetHeight; // force reflow
+          linksList.classList.add('collapsed');
+        }
+      });
+
+      var sectionName = btn.getAttribute('data-section');
+      var linksList = document.getElementById('nav-' + sectionName);
+      if (linksList) {
+        linksList.style.maxHeight = linksList.scrollHeight + 'px';
+      }
+    })(sectionToggles[t]);
+  }
+
+  // ==========================================
+  // SCROLLSPY
+  // ==========================================
+  var sidebarLinks = document.querySelectorAll('.sidebar-link');
+  var sections = [];
+
+  for (var s = 0; s < sidebarLinks.length; s++) {
+    var targetId = sidebarLinks[s].getAttribute('data-target');
+    var sectionEl = document.getElementById(targetId);
+    if (sectionEl) {
+      sections.push({ el: sectionEl, link: sidebarLinks[s], id: targetId });
+    }
+  }
+
+  function updateScrollspy() {
+    var scrollPos = window.scrollY + 100;
+    var active = null;
+
+    for (var i = sections.length - 1; i >= 0; i--) {
+      if (sections[i].el.offsetTop <= scrollPos) {
+        active = sections[i];
+        break;
+      }
+    }
+
+    for (var j = 0; j < sidebarLinks.length; j++) {
+      sidebarLinks[j].classList.remove('active');
+    }
+    if (active) {
+      active.link.classList.add('active');
+    }
+
+    updateSidebarProgress();
+  }
+
+  var scrollTimer = null;
+  window.addEventListener('scroll', function() {
+    if (scrollTimer) return;
+    scrollTimer = setTimeout(function() {
+      scrollTimer = null;
+      updateScrollspy();
+    }, 50);
+  });
+  updateScrollspy();
+
+  // Close mobile sidebar on link click
+  for (var sl = 0; sl < sidebarLinks.length; sl++) {
+    sidebarLinks[sl].addEventListener('click', function() {
+      if (window.innerWidth <= 1024) {
+        sidebar.classList.remove('open');
+        hamburger.classList.remove('open');
+        overlay.classList.remove('show');
+      }
+    });
+  }
+
+  // ==========================================
+  // SIDEBAR PROGRESS
+  // ==========================================
+  function updateSidebarProgress() {
+    var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    var scrolled = window.scrollY;
+    var pct = docHeight > 0 ? Math.min(100, (scrolled / docHeight) * 100) : 0;
+
+    var fill = document.getElementById('sidebarProgressFill');
+    if (fill) {
+      fill.style.width = pct + '%';
+    }
+  }
+
+  // ==========================================
+  // COPY TO CLIPBOARD
+  // ==========================================
+  window.copyCode = function(btn) {
+    var block = btn.closest('.code-block');
+    var codeEl = block.cloneNode(true);
+    var labelEl = codeEl.querySelector('.code-label');
+    var btnEl = codeEl.querySelector('.copy-btn');
+    if (labelEl) labelEl.remove();
+    if (btnEl) btnEl.remove();
+
+    var text = codeEl.textContent.trim();
+
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(function() {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(function() {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      }).catch(function() {
+        btn.textContent = 'Failed';
+        setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+      });
+    }
+  };
+
+  // ==========================================
+  // INTERACTIVE 1: A/B TESTER
+  // ==========================================
+  var abPairs = [
+    {
+      context: 'Tool for looking up customer billing information',
+      a: 'Gets customer billing info from the database.',
+      b: 'Retrieves a customer\'s billing history from Stripe by customer_id (format: cus_xxx). Returns invoices with amounts (cents), dates, and payment status. Use for past payment questions. Do NOT use for updating payment methods -- use update_payment_method instead. Returns empty array (not error) for customers with no history.',
+      winner: 'b',
+      criteria: 'Description B wins on all 5 rules: specific action (Stripe), input format (cus_xxx), output shape (invoices with amounts in cents), when-to-use with negative constraint, and edge case (empty array). Description A is dangerously vague.'
+    },
+    {
+      context: 'Tool for searching a knowledge base',
+      a: 'Searches the internal knowledge base using semantic similarity. Input: query string (natural language, max 500 chars). Returns top-5 matching articles with title, snippet, confidence score (0-1), and article_id. Use when users ask factual questions about company policies or procedures. For questions about specific employees, use lookup_employee instead.',
+      b: 'Searches the knowledge base. Takes a query and returns results. Can find articles about various topics.',
+      winner: 'a',
+      criteria: 'Description A specifies the search method (semantic similarity), input constraints (500 chars), output shape (top-5 with confidence), routing guidance, and differentiation from lookup_employee. Description B provides almost no actionable detail.'
+    },
+    {
+      context: 'Tool for creating a new user account',
+      a: 'Creates a new user account. Requires email, name, and role. Returns the created user object.',
+      b: 'Creates a new user account in the primary authentication system. Required inputs: email (must be valid, checked against existing accounts), full_name (string, 2-100 chars), role ("admin"|"editor"|"viewer"). Returns {user_id, email, created_at} on success. Fails with errorCategory "business" if email already exists -- suggest using update_user to modify the existing account. Rate-limited to 10 creates per minute.',
+      winner: 'b',
+      criteria: 'Description B excels with specific system context, parameter validation rules, enum values for role, structured error guidance for duplicates, and rate limit documentation. Description A omits all edge cases and constraints.'
+    },
+    {
+      context: 'Tool for deleting a resource',
+      a: 'Permanently deletes a project and all its associated data (tasks, files, comments). Input: project_id (UUID format). This action is IRREVERSIBLE. Before calling, confirm the user explicitly wants to delete. Returns {deleted: true, items_removed: number}. If the project has active collaborators, returns errorCategory "business" with a list of affected users -- the user must remove collaborators first.',
+      b: 'Deletes a project. Takes project_id. Returns success or failure. Be careful with this tool as it deletes things permanently.',
+      winner: 'a',
+      criteria: 'Description A documents the blast radius (tasks, files, comments), required pre-conditions (user confirmation), output shape, and the business error for active collaborators with recovery guidance. Description B\'s "be careful" is not actionable.'
+    },
+    {
+      context: 'Tool for sending notifications',
+      a: 'Sends a notification to one or more users via their preferred channel (email, Slack, or in-app). Input: user_ids (array, max 50), message (string, max 1000 chars), priority ("low"|"normal"|"urgent"). Urgent notifications also trigger SMS if the user has a phone on file. Returns {sent: number, failed: [{user_id, reason}]}. Use for operational alerts. Do NOT use for marketing messages -- use campaign_sender instead.',
+      b: 'Sends notifications to users. Supports email, Slack, and in-app. Can send to multiple users at once. Has different priority levels.',
+      winner: 'a',
+      criteria: 'Description A provides array limits (50), character limits (1000), enum values, the SMS side-effect for urgent priority, partial failure response shape, and explicit negative routing. Description B lists features without operational detail.'
+    },
+    {
+      context: 'Tool for running database queries',
+      a: 'Executes read-only SQL queries against the analytics database. Input: sql (string, SELECT only -- INSERT/UPDATE/DELETE are blocked). Max result set: 1000 rows. Returns {columns: string[], rows: any[][], row_count: number, truncated: boolean}. Queries timeout after 30 seconds. If the query references a table that does not exist, returns errorCategory "validation" with a list of available tables.',
+      b: 'Runs SQL queries on the database. Returns the results as JSON. Only supports SELECT queries for safety.',
+      winner: 'a',
+      criteria: 'Description A specifies the database (analytics, not production), enforcement mechanism (INSERT blocked), result limits (1000 rows), timeout (30s), truncation flag, and helpful error for missing tables. Description B mentions SELECT-only but nothing else.'
+    }
+  ];
+
+  var abState = { answered: 0, correct: 0 };
+
+  function renderAbPairs() {
+    var container = document.getElementById('abPairsContainer');
+    var html = '';
+
+    for (var i = 0; i < abPairs.length; i++) {
+      var pair = abPairs[i];
+      html += '<div class="ab-pair" id="ab-' + i + '">';
+      html += '<div class="ab-pair-header">';
+      html += '<span class="ab-pair-number">' + (i + 1) + '</span>';
+      html += '<span class="ab-pair-text">' + pair.context + '</span>';
+      html += '</div>';
+      html += '<div class="ab-choices">';
+      html += '<div class="ab-choice" id="ab-' + i + '-a" onclick="answerAb(' + i + ',\'a\')">';
+      html += '<div class="ab-label">Description A</div>';
+      html += pair.a;
+      html += '</div>';
+      html += '<div class="ab-choice" id="ab-' + i + '-b" onclick="answerAb(' + i + ',\'b\')">';
+      html += '<div class="ab-label">Description B</div>';
+      html += pair.b;
+      html += '</div>';
+      html += '</div>';
+      html += '<div class="ab-feedback" id="ab-feedback-' + i + '"></div>';
+      html += '</div>';
+    }
+
+    container.innerHTML = html;
+  }
+
+  window.answerAb = function(idx, choice) {
+    var pairEl = document.getElementById('ab-' + idx);
+    if (pairEl.classList.contains('correct') || pairEl.classList.contains('incorrect')) {
+      return;
+    }
+
+    var pair = abPairs[idx];
+    var isCorrect = choice === pair.winner;
+    var choiceA = document.getElementById('ab-' + idx + '-a');
+    var choiceB = document.getElementById('ab-' + idx + '-b');
+    var feedbackEl = document.getElementById('ab-feedback-' + idx);
+
+    abState.answered++;
+
+    choiceA.classList.add('disabled');
+    choiceB.classList.add('disabled');
+
+    if (pair.winner === 'a') {
+      choiceA.classList.add('correct-answer');
+      if (choice === 'b') choiceB.classList.add('wrong-answer');
+    } else {
+      choiceB.classList.add('correct-answer');
+      if (choice === 'a') choiceA.classList.add('wrong-answer');
+    }
+
+    if (isCorrect) {
+      abState.correct++;
+      pairEl.classList.add('correct');
+      feedbackEl.className = 'ab-feedback show correct';
+      feedbackEl.textContent = 'Correct! ' + pair.criteria;
+    } else {
+      pairEl.classList.add('incorrect');
+      feedbackEl.className = 'ab-feedback show incorrect';
+      feedbackEl.textContent = 'Not quite. ' + pair.criteria;
+    }
+
+    var scoreFill = document.getElementById('abScoreFill');
+    var scoreText = document.getElementById('abScoreText');
+    var pct = (abState.correct / abPairs.length) * 100;
+    scoreFill.style.width = pct + '%';
+    scoreText.textContent = abState.correct + ' / ' + abPairs.length;
+  };
+
+  renderAbPairs();
+
+  // ==========================================
+  // INTERACTIVE 2: MCP CONFIGURATOR
+  // ==========================================
+  var mcpPresets = {
+    database: {
+      name: 'postgres-db',
+      transport: 'stdio',
+      command: 'npx',
+      args: '-y, @modelcontextprotocol/server-postgres',
+      env: 'DATABASE_URL=${DB_CONNECTION_STRING}',
+      tools: 'query, list_tables, describe_table',
+      resources: 'schema://tables/users, schema://tables/orders, schema://tables/products'
+    },
+    github: {
+      name: 'github-api',
+      transport: 'stdio',
+      command: 'npx',
+      args: '-y, @modelcontextprotocol/server-github',
+      env: 'GITHUB_TOKEN=${GITHUB_TOKEN}',
+      tools: 'search_repos, get_file_contents, create_issue, list_prs',
+      resources: ''
+    },
+    knowledge: {
+      name: 'internal-kb',
+      transport: 'stdio',
+      command: 'node',
+      args: './mcp-servers/knowledge-base/index.js',
+      env: 'KB_API_URL=${KNOWLEDGE_BASE_URL}\nKB_API_KEY=${KB_API_KEY}',
+      tools: 'search_articles, get_article, list_categories',
+      resources: 'kb://categories, kb://schema/article'
+    },
+    custom: {
+      name: '',
+      transport: 'stdio',
+      command: '',
+      args: '',
+      env: '',
+      tools: '',
+      resources: ''
+    }
+  };
+
+  window.loadMcpPreset = function(presetName) {
+    var preset = mcpPresets[presetName];
+    if (!preset) return;
+
+    document.getElementById('mcpName').value = preset.name;
+    document.getElementById('mcpTransport').value = preset.transport;
+    document.getElementById('mcpCommand').value = preset.command;
+    document.getElementById('mcpArgs').value = preset.args;
+    document.getElementById('mcpEnv').value = preset.env;
+    document.getElementById('mcpTools').value = preset.tools;
+    document.getElementById('mcpResources').value = preset.resources;
+
+    var btns = document.querySelectorAll('.mcp-preset-btn');
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].classList.remove('active');
+    }
+    if (presetName !== 'custom') {
+      var allBtns = document.querySelectorAll('.mcp-preset-btn');
+      for (var j = 0; j < allBtns.length; j++) {
+        if (allBtns[j].textContent.toLowerCase().indexOf(presetName) !== -1 ||
+            (presetName === 'knowledge' && allBtns[j].textContent.indexOf('Knowledge') !== -1)) {
+          allBtns[j].classList.add('active');
+        }
+      }
+    }
+
+    // Hide previous output
+    document.getElementById('mcpOutput').classList.remove('show');
+  };
+
+  window.generateMcpConfig = function() {
+    var name = document.getElementById('mcpName').value.trim() || 'my-server';
+    var transport = document.getElementById('mcpTransport').value;
+    var command = document.getElementById('mcpCommand').value.trim();
+    var argsStr = document.getElementById('mcpArgs').value.trim();
+    var envStr = document.getElementById('mcpEnv').value.trim();
+    var toolsStr = document.getElementById('mcpTools').value.trim();
+    var resourcesStr = document.getElementById('mcpResources').value.trim();
+
+    var args = [];
+    if (argsStr) {
+      var argParts = argsStr.split(',');
+      for (var a = 0; a < argParts.length; a++) {
+        var trimmed = argParts[a].trim();
+        if (trimmed) args.push(trimmed);
+      }
+    }
+
+    var envObj = {};
+    if (envStr) {
+      var envLines = envStr.split('\n');
+      for (var e = 0; e < envLines.length; e++) {
+        var eqIdx = envLines[e].indexOf('=');
+        if (eqIdx > 0) {
+          var key = envLines[e].substring(0, eqIdx).trim();
+          var val = envLines[e].substring(eqIdx + 1).trim();
+          envObj[key] = val;
+        }
+      }
+    }
+
+    var config = { mcpServers: {} };
+    var serverConfig = {};
+
+    if (transport === 'stdio') {
+      serverConfig.command = command || 'npx';
+      if (args.length > 0) {
+        serverConfig.args = args;
+      }
+    } else {
+      serverConfig.url = command || 'http://localhost:3001';
+    }
+
+    var hasEnv = false;
+    for (var k in envObj) {
+      if (envObj.hasOwnProperty(k)) { hasEnv = true; break; }
+    }
+    if (hasEnv) {
+      serverConfig.env = envObj;
+    }
+
+    config.mcpServers[name] = serverConfig;
+
+    // Build the display string with syntax highlighting
+    var jsonStr = JSON.stringify(config, null, 2);
+    // Simple syntax highlighting
+    var highlighted = jsonStr
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"([^"]+)"(\s*:)/g, '<span class="prop">"$1"</span>$2')
+      .replace(/:\s*"([^"]+)"/g, ': <span class="str">"$1"</span>')
+      .replace(/:\s*(true|false|null)/g, ': <span class="kw">$1</span>');
+
+    var outputEl = document.getElementById('mcpOutputCode');
+    outputEl.innerHTML = highlighted;
+
+    // Add comment about tools and resources
+    var comment = '\n\n<span class="cm">// Tools provided: ' +
+      (toolsStr || 'none specified') + '</span>';
+    if (resourcesStr) {
+      comment += '\n<span class="cm">// Resources: ' + resourcesStr + '</span>';
+    }
+    outputEl.innerHTML += comment;
+
+    document.getElementById('mcpOutput').classList.add('show');
+  };
+
+  // ==========================================
+  // INTERACTIVE 3: ERROR RESPONSE DESIGNER
+  // ==========================================
+  var edScenarios = [
+    {
+      title: 'Rate limit hit on payment API',
+      context: 'Your payment processing tool calls Stripe\'s API, which returns HTTP 429 with a Retry-After: 30 header.',
+      ideal: {
+        isError: true,
+        errorCategory: 'transient',
+        isRetryable: true,
+        description: 'Stripe rate limit exceeded. The API returned HTTP 429 with a 30-second retry window.',
+        recoveryGuidance: 'Wait 30 seconds, then retry the same request. If this persists, consider batching requests.'
+      }
+    },
+    {
+      title: 'Invalid email format in user creation',
+      context: 'A user asks Claude to create an account with email "john.smith@" (missing domain).',
+      ideal: {
+        isError: true,
+        errorCategory: 'validation',
+        isRetryable: false,
+        description: 'The email "john.smith@" is not a valid email address -- it is missing the domain portion.',
+        recoveryGuidance: 'Ask the user for the complete email address including the domain (e.g., john.smith@example.com).'
+      }
+    },
+    {
+      title: 'Insufficient permissions to delete resource',
+      context: 'Claude tries to delete a shared project, but the current user has "viewer" role, not "admin".',
+      ideal: {
+        isError: true,
+        errorCategory: 'permission',
+        isRetryable: false,
+        description: 'The current user has "viewer" role and cannot delete projects. Only users with "admin" role can delete shared projects.',
+        recoveryGuidance: 'Inform the user they need admin permissions. Suggest contacting a project admin to perform the deletion.'
+      }
+    },
+    {
+      title: 'Duplicate record in database',
+      context: 'Claude tries to create a customer record, but a customer with the same email already exists in the system.',
+      ideal: {
+        isError: true,
+        errorCategory: 'business',
+        isRetryable: false,
+        description: 'A customer with this email already exists (customer_id: cus_abc123). Cannot create a duplicate.',
+        recoveryGuidance: 'Use get_customer with the existing customer_id to retrieve the record, or use update_customer to modify it.'
+      }
+    },
+    {
+      title: 'Third-party API returns 500',
+      context: 'Your weather lookup tool calls an external weather API that returns HTTP 500 Internal Server Error with no body.',
+      ideal: {
+        isError: true,
+        errorCategory: 'transient',
+        isRetryable: true,
+        description: 'The weather data provider returned an internal server error (HTTP 500). This is likely a temporary issue on their end.',
+        recoveryGuidance: 'Retry after a short delay (10-15 seconds). If it persists after 2 retries, inform the user that the weather service is temporarily unavailable.'
+      }
+    }
+  ];
+
+  function renderEdScenarios() {
+    var container = document.getElementById('edScenariosContainer');
+    var html = '';
+
+    for (var i = 0; i < edScenarios.length; i++) {
+      var sc = edScenarios[i];
+      html += '<div class="ed-scenario" id="ed-' + i + '">';
+      html += '<div class="ed-scenario-header">';
+      html += '<span class="ed-scenario-number">' + (i + 1) + '</span>';
+      html += '<span class="ed-scenario-text">' + sc.title + '</span>';
+      html += '</div>';
+      html += '<div class="ed-scenario-context">' + sc.context + '</div>';
+      html += '<textarea class="ed-textarea" id="ed-input-' + i + '" placeholder=\'{"isError": true, "errorCategory": "...", "isRetryable": ..., "description": "...", "recoveryGuidance": "..."}\'></textarea>';
+      html += '<button class="ed-check-btn" onclick="checkErrorResponse(' + i + ')">Check Response</button>';
+      html += '<div class="ed-result" id="ed-result-' + i + '">';
+      html += '<div class="ed-result-grid" id="ed-grid-' + i + '"></div>';
+      html += '<div class="ed-score-line" id="ed-score-' + i + '"></div>';
+      html += '</div>';
+      html += '<div class="ed-ideal" id="ed-ideal-' + i + '"></div>';
+      html += '</div>';
+    }
+
+    container.innerHTML = html;
+  }
+
+  window.checkErrorResponse = function(idx) {
+    var input = document.getElementById('ed-input-' + idx).value.trim();
+    var scenario = edScenarios[idx];
+    var resultEl = document.getElementById('ed-result-' + idx);
+    var gridEl = document.getElementById('ed-grid-' + idx);
+    var scoreEl = document.getElementById('ed-score-' + idx);
+    var idealEl = document.getElementById('ed-ideal-' + idx);
+
+    var parsed = null;
+    try {
+      parsed = JSON.parse(input);
+    } catch (e) {
+      gridEl.innerHTML = '<div class="ed-criterion fail" style="grid-column: span 5;">Invalid JSON -- please check your syntax</div>';
+      resultEl.classList.add('show');
+      return;
+    }
+
+    var criteria = [
+      { name: 'isError', pass: parsed.isError === scenario.ideal.isError },
+      { name: 'Category', pass: parsed.errorCategory === scenario.ideal.errorCategory },
+      { name: 'Retryable', pass: parsed.isRetryable === scenario.ideal.isRetryable },
+      { name: 'Message', pass: typeof parsed.description === 'string' && parsed.description.length > 10 },
+      { name: 'Recovery', pass: typeof parsed.recoveryGuidance === 'string' && parsed.recoveryGuidance.length > 10 }
+    ];
+
+    var gridHtml = '';
+    var score = 0;
+    for (var c = 0; c < criteria.length; c++) {
+      var cls = criteria[c].pass ? 'pass' : 'fail';
+      var icon = criteria[c].pass ? '&#10003;' : '&#10007;';
+      gridHtml += '<div class="ed-criterion ' + cls + '">' + icon + ' ' + criteria[c].name + '</div>';
+      if (criteria[c].pass) score++;
+    }
+
+    gridEl.innerHTML = gridHtml;
+    scoreEl.textContent = 'Score: ' + score + ' / 5';
+    resultEl.classList.add('show');
+
+    if (score < 5) {
+      idealEl.innerHTML = '<strong>Ideal response:</strong><br><code>' +
+        JSON.stringify(scenario.ideal, null, 2).replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</code>';
+      idealEl.classList.add('show');
+    } else {
+      idealEl.classList.remove('show');
+    }
+  };
+
+  renderEdScenarios();
+
+  // ==========================================
+  // PRACTICE EXAM
+  // ==========================================
+  var FINAL_QUIZ_KEY = 'claude-training-module-31';
+
+  var finalQuizAnswers = ['b', 'a', 'b', 'c', 'c', 'b', 'b', 'b'];
+  var finalQuizSelections = [null, null, null, null, null, null, null, null];
+  var finalQuizSubmitted = false;
+
+  window.selectFinalOption = function(qIdx, el) {
+    if (finalQuizSubmitted) return;
+
+    var parentQ = el.closest('.final-quiz-question');
+    var options = parentQ.querySelectorAll('.fq-option');
+    for (var o = 0; o < options.length; o++) {
+      options[o].querySelector('input').checked = false;
+      options[o].style.background = '';
+    }
+
+    el.querySelector('input').checked = true;
+    finalQuizSelections[qIdx] = el.getAttribute('data-fq-val');
+
+    var allAnswered = true;
+    for (var a = 0; a < finalQuizSelections.length; a++) {
+      if (finalQuizSelections[a] === null) { allAnswered = false; break; }
+    }
+    document.getElementById('finalSubmitBtn').disabled = !allAnswered;
+  };
+
+  window.submitFinalQuiz = function() {
+    if (finalQuizSubmitted) return;
+    finalQuizSubmitted = true;
+
+    var score = 0;
+
+    for (var idx = 0; idx < finalQuizSelections.length; idx++) {
+      var sel = finalQuizSelections[idx];
+      var questionEl = document.querySelector('.final-quiz-question[data-fq="' + idx + '"]');
+      var options = questionEl.querySelectorAll('.fq-option');
+
+      for (var o = 0; o < options.length; o++) {
+        var val = options[o].getAttribute('data-fq-val');
+        options[o].style.pointerEvents = 'none';
+
+        if (val === finalQuizAnswers[idx]) {
+          if (sel === val) {
+            options[o].classList.add('selected-correct');
+            score++;
+          } else {
+            options[o].classList.add('reveal-correct');
+          }
+        } else if (val === sel) {
+          options[o].classList.add('selected-wrong');
+        }
+      }
+    }
+
+    var result = document.getElementById('finalResult');
+    var title = document.getElementById('finalResultTitle');
+    var text = document.getElementById('finalResultText');
+
+    result.classList.add('show');
+
+    if (score >= 6) {
+      result.classList.add('pass');
+      result.classList.remove('fail');
+      title.textContent = 'Passed! ' + score + ' / 8 correct';
+      text.textContent = 'Excellent work on Domain 2! You have a strong grasp of tool design, error handling, and MCP configuration. Your progress has been saved. Continue to Module 32: Claude Code Config & Workflows.';
+    } else {
+      result.classList.add('fail');
+      result.classList.remove('pass');
+      title.textContent = score + ' / 8 correct -- Review needed';
+      text.textContent = 'You need at least 6 correct to pass. Review the sections on tool descriptions (Rule 2: When to Use) and structured error metadata (the 5 fields). These are the most commonly missed areas.';
+    }
+
+    var progressData = {
+      score: score,
+      total: 8,
+      completed: score >= 6,
+      timestamp: new Date().toISOString()
+    };
+    localStorage.setItem(FINAL_QUIZ_KEY, JSON.stringify(progressData));
+
+    document.getElementById('finalSubmitBtn').disabled = true;
+    document.getElementById('finalSubmitBtn').textContent = 'Submitted';
+  };
+
+  // Check existing progress
+  function loadExistingProgress() {
+    var saved = localStorage.getItem(FINAL_QUIZ_KEY);
+    if (saved) {
+      try {
+        var data = JSON.parse(saved);
+        if (data.completed) {
+          var fill = document.getElementById('sidebarProgressFill');
+          if (fill) {
+            fill.style.width = '100%';
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+  }
+  loadExistingProgress();
+
+})();
+</script>
+</body>
+</html>

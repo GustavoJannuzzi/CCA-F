@@ -1,0 +1,2990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 01: What Is Claude? | Claude AI Training</title>
+<style>
+/* ============================================
+   CSS CUSTOM PROPERTIES & DESIGN SYSTEM
+   ============================================ */
+:root {
+  --primary: #7C3AED;
+  --primary-light: #A78BFA;
+  --primary-dark: #5B21B6;
+  --accent: #06B6D4;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  --bg: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --bg-code: #F1F5F9;
+  --text: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --border: #E2E8F0;
+  --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --transition: 0.2s ease;
+  --sidebar-width: 280px;
+  --content-max: 800px;
+}
+
+[data-theme="dark"] {
+  --bg: #0F172A;
+  --bg-card: #1E293B;
+  --bg-code: #1E293B;
+  --text: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --border: #334155;
+  --shadow: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.3);
+}
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 24px;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  min-height: 100vh;
+  transition: background var(--transition), color var(--transition);
+}
+
+/* ============================================
+   THEME TOGGLE
+   ============================================ */
+.theme-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: all var(--transition);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+.theme-toggle:hover {
+  box-shadow: var(--shadow-lg);
+  transform: scale(1.05);
+}
+
+/* ============================================
+   SIDEBAR
+   ============================================ */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  z-index: 900;
+  transition: transform 0.3s ease, background var(--transition);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.sidebar-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+  margin-bottom: 12px;
+  transition: color var(--transition);
+}
+.sidebar-back:hover { color: var(--primary-dark); }
+
+.sidebar-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.sidebar-module-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.sidebar-nav {
+  padding: 12px 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.sidebar-section {
+  margin-bottom: 4px;
+}
+
+.sidebar-section-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 20px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  text-align: left;
+  transition: color var(--transition);
+}
+.sidebar-section-toggle:hover { color: var(--text); }
+.sidebar-section-toggle .chevron {
+  transition: transform 0.2s ease;
+  font-size: 0.65rem;
+}
+.sidebar-section-toggle.collapsed .chevron {
+  transform: rotate(-90deg);
+}
+
+.sidebar-links {
+  list-style: none;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.sidebar-links.collapsed {
+  max-height: 0 !important;
+}
+
+.sidebar-link {
+  display: block;
+  padding: 7px 20px 7px 32px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: all var(--transition);
+  line-height: 1.4;
+}
+.sidebar-link:hover {
+  color: var(--text);
+  background: var(--bg);
+}
+.sidebar-link.active {
+  color: var(--primary);
+  border-left-color: var(--primary);
+  background: rgba(124, 58, 237, 0.05);
+  font-weight: 600;
+}
+[data-theme="dark"] .sidebar-link.active {
+  background: rgba(124, 58, 237, 0.12);
+}
+
+.sidebar-progress {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sidebar-progress-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.sidebar-progress-track {
+  height: 6px;
+  background: var(--bg-code);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.sidebar-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 3px;
+  transition: width 0.5s ease;
+  width: 0%;
+}
+
+/* Hamburger button (mobile) */
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1001;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+  transition: all var(--transition);
+}
+.hamburger span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--text);
+  margin: 4px auto;
+  transition: all 0.3s ease;
+  border-radius: 1px;
+}
+.hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(4px, 4px); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(4px, -4px); }
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 899;
+}
+
+/* ============================================
+   MAIN CONTENT
+   ============================================ */
+.main-content {
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+  transition: margin var(--transition);
+}
+
+.content-wrapper {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 40px 32px 80px;
+}
+
+/* Module Header */
+.module-header {
+  margin-bottom: 48px;
+}
+.module-header .breadcrumb {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+.module-header .breadcrumb a {
+  color: var(--primary);
+  text-decoration: none;
+}
+.module-header .breadcrumb a:hover { text-decoration: underline; }
+
+.module-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.module-badge .number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.module-badge .label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.module-header h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+}
+
+.module-header .description {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 640px;
+}
+
+.module-meta {
+  display: flex;
+  gap: 16px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.module-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  background: var(--bg-code);
+  padding: 6px 14px;
+  border-radius: 20px;
+}
+
+/* ============================================
+   SECTIONS
+   ============================================ */
+.section {
+  margin-bottom: 56px;
+  scroll-margin-top: 24px;
+}
+
+.section-heading {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+  line-height: 1.3;
+}
+
+.section h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-top: 32px;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.section h4 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-top: 24px;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.section p {
+  margin-bottom: 16px;
+  color: var(--text-secondary);
+}
+
+.section ul, .section ol {
+  margin-bottom: 16px;
+  padding-left: 24px;
+}
+.section li {
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+}
+.section li strong {
+  color: var(--text);
+}
+
+/* ============================================
+   CODE BLOCKS
+   ============================================ */
+.code-block {
+  background: #1E293B;
+  color: #E2E8F0;
+  border-radius: var(--radius-sm);
+  padding: 20px 24px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  overflow-x: auto;
+  position: relative;
+  margin: 16px 0 20px;
+  tab-size: 2;
+}
+.code-block .code-label {
+  position: absolute;
+  top: 8px;
+  left: 16px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #64748B;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+.code-block.has-label {
+  padding-top: 36px;
+}
+.code-block .copy-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: #94A3B8;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  transition: all var(--transition);
+}
+.code-block .copy-btn:hover { background: rgba(255,255,255,0.2); color: white; }
+.code-block .copy-btn.copied { background: var(--success); color: white; }
+
+/* Syntax highlighting classes */
+.kw { color: #C084FC; }
+.str { color: #6EE7B7; }
+.fn { color: #7DD3FC; }
+.cm { color: #64748B; }
+.num { color: #FDBA74; }
+.op { color: #FCA5A5; }
+.type { color: #67E8F9; }
+.param { color: #FDE68A; }
+.prop { color: #F0ABFC; }
+.punc { color: #94A3B8; }
+
+/* Inline code */
+code {
+  background: var(--bg-code);
+  color: var(--primary);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.88em;
+}
+[data-theme="dark"] code {
+  background: #334155;
+}
+.code-block code {
+  background: none;
+  color: inherit;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+  white-space: pre-wrap;
+  display: block;
+}
+
+/* ============================================
+   CALLOUT BOXES
+   ============================================ */
+.callout {
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  margin: 20px 0;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.callout-icon {
+  flex-shrink: 0;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+.callout-content { flex: 1; }
+.callout-content p { margin-bottom: 6px; color: inherit; }
+.callout-content p:last-child { margin-bottom: 0; }
+
+.callout.info {
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  color: #1E40AF;
+}
+.callout.tip {
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  color: #166534;
+}
+.callout.warning {
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  color: #92400E;
+}
+.callout.important {
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  color: #991B1B;
+}
+
+[data-theme="dark"] .callout.info {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: #93C5FD;
+}
+[data-theme="dark"] .callout.tip {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #6EE7B7;
+}
+[data-theme="dark"] .callout.warning {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #FCD34D;
+}
+[data-theme="dark"] .callout.important {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #FCA5A5;
+}
+
+/* ============================================
+   COMPARISON TABLE
+   ============================================ */
+.comparison-table-wrapper {
+  overflow-x: auto;
+  margin: 20px 0;
+}
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.comparison-table th {
+  background: var(--primary);
+  color: white;
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+.comparison-table th:first-child {
+  border-radius: var(--radius-sm) 0 0 0;
+}
+.comparison-table th:last-child {
+  border-radius: 0 var(--radius-sm) 0 0;
+}
+.comparison-table td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+.comparison-table tr:nth-child(even) td {
+  background: var(--bg);
+}
+.comparison-table tr:last-child td:first-child {
+  border-radius: 0 0 0 var(--radius-sm);
+}
+.comparison-table tr:last-child td:last-child {
+  border-radius: 0 0 var(--radius-sm) 0;
+}
+
+/* ============================================
+   SURFACE CARDS (three-column layout)
+   ============================================ */
+.surface-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin: 24px 0;
+}
+.surface-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px 20px;
+  text-align: center;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+.surface-card:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow);
+}
+.surface-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  font-size: 1.6rem;
+  margin-bottom: 14px;
+}
+.surface-card-icon.browser { background: #EDE9FE; color: #7C3AED; }
+.surface-card-icon.cli { background: #E0E7FF; color: #4F46E5; }
+.surface-card-icon.cowork { background: #CCFBF1; color: #0D9488; }
+[data-theme="dark"] .surface-card-icon.browser { background: #3B0764; }
+[data-theme="dark"] .surface-card-icon.cli { background: #312E81; }
+[data-theme="dark"] .surface-card-icon.cowork { background: #042F2E; }
+
+.surface-card h4 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  color: var(--text);
+}
+.surface-card p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 0;
+}
+.surface-card .surface-best-for {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+/* ============================================
+   INTERACTIVE: TOOL PICKER / MODEL SELECTOR QUIZ
+   ============================================ */
+.quiz-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+}
+.quiz-container h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.quiz-score-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 12px 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+}
+.quiz-score-bar .score-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.quiz-score-track {
+  flex: 1;
+  height: 8px;
+  background: var(--bg-code);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.quiz-score-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--success));
+  border-radius: 4px;
+  transition: width 0.4s ease;
+  width: 0%;
+}
+.quiz-score-text {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  min-width: 50px;
+  text-align: right;
+}
+
+.quiz-question {
+  margin-bottom: 24px;
+  padding: 20px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  transition: border-color 0.3s ease;
+}
+.quiz-question.correct { border-color: var(--success); }
+.quiz-question.incorrect { border-color: var(--error); }
+
+.quiz-q-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.quiz-q-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  font-weight: 700;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+.quiz-q-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.quiz-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+.quiz-option {
+  padding: 10px 14px;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text);
+  text-align: center;
+  user-select: none;
+}
+.quiz-option:hover:not(.disabled) {
+  border-color: var(--primary-light);
+  background: rgba(124, 58, 237, 0.05);
+}
+.quiz-option.selected {
+  border-color: var(--primary);
+  background: rgba(124, 58, 237, 0.1);
+  color: var(--primary);
+}
+.quiz-option.correct-answer {
+  border-color: var(--success);
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+[data-theme="dark"] .quiz-option.correct-answer {
+  color: #6EE7B7;
+}
+.quiz-option.wrong-answer {
+  border-color: var(--error);
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+}
+.quiz-option.disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+.quiz-option.disabled:not(.correct-answer):not(.wrong-answer) {
+  opacity: 0.5;
+}
+
+.quiz-feedback {
+  margin-top: 10px;
+  font-size: 0.85rem;
+  padding: 8px 12px;
+  border-radius: 6px;
+  display: none;
+}
+.quiz-feedback.show { display: block; }
+.quiz-feedback.correct {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+.quiz-feedback.incorrect {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+}
+[data-theme="dark"] .quiz-feedback.correct { color: #6EE7B7; }
+[data-theme="dark"] .quiz-feedback.incorrect { color: #FCA5A5; }
+
+/* ============================================
+   INTERACTIVE: TOKEN COUNTER
+   ============================================ */
+.token-counter {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+}
+.token-counter h3 {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+.token-counter textarea {
+  width: 100%;
+  min-height: 140px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  background: var(--bg);
+  color: var(--text);
+  resize: vertical;
+  transition: border-color var(--transition);
+}
+.token-counter textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.token-samples {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0;
+  flex-wrap: wrap;
+}
+.token-sample-btn {
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--bg);
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.token-sample-btn:hover {
+  border-color: var(--primary-light);
+  color: var(--primary);
+  background: rgba(124, 58, 237, 0.05);
+}
+
+.token-result {
+  margin-top: 16px;
+}
+.token-gauge {
+  width: 100%;
+  height: 24px;
+  background: var(--bg-code);
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+.token-gauge-fill {
+  height: 100%;
+  border-radius: 12px;
+  transition: width 0.4s ease, background 0.4s ease;
+  width: 0%;
+  min-width: 0;
+  background: var(--success);
+}
+.token-gauge-fill.amber { background: var(--warning); }
+.token-gauge-fill.red { background: var(--error); }
+
+.token-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+.token-stats span {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.token-count-val { color: var(--text); }
+.token-percent-val { color: var(--text-muted); }
+.token-percent-val.amber { color: var(--warning); }
+.token-percent-val.red { color: var(--error); }
+
+/* ============================================
+   INTERACTIVE: SURFACE MATCHER
+   ============================================ */
+.surface-matcher {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+}
+.surface-matcher h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+.surface-matcher > p {
+  margin-bottom: 20px;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+}
+
+.sm-bins {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.sm-bin {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 12px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  text-align: center;
+}
+.sm-bin:hover {
+  border-color: var(--primary-light);
+  background: rgba(124, 58, 237, 0.04);
+}
+.sm-bin.highlight {
+  border-color: var(--primary);
+  background: rgba(124, 58, 237, 0.08);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+}
+.sm-bin-icon {
+  font-size: 1.4rem;
+}
+.sm-bin-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.sm-bin-count {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.sm-tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.sm-task {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+.sm-task:hover:not(.placed) {
+  border-color: var(--primary-light);
+  background: rgba(124, 58, 237, 0.03);
+}
+.sm-task.selected {
+  border-color: var(--primary);
+  background: rgba(124, 58, 237, 0.08);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+}
+.sm-task.correct-place {
+  border-color: var(--success);
+  background: rgba(16, 185, 129, 0.08);
+  cursor: default;
+}
+.sm-task.wrong-place {
+  border-color: var(--error);
+  background: rgba(239, 68, 68, 0.06);
+  cursor: default;
+}
+.sm-task-text {
+  flex: 1;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+.sm-task-status {
+  flex-shrink: 0;
+  font-size: 1.1rem;
+  line-height: 1;
+  min-width: 24px;
+  text-align: center;
+}
+.sm-task-explanation {
+  display: none;
+  margin-top: 8px;
+  font-size: 0.82rem;
+  padding: 8px 10px;
+  border-radius: 6px;
+}
+.sm-task-explanation.show { display: block; }
+.sm-task-explanation.correct-exp {
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+}
+.sm-task-explanation.wrong-exp {
+  background: rgba(239, 68, 68, 0.08);
+  color: var(--error);
+}
+[data-theme="dark"] .sm-task-explanation.correct-exp { color: #6EE7B7; }
+[data-theme="dark"] .sm-task-explanation.wrong-exp { color: #FCA5A5; }
+
+.sm-score-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 10px 14px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+}
+.sm-score-bar .score-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.sm-score-track {
+  flex: 1;
+  height: 8px;
+  background: var(--bg-code);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.sm-score-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--success));
+  border-radius: 4px;
+  transition: width 0.4s ease;
+  width: 0%;
+}
+.sm-score-text {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  min-width: 50px;
+  text-align: right;
+}
+
+/* ============================================
+   INTERACTIVE: END-OF-MODULE QUIZ
+   ============================================ */
+.final-quiz {
+  background: var(--bg-card);
+  border: 2px solid var(--primary-light);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+}
+.final-quiz h3 {
+  margin-top: 0;
+}
+
+.final-quiz-question {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.final-quiz-question .fq-number {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+.final-quiz-question .fq-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+.fq-options { list-style: none; padding: 0; }
+.fq-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 12px;
+  margin-bottom: 4px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+.fq-option:hover { background: rgba(124, 58, 237, 0.05); }
+.fq-option input[type="radio"] {
+  accent-color: var(--primary);
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+.fq-option.selected-correct {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+.fq-option.selected-wrong {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+}
+.fq-option.reveal-correct {
+  background: rgba(16, 185, 129, 0.08);
+  color: #059669;
+  font-weight: 600;
+}
+[data-theme="dark"] .fq-option.selected-correct { color: #6EE7B7; }
+[data-theme="dark"] .fq-option.selected-wrong { color: #FCA5A5; }
+[data-theme="dark"] .fq-option.reveal-correct { color: #6EE7B7; }
+
+.final-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 32px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  margin-top: 8px;
+}
+.final-submit-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-lg); }
+.final-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.final-result {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: var(--radius-sm);
+  display: none;
+}
+.final-result.show { display: block; }
+.final-result.pass {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.final-result.fail {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.final-result h4 {
+  margin-top: 0;
+  margin-bottom: 6px;
+  font-size: 1.1rem;
+}
+.final-result p {
+  margin-bottom: 0;
+  font-size: 0.95rem;
+}
+.final-result.pass h4 { color: var(--success); }
+.final-result.fail h4 { color: var(--warning); }
+
+/* ============================================
+   NAVIGATION FOOTER
+   ============================================ */
+.module-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 16px;
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 2px solid var(--border);
+}
+.nav-link {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: all var(--transition);
+  min-width: 0;
+  flex: 1;
+  max-width: 50%;
+}
+.nav-link:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow);
+}
+.nav-link.next { align-items: flex-end; text-align: right; }
+.nav-link .nav-dir {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--primary);
+}
+.nav-link .nav-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 1024px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .hamburger {
+    display: flex;
+  }
+  .sidebar-overlay.show {
+    display: block;
+  }
+  .main-content {
+    margin-left: 0;
+  }
+  .theme-toggle {
+    right: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .surface-grid {
+    grid-template-columns: 1fr;
+  }
+  .sm-bins {
+    grid-template-columns: 1fr;
+  }
+  .quiz-options {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .content-wrapper {
+    padding: 24px 16px 60px;
+  }
+  .module-header h1 {
+    font-size: 1.6rem;
+  }
+  .section-heading {
+    font-size: 1.3rem;
+  }
+  .quiz-options {
+    grid-template-columns: 1fr;
+  }
+  .module-nav {
+    flex-direction: column;
+  }
+  .nav-link {
+    max-width: 100%;
+  }
+  .nav-link.next {
+    align-items: flex-start;
+    text-align: left;
+  }
+  .token-samples {
+    flex-direction: column;
+  }
+}
+
+/* ============================================
+   SCROLLBAR STYLING
+   ============================================ */
+.sidebar::-webkit-scrollbar,
+.code-block::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.sidebar::-webkit-scrollbar-track,
+.code-block::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+.code-block::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.section {
+  animation: fadeInUp 0.4s ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section {
+    animation: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* Key concept highlight */
+.key-concept {
+  display: inline-block;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(6, 182, 212, 0.1));
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  color: var(--primary);
+}
+[data-theme="dark"] .key-concept {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(6, 182, 212, 0.15));
+  border-color: rgba(124, 58, 237, 0.35);
+}
+</style>
+</head>
+<body>
+<!-- ============================================
+     THEME TOGGLE
+     ============================================ -->
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+  <span id="themeIcon">&#9790;</span>
+</button>
+
+<!-- ============================================
+     HAMBURGER (mobile)
+     ============================================ -->
+<button class="hamburger" id="hamburger" aria-label="Toggle sidebar">
+  <span></span>
+  <span></span>
+  <span></span>
+</button>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ============================================
+     SIDEBAR
+     ============================================ -->
+<nav class="sidebar" id="sidebar" aria-label="Module navigation">
+  <div class="sidebar-header">
+    <a href="../index.html" class="sidebar-back">&larr; Back to Hub</a>
+    <div class="sidebar-title">Module 01</div>
+    <div class="sidebar-module-name">What Is Claude?</div>
+  </div>
+
+  <div class="sidebar-nav">
+    <!-- Section: Foundations -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="foundations" aria-expanded="true">
+        Foundations <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-foundations">
+        <li><a href="#ai-landscape" class="sidebar-link" data-target="ai-landscape">The AI Landscape</a></li>
+        <li><a href="#model-family" class="sidebar-link" data-target="model-family">The Claude Model Family</a></li>
+        <li><a href="#three-surfaces" class="sidebar-link" data-target="three-surfaces">Three Surfaces</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Key Concepts -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="concepts" aria-expanded="true">
+        Key Concepts <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-concepts">
+        <li><a href="#tokens-context" class="sidebar-link" data-target="tokens-context">Tokens &amp; Context</a></li>
+        <li><a href="#safety" class="sidebar-link" data-target="safety">Safety &amp; Responsible Use</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Exercises -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="exercises" aria-expanded="true">
+        Exercises <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-exercises">
+        <li><a href="#model-quiz" class="sidebar-link" data-target="model-quiz">Model Selector Quiz</a></li>
+        <li><a href="#surface-matcher" class="sidebar-link" data-target="surface-matcher">Surface Matcher</a></li>
+        <li><a href="#token-counter" class="sidebar-link" data-target="token-counter">Token Counter</a></li>
+        <li><a href="#final-quiz" class="sidebar-link" data-target="final-quiz">End-of-Module Quiz</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sidebar-progress">
+    <div class="sidebar-progress-label">Module Progress</div>
+    <div class="sidebar-progress-track">
+      <div class="sidebar-progress-fill" id="sidebarProgressFill"></div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================
+     MAIN CONTENT
+     ============================================ -->
+<main class="main-content">
+  <div class="content-wrapper">
+
+    <!-- Module Header -->
+    <header class="module-header">
+      <div class="breadcrumb">
+        <a href="../index.html">Training Hub</a> &raquo; Module 01
+      </div>
+      <div class="module-badge">
+        <span class="number">1</span>
+        <span class="label">Foundation</span>
+      </div>
+      <h1>What Is Claude? -- The Foundation</h1>
+      <p class="description">
+        Understand what Claude is, how it works, and the different ways you can interact with it.
+        This module builds the conceptual foundation that everything else in the training program rests on.
+      </p>
+      <div class="module-meta">
+        <span class="module-meta-item">&#9201; ~45 min</span>
+        <span class="module-meta-item">&#128218; Beginner</span>
+        <span class="module-meta-item">&#127891; Everyone</span>
+        <span class="module-meta-item">&#127919; 4 Interactive Exercises</span>
+      </div>
+    </header>
+
+    <!-- ========================================
+         SECTION 1: THE AI LANDSCAPE
+         ======================================== -->
+    <section class="section" id="ai-landscape">
+      <h2 class="section-heading">1. The AI Landscape</h2>
+
+      <h3>What Are Large Language Models (LLMs)?</h3>
+
+      <p>
+        Large Language Models are <span class="key-concept">neural networks</span> trained on massive text
+        datasets -- books, websites, code repositories, scientific papers, and more. At their core, they
+        work by predicting the next token (word or word-piece) in a sequence. But this deceptively simple
+        mechanism creates <strong>emergent capabilities</strong> that go far beyond mere text completion:
+        reasoning, analysis, code generation, translation, and nuanced conversation.
+      </p>
+
+      <p>
+        A helpful analogy: think of autocomplete on your phone, but elevated by many orders of magnitude.
+        Your phone's autocomplete predicts the next word based on shallow patterns. An LLM predicts the
+        next token based on a deep understanding of context, logic, nuance, and even intent. The gap
+        between the two is enormous -- like the difference between a calculator and a mathematician.
+      </p>
+
+      <h3>How Claude Differs from Other AI Assistants</h3>
+
+      <p>
+        Claude is built by <strong>Anthropic</strong>, a company founded with safety at its core.
+        Several things set Claude apart:
+      </p>
+
+      <ul>
+        <li>
+          <strong>Constitutional AI (CAI)</strong> -- Rather than relying solely on lists of rules,
+          Claude is trained to follow high-level principles. It learns to be helpful, harmless, and
+          honest through a process that embeds these values deeply into its behavior.
+        </li>
+        <li>
+          <strong>Reinforcement Learning from Human Feedback (RLHF)</strong> -- Human evaluators
+          rate Claude's responses, and the model is fine-tuned to align with human preferences for
+          quality, accuracy, and safety.
+        </li>
+        <li>
+          <strong>Helpful, Harmless, and Honest</strong> -- This is Anthropic's guiding triad.
+          Claude strives to provide genuinely useful answers, avoid causing harm, and be transparent
+          about what it knows and does not know.
+        </li>
+        <li>
+          <strong>Exceptional at analysis, reasoning, coding, and nuanced writing</strong> -- Claude
+          consistently excels in benchmarks for complex reasoning, code generation, and long-form
+          writing tasks.
+        </li>
+      </ul>
+
+      <h3>A Brief History of LLMs</h3>
+
+      <p>
+        Understanding where LLMs came from helps contextualize where they are going:
+      </p>
+
+      <ul>
+        <li>
+          <strong>2017: Transformers</strong> -- Google researchers published "Attention Is All You Need,"
+          introducing the transformer architecture. This replaced slower recurrent neural networks with
+          a parallelizable self-attention mechanism, unlocking massive scale.
+        </li>
+        <li>
+          <strong>2018-2020: Scaling Up</strong> -- GPT, BERT, GPT-2, and GPT-3 demonstrated that
+          bigger models trained on more data produced qualitatively better results. Each generation
+          showed new emergent capabilities.
+        </li>
+        <li>
+          <strong>2021-2022: Alignment</strong> -- Researchers discovered that raw capability was
+          not enough -- models needed to be aligned with human values. RLHF and Constitutional AI
+          emerged as techniques to make models helpful, honest, and harmless.
+        </li>
+        <li>
+          <strong>2023-Present: Agents</strong> -- LLMs evolved from text generators to autonomous
+          agents that can use tools, plan multi-step actions, and interact with external systems.
+          Claude Code is a prime example of this evolution.
+        </li>
+      </ul>
+
+      <div class="callout info">
+        <span class="callout-icon">&#9432;</span>
+        <div class="callout-content">
+          <p><strong>Why safety matters for enterprise:</strong> When you deploy AI in a business context,
+          you need a model that knows when to decline a request, explains its reasoning, and does not
+          fabricate authoritative-sounding but incorrect answers. Claude's safety training directly
+          addresses these enterprise concerns.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 2: THE CLAUDE MODEL FAMILY
+         ======================================== -->
+    <section class="section" id="model-family">
+      <h2 class="section-heading">2. The Claude Model Family</h2>
+
+      <p>
+        Claude comes in three model tiers, each optimized for different tradeoffs between speed, cost,
+        and capability. Choosing the right model for your task is one of the most impactful decisions
+        you will make when working with Claude.
+      </p>
+
+      <h3>Haiku 4.5 -- Fast and Cost-Effective</h3>
+      <p>
+        Haiku is the speedster of the family. It responds in roughly <strong>200 milliseconds</strong>
+        for short queries and costs a fraction of what the larger models charge. It is purpose-built for
+        tasks that are well-defined, repetitive, or high-volume.
+      </p>
+      <ul>
+        <li><strong>Best for:</strong> Simple classification, routing, quick Q&A, high-volume tasks</li>
+        <li><strong>Response time:</strong> ~200ms for short queries</li>
+        <li><strong>Cost:</strong> Lowest tier -- ideal when you need to process thousands of items</li>
+      </ul>
+
+      <h3>Sonnet 4.6 -- The Balanced Workhorse</h3>
+      <p>
+        Sonnet hits the sweet spot between capability and cost. For most day-to-day tasks -- coding,
+        analysis, writing, conversation -- Sonnet delivers excellent quality at a speed and price point
+        that makes it the default choice for the majority of workflows.
+      </p>
+      <ul>
+        <li><strong>Best for:</strong> Most tasks -- coding, analysis, writing, conversation</li>
+        <li><strong>Excellent speed-to-quality ratio</strong> -- fast enough for interactive use, capable enough for complex work</li>
+        <li><strong>Cost:</strong> Mid-tier, outstanding value for the capability level</li>
+      </ul>
+
+      <h3>Opus 4.6 -- Maximum Capability</h3>
+      <p>
+        Opus is Claude at its most powerful. When you face genuinely hard problems -- complex architecture
+        decisions, subtle debugging, multi-layered research, or tasks that require holding many
+        constraints in mind simultaneously -- Opus is the model to reach for.
+      </p>
+      <ul>
+        <li><strong>Best for:</strong> Complex reasoning, architecture design, nuanced analysis, research</li>
+        <li><strong>Deepest understanding</strong> -- the most thorough, considered responses</li>
+        <li><strong>Cost:</strong> Highest, but worth it for problems where getting it right matters most</li>
+      </ul>
+
+      <h4>Model Comparison</h4>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table" aria-label="Claude model comparison">
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>Haiku 4.5</th>
+              <th>Sonnet 4.6</th>
+              <th>Opus 4.6</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Speed</strong></td>
+              <td>Fastest</td>
+              <td>Fast</td>
+              <td>Moderate</td>
+            </tr>
+            <tr>
+              <td><strong>Cost</strong></td>
+              <td>$</td>
+              <td>$$</td>
+              <td>$$$</td>
+            </tr>
+            <tr>
+              <td><strong>Reasoning</strong></td>
+              <td>Good</td>
+              <td>Very Good</td>
+              <td>Exceptional</td>
+            </tr>
+            <tr>
+              <td><strong>Context Window</strong></td>
+              <td>200K tokens</td>
+              <td>200K tokens</td>
+              <td>200K (1M available)</td>
+            </tr>
+            <tr>
+              <td><strong>Best For</strong></td>
+              <td>Simple, high-volume tasks</td>
+              <td>Most everyday tasks</td>
+              <td>Hard, complex problems</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4>Practical Example: A Day of Model Choices</h4>
+
+      <p>
+        Imagine a typical day for a software engineering lead. Here is how they might use all three
+        models across different tasks:
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Morning: Triage</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm"># Haiku: Classify 200 overnight support tickets</span>
+<span class="cm"># Task: Simple categorization into bug/feature/question/billing</span>
+<span class="cm"># Why Haiku: High volume, simple classification, speed matters</span>
+<span class="cm"># Cost: ~$0.50 total for 200 tickets</span></code></div>
+
+      <div class="code-block has-label">
+        <span class="code-label">Midday: Development</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm"># Sonnet: Help refactor the payment service</span>
+<span class="cm"># Task: Rewrite a module to use the new API, add tests</span>
+<span class="cm"># Why Sonnet: Good coding ability, fast iteration, reasonable cost</span>
+<span class="cm"># Cost: ~$2-5 for a multi-turn coding session</span></code></div>
+
+      <div class="code-block has-label">
+        <span class="code-label">Afternoon: Architecture</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm"># Opus: Design the migration strategy from monolith to microservices</span>
+<span class="cm"># Task: Analyze dependencies, propose service boundaries, plan rollout</span>
+<span class="cm"># Why Opus: Multi-constraint reasoning, needs deepest analysis</span>
+<span class="cm"># Cost: ~$10-15 for a thorough architecture session</span></code></div>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>Rule of thumb:</strong> Start with Sonnet. If the task is simple and you need speed
+          or volume, drop to Haiku. If Sonnet's output is not quite deep or nuanced enough, escalate to
+          Opus. Most people find that Sonnet handles 80% of their work perfectly well.</p>
+        </div>
+      </div>
+
+      <h4>When to Upgrade Your Model Choice</h4>
+
+      <p>
+        How do you know when Sonnet is not enough and you should switch to Opus? Watch for these signs:
+      </p>
+
+      <ul>
+        <li>
+          <strong>Sonnet's answer feels surface-level</strong> -- If you ask for an architecture
+          review and get generic advice rather than specific insights about your codebase, Opus may
+          find the deeper patterns.
+        </li>
+        <li>
+          <strong>The task has many interacting constraints</strong> -- Compliance requirements +
+          performance targets + backward compatibility + team bandwidth = a problem that benefits
+          from Opus's deeper reasoning.
+        </li>
+        <li>
+          <strong>You are debugging something subtle</strong> -- Race conditions, memory leaks,
+          edge cases in distributed systems -- these require the kind of careful analysis where
+          Opus shines.
+        </li>
+        <li>
+          <strong>The cost of getting it wrong is high</strong> -- For a production migration plan
+          or a security audit, the extra cost of Opus is trivial compared to the cost of missing
+          something important.
+        </li>
+      </ul>
+    </section>
+
+    <!-- ========================================
+         SECTION 3: THREE SURFACES, ONE INTELLIGENCE
+         ======================================== -->
+    <section class="section" id="three-surfaces">
+      <h2 class="section-heading">3. Three Surfaces, One Intelligence</h2>
+
+      <p>
+        Claude's intelligence is consistent across all interfaces -- the same models, the same training,
+        the same capabilities. What changes is the <em>surface</em>: the interface optimized for different
+        workflows. Think of it as the same engine under three different vehicle bodies, each designed for
+        a different type of road.
+      </p>
+
+      <div class="surface-grid">
+        <div class="surface-card">
+          <div class="surface-card-icon browser" aria-hidden="true">&#127760;</div>
+          <h4>Claude in the Browser</h4>
+          <p>
+            Chat-based interface at claude.ai that anyone can use. Create Projects for persistent context,
+            use Artifacts for documents, code, and diagrams.
+          </p>
+          <div class="surface-best-for">Best for: writing, analysis, research, brainstorming</div>
+        </div>
+
+        <div class="surface-card">
+          <div class="surface-card-icon cli" aria-hidden="true">&#128187;</div>
+          <h4>Claude Code (CLI)</h4>
+          <p>
+            Command-line AI pair programmer. Reads, writes, and edits code directly. Runs commands, manages git.
+            Has 8 core tools: Read, Write, Edit, Bash, Glob, Grep, Agent, WebSearch.
+          </p>
+          <div class="surface-best-for">Best for: development, code review, debugging, automation</div>
+        </div>
+
+        <div class="surface-card">
+          <div class="surface-card-icon cowork" aria-hidden="true">&#128101;</div>
+          <h4>Claude Cowork</h4>
+          <p>
+            Shared team workspace for collaboration. Persistent team context, shared knowledge bases,
+            governance and usage controls.
+          </p>
+          <div class="surface-best-for">Best for: team workflows, enterprise, collaborative authoring</div>
+        </div>
+      </div>
+
+      <h3>Claude in the Browser (claude.ai)</h3>
+      <p>
+        The browser interface is the most accessible way to interact with Claude. Open a browser, go
+        to claude.ai, and start chatting. It is ideal for knowledge work -- writing, analysis,
+        research, brainstorming, and creative tasks.
+      </p>
+      <ul>
+        <li><strong>Projects</strong> -- Organize conversations with persistent context. Upload reference
+        documents, set custom instructions, and maintain continuity across sessions.</li>
+        <li><strong>Artifacts</strong> -- Claude can generate standalone documents, code files, and
+        interactive Mermaid diagrams right in the conversation. Think of them as deliverables Claude
+        creates alongside its explanations.</li>
+        <li>No installation required -- works in any modern browser.</li>
+      </ul>
+
+      <h3>Claude Code (CLI)</h3>
+      <p>
+        Claude Code runs in your terminal as a full-fledged <span class="key-concept">autonomous agent</span>.
+        It does not just suggest code in a chat window -- it actually reads your files, writes edits,
+        runs your test suite, manages git, and builds software. It reasons about your codebase and
+        executes multi-step plans.
+      </p>
+      <ul>
+        <li><strong>8 core tools:</strong> Read, Write, Edit, Bash, Glob, Grep, Agent, WebSearch</li>
+        <li>Operates on your local filesystem with a permission system for safety</li>
+        <li>Ideal for software development, code review, debugging, and automation</li>
+        <li>Installs via <code>npm install -g @anthropic-ai/claude-code</code></li>
+      </ul>
+
+      <div class="code-block has-label">
+        <span class="code-label">Example: Claude Code in Action</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm"># You type a natural language request:</span>
+<span class="str">"Add a health check endpoint to our FastAPI backend that returns</span>
+<span class="str"> the server uptime and database connection status."</span>
+
+<span class="cm"># Claude Code autonomously:</span>
+<span class="cm"># 1. Searches for the FastAPI app definition (Grep)</span>
+<span class="cm"># 2. Reads the main app file (Read)</span>
+<span class="cm"># 3. Adds the new endpoint (Edit)</span>
+<span class="cm"># 4. Reads existing tests for patterns (Read)</span>
+<span class="cm"># 5. Creates a new test file (Write)</span>
+<span class="cm"># 6. Runs the test suite to verify (Bash)</span>
+<span class="cm"># 7. Reports success with a summary</span></code></div>
+
+      <h3>Claude Cowork (Team Workspace)</h3>
+      <p>
+        Cowork brings Claude into a shared, collaborative environment designed for teams. It provides
+        persistent context that the whole team can access, shared knowledge bases, and enterprise-grade
+        governance controls.
+      </p>
+      <ul>
+        <li><strong>Shared workspace</strong> -- Multiple team members interact with the same context</li>
+        <li><strong>Governance</strong> -- Audit logs, content filtering, usage policies, role-based access</li>
+        <li><strong>Enterprise adoption</strong> -- Designed for organizations scaling Claude across departments</li>
+      </ul>
+
+      <div class="callout info">
+        <span class="callout-icon">&#9432;</span>
+        <div class="callout-content">
+          <p><strong>Which surface should I use?</strong> Use the browser for general knowledge work.
+          Use Claude Code for anything involving code on your machine. Use Cowork when your team needs
+          shared context and governance. Many people use all three depending on the task at hand.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 4: UNDERSTANDING TOKENS AND CONTEXT
+         ======================================== -->
+    <section class="section" id="tokens-context">
+      <h2 class="section-heading">4. Understanding Tokens and Context</h2>
+
+      <h3>What Are Tokens?</h3>
+
+      <p>
+        Tokens are the fundamental unit of text that Claude processes. When you send a message, Claude
+        does not see individual characters or even whole words -- it sees <span class="key-concept">tokens</span>,
+        which are pieces of text that typically correspond to common word fragments.
+      </p>
+
+      <ul>
+        <li>Roughly <strong>1 token = 4 characters = 0.75 words</strong></li>
+        <li>"Hello, world!" = approximately 4 tokens</li>
+        <li>A typical English sentence = about 15-25 tokens</li>
+        <li>Common words like "the", "is", "and" are usually 1 token each</li>
+        <li>Longer or uncommon words may be split across multiple tokens</li>
+      </ul>
+
+      <h3>The Context Window</h3>
+
+      <p>
+        The context window is Claude's <strong>working memory</strong> -- everything Claude can consider
+        at one time. It includes your system prompt, the entire conversation history, all tool results,
+        and the current message.
+      </p>
+
+      <ul>
+        <li><strong>Standard:</strong> 200,000 tokens (~150,000 words, or roughly 500 pages of text)</li>
+        <li><strong>Opus extended:</strong> Up to 1,000,000 tokens (available for the Opus model)</li>
+        <li>The context window includes: system prompt + conversation history + tool results + current message</li>
+      </ul>
+
+      <div class="callout warning">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Context is finite.</strong> When the context window fills up, earlier parts of the
+          conversation are compressed or lost. This means very long conversations gradually degrade as
+          earlier context gets summarized. Managing context effectively is a key skill for power users.</p>
+        </div>
+      </div>
+
+      <h4>Quick Token Reference</h4>
+
+      <p>
+        To build intuition, here is what different types of content typically cost in tokens:
+      </p>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table" aria-label="Token size reference">
+          <thead>
+            <tr>
+              <th>Content Type</th>
+              <th>Approximate Size</th>
+              <th>Tokens</th>
+              <th>% of 200K Window</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>A short prompt</strong></td>
+              <td>1-2 sentences</td>
+              <td>~30-50</td>
+              <td>0.02%</td>
+            </tr>
+            <tr>
+              <td><strong>A detailed prompt</strong></td>
+              <td>1 paragraph</td>
+              <td>~100-200</td>
+              <td>0.1%</td>
+            </tr>
+            <tr>
+              <td><strong>A business email</strong></td>
+              <td>~500 words</td>
+              <td>~650</td>
+              <td>0.3%</td>
+            </tr>
+            <tr>
+              <td><strong>A Python source file</strong></td>
+              <td>~150 lines</td>
+              <td>~1,000-1,500</td>
+              <td>0.7%</td>
+            </tr>
+            <tr>
+              <td><strong>A blog post</strong></td>
+              <td>~2,000 words</td>
+              <td>~2,700</td>
+              <td>1.3%</td>
+            </tr>
+            <tr>
+              <td><strong>A full codebase README</strong></td>
+              <td>~5,000 words</td>
+              <td>~6,700</td>
+              <td>3.3%</td>
+            </tr>
+            <tr>
+              <td><strong>A long research paper</strong></td>
+              <td>~30 pages</td>
+              <td>~15,000-20,000</td>
+              <td>10%</td>
+            </tr>
+            <tr>
+              <td><strong>A novel</strong></td>
+              <td>~80,000 words</td>
+              <td>~107,000</td>
+              <td>53%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Input vs. Output Tokens</h3>
+
+      <p>
+        Token costs are split into two categories, and the distinction matters for budgeting:
+      </p>
+
+      <ul>
+        <li>
+          <strong>Input tokens</strong> -- Everything you send to Claude: your prompts, uploaded files,
+          system instructions, conversation history. These are the cheaper of the two categories.
+        </li>
+        <li>
+          <strong>Output tokens</strong> -- Everything Claude generates back: responses, code, explanations.
+          These cost more than input tokens because generation requires more computation.
+        </li>
+      </ul>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>Budget tip:</strong> Be specific in your prompts to get concise, targeted responses.
+          A vague prompt like "tell me about Python" will generate a long, expensive response. A precise
+          prompt like "explain Python's GIL in 3 sentences" produces a focused answer that costs a fraction
+          of the tokens.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 5: SAFETY AND RESPONSIBLE USE
+         ======================================== -->
+    <section class="section" id="safety">
+      <h2 class="section-heading">5. Safety and Responsible Use</h2>
+
+      <p>
+        Safety is not a bolt-on feature for Claude -- it is woven into the model's training from the
+        ground up. Understanding how Claude approaches safety helps you work with it more effectively
+        and set appropriate expectations.
+      </p>
+
+      <h3>Constitutional AI</h3>
+      <p>
+        Instead of maintaining an ever-growing list of specific prohibited behaviors, Anthropic trains
+        Claude using <span class="key-concept">Constitutional AI</span>. Claude learns to follow
+        principles -- be helpful, be harmless, be honest -- and applies those principles to novel
+        situations it has never seen before. This makes Claude's safety behavior more robust and
+        generalizable than rule-based systems.
+      </p>
+
+      <h3>Refusal Behavior</h3>
+      <p>
+        Claude will decline requests that would cause harm, but it does so transparently. Rather than
+        silently ignoring a request or giving a vague non-answer, Claude explains <em>why</em> it is
+        declining and often suggests alternative approaches that achieve the user's legitimate goal
+        without the harmful elements.
+      </p>
+
+      <h3>System Prompts</h3>
+      <p>
+        System prompts allow organizations to constrain Claude's behavior for specific use cases.
+        For example, a customer support deployment might instruct Claude to only answer questions
+        about the company's products, while a code review tool might focus Claude on security and
+        performance issues. System prompts shape behavior without retraining the model.
+      </p>
+
+      <h3>Enterprise Controls</h3>
+      <ul>
+        <li><strong>Audit logs</strong> -- Track every interaction for compliance and review</li>
+        <li><strong>Content filtering</strong> -- Additional guardrails for sensitive industries</li>
+        <li><strong>Usage policies</strong> -- Set limits on who can use which models and how much</li>
+        <li><strong>Role-based access</strong> -- Control which teams and individuals can access specific capabilities</li>
+      </ul>
+
+      <h3>Data Handling</h3>
+      <p>
+        By default, conversations with Claude are <strong>not used for training</strong>. Your data
+        remains your data. For enterprise deployments, Anthropic offers additional data handling
+        commitments and compliance certifications. This is a critical consideration for organizations
+        working with sensitive information.
+      </p>
+
+      <h3>Best Practices for Responsible Use</h3>
+
+      <p>
+        Being an effective Claude user means understanding where AI excels and where human judgment
+        remains essential:
+      </p>
+
+      <ul>
+        <li>
+          <strong>Always verify critical outputs.</strong> If Claude generates a legal clause, a
+          financial calculation, or a security configuration, have a domain expert review it before
+          using it in production.
+        </li>
+        <li>
+          <strong>Do not share sensitive credentials.</strong> Avoid pasting API keys, passwords,
+          or other secrets into conversations. Even though conversations are not used for training,
+          this is good security hygiene.
+        </li>
+        <li>
+          <strong>Understand Claude's limitations.</strong> Claude's training data has a knowledge
+          cutoff. For very recent events, breaking news, or rapidly evolving topics, verify
+          information from authoritative sources.
+        </li>
+        <li>
+          <strong>Use system prompts for guardrails.</strong> When deploying Claude for a specific
+          use case (customer support, code review, content creation), write a clear system prompt
+          that defines acceptable behavior, output format, and scope limitations.
+        </li>
+        <li>
+          <strong>Iterate on safety.</strong> If Claude produces an unexpected or concerning
+          output, report it and adjust your prompts. Safety is a collaborative process between
+          the user and the model.
+        </li>
+      </ul>
+
+      <div class="callout important">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Your responsibility:</strong> While Claude has extensive safety training, it is not
+          infallible. Always review Claude's outputs, especially for tasks involving sensitive data,
+          legal content, medical information, or production deployments. Claude is a powerful tool, but
+          the human in the loop remains essential.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE: MODEL SELECTOR QUIZ
+         ======================================== -->
+    <section class="section" id="model-quiz">
+      <h2 class="section-heading">Model Selector Quiz</h2>
+
+      <p>
+        Test your understanding of which Claude model to choose. For each scenario, pick the best
+        model tier. Try to get all 8 correct!
+      </p>
+
+      <div class="quiz-container" id="modelQuizContainer">
+        <div class="quiz-score-bar">
+          <span class="score-label">Score:</span>
+          <div class="quiz-score-track">
+            <div class="quiz-score-fill" id="modelQuizScoreFill"></div>
+          </div>
+          <span class="quiz-score-text" id="modelQuizScoreText">0 / 8</span>
+        </div>
+
+        <!-- Quiz questions injected by JS -->
+        <div id="modelQuizQuestions"></div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE: SURFACE MATCHER
+         ======================================== -->
+    <section class="section" id="surface-matcher">
+      <h2 class="section-heading">Surface Matcher</h2>
+
+      <p>
+        Match each task to the best Claude surface. Click a task to select it (it will highlight in
+        purple), then click one of the three bins above to place it. You will get immediate feedback
+        on whether your choice was correct.
+      </p>
+
+      <div class="surface-matcher" id="surfaceMatcherContainer">
+        <div class="sm-score-bar">
+          <span class="score-label">Score:</span>
+          <div class="sm-score-track">
+            <div class="sm-score-fill" id="smScoreFill"></div>
+          </div>
+          <span class="sm-score-text" id="smScoreText">0 / 8</span>
+        </div>
+
+        <div class="sm-bins" id="smBins">
+          <div class="sm-bin" data-bin="browser" onclick="selectBin('browser')">
+            <span class="sm-bin-icon" aria-hidden="true">&#127760;</span>
+            <span class="sm-bin-label">Browser</span>
+            <span class="sm-bin-count" id="binCountBrowser">0 placed</span>
+          </div>
+          <div class="sm-bin" data-bin="code" onclick="selectBin('code')">
+            <span class="sm-bin-icon" aria-hidden="true">&#128187;</span>
+            <span class="sm-bin-label">Code</span>
+            <span class="sm-bin-count" id="binCountCode">0 placed</span>
+          </div>
+          <div class="sm-bin" data-bin="cowork" onclick="selectBin('cowork')">
+            <span class="sm-bin-icon" aria-hidden="true">&#128101;</span>
+            <span class="sm-bin-label">Cowork</span>
+            <span class="sm-bin-count" id="binCountCowork">0 placed</span>
+          </div>
+        </div>
+
+        <div class="sm-tasks" id="smTasks">
+          <!-- Tasks injected by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE: TOKEN COUNTER SIMULATOR
+         ======================================== -->
+    <section class="section" id="token-counter">
+      <h2 class="section-heading">Token Counter Simulator</h2>
+
+      <p>
+        Type or paste text below to see a real-time estimate of how many tokens it would consume.
+        The gauge shows what percentage of a 200K context window the text occupies. Try the
+        sample buttons to build intuition for token sizes.
+      </p>
+
+      <div class="token-counter" id="tokenCounterContainer">
+        <h3>Estimate Your Tokens</h3>
+
+        <textarea id="tokenInput" placeholder="Type or paste text here to estimate tokens..." rows="6" aria-label="Text input for token estimation"></textarea>
+
+        <div class="token-samples">
+          <button class="token-sample-btn" onclick="loadSample('short')" aria-label="Load short prompt sample">Short prompt</button>
+          <button class="token-sample-btn" onclick="loadSample('email')" aria-label="Load long email sample">Long email</button>
+          <button class="token-sample-btn" onclick="loadSample('code')" aria-label="Load code file sample">Code file</button>
+          <button class="token-sample-btn" onclick="loadSample('doc')" aria-label="Load full document sample">Full document</button>
+        </div>
+
+        <div class="token-result">
+          <div class="token-gauge">
+            <div class="token-gauge-fill" id="tokenGaugeFill"></div>
+          </div>
+          <div class="token-stats">
+            <span class="token-count-val" id="tokenCount">0 tokens</span>
+            <span class="token-percent-val" id="tokenPercent">0% of context window</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE: END-OF-MODULE QUIZ
+         ======================================== -->
+    <section class="section" id="final-quiz">
+      <h2 class="section-heading">End-of-Module Quiz</h2>
+
+      <p>
+        Complete this quiz to finish Module 01. Your score will be saved to track your progress
+        through the training program. You need at least 3 out of 5 to pass.
+      </p>
+
+      <div class="final-quiz" id="finalQuizContainer">
+        <h3>Module 01: Assessment</h3>
+
+        <!-- Question 1 -->
+        <div class="final-quiz-question" data-fq="0">
+          <div class="fq-number">Question 1 of 5</div>
+          <div class="fq-text">
+            Which Claude model would you choose for a task that requires deep reasoning about a complex architectural decision?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="0" data-fq-val="a" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="a"> Haiku 4.5
+            </li>
+            <li class="fq-option" data-fq-idx="0" data-fq-val="b" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="b"> Sonnet 4.6
+            </li>
+            <li class="fq-option" data-fq-idx="0" data-fq-val="c" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="c"> Opus 4.6
+            </li>
+            <li class="fq-option" data-fq-idx="0" data-fq-val="d" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="d"> Any model -- they all reason equally well
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="final-quiz-question" data-fq="1">
+          <div class="fq-number">Question 2 of 5</div>
+          <div class="fq-text">
+            Approximately how many tokens is 200,000 tokens equivalent to?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="1" data-fq-val="a" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="a"> About 50 pages of text
+            </li>
+            <li class="fq-option" data-fq-idx="1" data-fq-val="b" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="b"> About 150,000 words
+            </li>
+            <li class="fq-option" data-fq-idx="1" data-fq-val="c" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="c"> About 10,000 words
+            </li>
+            <li class="fq-option" data-fq-idx="1" data-fq-val="d" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="d"> About 1 million characters
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="final-quiz-question" data-fq="2">
+          <div class="fq-number">Question 3 of 5</div>
+          <div class="fq-text">
+            Which Claude surface is best suited for a team collaborating on shared prompt libraries with governance controls?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="2" data-fq-val="a" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="a"> Claude.ai Browser
+            </li>
+            <li class="fq-option" data-fq-idx="2" data-fq-val="b" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="b"> Claude Code CLI
+            </li>
+            <li class="fq-option" data-fq-idx="2" data-fq-val="c" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="c"> Claude Cowork
+            </li>
+            <li class="fq-option" data-fq-idx="2" data-fq-val="d" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="d"> Claude API
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 4 -->
+        <div class="final-quiz-question" data-fq="3">
+          <div class="fq-number">Question 4 of 5</div>
+          <div class="fq-text">
+            What is Constitutional AI?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="3" data-fq-val="a" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="a"> A legal framework for AI regulation
+            </li>
+            <li class="fq-option" data-fq-idx="3" data-fq-val="b" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="b"> A training approach where Claude follows principles rather than rigid rules
+            </li>
+            <li class="fq-option" data-fq-idx="3" data-fq-val="c" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="c"> A type of AI that only works for government use
+            </li>
+            <li class="fq-option" data-fq-idx="3" data-fq-val="d" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="d"> An encryption method for AI conversations
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 5 -->
+        <div class="final-quiz-question" data-fq="4">
+          <div class="fq-number">Question 5 of 5</div>
+          <div class="fq-text">
+            What happens when Claude's context window is full?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="4" data-fq-val="a" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="a"> Claude crashes and restarts
+            </li>
+            <li class="fq-option" data-fq-idx="4" data-fq-val="b" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="b"> Claude automatically deletes old messages to make room
+            </li>
+            <li class="fq-option" data-fq-idx="4" data-fq-val="c" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="c"> Earlier parts of the conversation may be compressed or lost
+            </li>
+            <li class="fq-option" data-fq-idx="4" data-fq-val="d" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="d"> Claude switches to a model with a larger context window
+            </li>
+          </ul>
+        </div>
+
+        <button class="final-submit-btn" id="finalSubmitBtn" onclick="submitFinalQuiz()" disabled>
+          Submit Answers
+        </button>
+
+        <div class="final-result" id="finalResult">
+          <h4 id="finalResultTitle"></h4>
+          <p id="finalResultText"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         NAVIGATION FOOTER
+         ======================================== -->
+    <nav class="module-nav" aria-label="Module navigation">
+      <a href="../index.html" class="nav-link prev">
+        <span class="nav-dir">&larr; Back</span>
+        <span class="nav-title">Training Hub</span>
+      </a>
+      <a href="02-claude-browser.html" class="nav-link next">
+        <span class="nav-dir">Next &rarr;</span>
+        <span class="nav-title">Module 02: Claude in the Browser</span>
+      </a>
+    </nav>
+
+  </div>
+</main>
+
+<!-- ============================================
+     JAVASCRIPT
+     ============================================ -->
+<script>
+(function() {
+  'use strict';
+
+  // ==========================================
+  // THEME MANAGEMENT
+  // ==========================================
+  var THEME_KEY = 'claude-training-theme';
+
+  function getTheme() {
+    return localStorage.getItem(THEME_KEY) || 'light';
+  }
+
+  function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem(THEME_KEY, theme);
+    var icon = document.getElementById('themeIcon');
+    if (icon) {
+      icon.textContent = theme === 'dark' ? '\u2600' : '\u263E';
+    }
+  }
+
+  // Initialize theme
+  setTheme(getTheme());
+
+  document.getElementById('themeToggle').addEventListener('click', function() {
+    var current = getTheme();
+    setTheme(current === 'dark' ? 'light' : 'dark');
+  });
+
+  // ==========================================
+  // SIDEBAR MOBILE TOGGLE
+  // ==========================================
+  var hamburger = document.getElementById('hamburger');
+  var sidebar = document.getElementById('sidebar');
+  var overlay = document.getElementById('sidebarOverlay');
+
+  function toggleSidebar() {
+    var isOpen = sidebar.classList.contains('open');
+    sidebar.classList.toggle('open');
+    hamburger.classList.toggle('open');
+    if (isOpen) {
+      overlay.classList.remove('show');
+    } else {
+      overlay.classList.add('show');
+    }
+  }
+
+  hamburger.addEventListener('click', toggleSidebar);
+  overlay.addEventListener('click', toggleSidebar);
+
+  // ==========================================
+  // SIDEBAR SECTION COLLAPSING
+  // ==========================================
+  var sectionToggles = document.querySelectorAll('.sidebar-section-toggle');
+  for (var t = 0; t < sectionToggles.length; t++) {
+    (function(btn) {
+      btn.addEventListener('click', function() {
+        var sectionName = this.getAttribute('data-section');
+        var linksList = document.getElementById('nav-' + sectionName);
+        var isCollapsed = this.classList.contains('collapsed');
+
+        if (isCollapsed) {
+          this.classList.remove('collapsed');
+          this.setAttribute('aria-expanded', 'true');
+          linksList.classList.remove('collapsed');
+          linksList.style.maxHeight = linksList.scrollHeight + 'px';
+        } else {
+          this.classList.add('collapsed');
+          this.setAttribute('aria-expanded', 'false');
+          linksList.style.maxHeight = linksList.scrollHeight + 'px';
+          // Force reflow
+          linksList.offsetHeight;
+          linksList.classList.add('collapsed');
+        }
+      });
+
+      // Initialize: set max-height so transitions work
+      var sectionName = btn.getAttribute('data-section');
+      var linksList = document.getElementById('nav-' + sectionName);
+      if (linksList) {
+        linksList.style.maxHeight = linksList.scrollHeight + 'px';
+      }
+    })(sectionToggles[t]);
+  }
+
+  // ==========================================
+  // SCROLLSPY
+  // ==========================================
+  var sidebarLinks = document.querySelectorAll('.sidebar-link');
+  var sections = [];
+
+  for (var s = 0; s < sidebarLinks.length; s++) {
+    var targetId = sidebarLinks[s].getAttribute('data-target');
+    var sectionEl = document.getElementById(targetId);
+    if (sectionEl) {
+      sections.push({ el: sectionEl, link: sidebarLinks[s], id: targetId });
+    }
+  }
+
+  function updateScrollspy() {
+    var scrollPos = window.scrollY + 100;
+    var active = null;
+
+    for (var i = sections.length - 1; i >= 0; i--) {
+      if (sections[i].el.offsetTop <= scrollPos) {
+        active = sections[i];
+        break;
+      }
+    }
+
+    for (var j = 0; j < sidebarLinks.length; j++) {
+      sidebarLinks[j].classList.remove('active');
+    }
+    if (active) {
+      active.link.classList.add('active');
+    }
+
+    // Update progress based on scroll
+    updateSidebarProgress();
+  }
+
+  var scrollTimer = null;
+  window.addEventListener('scroll', function() {
+    if (scrollTimer) return;
+    scrollTimer = setTimeout(function() {
+      scrollTimer = null;
+      updateScrollspy();
+    }, 50);
+  });
+  updateScrollspy();
+
+  // Close mobile sidebar on link click
+  for (var lk = 0; lk < sidebarLinks.length; lk++) {
+    sidebarLinks[lk].addEventListener('click', function() {
+      if (window.innerWidth <= 1024) {
+        sidebar.classList.remove('open');
+        hamburger.classList.remove('open');
+        overlay.classList.remove('show');
+      }
+    });
+  }
+
+  // ==========================================
+  // SIDEBAR PROGRESS
+  // ==========================================
+  function updateSidebarProgress() {
+    var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    var scrolled = window.scrollY;
+    var pct = docHeight > 0 ? Math.min(100, (scrolled / docHeight) * 100) : 0;
+
+    var fill = document.getElementById('sidebarProgressFill');
+    if (fill) {
+      fill.style.width = pct + '%';
+    }
+  }
+
+  // ==========================================
+  // COPY TO CLIPBOARD
+  // ==========================================
+  window.copyCode = function(btn) {
+    var block = btn.closest('.code-block');
+    // Get text content without the label and copy button text
+    var codeEl = block.cloneNode(true);
+    var labelEl = codeEl.querySelector('.code-label');
+    var btnEl = codeEl.querySelector('.copy-btn');
+    if (labelEl) labelEl.remove();
+    if (btnEl) btnEl.remove();
+
+    var text = codeEl.textContent.trim();
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function() {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(function() {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      })['catch'](function() {
+        btn.textContent = 'Failed';
+        setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+      });
+    } else {
+      // Fallback for older browsers
+      btn.textContent = 'Failed';
+      setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+    }
+  };
+
+  // ==========================================
+  // MODEL SELECTOR QUIZ
+  // ==========================================
+  var modelQuizData = [
+    {
+      scenario: "You need to classify 10,000 customer support tickets into 5 categories as quickly and cheaply as possible.",
+      options: ["Haiku", "Sonnet", "Opus"],
+      correct: 0,
+      explanation: "Haiku is perfect for high-volume, simple classification tasks. It's the fastest and most cost-effective model for straightforward categorization."
+    },
+    {
+      scenario: "You're reviewing a complex 500-line pull request with subtle concurrency bugs.",
+      options: ["Haiku", "Sonnet", "Opus"],
+      correct: 2,
+      explanation: "Opus excels at complex reasoning tasks. Finding subtle concurrency bugs requires deep understanding of code flow and potential race conditions."
+    },
+    {
+      scenario: "You need to generate a summary of a meeting transcript for a Slack update.",
+      options: ["Haiku", "Sonnet", "Opus"],
+      correct: 1,
+      explanation: "Sonnet provides the best balance -- it handles summarization well with good speed and reasonable cost. No need for Opus-level reasoning here."
+    },
+    {
+      scenario: "You're designing a microservices architecture for a new healthcare platform with HIPAA compliance requirements.",
+      options: ["Haiku", "Sonnet", "Opus"],
+      correct: 2,
+      explanation: "Opus is best for complex architecture decisions involving multiple constraints (microservices design + compliance + healthcare domain knowledge)."
+    },
+    {
+      scenario: "You need to extract the date and amount from 5,000 invoices in a standardized format.",
+      options: ["Haiku", "Sonnet", "Opus"],
+      correct: 0,
+      explanation: "Haiku handles structured extraction from standardized documents efficiently. The task is repetitive and well-defined -- perfect for the fastest model."
+    },
+    {
+      scenario: "You want Claude to help you write a thought leadership blog post about AI trends.",
+      options: ["Haiku", "Sonnet", "Opus"],
+      correct: 1,
+      explanation: "Sonnet is ideal for creative writing tasks. It produces high-quality prose at a good speed. Opus would work but isn't necessary for standard writing."
+    },
+    {
+      scenario: "You're debugging a memory leak in a production Node.js application by analyzing heap dumps and event loops.",
+      options: ["Haiku", "Sonnet", "Opus"],
+      correct: 2,
+      explanation: "Debugging production memory leaks requires deep technical analysis and reasoning about complex runtime behavior -- Opus territory."
+    },
+    {
+      scenario: "You need to auto-respond to simple FAQ questions on your company's help desk.",
+      options: ["Haiku", "Sonnet", "Opus"],
+      correct: 0,
+      explanation: "FAQ responses are well-defined and repetitive. Haiku's speed and cost make it perfect for high-volume, simple response generation."
+    }
+  ];
+
+  var modelQuizState = {
+    answered: 0,
+    correct: 0
+  };
+
+  function renderModelQuiz() {
+    var container = document.getElementById('modelQuizQuestions');
+    var html = '';
+
+    for (var idx = 0; idx < modelQuizData.length; idx++) {
+      var q = modelQuizData[idx];
+      html += '<div class="quiz-question" id="mq-' + idx + '">';
+      html += '<div class="quiz-q-header">';
+      html += '<span class="quiz-q-number">' + (idx + 1) + '</span>';
+      html += '<span class="quiz-q-text">' + q.scenario + '</span>';
+      html += '</div>';
+      html += '<div class="quiz-options">';
+
+      for (var optIdx = 0; optIdx < q.options.length; optIdx++) {
+        html += '<button class="quiz-option" data-mq="' + idx + '" data-opt="' + optIdx + '" onclick="answerModelQuiz(' + idx + ',' + optIdx + ')" aria-label="' + q.options[optIdx] + '">';
+        html += q.options[optIdx];
+        html += '</button>';
+      }
+
+      html += '</div>';
+      html += '<div class="quiz-feedback" id="mq-feedback-' + idx + '"></div>';
+      html += '</div>';
+    }
+
+    container.innerHTML = html;
+  }
+
+  window.answerModelQuiz = function(qIdx, optIdx) {
+    var question = modelQuizData[qIdx];
+    var questionEl = document.getElementById('mq-' + qIdx);
+    var feedbackEl = document.getElementById('mq-feedback-' + qIdx);
+    var buttons = questionEl.querySelectorAll('.quiz-option');
+
+    // Prevent re-answering
+    if (questionEl.classList.contains('correct') || questionEl.classList.contains('incorrect')) {
+      return;
+    }
+
+    modelQuizState.answered++;
+
+    var isCorrect = optIdx === question.correct;
+
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].classList.add('disabled');
+      if (i === question.correct) {
+        buttons[i].classList.add('correct-answer');
+      }
+      if (i === optIdx && !isCorrect) {
+        buttons[i].classList.add('wrong-answer');
+      }
+    }
+
+    if (isCorrect) {
+      modelQuizState.correct++;
+      questionEl.classList.add('correct');
+      feedbackEl.className = 'quiz-feedback show correct';
+      feedbackEl.textContent = 'Correct! ' + question.explanation;
+    } else {
+      questionEl.classList.add('incorrect');
+      feedbackEl.className = 'quiz-feedback show incorrect';
+      feedbackEl.textContent = 'Not quite. ' + question.explanation;
+    }
+
+    // Update score
+    var scoreFill = document.getElementById('modelQuizScoreFill');
+    var scoreText = document.getElementById('modelQuizScoreText');
+    var pct = (modelQuizState.correct / modelQuizData.length) * 100;
+    scoreFill.style.width = pct + '%';
+    scoreText.textContent = modelQuizState.correct + ' / ' + modelQuizData.length;
+  };
+
+  renderModelQuiz();
+
+  // ==========================================
+  // SURFACE MATCHER
+  // ==========================================
+  var surfaceMatchData = [
+    { task: "Draft a client proposal for an AI implementation project", correct: "browser", explanation: "Claude.ai is ideal for document drafting -- use Projects to maintain context about the client." },
+    { task: "Refactor a Python class to use async/await instead of threading", correct: "code", explanation: "Claude Code can read the file, understand the codebase, and make targeted edits." },
+    { task: "Review your team's prompt library and standardize best practices", correct: "cowork", explanation: "Cowork's shared workspace lets the whole team collaborate on prompt standards." },
+    { task: "Debug a failing CI/CD pipeline by reading logs and fixing the config", correct: "code", explanation: "Claude Code can run commands, read log files, and edit configuration -- all in your terminal." },
+    { task: "Create a Mermaid diagram of your application's architecture", correct: "browser", explanation: "Claude.ai's Artifacts feature renders Mermaid diagrams visually as you iterate." },
+    { task: "Set up governance policies for your department's Claude usage", correct: "cowork", explanation: "Cowork provides enterprise governance controls, audit trails, and usage policies." },
+    { task: "Add comprehensive unit tests to an untested legacy module", correct: "code", explanation: "Claude Code can read the existing code, understand dependencies, and generate test files." },
+    { task: "Research competitive landscape and synthesize findings from 5 analyst reports", correct: "browser", explanation: "Claude.ai with Projects lets you upload all reports as context and ask synthesis questions." }
+  ];
+
+  var smState = {
+    selectedTask: null,
+    answered: 0,
+    correct: 0,
+    binCounts: { browser: 0, code: 0, cowork: 0 }
+  };
+
+  function renderSurfaceMatcher() {
+    var container = document.getElementById('smTasks');
+    var html = '';
+
+    for (var i = 0; i < surfaceMatchData.length; i++) {
+      var item = surfaceMatchData[i];
+      html += '<div class="sm-task" id="sm-task-' + i + '" data-sm-idx="' + i + '" onclick="selectSmTask(' + i + ')">';
+      html += '<div class="sm-task-text">' + item.task + '</div>';
+      html += '<div class="sm-task-status" id="sm-status-' + i + '"></div>';
+      html += '</div>';
+      html += '<div class="sm-task-explanation" id="sm-exp-' + i + '"></div>';
+    }
+
+    container.innerHTML = html;
+  }
+
+  window.selectSmTask = function(idx) {
+    var taskEl = document.getElementById('sm-task-' + idx);
+
+    // Don't allow re-selecting placed tasks
+    if (taskEl.classList.contains('correct-place') || taskEl.classList.contains('wrong-place')) {
+      return;
+    }
+
+    // Deselect previous
+    var allTasks = document.querySelectorAll('.sm-task');
+    for (var t = 0; t < allTasks.length; t++) {
+      allTasks[t].classList.remove('selected');
+    }
+
+    // Select this one
+    taskEl.classList.add('selected');
+    smState.selectedTask = idx;
+
+    // Highlight bins to indicate they're clickable
+    var allBins = document.querySelectorAll('.sm-bin');
+    for (var b = 0; b < allBins.length; b++) {
+      allBins[b].classList.add('highlight');
+    }
+  };
+
+  window.selectBin = function(binName) {
+    if (smState.selectedTask === null) return;
+
+    var idx = smState.selectedTask;
+    var item = surfaceMatchData[idx];
+    var taskEl = document.getElementById('sm-task-' + idx);
+    var statusEl = document.getElementById('sm-status-' + idx);
+    var expEl = document.getElementById('sm-exp-' + idx);
+
+    // Don't allow re-placing
+    if (taskEl.classList.contains('correct-place') || taskEl.classList.contains('wrong-place')) {
+      return;
+    }
+
+    smState.answered++;
+    var isCorrect = binName === item.correct;
+
+    // Deselect task
+    taskEl.classList.remove('selected');
+    smState.selectedTask = null;
+
+    // Remove bin highlights
+    var allBins = document.querySelectorAll('.sm-bin');
+    for (var b = 0; b < allBins.length; b++) {
+      allBins[b].classList.remove('highlight');
+    }
+
+    if (isCorrect) {
+      smState.correct++;
+      smState.binCounts[binName]++;
+      taskEl.classList.add('correct-place');
+      statusEl.innerHTML = '&#10003;';
+      statusEl.style.color = '#059669';
+      expEl.className = 'sm-task-explanation show correct-exp';
+      expEl.textContent = 'Correct! ' + item.explanation;
+    } else {
+      smState.binCounts[binName]++;
+      taskEl.classList.add('wrong-place');
+      statusEl.innerHTML = '&#10007;';
+      statusEl.style.color = '#EF4444';
+      expEl.className = 'sm-task-explanation show wrong-exp';
+      expEl.textContent = 'Not quite -- the best fit is ' + item.correct.charAt(0).toUpperCase() + item.correct.slice(1) + '. ' + item.explanation;
+    }
+
+    // Update bin counts
+    document.getElementById('binCountBrowser').textContent = smState.binCounts.browser + ' placed';
+    document.getElementById('binCountCode').textContent = smState.binCounts.code + ' placed';
+    document.getElementById('binCountCowork').textContent = smState.binCounts.cowork + ' placed';
+
+    // Update score
+    var scoreFill = document.getElementById('smScoreFill');
+    var scoreText = document.getElementById('smScoreText');
+    var pct = (smState.correct / surfaceMatchData.length) * 100;
+    scoreFill.style.width = pct + '%';
+    scoreText.textContent = smState.correct + ' / ' + surfaceMatchData.length;
+  };
+
+  renderSurfaceMatcher();
+
+  // ==========================================
+  // TOKEN COUNTER SIMULATOR
+  // ==========================================
+  var CONTEXT_WINDOW = 200000;
+
+  var sampleTexts = {
+    short: "Explain the difference between a mutex and a semaphore in concurrent programming. Include a practical example of when you'd use each one.",
+    email: "Subject: Q3 Strategic Planning Review - Action Items and Follow-ups\n\nHi Team,\n\nThank you all for attending yesterday's Q3 strategic planning session. I wanted to summarize the key decisions, action items, and next steps that we discussed.\n\nFirst, regarding the product roadmap: we've agreed to prioritize the enterprise dashboard redesign over the mobile app refresh for Q3. The reasoning is that our enterprise customers represent 78% of ARR, and the current dashboard has been a consistent pain point in customer satisfaction surveys. Sarah's team will own the UX research phase (target: July 15), and Michael's engineering team will begin implementation sprints starting August 1.\n\nSecond, on the hiring front: we've approved three new positions - a Senior Backend Engineer, a Product Designer, and a Data Analyst. HR will post these by end of week. Please share the job descriptions within your networks. We need to fill these roles by mid-August to stay on track for Q4 deliverables.\n\nThird, the budget reallocation: we're shifting $150K from the marketing conference budget to product development tools and infrastructure. This includes upgrading our CI/CD pipeline, adding monitoring tools, and licensing design software. Finance needs department-level breakdowns by Friday.\n\nAction Items:\n- Sarah: Complete UX research plan and timeline (due June 28)\n- Michael: Draft technical architecture document for dashboard (due July 5)\n- Jennifer: Finalize job descriptions and coordinate with HR (due June 25)\n- David: Prepare budget reallocation breakdown by department (due June 27)\n- All: Review the attached competitive analysis and provide feedback by July 1\n\nOur next planning sync is scheduled for July 10 at 2 PM EST. Please come prepared with progress updates on your respective action items.\n\nLet me know if you have any questions or concerns about the above. Looking forward to a productive Q3.\n\nBest regards,\nAlex Chen\nVP of Product\n\nP.S. The team offsite is confirmed for July 22-23 in Austin. Travel details to follow.",
+    code: "import asyncio\nimport logging\nfrom typing import Optional, Dict, List, Any\nfrom dataclasses import dataclass, field\nfrom datetime import datetime, timedelta\nfrom enum import Enum\n\nlogger = logging.getLogger(__name__)\n\n\nclass TaskStatus(Enum):\n    PENDING = 'pending'\n    RUNNING = 'running'\n    COMPLETED = 'completed'\n    FAILED = 'failed'\n    CANCELLED = 'cancelled'\n\n\n@dataclass\nclass TaskResult:\n    task_id: str\n    status: TaskStatus\n    result: Optional[Any] = None\n    error: Optional[str] = None\n    started_at: Optional[datetime] = None\n    completed_at: Optional[datetime] = None\n    duration_ms: Optional[float] = None\n\n\n@dataclass\nclass TaskConfig:\n    max_retries: int = 3\n    retry_delay_seconds: float = 1.0\n    timeout_seconds: float = 30.0\n    backoff_multiplier: float = 2.0\n\n\nclass AsyncTaskManager:\n    \"\"\"Manages async task execution with retry logic, timeouts, and cancellation.\"\"\"\n\n    def __init__(self, config: Optional[TaskConfig] = None):\n        self._config = config or TaskConfig()\n        self._tasks: Dict[str, asyncio.Task] = {}\n        self._results: Dict[str, TaskResult] = {}\n        self._semaphore = asyncio.Semaphore(10)\n        self._shutdown_event = asyncio.Event()\n\n    async def submit_task(\n        self,\n        task_id: str,\n        coroutine_fn: Any,\n        *args: Any,\n        **kwargs: Any\n    ) -> str:\n        \"\"\"Submit an async task for execution.\"\"\"\n        if task_id in self._tasks:\n            raise ValueError(f'Task {task_id} already exists')\n\n        self._results[task_id] = TaskResult(\n            task_id=task_id,\n            status=TaskStatus.PENDING\n        )\n\n        task = asyncio.create_task(\n            self._execute_with_retry(task_id, coroutine_fn, *args, **kwargs)\n        )\n        self._tasks[task_id] = task\n        return task_id\n\n    async def _execute_with_retry(\n        self,\n        task_id: str,\n        coroutine_fn: Any,\n        *args: Any,\n        **kwargs: Any\n    ) -> TaskResult:\n        \"\"\"Execute task with retry logic and exponential backoff.\"\"\"\n        delay = self._config.retry_delay_seconds\n\n        for attempt in range(self._config.max_retries + 1):\n            try:\n                async with self._semaphore:\n                    self._results[task_id].status = TaskStatus.RUNNING\n                    self._results[task_id].started_at = datetime.utcnow()\n\n                    result = await asyncio.wait_for(\n                        coroutine_fn(*args, **kwargs),\n                        timeout=self._config.timeout_seconds\n                    )\n\n                    self._results[task_id].status = TaskStatus.COMPLETED\n                    self._results[task_id].result = result\n                    self._results[task_id].completed_at = datetime.utcnow()\n\n                    if self._results[task_id].started_at:\n                        delta = (\n                            self._results[task_id].completed_at\n                            - self._results[task_id].started_at\n                        )\n                        self._results[task_id].duration_ms = (\n                            delta.total_seconds() * 1000\n                        )\n\n                    return self._results[task_id]\n\n            except asyncio.TimeoutError:\n                logger.warning(\n                    'Task %s timed out (attempt %d/%d)',\n                    task_id, attempt + 1, self._config.max_retries + 1\n                )\n            except asyncio.CancelledError:\n                self._results[task_id].status = TaskStatus.CANCELLED\n                raise\n            except Exception as e:\n                logger.error(\n                    'Task %s failed (attempt %d/%d): %s',\n                    task_id, attempt + 1, self._config.max_retries + 1, str(e)\n                )\n                self._results[task_id].error = str(e)\n\n            if attempt < self._config.max_retries:\n                await asyncio.sleep(delay)\n                delay *= self._config.backoff_multiplier\n\n        self._results[task_id].status = TaskStatus.FAILED\n        self._results[task_id].completed_at = datetime.utcnow()\n        return self._results[task_id]\n\n    async def cancel_task(self, task_id: str) -> bool:\n        \"\"\"Cancel a running task.\"\"\"\n        task = self._tasks.get(task_id)\n        if task and not task.done():\n            task.cancel()\n            return True\n        return False\n\n    def get_result(self, task_id: str) -> Optional[TaskResult]:\n        \"\"\"Get the result of a task.\"\"\"\n        return self._results.get(task_id)\n\n    def get_all_results(self) -> List[TaskResult]:\n        \"\"\"Get all task results.\"\"\"\n        return list(self._results.values())\n\n    async def shutdown(self, timeout: float = 10.0) -> None:\n        \"\"\"Gracefully shut down, cancelling remaining tasks.\"\"\"\n        self._shutdown_event.set()\n        pending = [\n            t for t in self._tasks.values()\n            if not t.done()\n        ]\n        if pending:\n            done, not_done = await asyncio.wait(\n                pending, timeout=timeout\n            )\n            for task in not_done:\n                task.cancel()\n",
+    doc: (function() {
+      // Generate ~10000 tokens worth of text
+      var paragraphs = [
+        "Chapter 1: Introduction to Artificial Intelligence\n\nArtificial intelligence has undergone a remarkable transformation over the past decade. What was once confined to research laboratories and science fiction narratives has become an integral part of daily life, powering everything from search engines and recommendation systems to autonomous vehicles and medical diagnostics.\n\n",
+        "The field traces its origins to the 1950s, when pioneers like Alan Turing, John McCarthy, and Marvin Minsky began exploring whether machines could think. Turing's famous paper, 'Computing Machinery and Intelligence,' posed the question that would define the field for decades: 'Can machines think?' His proposed test -- now known as the Turing Test -- suggested that if a machine could engage in conversation indistinguishable from a human's, it could be considered intelligent.\n\n",
+        "The early decades of AI research were characterized by ambitious optimism. Researchers believed that human-level artificial intelligence was just around the corner. This period produced significant achievements, including the Logic Theorist (1956), which could prove mathematical theorems, and ELIZA (1966), a natural language processing program that could simulate conversation with a Rogerian psychotherapist.\n\n",
+        "However, progress proved slower than expected. The 1970s brought the first 'AI Winter,' a period of reduced funding and diminished expectations. Critics pointed out that AI systems were brittle -- they could perform well on narrow tasks but failed catastrophically when encountering situations outside their training. The combinatorial explosion problem made it clear that brute-force approaches would not scale to real-world complexity.\n\n",
+        "The revival of interest in neural networks during the 1980s and the development of backpropagation algorithms laid the groundwork for modern deep learning. These techniques allowed multi-layer neural networks to learn from data by adjusting the strength of connections between artificial neurons. While the computational resources of the era limited their practical application, the theoretical foundations were being established.\n\n",
+        "Chapter 2: The Deep Learning Revolution\n\nThe breakthrough moment for modern AI came in 2012, when a deep convolutional neural network called AlexNet dramatically outperformed all competitors in the ImageNet Large Scale Visual Recognition Challenge. This victory demonstrated that deep neural networks, when combined with large datasets and powerful GPUs, could achieve superhuman performance on specific tasks.\n\n",
+        "The years that followed saw an explosion of deep learning applications. Computer vision systems became capable of identifying objects, faces, and scenes with remarkable accuracy. Natural language processing advanced from simple keyword matching to sophisticated understanding of context and meaning. Generative models began producing increasingly realistic images, text, and audio.\n\n",
+        "The transformer architecture, introduced in 2017 by researchers at Google in the paper 'Attention Is All You Need,' represented another paradigm shift. Transformers replaced the recurrent neural networks that had dominated sequence modeling with a self-attention mechanism that could process entire sequences in parallel. This innovation dramatically improved both the quality and efficiency of language models.\n\n",
+        "GPT (Generative Pre-trained Transformer), introduced by OpenAI in 2018, demonstrated that large language models pre-trained on vast amounts of text could be fine-tuned for a wide variety of downstream tasks. Each subsequent generation of these models -- GPT-2, GPT-3, GPT-4 -- showed that scaling up model size and training data could produce qualitative improvements in capability.\n\n",
+        "Chapter 3: Large Language Models\n\nLarge Language Models represent a fundamental advance in artificial intelligence. Unlike traditional AI systems that are designed for specific tasks, LLMs are trained on broad datasets and can perform a wide range of tasks without task-specific training. This capability, known as 'few-shot' or 'zero-shot' learning, means that LLMs can tackle novel problems simply by being given a description of the task.\n\n",
+        "The training process for LLMs involves two main phases. In pre-training, the model learns to predict the next token in a sequence by processing billions of tokens of text. This process teaches the model not just grammar and facts, but also reasoning patterns, world knowledge, and even elements of common sense. In the fine-tuning phase, the model is further trained on carefully curated datasets to improve its helpfulness, accuracy, and safety.\n\n",
+        "One of the most important developments in LLM training has been Reinforcement Learning from Human Feedback (RLHF). In this approach, human evaluators rate model outputs, and these ratings are used to train a reward model. The language model is then fine-tuned using reinforcement learning to maximize the reward model's score. This process helps align the model's behavior with human preferences and values.\n\n",
+        "Constitutional AI, developed by Anthropic, takes alignment a step further. Rather than relying solely on human feedback for every possible scenario, Constitutional AI trains the model to follow a set of principles -- a 'constitution' -- that guides its behavior. The model learns to self-evaluate its outputs against these principles, making it more robust and consistent in its safety behavior.\n\n",
+        "Chapter 4: Applications and Impact\n\nThe applications of large language models span virtually every domain of human knowledge work. In software engineering, LLMs serve as coding assistants that can write, review, debug, and explain code. In healthcare, they help analyze medical literature, assist with diagnosis, and generate patient communications. In education, they provide personalized tutoring, generate practice problems, and explain complex concepts.\n\n",
+        "The legal profession has embraced LLMs for document review, contract analysis, and legal research. Financial services use them for risk assessment, regulatory compliance, and customer communication. Marketing teams employ them for content creation, audience analysis, and campaign optimization. Scientific researchers use them to survey literature, generate hypotheses, and write papers.\n\n",
+        "However, the deployment of LLMs also raises important questions about accuracy, bias, privacy, and the future of work. Models can generate plausible-sounding but incorrect information -- a phenomenon known as 'hallucination.' They may reflect biases present in their training data. And their capability to automate knowledge work has significant implications for employment and the economy.\n\n",
+        "Chapter 5: The Future of AI\n\nLooking ahead, several trends are shaping the future of artificial intelligence. Multi-modal models that can process text, images, audio, and video simultaneously are becoming more capable. Agent-based systems that can plan, execute multi-step tasks, and interact with tools and APIs are expanding the practical utility of AI. And advances in safety research are making it increasingly possible to deploy AI systems that are reliable, honest, and aligned with human values.\n\n",
+        "The race to develop more powerful AI systems continues, with significant investment from both technology companies and governments around the world. As these systems become more capable, the importance of safety, alignment, and responsible deployment grows accordingly. The challenge of the coming decades will be to harness the enormous potential of artificial intelligence while managing its risks and ensuring its benefits are broadly shared.\n\n",
+        "The story of artificial intelligence is, at its core, a story about the human aspiration to understand and replicate the most extraordinary phenomenon in the known universe: intelligence itself. As we stand at this remarkable inflection point, the decisions we make about how to develop, deploy, and govern AI will shape the trajectory of civilization for generations to come.\n\n"
+      ];
+      return paragraphs.join('');
+    })()
+  };
+
+  var tokenInput = document.getElementById('tokenInput');
+
+  function updateTokenCounter() {
+    var text = tokenInput.value;
+    var charCount = text.length;
+    var tokenEstimate = Math.ceil(charCount / 4);
+    var pct = CONTEXT_WINDOW > 0 ? (tokenEstimate / CONTEXT_WINDOW) * 100 : 0;
+
+    // Update count
+    var countEl = document.getElementById('tokenCount');
+    var pctEl = document.getElementById('tokenPercent');
+    var gaugeEl = document.getElementById('tokenGaugeFill');
+
+    countEl.textContent = tokenEstimate.toLocaleString() + ' tokens (~' + charCount.toLocaleString() + ' chars)';
+
+    var pctRounded = Math.round(pct * 100) / 100;
+    pctEl.textContent = pctRounded + '% of context window';
+
+    // Color coding
+    gaugeEl.className = 'token-gauge-fill';
+    pctEl.className = 'token-percent-val';
+
+    if (pct > 25) {
+      gaugeEl.classList.add('red');
+      pctEl.classList.add('red');
+    } else if (pct > 5) {
+      gaugeEl.classList.add('amber');
+      pctEl.classList.add('amber');
+    }
+
+    // Gauge width (cap at 100%)
+    var gaugeWidth = Math.min(100, pct);
+    gaugeEl.style.width = gaugeWidth + '%';
+  }
+
+  tokenInput.addEventListener('input', updateTokenCounter);
+  tokenInput.addEventListener('paste', function() {
+    // Small delay to let paste complete
+    setTimeout(updateTokenCounter, 10);
+  });
+
+  window.loadSample = function(type) {
+    var text = sampleTexts[type];
+    if (text) {
+      tokenInput.value = text;
+      updateTokenCounter();
+    }
+  };
+
+  // Initialize
+  updateTokenCounter();
+
+  // ==========================================
+  // FINAL QUIZ
+  // ==========================================
+  var FINAL_QUIZ_KEY = 'claude-training-module-01';
+
+  var finalQuizAnswers = ['c', 'b', 'c', 'b', 'c'];
+  var finalQuizSelections = [null, null, null, null, null];
+  var finalQuizSubmitted = false;
+
+  window.selectFinalOption = function(qIdx, el) {
+    if (finalQuizSubmitted) return;
+
+    // Deselect siblings
+    var parentQ = el.closest('.final-quiz-question');
+    var allOpts = parentQ.querySelectorAll('.fq-option');
+    for (var o = 0; o < allOpts.length; o++) {
+      allOpts[o].querySelector('input').checked = false;
+      allOpts[o].style.background = '';
+    }
+
+    // Select this one
+    el.querySelector('input').checked = true;
+    finalQuizSelections[qIdx] = el.getAttribute('data-fq-val');
+
+    // Enable submit if all answered
+    var allAnswered = true;
+    for (var a = 0; a < finalQuizSelections.length; a++) {
+      if (finalQuizSelections[a] === null) {
+        allAnswered = false;
+        break;
+      }
+    }
+    document.getElementById('finalSubmitBtn').disabled = !allAnswered;
+  };
+
+  window.submitFinalQuiz = function() {
+    if (finalQuizSubmitted) return;
+    finalQuizSubmitted = true;
+
+    var score = 0;
+
+    for (var idx = 0; idx < finalQuizSelections.length; idx++) {
+      var sel = finalQuizSelections[idx];
+      var questionEl = document.querySelector('.final-quiz-question[data-fq="' + idx + '"]');
+      var options = questionEl.querySelectorAll('.fq-option');
+
+      for (var oi = 0; oi < options.length; oi++) {
+        var opt = options[oi];
+        var val = opt.getAttribute('data-fq-val');
+        opt.style.pointerEvents = 'none';
+
+        if (val === finalQuizAnswers[idx]) {
+          if (sel === val) {
+            opt.classList.add('selected-correct');
+            score++;
+          } else {
+            opt.classList.add('reveal-correct');
+          }
+        } else if (val === sel) {
+          opt.classList.add('selected-wrong');
+        }
+      }
+    }
+
+    // Show result
+    var result = document.getElementById('finalResult');
+    var title = document.getElementById('finalResultTitle');
+    var text = document.getElementById('finalResultText');
+
+    result.classList.add('show');
+
+    if (score >= 3) {
+      result.classList.add('pass');
+      result.classList.remove('fail');
+      title.textContent = 'Passed! ' + score + ' / 5 correct';
+      text.textContent = 'Great work! You have a solid understanding of what Claude is and how it works. ' +
+        'Your progress has been saved. Move on to Module 02: Claude in the Browser to continue your training.';
+    } else {
+      result.classList.add('fail');
+      result.classList.remove('pass');
+      title.textContent = score + ' / 5 correct -- Review needed';
+      text.textContent = 'You need at least 3 correct answers to pass. Review the material above and try again. ' +
+        'Pay special attention to the model family, surfaces, and safety sections.';
+    }
+
+    // Save progress
+    var progressData = {
+      score: score,
+      total: 5,
+      completed: score >= 3,
+      timestamp: new Date().toISOString()
+    };
+    localStorage.setItem(FINAL_QUIZ_KEY, JSON.stringify(progressData));
+
+    // Disable submit button
+    document.getElementById('finalSubmitBtn').disabled = true;
+    document.getElementById('finalSubmitBtn').textContent = 'Submitted';
+  };
+
+  // Check for existing progress
+  function loadExistingProgress() {
+    var saved = localStorage.getItem(FINAL_QUIZ_KEY);
+    if (saved) {
+      try {
+        var data = JSON.parse(saved);
+        if (data.completed) {
+          // Indicate completion in the sidebar
+          var fill = document.getElementById('sidebarProgressFill');
+          if (fill) {
+            fill.style.width = '100%';
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+  }
+  loadExistingProgress();
+
+})();
+</script>
+</body>
+</html>

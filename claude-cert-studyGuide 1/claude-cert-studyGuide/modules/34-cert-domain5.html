@@ -1,0 +1,3025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 34: Cert -- Context Management &amp; Reliability (15%) | Claude AI Training</title>
+<style>
+/* ============================================
+   CSS CUSTOM PROPERTIES & DESIGN SYSTEM
+   Premium Edition with 3-layer shadows, spring
+   transitions, gradient headings, deep dark mode
+   ============================================ */
+:root {
+  --primary: #7C3AED;
+  --primary-light: #A78BFA;
+  --primary-dark: #5B21B6;
+  --accent: #06B6D4;
+  --accent-light: #22D3EE;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  --bg: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --bg-code: #F1F5F9;
+  --text: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --border: #E2E8F0;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04), 0 0px 0px rgba(124,58,237,0);
+  --shadow-lg: 0 4px 12px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.06), 0 0 0 rgba(124,58,237,0);
+  --shadow-glow: 0 4px 12px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.06), 0 0 24px rgba(124,58,237,0.12);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --transition: 0.2s ease;
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --sidebar-width: 280px;
+  --content-max: 800px;
+}
+
+[data-theme="dark"] {
+  --bg: #0B0F1A;
+  --bg-card: #141926;
+  --bg-code: #1A2030;
+  --text: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --border: #1E293B;
+  --shadow: 0 1px 3px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.2), 0 0 0 rgba(124,58,237,0);
+  --shadow-lg: 0 4px 12px rgba(0,0,0,0.4), 0 12px 32px rgba(0,0,0,0.3), 0 0 0 rgba(124,58,237,0);
+  --shadow-glow: 0 4px 12px rgba(0,0,0,0.4), 0 12px 32px rgba(0,0,0,0.3), 0 0 32px rgba(124,58,237,0.15);
+}
+
+/* ============================================
+   REDUCED MOTION
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  html { scroll-behavior: auto; }
+}
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 24px;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  min-height: 100vh;
+  transition: background var(--transition), color var(--transition);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   THEME TOGGLE
+   ============================================ */
+.theme-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: all 0.3s var(--spring);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+.theme-toggle:hover {
+  box-shadow: var(--shadow-glow);
+  transform: scale(1.1);
+}
+
+/* ============================================
+   SIDEBAR
+   ============================================ */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  z-index: 900;
+  transition: transform 0.3s var(--spring), background var(--transition);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.sidebar-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+  margin-bottom: 12px;
+  transition: color var(--transition);
+}
+.sidebar-back:hover { color: var(--primary-dark); }
+
+.sidebar-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.sidebar-module-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.sidebar-nav {
+  padding: 12px 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.sidebar-section {
+  margin-bottom: 4px;
+}
+
+.sidebar-section-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 20px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  text-align: left;
+  transition: color var(--transition);
+}
+.sidebar-section-toggle:hover { color: var(--text); }
+.sidebar-section-toggle .chevron {
+  transition: transform 0.3s var(--spring);
+  font-size: 0.65rem;
+}
+.sidebar-section-toggle.collapsed .chevron {
+  transform: rotate(-90deg);
+}
+
+.sidebar-links {
+  list-style: none;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.sidebar-links.collapsed {
+  max-height: 0 !important;
+}
+
+.sidebar-link {
+  display: block;
+  padding: 7px 20px 7px 32px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: all var(--transition);
+  line-height: 1.4;
+}
+.sidebar-link:hover {
+  color: var(--text);
+  background: var(--bg);
+}
+.sidebar-link.active {
+  color: var(--primary);
+  border-left-color: var(--primary);
+  background: rgba(124, 58, 237, 0.05);
+  font-weight: 600;
+}
+[data-theme="dark"] .sidebar-link.active {
+  background: rgba(124, 58, 237, 0.12);
+}
+
+.sidebar-progress {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sidebar-progress-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.sidebar-progress-track {
+  height: 6px;
+  background: var(--bg-code);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.sidebar-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 3px;
+  transition: width 0.5s ease;
+  width: 0%;
+}
+
+/* Hamburger button (mobile) */
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1001;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+  transition: all var(--transition);
+}
+.hamburger span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--text);
+  margin: 4px auto;
+  transition: all 0.3s ease;
+  border-radius: 1px;
+}
+.hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(4px, 4px); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(4px, -4px); }
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 899;
+}
+
+/* ============================================
+   MAIN CONTENT
+   ============================================ */
+.main-content {
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+  transition: margin var(--transition);
+}
+
+.content-wrapper {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 40px 32px 80px;
+}
+
+/* Module Header */
+.module-header {
+  margin-bottom: 48px;
+}
+.module-header .breadcrumb {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+.module-header .breadcrumb a {
+  color: var(--primary);
+  text-decoration: none;
+}
+.module-header .breadcrumb a:hover { text-decoration: underline; }
+
+.module-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.module-badge .number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.module-badge .label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.module-header h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.module-header .description {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 640px;
+}
+
+.module-meta {
+  display: flex;
+  gap: 16px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.module-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  background: var(--bg-code);
+  padding: 6px 14px;
+  border-radius: 20px;
+}
+
+/* ============================================
+   SECTIONS
+   ============================================ */
+.section {
+  margin-bottom: 56px;
+  scroll-margin-top: 24px;
+}
+
+.section-heading {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+  line-height: 1.3;
+}
+
+.section h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-top: 32px;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.section h4 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-top: 24px;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.section p {
+  margin-bottom: 16px;
+  color: var(--text-secondary);
+}
+
+.section ul, .section ol {
+  margin-bottom: 16px;
+  padding-left: 24px;
+}
+.section li {
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+}
+.section li strong {
+  color: var(--text);
+}
+
+/* ============================================
+   CODE BLOCKS
+   ============================================ */
+.code-block {
+  background: #1E293B;
+  color: #E2E8F0;
+  border-radius: var(--radius-sm);
+  padding: 20px 24px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  overflow-x: auto;
+  position: relative;
+  margin: 16px 0 20px;
+  tab-size: 2;
+}
+.code-block .code-label {
+  position: absolute;
+  top: 8px;
+  left: 16px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #64748B;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+.code-block.has-label {
+  padding-top: 36px;
+}
+.code-block .copy-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: #94A3B8;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  transition: all var(--transition);
+}
+.code-block .copy-btn:hover { background: rgba(255,255,255,0.2); color: white; }
+.code-block .copy-btn.copied { background: var(--success); color: white; }
+
+/* Syntax highlighting */
+.kw { color: #C084FC; }
+.str { color: #6EE7B7; }
+.fn { color: #7DD3FC; }
+.cm { color: #64748B; }
+.num { color: #FDBA74; }
+.op { color: #FCA5A5; }
+.type { color: #67E8F9; }
+.param { color: #FDE68A; }
+.prop { color: #F0ABFC; }
+.punc { color: #94A3B8; }
+
+/* Inline code */
+code {
+  background: var(--bg-code);
+  color: var(--primary);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.88em;
+}
+[data-theme="dark"] code {
+  background: #334155;
+}
+.code-block code {
+  background: none;
+  color: inherit;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+  white-space: pre-wrap;
+  display: block;
+}
+
+/* ============================================
+   CALLOUT BOXES
+   ============================================ */
+.callout {
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  margin: 20px 0;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.callout-icon {
+  flex-shrink: 0;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+.callout-content { flex: 1; }
+.callout-content p { margin-bottom: 6px; color: inherit; }
+.callout-content p:last-child { margin-bottom: 0; }
+
+.callout.info {
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  color: #1E40AF;
+}
+.callout.tip {
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  color: #166534;
+}
+.callout.warning {
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  color: #92400E;
+}
+.callout.important {
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  color: #991B1B;
+}
+
+[data-theme="dark"] .callout.info {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: #93C5FD;
+}
+[data-theme="dark"] .callout.tip {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #6EE7B7;
+}
+[data-theme="dark"] .callout.warning {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #FCD34D;
+}
+[data-theme="dark"] .callout.important {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #FCA5A5;
+}
+
+/* ============================================
+   ACCENT CARDS
+   ============================================ */
+.accent-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin: 24px 0;
+  box-shadow: var(--shadow);
+  transition: all 0.3s var(--spring);
+}
+.accent-card:hover {
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+  border-color: var(--primary-light);
+}
+.accent-card h4 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.accent-card p {
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+.accent-card p:last-child { margin-bottom: 0; }
+
+/* ============================================
+   COMPARISON TABLE
+   ============================================ */
+.comparison-table-wrapper {
+  overflow-x: auto;
+  margin: 20px 0;
+}
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.comparison-table th {
+  background: var(--primary);
+  color: white;
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+.comparison-table th:first-child {
+  border-radius: var(--radius-sm) 0 0 0;
+}
+.comparison-table th:last-child {
+  border-radius: 0 var(--radius-sm) 0 0;
+}
+.comparison-table td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+.comparison-table tr:nth-child(even) td {
+  background: var(--bg);
+}
+.comparison-table tr:last-child td:first-child {
+  border-radius: 0 0 0 var(--radius-sm);
+}
+.comparison-table tr:last-child td:last-child {
+  border-radius: 0 0 var(--radius-sm) 0;
+}
+
+/* ============================================
+   DOMAIN WEIGHT BAR
+   ============================================ */
+.domain-weight {
+  margin: 24px 0;
+  padding: 20px 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.domain-weight-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.domain-weight-bar {
+  width: 100%;
+  height: 24px;
+  background: var(--bg-code);
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+.domain-weight-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: white;
+  letter-spacing: 0.04em;
+}
+.domain-weight-tasks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+.domain-weight-task {
+  font-size: 0.8rem;
+  padding: 4px 12px;
+  background: rgba(124, 58, 237, 0.08);
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  border-radius: 20px;
+  color: var(--primary);
+  font-weight: 500;
+}
+[data-theme="dark"] .domain-weight-task {
+  background: rgba(124, 58, 237, 0.15);
+  border-color: rgba(124, 58, 237, 0.3);
+}
+
+/* ============================================
+   INTERACTIVE: CONTEXT OPTIMIZATION
+   ============================================ */
+.context-opt {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  box-shadow: var(--shadow);
+}
+.context-opt h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.scenario-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 24px;
+}
+.scenario-tab {
+  padding: 10px 20px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: all var(--transition);
+}
+.scenario-tab:hover { color: var(--text); }
+.scenario-tab.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+.context-blocks {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.context-block {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--border);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+.context-block:hover {
+  border-color: var(--primary-light);
+}
+
+.context-block-color {
+  width: 8px;
+  height: 40px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.context-block-info {
+  flex: 1;
+}
+.context-block-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+.context-block-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+.context-block-tokens {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  min-width: 70px;
+  text-align: right;
+}
+
+.context-block-actions {
+  display: flex;
+  gap: 4px;
+}
+.context-action-btn {
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--bg);
+  color: var(--text-muted);
+  transition: all var(--transition);
+}
+.context-action-btn:hover { border-color: var(--primary); color: var(--primary); }
+.context-action-btn.active-keep {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: var(--success);
+  color: var(--success);
+}
+.context-action-btn.active-summarize {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: var(--warning);
+  color: var(--warning);
+}
+.context-action-btn.active-drop {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: var(--error);
+  color: var(--error);
+}
+
+.context-budget-bar {
+  margin: 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.context-budget-track {
+  flex: 1;
+  height: 16px;
+  background: var(--bg-code);
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+.context-budget-fill {
+  height: 100%;
+  border-radius: 8px;
+  transition: width 0.3s ease;
+}
+.context-budget-fill.ok { background: linear-gradient(90deg, var(--success), #34D399); }
+.context-budget-fill.warn { background: linear-gradient(90deg, var(--warning), #FBBF24); }
+.context-budget-fill.over { background: linear-gradient(90deg, var(--error), #F87171); }
+.context-budget-limit {
+  position: absolute;
+  right: 4px;
+  top: 0;
+  height: 100%;
+  width: 2px;
+  background: var(--text-muted);
+}
+.context-budget-text {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  min-width: 100px;
+  text-align: right;
+}
+
+.context-quality {
+  margin-top: 16px;
+  padding: 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  display: none;
+}
+.context-quality.show { display: block; }
+
+.quality-meter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.quality-label { font-size: 0.85rem; font-weight: 600; color: var(--text); min-width: 120px; }
+.quality-track { flex: 1; height: 8px; background: var(--bg-code); border-radius: 4px; overflow: hidden; }
+.quality-fill { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
+.quality-fill.high { background: var(--success); }
+.quality-fill.medium { background: var(--warning); }
+.quality-fill.low { background: var(--error); }
+.quality-value { font-size: 0.8rem; font-weight: 600; min-width: 40px; text-align: right; }
+
+.lab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s var(--spring);
+  margin-top: 12px;
+}
+.lab-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-glow); }
+.lab-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+.lab-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  background: var(--bg-code);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  margin-top: 12px;
+  margin-left: 8px;
+}
+.lab-btn-secondary:hover { background: var(--border); }
+
+/* ============================================
+   ESCALATION FLOW DESIGNER
+   ============================================ */
+.escalation-designer {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  box-shadow: var(--shadow);
+}
+.escalation-designer h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.trigger-list {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0;
+}
+.trigger-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+  transition: all var(--transition);
+}
+.trigger-item:hover { border-color: var(--primary-light); }
+
+.trigger-checkbox {
+  accent-color: var(--primary);
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+.trigger-label {
+  flex: 1;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+.trigger-type {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.trigger-type.explicit { background: rgba(16,185,129,0.15); color: var(--success); }
+.trigger-type.policy { background: rgba(245,158,11,0.15); color: var(--warning); }
+.trigger-type.sentiment { background: rgba(239,68,68,0.15); color: var(--error); }
+.trigger-type.progress { background: rgba(6,182,212,0.15); color: var(--accent); }
+
+.handoff-config {
+  margin: 20px 0;
+  padding: 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.handoff-config label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.handoff-textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 10px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 0.85rem;
+  font-family: inherit;
+  line-height: 1.5;
+  resize: vertical;
+}
+.handoff-textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.sim-interaction {
+  padding: 16px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 12px;
+}
+.sim-customer-msg {
+  font-size: 0.9rem;
+  color: var(--text);
+  margin-bottom: 8px;
+  padding: 10px 14px;
+  background: var(--bg-card);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--accent);
+}
+.sim-result {
+  font-size: 0.85rem;
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin-top: 8px;
+}
+.sim-result.correct { background: rgba(16,185,129,0.12); color: #059669; }
+.sim-result.incorrect { background: rgba(239,68,68,0.1); color: var(--error); }
+[data-theme="dark"] .sim-result.correct { color: #6EE7B7; }
+[data-theme="dark"] .sim-result.incorrect { color: #FCA5A5; }
+
+.score-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+.score-badge.excellent { background: rgba(16,185,129,0.15); color: var(--success); }
+.score-badge.good { background: rgba(6,182,212,0.15); color: var(--accent); }
+.score-badge.fair { background: rgba(245,158,11,0.15); color: var(--warning); }
+.score-badge.poor { background: rgba(239,68,68,0.15); color: var(--error); }
+
+/* ============================================
+   FINAL QUIZ
+   ============================================ */
+.final-quiz {
+  background: var(--bg-card);
+  border: 2px solid var(--primary-light);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  box-shadow: var(--shadow);
+}
+.final-quiz h3 {
+  margin-top: 0;
+}
+
+.final-quiz-question {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.final-quiz-question .fq-number {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+.final-quiz-question .fq-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+.fq-options { list-style: none; padding: 0; }
+.fq-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 12px;
+  margin-bottom: 4px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+.fq-option:hover { background: rgba(124, 58, 237, 0.05); }
+.fq-option input[type="radio"] {
+  accent-color: var(--primary);
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+.fq-option.selected-correct {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+.fq-option.selected-wrong {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+}
+.fq-option.reveal-correct {
+  background: rgba(16, 185, 129, 0.08);
+  color: #059669;
+  font-weight: 600;
+}
+[data-theme="dark"] .fq-option.selected-correct { color: #6EE7B7; }
+[data-theme="dark"] .fq-option.selected-wrong { color: #FCA5A5; }
+[data-theme="dark"] .fq-option.reveal-correct { color: #6EE7B7; }
+
+.final-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 32px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s var(--spring);
+  margin-top: 8px;
+}
+.final-submit-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-glow); }
+.final-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.final-result {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: var(--radius-sm);
+  display: none;
+}
+.final-result.show { display: block; }
+.final-result.pass {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.final-result.fail {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.final-result h4 {
+  margin-top: 0;
+  margin-bottom: 6px;
+  font-size: 1.1rem;
+}
+.final-result p {
+  margin-bottom: 0;
+  font-size: 0.95rem;
+}
+.final-result.pass h4 { color: var(--success); }
+.final-result.fail h4 { color: var(--warning); }
+
+/* ============================================
+   KEY CONCEPT
+   ============================================ */
+.key-concept {
+  display: inline-block;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(6, 182, 212, 0.1));
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  color: var(--primary);
+}
+[data-theme="dark"] .key-concept {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(6, 182, 212, 0.15));
+  border-color: rgba(124, 58, 237, 0.35);
+}
+
+/* ============================================
+   NAVIGATION FOOTER
+   ============================================ */
+.module-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 16px;
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 2px solid var(--border);
+}
+.nav-link {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: all 0.3s var(--spring);
+  min-width: 0;
+  flex: 1;
+  max-width: 50%;
+  box-shadow: var(--shadow);
+}
+.nav-link:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+}
+.nav-link.next { align-items: flex-end; text-align: right; }
+.nav-link .nav-dir {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--primary);
+}
+.nav-link .nav-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 1024px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .hamburger {
+    display: flex;
+  }
+  .sidebar-overlay.show {
+    display: block;
+  }
+  .main-content {
+    margin-left: 0;
+  }
+  .theme-toggle {
+    right: 16px;
+  }
+}
+
+@media (max-width: 640px) {
+  .content-wrapper {
+    padding: 24px 16px 60px;
+  }
+  .module-header h1 {
+    font-size: 1.6rem;
+  }
+  .section-heading {
+    font-size: 1.3rem;
+  }
+  .scenario-tabs {
+    flex-wrap: wrap;
+  }
+  .context-block {
+    flex-wrap: wrap;
+  }
+  .context-block-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+  .module-nav {
+    flex-direction: column;
+  }
+  .nav-link {
+    max-width: 100%;
+  }
+  .nav-link.next {
+    align-items: flex-start;
+    text-align: left;
+  }
+}
+
+/* ============================================
+   SCROLLBAR STYLING
+   ============================================ */
+.sidebar::-webkit-scrollbar,
+.code-block::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.sidebar::-webkit-scrollbar-track,
+.code-block::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+.code-block::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.section {
+  animation: fadeInUp 0.4s ease both;
+}
+</style>
+</head>
+<body>
+<!-- ============================================
+     THEME TOGGLE
+     ============================================ -->
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+  <span id="themeIcon">&#9790;</span>
+</button>
+
+<!-- ============================================
+     HAMBURGER (mobile)
+     ============================================ -->
+<button class="hamburger" id="hamburger" aria-label="Toggle sidebar">
+  <span></span>
+  <span></span>
+  <span></span>
+</button>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ============================================
+     SIDEBAR
+     ============================================ -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="../index.html" class="sidebar-back">&larr; Back to Hub</a>
+    <div class="sidebar-title">Module 34</div>
+    <div class="sidebar-module-name">Cert: Context Management &amp; Reliability</div>
+  </div>
+
+  <div class="sidebar-nav">
+    <!-- Section: Content -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="content">
+        Content <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-content">
+        <li><a href="#domain-overview" class="sidebar-link" data-target="domain-overview">Domain Overview</a></li>
+        <li><a href="#context-preservation" class="sidebar-link" data-target="context-preservation">Context Preservation</a></li>
+        <li><a href="#escalation-ambiguity" class="sidebar-link" data-target="escalation-ambiguity">Escalation &amp; Ambiguity</a></li>
+        <li><a href="#error-propagation" class="sidebar-link" data-target="error-propagation">Error Propagation</a></li>
+        <li><a href="#codebase-confidence" class="sidebar-link" data-target="codebase-confidence">Codebase &amp; Confidence</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Labs -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="labs">
+        Interactive Labs <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-labs">
+        <li><a href="#context-opt-lab" class="sidebar-link" data-target="context-opt-lab">Context Optimization</a></li>
+        <li><a href="#escalation-lab" class="sidebar-link" data-target="escalation-lab">Escalation Flow Designer</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Assessment -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="assessment">
+        Assessment <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-assessment">
+        <li><a href="#practice-exam" class="sidebar-link" data-target="practice-exam">Practice Exam (7 Questions)</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sidebar-progress">
+    <div class="sidebar-progress-label">Module Progress</div>
+    <div class="sidebar-progress-track">
+      <div class="sidebar-progress-fill" id="sidebarProgressFill"></div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================
+     MAIN CONTENT
+     ============================================ -->
+<main class="main-content">
+  <div class="content-wrapper">
+
+    <!-- Module Header -->
+    <header class="module-header">
+      <div class="breadcrumb">
+        <a href="../index.html">Training Hub</a> &raquo; <a href="33-cert-domain4.html">Module 33</a> &raquo; Module 34
+      </div>
+      <div class="module-badge">
+        <span class="number">34</span>
+        <span class="label">Certification</span>
+      </div>
+      <h1>Context Management &amp; Reliability</h1>
+      <p class="description">
+        Master the 15%-weighted certification domain covering context preservation strategies, escalation patterns,
+        error propagation, codebase exploration techniques, and confidence calibration for production AI systems.
+      </p>
+      <div class="module-meta">
+        <span class="module-meta-item">&#9201; ~60 min</span>
+        <span class="module-meta-item">&#128218; Expert</span>
+        <span class="module-meta-item">&#127919; 2 Interactive Labs</span>
+        <span class="module-meta-item">&#9989; 7-Question Practice Exam</span>
+      </div>
+    </header>
+
+    <!-- ========================================
+         SECTION 1: DOMAIN OVERVIEW
+         ======================================== -->
+    <section class="section" id="domain-overview">
+      <h2 class="section-heading">1. Domain Overview</h2>
+
+      <p>
+        Domain 5 of the Claude AI certification exam focuses on <strong>Context Management &amp; Reliability</strong>
+        and carries a <strong>15% weight</strong>. This domain tests your ability to build AI systems that remain
+        accurate over long conversations, degrade gracefully when errors occur, and know when to escalate to humans.
+      </p>
+
+      <div class="domain-weight">
+        <div class="domain-weight-label">Exam Weight: Domain 5</div>
+        <div class="domain-weight-bar">
+          <div class="domain-weight-fill" style="width: 15%;">15%</div>
+        </div>
+        <div class="domain-weight-tasks">
+          <span class="domain-weight-task">Context Preservation</span>
+          <span class="domain-weight-task">Escalation Patterns</span>
+          <span class="domain-weight-task">Error Propagation</span>
+          <span class="domain-weight-task">Codebase Exploration</span>
+          <span class="domain-weight-task">Confidence Calibration</span>
+          <span class="domain-weight-task">Information Provenance</span>
+        </div>
+      </div>
+
+      <h3>Why This Domain Matters</h3>
+
+      <p>
+        Context management is the hidden complexity that separates toy demos from production systems. A chatbot
+        that works perfectly for 5 turns may fail catastrophically at turn 50 when critical information has been
+        pushed out of the context window. Similarly, a system that never escalates to humans will inevitably
+        make confident-sounding errors on edge cases. This domain tests whether you can build systems that
+        <em>know what they know</em>, <em>preserve what matters</em>, and <em>fail gracefully</em>.
+      </p>
+
+      <h3>The Six Task Areas</h3>
+
+      <ul>
+        <li>
+          <strong>Conversation Context Preservation:</strong> Techniques for maintaining critical information
+          across long conversations, including progressive summarization risks and the "lost in the middle" effect.
+        </li>
+        <li>
+          <strong>Escalation Patterns:</strong> When and how to hand conversations to humans. The exam focuses
+          on <em>explicit criteria</em> for escalation (not sentiment-based), honoring human requests immediately,
+          and proper handoff content.
+        </li>
+        <li>
+          <strong>Error Propagation:</strong> How to handle errors from tool calls, distinguish access failures
+          from valid empty results, and annotate synthesized responses with coverage information.
+        </li>
+        <li>
+          <strong>Codebase Exploration:</strong> Maintaining accuracy during extended code exploration sessions,
+          using scratchpad files, and delegating to subagents for verbose research.
+        </li>
+        <li>
+          <strong>Confidence Calibration:</strong> Field-level confidence annotations, stratified sampling for
+          error detection, and handling temporal data (publication dates, filing dates).
+        </li>
+        <li>
+          <strong>Information Provenance:</strong> Tracking which claims come from which sources, distinguishing
+          between stated facts and inferences, and mapping conclusions to their evidence.
+        </li>
+      </ul>
+
+      <div class="callout info">
+        <span class="callout-icon">&#9432;</span>
+        <div class="callout-content">
+          <p><strong>Exam tip:</strong> This domain heavily tests your understanding of failure modes. Many questions
+          present a system that <em>appears</em> to work but has a subtle reliability problem. Look for questions about
+          what happens after 20+ conversation turns, what happens when one of three data sources fails, and what
+          happens when the model encounters a case it has never seen before.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 2: CONTEXT PRESERVATION
+         ======================================== -->
+    <section class="section" id="context-preservation">
+      <h2 class="section-heading">2. Context Preservation</h2>
+
+      <p>
+        Claude's context window is large but finite. In production systems -- especially multi-turn customer service
+        agents, code exploration sessions, and research workflows -- conversations regularly approach or exceed
+        context limits. The exam tests your understanding of what goes wrong and how to mitigate it.
+      </p>
+
+      <h3>Progressive Summarization Risks</h3>
+
+      <p>
+        A common approach to context management is <span class="key-concept">progressive summarization</span>:
+        periodically replacing older messages with a summary. This sounds elegant but has a critical failure
+        mode that the exam tests:
+      </p>
+
+      <div class="accent-card">
+        <h4>What Progressive Summarization Loses</h4>
+        <ul>
+          <li><strong>Numerical values:</strong> "The customer's account balance is $4,237.89" gets summarized to "Customer discussed account balance" -- the exact amount is lost</li>
+          <li><strong>Dates and deadlines:</strong> "Payment is due by March 15th" becomes "Customer asked about payment deadline"</li>
+          <li><strong>Specific identifiers:</strong> "Order #ORD-2024-78341" becomes "Customer referenced an order"</li>
+          <li><strong>Amounts and quantities:</strong> "3 items at $29.99 each" becomes "Customer ordered items"</li>
+          <li><strong>Conditional terms:</strong> "If the claim exceeds $10,000, require supervisor approval" loses the threshold</li>
+        </ul>
+      </div>
+
+      <div class="callout important">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Exam answer pattern:</strong> When asked about progressive summarization, the correct answer
+          acknowledges that it <em>loses transactional specifics</em>. The mitigation is to extract critical facts
+          (numbers, dates, IDs, amounts) into a persistent structured block that is never summarized.</p>
+        </div>
+      </div>
+
+      <h3>The "Lost in the Middle" Effect</h3>
+
+      <p>
+        Research has shown that Claude (and all large language models) pay more attention to information at the
+        <strong>beginning</strong> and <strong>end</strong> of the context, with reduced attention to content
+        in the middle. This is called the <span class="key-concept">"lost in the middle"</span> effect.
+      </p>
+
+      <p>
+        The practical implication: if you place a critical instruction or fact in the middle of a long context,
+        Claude may not apply it consistently. The exam tests two mitigation strategies:
+      </p>
+
+      <ul>
+        <li>
+          <strong>Place summaries and critical facts at the beginning</strong> of the input (system prompt or
+          early in the user message), not buried in conversation history.
+        </li>
+        <li>
+          <strong>Repeat key instructions</strong> in both the system prompt and the final user message for
+          critical behaviors like escalation rules or output format requirements.
+        </li>
+      </ul>
+
+      <h3>Extracting "Case Facts" into a Persistent Block</h3>
+
+      <p>
+        The recommended architecture for long-running conversations:
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Case Facts Block Pattern</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm"># System prompt includes a structured facts block
+# that is updated after each turn but never summarized:</span>
+
+<span class="str">&lt;case_facts&gt;
+  customer_name: Jane Doe
+  account_id: ACC-2024-55912
+  issue_type: billing_dispute
+  disputed_amount: $147.50
+  disputed_date: 2024-03-01
+  order_id: ORD-2024-78341
+  resolution_offered: full_refund
+  resolution_status: pending_approval
+  escalation_history: none
+  turns_elapsed: 12
+&lt;/case_facts&gt;</span>
+
+<span class="cm"># Conversation history is summarized, but case_facts
+# block is preserved verbatim across all turns.</span></code></div>
+
+      <h3>Trimming Verbose Tool Outputs</h3>
+
+      <p>
+        Another context management technique: when tool calls return large amounts of data (e.g., a database
+        query returning 500 rows, or a file read returning 1000 lines), trim the output before including it
+        in the conversation. The exam tests your ability to recognize when verbose tool output is the primary
+        cause of context exhaustion.
+      </p>
+
+      <h3>Requiring Subagent Structured Outputs</h3>
+
+      <p>
+        When using subagents (via the Agent tool or separate API calls) for research tasks, require them to
+        return <strong>structured summaries with metadata</strong> rather than raw conversation transcripts.
+        This compresses the information before it enters the main conversation's context:
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Subagent Output Format</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>{
+  <span class="prop">"findings"</span>: [
+    {
+      <span class="prop">"claim"</span>: <span class="str">"Authentication uses JWT with 24h expiry"</span>,
+      <span class="prop">"source_file"</span>: <span class="str">"src/auth/jwt_handler.py"</span>,
+      <span class="prop">"source_line"</span>: <span class="num">42</span>,
+      <span class="prop">"confidence"</span>: <span class="str">"high"</span>
+    },
+    {
+      <span class="prop">"claim"</span>: <span class="str">"Rate limiting is 100 req/min per API key"</span>,
+      <span class="prop">"source_file"</span>: <span class="str">"src/middleware/rate_limit.py"</span>,
+      <span class="prop">"source_line"</span>: <span class="num">18</span>,
+      <span class="prop">"confidence"</span>: <span class="str">"high"</span>
+    }
+  ],
+  <span class="prop">"files_examined"</span>: <span class="num">23</span>,
+  <span class="prop">"gaps"</span>: [<span class="str">"Could not determine session storage backend"</span>]
+}</code></div>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>Key pattern:</strong> The subagent reads 23 files and produces a compact summary. Only the
+          summary enters the main conversation's context. Without this pattern, the 23 file reads would consume
+          most of the main context window.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 3: ESCALATION & AMBIGUITY
+         ======================================== -->
+    <section class="section" id="escalation-ambiguity">
+      <h2 class="section-heading">3. Escalation &amp; Ambiguity</h2>
+
+      <p>
+        Escalation -- knowing when to hand a conversation to a human -- is one of the highest-stakes decisions
+        in a customer-facing AI system. The exam tests whether you understand the correct escalation triggers
+        and common anti-patterns.
+      </p>
+
+      <h3>Explicit Escalation Criteria</h3>
+
+      <p>
+        The exam presents scenarios where you must identify the <strong>correct trigger</strong> for escalation.
+        The key principle: escalation should be based on <em>explicit, observable conditions</em>, not on
+        sentiment analysis or frustration detection.
+      </p>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Trigger Type</th>
+              <th>Example</th>
+              <th>Reliability</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Explicit request</strong></td>
+              <td>"I want to speak to a human" / "Transfer me to a manager"</td>
+              <td>Always honor immediately</td>
+            </tr>
+            <tr>
+              <td><strong>Policy gap</strong></td>
+              <td>Customer asks about a scenario not covered by documented policies</td>
+              <td>High reliability -- clear decision boundary</td>
+            </tr>
+            <tr>
+              <td><strong>Unable to make progress</strong></td>
+              <td>3 failed attempts to resolve the same issue</td>
+              <td>High reliability -- measurable condition</td>
+            </tr>
+            <tr>
+              <td><strong>Identity ambiguity</strong></td>
+              <td>Multiple accounts match the customer's description</td>
+              <td>High reliability -- requires human judgment</td>
+            </tr>
+            <tr>
+              <td><strong>Sentiment-based</strong></td>
+              <td>"Customer seems frustrated" based on tone analysis</td>
+              <td>LOW reliability -- tone is culturally variable and easy to misread</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Honor Explicit Human Requests Immediately</h3>
+
+      <p>
+        When a customer explicitly asks for a human, the only correct response is to initiate the handoff.
+        <strong>Do not</strong> attempt to resolve the issue first, ask "Are you sure?", or explain that
+        the AI can help. This is a trust issue: if the customer has to ask twice, they lose trust in the
+        entire system.
+      </p>
+
+      <div class="accent-card">
+        <h4>Correct Handoff Pattern</h4>
+        <div class="code-block has-label">
+          <span class="code-label">Agent Response</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="str">"I understand you would like to speak with a human agent.
+Let me transfer you now. I will include a summary of our
+conversation so you will not need to repeat yourself.
+
+Summary for the agent:
+- Customer: Jane Doe (ACC-2024-55912)
+- Issue: Billing dispute for $147.50 on order ORD-2024-78341
+- What we tried: Verified the charge, offered full refund
+- Status: Customer declined refund, requesting supervisor review
+- Customer sentiment: Professional but firm
+
+Transferring now..."</span></code></div>
+      </div>
+
+      <h3>Acknowledge Frustration But Offer Resolution</h3>
+
+      <p>
+        When a customer expresses frustration but does <em>not</em> request a human, the correct response
+        is to acknowledge their frustration and continue working toward resolution. Escalation is only
+        appropriate if you cannot make further progress or the customer explicitly requests it.
+      </p>
+
+      <h3>Ask for Identifiers When Multiple Matches</h3>
+
+      <p>
+        When a customer provides ambiguous identifying information (e.g., "I placed an order last week" but
+        has multiple recent orders), ask for specific identifiers rather than guessing:
+      </p>
+
+      <ul>
+        <li>"I can see several recent orders on your account. Could you provide the order number? It starts with ORD- and was included in your confirmation email."</li>
+        <li>Do <strong>not</strong> pick the most recent order and assume it is the right one</li>
+        <li>If the customer cannot provide an identifier, describe each option briefly and ask them to confirm</li>
+      </ul>
+
+      <h3>Escalate on Policy Ambiguity</h3>
+
+      <p>
+        When the customer's situation falls outside documented policies, escalate rather than inventing a
+        policy. Common examples: unusual refund amounts, cross-border regulatory questions, requests
+        involving legal liability. The correct response acknowledges the limitation:
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Policy Gap Escalation</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="str">"This situation involves a cross-border return which requires
+review of specific regulatory requirements that are outside my
+documented guidelines. I want to make sure you get accurate
+information, so I am going to connect you with a specialist
+who handles international returns. One moment please."</span></code></div>
+
+      <div class="callout warning">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Exam focus:</strong> The exam will present a frustrated customer and ask whether to escalate.
+          The correct answer depends on whether the customer <em>explicitly requests</em> a human, not on how
+          frustrated they seem. Frustration alone is not an escalation trigger -- inability to resolve the issue is.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 4: ERROR PROPAGATION
+         ======================================== -->
+    <section class="section" id="error-propagation">
+      <h2 class="section-heading">4. Error Propagation Strategies</h2>
+
+      <p>
+        In multi-tool, multi-step AI systems, errors are inevitable. A database call times out. A file is not
+        found. An API returns unexpected data. The exam tests how you handle these errors -- not whether they
+        occur, but how they propagate through the system and how the final output communicates what happened.
+      </p>
+
+      <h3>Structured Error Context</h3>
+
+      <p>
+        When a tool call fails, capture structured information about the failure rather than just
+        "an error occurred." This enables downstream processing to make informed decisions:
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Structured Error Object</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>{
+  <span class="prop">"error_type"</span>: <span class="str">"database_timeout"</span>,
+  <span class="prop">"attempted_action"</span>: <span class="str">"fetch customer order history"</span>,
+  <span class="prop">"partial_results"</span>: <span class="str">"Retrieved 3 of estimated 12 orders before timeout"</span>,
+  <span class="prop">"alternatives"</span>: [
+    <span class="str">"Retry with narrower date range"</span>,
+    <span class="str">"Use cached results from last successful query (2 hours old)"</span>,
+    <span class="str">"Proceed with partial results and note the gap"</span>
+  ],
+  <span class="prop">"impact_on_response"</span>: <span class="str">"Cannot provide complete order history"</span>
+}</code></div>
+
+      <h3>Distinguish Access Failures from Valid Empty Results</h3>
+
+      <p>
+        This is a critical distinction that the exam tests. Consider two scenarios:
+      </p>
+
+      <ul>
+        <li>
+          <strong>Access failure:</strong> The database query timed out, returning no results. This means
+          we <em>do not know</em> whether results exist. The correct annotation is "unable to retrieve" -- not "no results found."
+        </li>
+        <li>
+          <strong>Valid empty result:</strong> The database query succeeded and returned zero rows. This means
+          we <em>know</em> there are no matching records. The correct annotation is "confirmed: no results."
+        </li>
+      </ul>
+
+      <div class="callout important">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Exam trap:</strong> A question may describe a system that reports "No orders found for this
+          customer" when the actual failure was a database timeout. The correct answer identifies this as a
+          dangerous conflation of "access failure" with "valid empty result" that could cause the agent to
+          make incorrect decisions (e.g., telling a customer they have no orders when in fact the query just
+          failed).</p>
+        </div>
+      </div>
+
+      <h3>Local Recovery for Transient Failures</h3>
+
+      <p>
+        Not every failure needs to propagate to the user. Transient failures (network timeouts, rate limits,
+        temporary service unavailability) should be retried locally before surfacing to the user:
+      </p>
+
+      <ul>
+        <li><strong>Retry with backoff</strong> for timeout errors (1s, 2s, 4s)</li>
+        <li><strong>Use cached data</strong> when fresh data is unavailable, annotating the staleness</li>
+        <li><strong>Narrow the query</strong> if a broad query times out (e.g., reduce date range)</li>
+        <li><strong>Surface clearly</strong> only after recovery attempts fail</li>
+      </ul>
+
+      <h3>Coverage Annotations in Synthesis</h3>
+
+      <p>
+        When synthesizing information from multiple sources, annotate which parts of the response are
+        well-supported and which have gaps. This is especially important when some sources succeeded
+        and others failed:
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Coverage-Annotated Response</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="str">"Based on available data:
+
+Account summary [COMPLETE - all 3 sources available]:
+- Name: Jane Doe
+- Balance: $4,237.89
+- Status: Active since 2019
+
+Recent orders [PARTIAL - 3 of 12 orders retrieved]:
+- ORD-2024-78341: $147.50 (March 1)
+- ORD-2024-76902: $89.00 (Feb 15)
+- ORD-2024-75180: $212.30 (Feb 2)
+Note: Order history may be incomplete due to a temporary
+database issue. The remaining orders could not be retrieved.
+
+Loyalty points [UNAVAILABLE - service timeout]:
+- Unable to retrieve loyalty points at this time.
+  This does not mean you have zero points."</span></code></div>
+
+      <h3>Anti-Patterns</h3>
+
+      <ul>
+        <li>
+          <strong>Silent suppression:</strong> Swallowing errors and presenting incomplete data as if it
+          were complete. The user has no idea they are seeing partial results.
+        </li>
+        <li>
+          <strong>Terminating on single failure:</strong> If 3 out of 4 data sources succeed, the correct
+          response presents the available data with a note about the gap -- not "I could not process your request."
+        </li>
+        <li>
+          <strong>Cascading failure inflation:</strong> Reporting "multiple system errors" when only one
+          service failed and the others succeeded normally.
+        </li>
+      </ul>
+    </section>
+
+    <!-- ========================================
+         SECTION 5: CODEBASE EXPLORATION & CONFIDENCE
+         ======================================== -->
+    <section class="section" id="codebase-confidence">
+      <h2 class="section-heading">5. Codebase Exploration &amp; Confidence</h2>
+
+      <h3>Context Degradation in Extended Sessions</h3>
+
+      <p>
+        A phenomenon the exam tests: after many turns of codebase exploration (reading files, running searches,
+        analyzing results), Claude's responses can degrade from specific, well-sourced answers to
+        <span class="key-concept">vague "typical patterns" answers</span>. This happens because:
+      </p>
+
+      <ul>
+        <li>Earlier file reads have been pushed out of the context window or compressed by summarization</li>
+        <li>Claude begins relying on its training data knowledge of "typical" patterns rather than the actual code</li>
+        <li>Specific function names, line numbers, and parameter names get replaced by generic descriptions</li>
+      </ul>
+
+      <p>
+        The telltale sign: Claude starts saying things like "this likely uses a repository pattern" instead of
+        "the <code>UserRepository</code> class at <code>src/repos/user.py:34</code> implements
+        <code>get_by_id()</code> with a SQLAlchemy query." When answers become generic, the context
+        has degraded.
+      </p>
+
+      <h3>Scratchpad Files for Persisting Findings</h3>
+
+      <p>
+        A practical mitigation for context degradation: write findings to a scratchpad file as you discover
+        them. This creates a persistent record that survives context window turnover:
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Scratchpad Pattern</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm"># .claude/scratchpad.md</span>
+<span class="cm"># Written by Claude during exploration, read back when needed</span>
+
+<span class="str">## Authentication Flow
+- Entry point: src/auth/router.py:login() (line 45)
+- Calls: src/auth/service.py:authenticate(email, password)
+- JWT creation: src/auth/jwt.py:create_token() with 24h expiry
+- Token stored: HttpOnly cookie named "session_token"
+- Refresh: src/auth/router.py:refresh() (line 78)
+
+## Database Access
+- ORM: SQLAlchemy with async sessions
+- Session factory: src/db/session.py:get_session()
+- Migrations: Alembic in migrations/ directory
+- Models: src/models/ (User, Order, Product, Payment)
+
+## Open Questions
+- [ ] Where is rate limiting configured?
+- [ ] How are background jobs scheduled?</span></code></div>
+
+      <h3>Subagent Delegation for Verbose Research</h3>
+
+      <p>
+        When a research task requires reading many files, delegate to a subagent rather than reading
+        everything in the main conversation. The subagent:
+      </p>
+
+      <ol>
+        <li>Gets its own context window (not competing with the main conversation)</li>
+        <li>Performs all the verbose file reads and searches</li>
+        <li>Returns a compact structured summary to the main conversation</li>
+        <li>The main conversation preserves its context for decision-making</li>
+      </ol>
+
+      <h3>Using /compact for Long Sessions</h3>
+
+      <p>
+        The <code>/compact</code> command in Claude Code triggers an explicit context compression. The exam
+        tests when this is appropriate:
+      </p>
+
+      <ul>
+        <li><strong>Use /compact</strong> after completing a discrete subtask (e.g., finished exploring auth, moving to database layer)</li>
+        <li><strong>Use /compact</strong> when Claude's answers become noticeably generic or when it starts hallucinating file paths</li>
+        <li><strong>Do not use /compact</strong> in the middle of a multi-step operation that depends on recent context</li>
+        <li><strong>Before using /compact</strong>, ensure critical findings are written to a scratchpad file</li>
+      </ul>
+
+      <h3>Structured State for Crash Recovery</h3>
+
+      <p>
+        In long-running tasks, periodically save structured state that allows the task to be resumed
+        after a crash or session timeout. This is especially important for multi-file refactoring or
+        migration tasks:
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Recovery State</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>{
+  <span class="prop">"task"</span>: <span class="str">"migrate_auth_to_oauth2"</span>,
+  <span class="prop">"completed_files"</span>: [<span class="str">"src/auth/basic.py"</span>, <span class="str">"src/auth/session.py"</span>],
+  <span class="prop">"pending_files"</span>: [<span class="str">"src/auth/middleware.py"</span>, <span class="str">"src/routes/protected.py"</span>],
+  <span class="prop">"decisions_made"</span>: {
+    <span class="prop">"token_storage"</span>: <span class="str">"HttpOnly cookie (not localStorage)"</span>,
+    <span class="prop">"refresh_strategy"</span>: <span class="str">"sliding window, 7-day max"</span>
+  },
+  <span class="prop">"last_checkpoint"</span>: <span class="str">"2024-03-15T14:30:00Z"</span>
+}</code></div>
+
+      <h3>Field-Level Confidence Calibration</h3>
+
+      <p>
+        Rather than providing a single confidence score for an entire extraction, provide
+        <strong>field-level confidence</strong> annotations. This allows downstream systems to handle
+        high-confidence and low-confidence fields differently:
+      </p>
+
+      <ul>
+        <li><strong>High confidence:</strong> Value was explicitly stated in the source with no ambiguity</li>
+        <li><strong>Medium confidence:</strong> Value was inferred from context or partially stated</li>
+        <li><strong>Low confidence:</strong> Value is a best guess based on patterns in the source</li>
+        <li><strong>Not found:</strong> Value could not be determined from the source at all</li>
+      </ul>
+
+      <h3>Stratified Sampling for Error Detection</h3>
+
+      <p>
+        When processing large batches of documents, you cannot manually review every result. Stratified
+        sampling -- reviewing a proportional sample from each confidence level -- is more effective
+        than random sampling:
+      </p>
+
+      <ul>
+        <li>Review 100% of "low confidence" results (small number, high error rate)</li>
+        <li>Review 20% of "medium confidence" results</li>
+        <li>Review 5% of "high confidence" results</li>
+        <li>This catches more errors per review hour than random sampling across all results</li>
+      </ul>
+
+      <h3>Temporal Data Handling</h3>
+
+      <p>
+        A subtle exam topic: when extracting dates from documents, distinguish between:
+      </p>
+
+      <ul>
+        <li><strong>Document date:</strong> When the document was created or published</li>
+        <li><strong>Event date:</strong> When the event described in the document occurred</li>
+        <li><strong>Effective date:</strong> When a policy, contract, or rule takes effect</li>
+        <li><strong>Filing date:</strong> When the document was officially filed or submitted</li>
+      </ul>
+
+      <p>
+        Conflating these dates is a common extraction error. The exam may present a scenario where
+        Claude extracts a "date" without specifying which type, leading to downstream errors.
+      </p>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>Provenance pattern:</strong> For every factual claim in a synthesized response, maintain
+          a claim-source mapping. Each claim should trace back to a specific source document, page, or section.
+          This enables verification and builds trust with users who need to audit the AI's reasoning.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE: CONTEXT OPTIMIZATION
+         ======================================== -->
+    <section class="section" id="context-opt-lab">
+      <h2 class="section-heading">Context Optimization Challenge</h2>
+
+      <p>
+        You are presented with a conversation that exceeds the context window. For each block, decide
+        whether to <strong>Keep</strong> (essential, preserve verbatim), <strong>Summarize</strong> (reduce
+        to key facts), or <strong>Drop</strong> (irrelevant, remove entirely). See how your choices affect
+        response quality.
+      </p>
+
+      <div class="context-opt" id="contextOptContainer">
+        <h3>Optimize the Context</h3>
+
+        <div class="scenario-tabs">
+          <button class="scenario-tab active" onclick="switchContextScenario(0)">Customer Support</button>
+          <button class="scenario-tab" onclick="switchContextScenario(1)">Code Exploration</button>
+          <button class="scenario-tab" onclick="switchContextScenario(2)">Research Synthesis</button>
+        </div>
+
+        <div id="scenarioDescription" style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 16px;"></div>
+
+        <div class="context-budget-bar">
+          <span style="font-size: 0.85rem; font-weight: 600; color: var(--text);">Context Budget:</span>
+          <div class="context-budget-track">
+            <div class="context-budget-fill ok" id="contextBudgetFill" style="width: 100%;"></div>
+          </div>
+          <span class="context-budget-text" id="contextBudgetText">200K / 200K</span>
+        </div>
+
+        <div class="context-blocks" id="contextBlocks"></div>
+
+        <button class="lab-btn" onclick="evaluateContextChoices()">Evaluate My Choices</button>
+
+        <div class="context-quality" id="contextQuality">
+          <h4 style="margin-bottom: 12px;">Response Quality Impact</h4>
+          <div id="qualityMeters"></div>
+          <div id="qualityFeedback" style="margin-top: 12px; font-size: 0.9rem; color: var(--text-secondary);"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE: ESCALATION FLOW DESIGNER
+         ======================================== -->
+    <section class="section" id="escalation-lab">
+      <h2 class="section-heading">Escalation Flow Designer</h2>
+
+      <p>
+        Design an escalation policy for a customer service agent. Select your escalation triggers, configure
+        the human handoff content, then test your policy against 5 simulated customer interactions.
+      </p>
+
+      <div class="escalation-designer" id="escalationContainer">
+        <h3>Step 1: Select Escalation Triggers</h3>
+        <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 12px;">
+          Choose which conditions should trigger escalation to a human agent. Select at least 3.
+        </p>
+
+        <ul class="trigger-list" id="triggerList">
+          <li class="trigger-item">
+            <input type="checkbox" class="trigger-checkbox" id="trig-explicit" checked>
+            <span class="trigger-label">Customer explicitly requests a human agent</span>
+            <span class="trigger-type explicit">Explicit</span>
+          </li>
+          <li class="trigger-item">
+            <input type="checkbox" class="trigger-checkbox" id="trig-policy">
+            <span class="trigger-label">Customer's situation falls outside documented policies</span>
+            <span class="trigger-type policy">Policy</span>
+          </li>
+          <li class="trigger-item">
+            <input type="checkbox" class="trigger-checkbox" id="trig-progress" checked>
+            <span class="trigger-label">3 failed attempts to resolve the same issue</span>
+            <span class="trigger-type progress">Progress</span>
+          </li>
+          <li class="trigger-item">
+            <input type="checkbox" class="trigger-checkbox" id="trig-ambiguous">
+            <span class="trigger-label">Multiple accounts or orders match and customer cannot identify</span>
+            <span class="trigger-type policy">Policy</span>
+          </li>
+          <li class="trigger-item">
+            <input type="checkbox" class="trigger-checkbox" id="trig-sentiment">
+            <span class="trigger-label">Customer expresses frustration or anger (sentiment-based)</span>
+            <span class="trigger-type sentiment">Sentiment</span>
+          </li>
+          <li class="trigger-item">
+            <input type="checkbox" class="trigger-checkbox" id="trig-amount">
+            <span class="trigger-label">Dispute amount exceeds $500</span>
+            <span class="trigger-type policy">Policy</span>
+          </li>
+          <li class="trigger-item">
+            <input type="checkbox" class="trigger-checkbox" id="trig-legal">
+            <span class="trigger-label">Customer mentions legal action, lawyers, or regulatory complaints</span>
+            <span class="trigger-type policy">Policy</span>
+          </li>
+          <li class="trigger-item">
+            <input type="checkbox" class="trigger-checkbox" id="trig-repeat">
+            <span class="trigger-label">Customer has contacted support 3+ times about the same issue</span>
+            <span class="trigger-type progress">Progress</span>
+          </li>
+        </ul>
+
+        <h3 style="margin-top: 24px;">Step 2: Configure Handoff Content</h3>
+        <div class="handoff-config">
+          <label for="handoffContent">What information should be included in the human handoff?</label>
+          <textarea class="handoff-textarea" id="handoffContent">Customer name and account ID
+Summary of the issue
+Steps already taken by the AI agent
+Any offers or resolutions discussed
+Customer's stated preference</textarea>
+        </div>
+
+        <h3 style="margin-top: 24px;">Step 3: Test Against Scenarios</h3>
+        <button class="lab-btn" onclick="testEscalationPolicy()">Run Simulation</button>
+
+        <div id="escalationResults" style="display: none; margin-top: 20px;">
+          <div id="escalationScore" style="margin-bottom: 16px;"></div>
+          <div id="escalationSims"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         PRACTICE EXAM
+         ======================================== -->
+    <section class="section" id="practice-exam">
+      <h2 class="section-heading">Practice Exam: Domain 5</h2>
+
+      <p>
+        Complete this 7-question practice exam covering the key topics from Domain 5. You need at least 5
+        correct to pass. Your score will be saved to track your progress.
+      </p>
+
+      <div class="final-quiz" id="finalQuizContainer">
+        <h3>Domain 5: Context Management &amp; Reliability</h3>
+
+        <!-- Question 1 -->
+        <div class="final-quiz-question" data-fq="0">
+          <div class="fq-number">Question 1 of 7</div>
+          <div class="fq-text">
+            A customer service agent uses progressive summarization to manage context. After 20 turns, a customer
+            asks "What was the exact amount of my disputed charge?" but the agent can only say "You mentioned a
+            billing dispute earlier." What went wrong?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="0" data-fq-val="a" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="a"> The context window is too small for 20 turns
+            </li>
+            <li class="fq-option" data-fq-idx="0" data-fq-val="b" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="b"> Progressive summarization discarded the specific dollar amount, replacing it with a generic summary; transactional facts should be extracted into a persistent case facts block
+            </li>
+            <li class="fq-option" data-fq-idx="0" data-fq-val="c" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="c"> The model has poor long-term memory and should be replaced with a model that has a larger context window
+            </li>
+            <li class="fq-option" data-fq-idx="0" data-fq-val="d" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="d"> The summarization algorithm is buggy and needs to be fixed
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="final-quiz-question" data-fq="1">
+          <div class="fq-number">Question 2 of 7</div>
+          <div class="fq-text">
+            Research shows that LLMs pay less attention to information in the middle of long contexts compared to
+            the beginning and end. What is the best mitigation for critical instructions?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="1" data-fq-val="a" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="a"> Reduce the context length so there is no "middle"
+            </li>
+            <li class="fq-option" data-fq-idx="1" data-fq-val="b" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="b"> Place critical facts and instructions at the beginning of the input and repeat key behavioral rules in the final user message
+            </li>
+            <li class="fq-option" data-fq-idx="1" data-fq-val="c" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="c"> Bold or capitalize important text so the model notices it
+            </li>
+            <li class="fq-option" data-fq-idx="1" data-fq-val="d" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="d"> Use a different model that does not have this limitation
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="final-quiz-question" data-fq="2">
+          <div class="fq-number">Question 3 of 7</div>
+          <div class="fq-text">
+            A customer says "This is ridiculous, I have been dealing with this for two weeks. Your service is
+            terrible." They have NOT explicitly asked for a human. Should the agent escalate?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="2" data-fq-val="a" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="a"> Yes, because the customer is clearly frustrated and sentiment-based escalation protects the customer experience
+            </li>
+            <li class="fq-option" data-fq-idx="2" data-fq-val="b" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="b"> No -- acknowledge their frustration and continue working toward resolution unless the agent cannot make progress or the customer explicitly requests a human
+            </li>
+            <li class="fq-option" data-fq-idx="2" data-fq-val="c" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="c"> Yes, any expression of negative sentiment should trigger immediate escalation
+            </li>
+            <li class="fq-option" data-fq-idx="2" data-fq-val="d" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="d"> Ask the customer "Would you like to speak with a human?" before deciding
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 4 -->
+        <div class="final-quiz-question" data-fq="3">
+          <div class="fq-number">Question 4 of 7</div>
+          <div class="fq-text">
+            An AI agent queries 3 databases. Database A returns results, Database B times out, and Database C
+            returns zero rows. Which response is correct?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="3" data-fq-val="a" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="a"> "I was unable to process your request due to a system error."
+            </li>
+            <li class="fq-option" data-fq-idx="3" data-fq-val="b" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="b"> Present results from Database A, note that Database B data is unavailable due to timeout, and report that Database C confirmed no matching records
+            </li>
+            <li class="fq-option" data-fq-idx="3" data-fq-val="c" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="c"> Present results from Database A and Database C, silently skipping Database B
+            </li>
+            <li class="fq-option" data-fq-idx="3" data-fq-val="d" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="d"> Report "No results found in 2 out of 3 databases" (combining the timeout and the empty result)
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 5 -->
+        <div class="final-quiz-question" data-fq="4">
+          <div class="fq-number">Question 5 of 7</div>
+          <div class="fq-text">
+            During a long code exploration session, Claude starts saying "this likely follows a typical repository pattern"
+            instead of citing specific files and line numbers. What is happening and what is the best mitigation?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="4" data-fq-val="a" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="a"> Claude is being lazy; tell it to be more specific
+            </li>
+            <li class="fq-option" data-fq-idx="4" data-fq-val="b" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="b"> Context has degraded -- earlier file reads have been pushed out. Use scratchpad files to persist findings, delegate verbose research to subagents, and use /compact between exploration phases
+            </li>
+            <li class="fq-option" data-fq-idx="4" data-fq-val="c" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="c"> The codebase is too large for Claude to handle; split the analysis across multiple sessions
+            </li>
+            <li class="fq-option" data-fq-idx="4" data-fq-val="d" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="d"> The model's training data includes generic patterns that override specific file knowledge
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 6 -->
+        <div class="final-quiz-question" data-fq="5">
+          <div class="fq-number">Question 6 of 7</div>
+          <div class="fq-text">
+            You are processing 10,000 medical records and need to detect extraction errors efficiently. Which
+            sampling strategy catches the most errors per review hour?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="5" data-fq-val="a" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="a"> Random sampling: review 5% of all results regardless of confidence
+            </li>
+            <li class="fq-option" data-fq-idx="5" data-fq-val="b" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="b"> Review only the first 500 results chronologically
+            </li>
+            <li class="fq-option" data-fq-idx="5" data-fq-val="c" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="c"> Stratified sampling: review 100% of low-confidence, 20% of medium-confidence, and 5% of high-confidence results
+            </li>
+            <li class="fq-option" data-fq-idx="5" data-fq-val="d" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="d"> Review only results where the model flagged an error
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 7 -->
+        <div class="final-quiz-question" data-fq="6">
+          <div class="fq-number">Question 7 of 7</div>
+          <div class="fq-text">
+            A document extraction system reports "filing_date: 2024-03-15" from a contract. An auditor later
+            finds the contract was <em>signed</em> on March 15 but <em>filed</em> on March 22. What provenance
+            failure does this illustrate?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="6" data-fq-val="a" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="a"> The model hallucinated the date entirely
+            </li>
+            <li class="fq-option" data-fq-idx="6" data-fq-val="b" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="b"> The model confused the signing date with the filing date because the schema did not distinguish between temporal date types, and the extraction prompt did not define what "filing_date" means
+            </li>
+            <li class="fq-option" data-fq-idx="6" data-fq-val="c" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="c"> The model cannot parse dates accurately
+            </li>
+            <li class="fq-option" data-fq-idx="6" data-fq-val="d" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="d"> The document contained contradictory information
+            </li>
+          </ul>
+        </div>
+
+        <button class="final-submit-btn" id="finalSubmitBtn" onclick="submitFinalQuiz()" disabled>
+          Submit Answers
+        </button>
+
+        <div class="final-result" id="finalResult">
+          <h4 id="finalResultTitle"></h4>
+          <p id="finalResultText"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         NAVIGATION FOOTER
+         ======================================== -->
+    <nav class="module-nav">
+      <a href="33-cert-domain4.html" class="nav-link prev">
+        <span class="nav-dir">&larr; Previous</span>
+        <span class="nav-title">Module 33: Cert -- Prompt Engineering &amp; Structured Output</span>
+      </a>
+      <a href="35-cert-practice-exam.html" class="nav-link next">
+        <span class="nav-dir">Next &rarr;</span>
+        <span class="nav-title">Module 35: Practice Exam Engine</span>
+      </a>
+    </nav>
+
+  </div>
+</main>
+
+<!-- ============================================
+     JAVASCRIPT
+     ============================================ -->
+<script>
+(function() {
+  'use strict';
+
+  // ==========================================
+  // THEME MANAGEMENT
+  // ==========================================
+  var THEME_KEY = 'claude-training-theme';
+
+  function getTheme() {
+    return localStorage.getItem(THEME_KEY) || 'light';
+  }
+
+  function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem(THEME_KEY, theme);
+    var icon = document.getElementById('themeIcon');
+    if (icon) {
+      icon.textContent = theme === 'dark' ? '\u2600' : '\u263E';
+    }
+  }
+
+  setTheme(getTheme());
+
+  document.getElementById('themeToggle').addEventListener('click', function() {
+    var current = getTheme();
+    setTheme(current === 'dark' ? 'light' : 'dark');
+  });
+
+  // ==========================================
+  // SIDEBAR MOBILE TOGGLE
+  // ==========================================
+  var hamburger = document.getElementById('hamburger');
+  var sidebar = document.getElementById('sidebar');
+  var overlay = document.getElementById('sidebarOverlay');
+
+  function toggleSidebar() {
+    var isOpen = sidebar.classList.contains('open');
+    sidebar.classList.toggle('open');
+    hamburger.classList.toggle('open');
+    if (isOpen) {
+      overlay.classList.remove('show');
+    } else {
+      overlay.classList.add('show');
+    }
+  }
+
+  hamburger.addEventListener('click', toggleSidebar);
+  overlay.addEventListener('click', toggleSidebar);
+
+  // ==========================================
+  // SIDEBAR SECTION COLLAPSING
+  // ==========================================
+  var sectionToggles = document.querySelectorAll('.sidebar-section-toggle');
+  for (var i = 0; i < sectionToggles.length; i++) {
+    (function(btn) {
+      btn.addEventListener('click', function() {
+        var sectionName = this.getAttribute('data-section');
+        var linksList = document.getElementById('nav-' + sectionName);
+        var isCollapsed = this.classList.contains('collapsed');
+
+        if (isCollapsed) {
+          this.classList.remove('collapsed');
+          linksList.classList.remove('collapsed');
+          linksList.style.maxHeight = linksList.scrollHeight + 'px';
+        } else {
+          this.classList.add('collapsed');
+          linksList.style.maxHeight = linksList.scrollHeight + 'px';
+          linksList.offsetHeight;
+          linksList.classList.add('collapsed');
+        }
+      });
+
+      var sectionName = btn.getAttribute('data-section');
+      var linksList = document.getElementById('nav-' + sectionName);
+      if (linksList) {
+        linksList.style.maxHeight = linksList.scrollHeight + 'px';
+      }
+    })(sectionToggles[i]);
+  }
+
+  // ==========================================
+  // SCROLLSPY
+  // ==========================================
+  var sidebarLinks = document.querySelectorAll('.sidebar-link');
+  var sections = [];
+
+  for (var i = 0; i < sidebarLinks.length; i++) {
+    var targetId = sidebarLinks[i].getAttribute('data-target');
+    var section = document.getElementById(targetId);
+    if (section) {
+      sections.push({ el: section, link: sidebarLinks[i], id: targetId });
+    }
+  }
+
+  function updateScrollspy() {
+    var scrollPos = window.scrollY + 100;
+    var active = null;
+
+    for (var i = sections.length - 1; i >= 0; i--) {
+      if (sections[i].el.offsetTop <= scrollPos) {
+        active = sections[i];
+        break;
+      }
+    }
+
+    for (var j = 0; j < sidebarLinks.length; j++) {
+      sidebarLinks[j].classList.remove('active');
+    }
+    if (active) {
+      active.link.classList.add('active');
+    }
+
+    updateSidebarProgress();
+  }
+
+  var scrollTimer = null;
+  window.addEventListener('scroll', function() {
+    if (scrollTimer) return;
+    scrollTimer = setTimeout(function() {
+      scrollTimer = null;
+      updateScrollspy();
+    }, 50);
+  });
+  updateScrollspy();
+
+  for (var i = 0; i < sidebarLinks.length; i++) {
+    sidebarLinks[i].addEventListener('click', function() {
+      if (window.innerWidth <= 1024) {
+        sidebar.classList.remove('open');
+        hamburger.classList.remove('open');
+        overlay.classList.remove('show');
+      }
+    });
+  }
+
+  // ==========================================
+  // SIDEBAR PROGRESS
+  // ==========================================
+  function updateSidebarProgress() {
+    var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    var scrolled = window.scrollY;
+    var pct = docHeight > 0 ? Math.min(100, (scrolled / docHeight) * 100) : 0;
+    var fill = document.getElementById('sidebarProgressFill');
+    if (fill) {
+      fill.style.width = pct + '%';
+    }
+  }
+
+  // ==========================================
+  // COPY TO CLIPBOARD
+  // ==========================================
+  window.copyCode = function(btn) {
+    var block = btn.closest('.code-block');
+    var codeEl = block.cloneNode(true);
+    var labelEl = codeEl.querySelector('.code-label');
+    var btnEl = codeEl.querySelector('.copy-btn');
+    if (labelEl) labelEl.remove();
+    if (btnEl) btnEl.remove();
+    var text = codeEl.textContent.trim();
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function() {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(function() {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      }).catch(function() {
+        btn.textContent = 'Failed';
+        setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+      });
+    } else {
+      btn.textContent = 'Failed';
+      setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+    }
+  };
+
+  // ==========================================
+  // CONTEXT OPTIMIZATION CHALLENGE
+  // ==========================================
+  var contextScenarios = [
+    {
+      name: 'Customer Support',
+      desc: 'A customer service conversation with 15 turns about a billing dispute. The context window is at 180K of 200K tokens. You need room for the response.',
+      limit: 200000,
+      blocks: [
+        { id: 'sys', title: 'System Prompt', desc: 'Agent personality, policy rules, escalation criteria', tokens: 3000, color: '#7C3AED', importance: 'essential', bestAction: 'keep' },
+        { id: 'greeting', title: 'Initial Greeting Exchange', desc: 'Customer says hi, agent introduces itself (turns 1-2)', tokens: 800, color: '#94A3B8', importance: 'low', bestAction: 'drop' },
+        { id: 'identify', title: 'Customer Identification', desc: 'Customer provides name, email, account lookup (turns 3-4)', tokens: 2400, color: '#06B6D4', importance: 'medium', bestAction: 'summarize' },
+        { id: 'issue-desc', title: 'Issue Description', desc: 'Customer explains $147.50 charge dispute on ORD-2024-78341 (turns 5-6)', tokens: 4200, color: '#F59E0B', importance: 'critical', bestAction: 'keep' },
+        { id: 'db-lookup', title: 'Database Lookup Results', desc: 'Full order details, payment history, 500 lines of transaction log', tokens: 45000, color: '#EF4444', importance: 'medium', bestAction: 'summarize' },
+        { id: 'troubleshoot', title: 'Troubleshooting Discussion', desc: 'Back-and-forth about what happened, when, how (turns 7-10)', tokens: 8000, color: '#10B981', importance: 'medium', bestAction: 'summarize' },
+        { id: 'offer', title: 'Resolution Offer', desc: 'Agent offers refund, customer asks follow-up questions (turns 11-13)', tokens: 5600, color: '#F59E0B', importance: 'critical', bestAction: 'keep' },
+        { id: 'recent', title: 'Most Recent Messages', desc: 'Customer asking about refund timeline and next steps (turns 14-15)', tokens: 3200, color: '#7C3AED', importance: 'essential', bestAction: 'keep' }
+      ]
+    },
+    {
+      name: 'Code Exploration',
+      desc: 'Exploring a codebase to understand the authentication system. You have read 30+ files and the context is at 185K of 200K.',
+      limit: 200000,
+      blocks: [
+        { id: 'sys', title: 'System Prompt + CLAUDE.md', desc: 'Project context, build commands, coding conventions', tokens: 4000, color: '#7C3AED', importance: 'essential', bestAction: 'keep' },
+        { id: 'early-search', title: 'Initial File Searches', desc: 'Glob and Grep results from early exploration (12 searches)', tokens: 8000, color: '#94A3B8', importance: 'low', bestAction: 'drop' },
+        { id: 'auth-files', title: 'Auth Module File Reads', desc: 'Full contents of 8 auth-related files (jwt.py, session.py, etc.)', tokens: 48000, color: '#EF4444', importance: 'medium', bestAction: 'summarize' },
+        { id: 'db-files', title: 'Database Layer File Reads', desc: 'Full contents of 6 database files (models, migrations, session)', tokens: 36000, color: '#F59E0B', importance: 'medium', bestAction: 'summarize' },
+        { id: 'test-runs', title: 'Test Run Outputs', desc: 'Verbose pytest output from 3 test runs (including passing tests)', tokens: 32000, color: '#94A3B8', importance: 'low', bestAction: 'drop' },
+        { id: 'middleware', title: 'Middleware File Reads', desc: 'Rate limiting, CORS, error handling middleware (4 files)', tokens: 24000, color: '#06B6D4', importance: 'medium', bestAction: 'summarize' },
+        { id: 'scratchpad', title: 'Scratchpad Findings', desc: 'Structured notes written during exploration', tokens: 3000, color: '#10B981', importance: 'critical', bestAction: 'keep' },
+        { id: 'current-task', title: 'Current Task Discussion', desc: 'User asking about implementing OAuth2 flow', tokens: 4000, color: '#7C3AED', importance: 'essential', bestAction: 'keep' }
+      ]
+    },
+    {
+      name: 'Research Synthesis',
+      desc: 'Synthesizing findings from 12 source documents about market trends. Context at 175K of 200K.',
+      limit: 200000,
+      blocks: [
+        { id: 'sys', title: 'Research Brief', desc: 'Client requirements, report structure, citation format', tokens: 2500, color: '#7C3AED', importance: 'essential', bestAction: 'keep' },
+        { id: 'doc1-3', title: 'Source Documents 1-3', desc: 'Full text of industry reports (Morgan Stanley, Goldman, JP Morgan)', tokens: 42000, color: '#F59E0B', importance: 'medium', bestAction: 'summarize' },
+        { id: 'doc4-6', title: 'Source Documents 4-6', desc: 'Government regulatory filings and statistical reports', tokens: 38000, color: '#06B6D4', importance: 'medium', bestAction: 'summarize' },
+        { id: 'doc7-9', title: 'Source Documents 7-9', desc: 'Academic papers on market dynamics', tokens: 35000, color: '#10B981', importance: 'medium', bestAction: 'summarize' },
+        { id: 'doc10-12', title: 'Source Documents 10-12', desc: 'News articles and press releases (mostly background)', tokens: 28000, color: '#94A3B8', importance: 'low', bestAction: 'drop' },
+        { id: 'analysis', title: 'Intermediate Analysis Notes', desc: 'Key findings, contradictions, and cross-references identified', tokens: 6000, color: '#F59E0B', importance: 'critical', bestAction: 'keep' },
+        { id: 'draft', title: 'Report Draft (In Progress)', desc: 'Current state of the synthesis report with claim-source mapping', tokens: 12000, color: '#7C3AED', importance: 'essential', bestAction: 'keep' },
+        { id: 'user-feedback', title: 'Client Feedback', desc: 'Client notes on first draft -- specific revision requests', tokens: 4000, color: '#7C3AED', importance: 'essential', bestAction: 'keep' }
+      ]
+    }
+  ];
+
+  var currentContextScenario = 0;
+  var blockChoices = {};
+
+  function renderContextScenario() {
+    var scenario = contextScenarios[currentContextScenario];
+    document.getElementById('scenarioDescription').textContent = scenario.desc;
+
+    var blocksEl = document.getElementById('contextBlocks');
+    var html = '';
+    blockChoices = {};
+
+    for (var i = 0; i < scenario.blocks.length; i++) {
+      var b = scenario.blocks[i];
+      blockChoices[b.id] = 'keep';
+
+      html += '<div class="context-block" id="cb-' + b.id + '">';
+      html += '<div class="context-block-color" style="background: ' + b.color + ';"></div>';
+      html += '<div class="context-block-info">';
+      html += '<div class="context-block-title">' + b.title + '</div>';
+      html += '<div class="context-block-desc">' + b.desc + '</div>';
+      html += '</div>';
+      html += '<div class="context-block-tokens">' + (b.tokens / 1000).toFixed(1) + 'K tok</div>';
+      html += '<div class="context-block-actions">';
+      html += '<button class="context-action-btn active-keep" data-block="' + b.id + '" data-action="keep" onclick="setBlockAction(\'' + b.id + '\', \'keep\', this)">Keep</button>';
+      html += '<button class="context-action-btn" data-block="' + b.id + '" data-action="summarize" onclick="setBlockAction(\'' + b.id + '\', \'summarize\', this)">Sum</button>';
+      html += '<button class="context-action-btn" data-block="' + b.id + '" data-action="drop" onclick="setBlockAction(\'' + b.id + '\', \'drop\', this)">Drop</button>';
+      html += '</div>';
+      html += '</div>';
+    }
+
+    blocksEl.innerHTML = html;
+    updateContextBudget();
+    document.getElementById('contextQuality').classList.remove('show');
+  }
+
+  window.switchContextScenario = function(idx) {
+    currentContextScenario = idx;
+    var tabs = document.querySelectorAll('.scenario-tab');
+    for (var i = 0; i < tabs.length; i++) {
+      tabs[i].classList.remove('active');
+    }
+    tabs[idx].classList.add('active');
+    renderContextScenario();
+  };
+
+  window.setBlockAction = function(blockId, action, btn) {
+    blockChoices[blockId] = action;
+
+    var blockEl = document.getElementById('cb-' + blockId);
+    var buttons = blockEl.querySelectorAll('.context-action-btn');
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].classList.remove('active-keep', 'active-summarize', 'active-drop');
+    }
+    btn.classList.add('active-' + action);
+
+    updateContextBudget();
+  };
+
+  function updateContextBudget() {
+    var scenario = contextScenarios[currentContextScenario];
+    var totalTokens = 0;
+
+    for (var i = 0; i < scenario.blocks.length; i++) {
+      var b = scenario.blocks[i];
+      var action = blockChoices[b.id] || 'keep';
+      if (action === 'keep') totalTokens += b.tokens;
+      else if (action === 'summarize') totalTokens += Math.round(b.tokens * 0.15);
+      // drop adds 0
+    }
+
+    var pct = Math.round((totalTokens / scenario.limit) * 100);
+    var fillEl = document.getElementById('contextBudgetFill');
+    var textEl = document.getElementById('contextBudgetText');
+
+    fillEl.style.width = Math.min(100, pct) + '%';
+    fillEl.classList.remove('ok', 'warn', 'over');
+    if (pct > 95) fillEl.classList.add('over');
+    else if (pct > 75) fillEl.classList.add('warn');
+    else fillEl.classList.add('ok');
+
+    textEl.textContent = (totalTokens / 1000).toFixed(0) + 'K / ' + (scenario.limit / 1000) + 'K (' + pct + '%)';
+  }
+
+  window.evaluateContextChoices = function() {
+    var scenario = contextScenarios[currentContextScenario];
+    var correctCount = 0;
+    var totalBlocks = scenario.blocks.length;
+
+    // Quality dimensions
+    var factualAccuracy = 100;
+    var completeness = 100;
+    var recency = 100;
+
+    var feedbackLines = [];
+
+    for (var i = 0; i < scenario.blocks.length; i++) {
+      var b = scenario.blocks[i];
+      var choice = blockChoices[b.id] || 'keep';
+      var best = b.bestAction;
+
+      if (choice === best) {
+        correctCount++;
+      } else {
+        if (b.importance === 'essential' && choice !== 'keep') {
+          factualAccuracy -= 25;
+          completeness -= 20;
+          feedbackLines.push('"' + b.title + '" is essential and should be kept verbatim. ' + (choice === 'drop' ? 'Dropping it causes significant accuracy loss.' : 'Summarizing it risks losing critical details.'));
+        } else if (b.importance === 'critical' && choice === 'drop') {
+          factualAccuracy -= 15;
+          completeness -= 15;
+          feedbackLines.push('"' + b.title + '" contains critical facts. Dropping it entirely loses important context. Summarizing would be acceptable.');
+        } else if (b.importance === 'low' && choice === 'keep') {
+          feedbackLines.push('"' + b.title + '" has low relevance and is consuming context budget. ' + (b.tokens > 20000 ? 'At ' + (b.tokens / 1000).toFixed(0) + 'K tokens, this is a major context hog.' : 'Consider dropping or summarizing.'));
+        } else if (b.importance === 'medium' && choice === 'keep' && b.tokens > 20000) {
+          feedbackLines.push('"' + b.title + '" at ' + (b.tokens / 1000).toFixed(0) + 'K tokens could be summarized to save context budget while retaining key information.');
+        }
+      }
+    }
+
+    // Check if over budget
+    var totalTokens = 0;
+    for (var i = 0; i < scenario.blocks.length; i++) {
+      var b = scenario.blocks[i];
+      var action = blockChoices[b.id] || 'keep';
+      if (action === 'keep') totalTokens += b.tokens;
+      else if (action === 'summarize') totalTokens += Math.round(b.tokens * 0.15);
+    }
+
+    var overBudget = totalTokens > scenario.limit * 0.90;
+    if (overBudget) {
+      completeness -= 10;
+      feedbackLines.push('Context is over 90% full -- little room for Claude to generate a response. This may cause truncation or degraded output quality.');
+    }
+
+    factualAccuracy = Math.max(0, factualAccuracy);
+    completeness = Math.max(0, completeness);
+    recency = Math.max(0, recency);
+
+    var qualityEl = document.getElementById('contextQuality');
+    var metersEl = document.getElementById('qualityMeters');
+    var feedbackEl = document.getElementById('qualityFeedback');
+
+    function meterClass(v) { return v >= 70 ? 'high' : (v >= 40 ? 'medium' : 'low'); }
+
+    metersEl.innerHTML =
+      '<div class="quality-meter"><span class="quality-label">Factual Accuracy</span><div class="quality-track"><div class="quality-fill ' + meterClass(factualAccuracy) + '" style="width: ' + factualAccuracy + '%;"></div></div><span class="quality-value">' + factualAccuracy + '%</span></div>' +
+      '<div class="quality-meter"><span class="quality-label">Completeness</span><div class="quality-track"><div class="quality-fill ' + meterClass(completeness) + '" style="width: ' + completeness + '%;"></div></div><span class="quality-value">' + completeness + '%</span></div>' +
+      '<div class="quality-meter"><span class="quality-label">Match (' + correctCount + '/' + totalBlocks + ' optimal)</span><div class="quality-track"><div class="quality-fill ' + meterClass(Math.round(correctCount / totalBlocks * 100)) + '" style="width: ' + Math.round(correctCount / totalBlocks * 100) + '%;"></div></div><span class="quality-value">' + correctCount + '/' + totalBlocks + '</span></div>';
+
+    if (feedbackLines.length > 0) {
+      feedbackEl.innerHTML = '<strong>Feedback:</strong><ul style="margin-top: 6px;">' + feedbackLines.map(function(l) { return '<li style="margin-bottom: 4px;">' + l + '</li>'; }).join('') + '</ul>';
+    } else {
+      feedbackEl.innerHTML = '<strong>Excellent!</strong> Your context optimization choices match the expert recommendations for this scenario.';
+    }
+
+    qualityEl.classList.add('show');
+  };
+
+  renderContextScenario();
+
+  // ==========================================
+  // ESCALATION FLOW DESIGNER
+  // ==========================================
+  var escalationSims = [
+    {
+      message: "I just want to talk to a real person. I don't want to deal with a bot anymore.",
+      shouldEscalate: true,
+      reason: 'Customer explicitly requested a human agent. This must always be honored immediately.',
+      matchesTrigger: 'trig-explicit'
+    },
+    {
+      message: "I bought something from your international store and want to return it, but I live in a different country than where I ordered from. What are my options?",
+      shouldEscalate: true,
+      reason: 'Cross-border return is a policy gap -- this falls outside standard documented policies and requires specialist knowledge.',
+      matchesTrigger: 'trig-policy'
+    },
+    {
+      message: "This is SO frustrating! I've been on hold for 30 minutes and now I'm talking to a bot? Are you kidding me?",
+      shouldEscalate: false,
+      reason: 'Customer is frustrated but has NOT explicitly requested a human. The correct response is to acknowledge frustration, apologize for the wait, and work toward resolution.',
+      matchesTrigger: 'trig-sentiment'
+    },
+    {
+      message: "I've already called three times about this same issue and nobody has fixed it. Order number ORD-2024-99123. The item arrived damaged and I need a replacement.",
+      shouldEscalate: true,
+      reason: 'Customer has contacted support 3+ times about the same issue. This indicates the AI has been unable to make progress and the issue needs human attention.',
+      matchesTrigger: 'trig-repeat'
+    },
+    {
+      message: "I was charged $750 on my credit card but I only authorized a $200 purchase. I want a full refund immediately or I will contact my bank to dispute the charge.",
+      shouldEscalate: true,
+      reason: 'Dispute amount exceeds $500 and customer is threatening a chargeback. Both the amount threshold and the financial/legal implications warrant escalation.',
+      matchesTrigger: 'trig-amount'
+    }
+  ];
+
+  window.testEscalationPolicy = function() {
+    var selectedTriggers = [];
+    var triggerCheckboxes = document.querySelectorAll('.trigger-checkbox');
+    for (var i = 0; i < triggerCheckboxes.length; i++) {
+      if (triggerCheckboxes[i].checked) {
+        selectedTriggers.push(triggerCheckboxes[i].id);
+      }
+    }
+
+    var handoffContent = document.getElementById('handoffContent').value.trim();
+    var resultsEl = document.getElementById('escalationResults');
+    var scoreEl = document.getElementById('escalationScore');
+    var simsEl = document.getElementById('escalationSims');
+
+    resultsEl.style.display = 'block';
+
+    var correct = 0;
+    var total = escalationSims.length;
+    var html = '';
+
+    for (var i = 0; i < escalationSims.length; i++) {
+      var sim = escalationSims[i];
+      var wouldEscalate = selectedTriggers.indexOf(sim.matchesTrigger) !== -1;
+      var isCorrect = wouldEscalate === sim.shouldEscalate;
+
+      if (isCorrect) correct++;
+
+      html += '<div class="sim-interaction">';
+      html += '<div class="sim-customer-msg">' + sim.message + '</div>';
+
+      var actionText = wouldEscalate ? 'Your policy: ESCALATE' : 'Your policy: HANDLE (no escalation)';
+      var expectedText = sim.shouldEscalate ? 'Expected: ESCALATE' : 'Expected: HANDLE (no escalation)';
+
+      html += '<div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 8px;">' + actionText + ' | ' + expectedText + '</div>';
+
+      var resultClass = isCorrect ? 'correct' : 'incorrect';
+      var resultText = isCorrect ? 'Correct!' : 'Incorrect.';
+      html += '<div class="sim-result ' + resultClass + '">' + resultText + ' ' + sim.reason + '</div>';
+      html += '</div>';
+    }
+
+    // Score handoff completeness
+    var handoffScore = 0;
+    var handoffChecks = ['name', 'account', 'issue', 'summary', 'step', 'taken', 'resolution', 'offer', 'preference'];
+    var handoffLower = handoffContent.toLowerCase();
+    for (var h = 0; h < handoffChecks.length; h++) {
+      if (handoffLower.indexOf(handoffChecks[h]) !== -1) handoffScore++;
+    }
+    var handoffPct = Math.round((handoffScore / handoffChecks.length) * 100);
+
+    var totalScore = correct;
+    var scoreClass = totalScore >= 4 ? 'excellent' : (totalScore >= 3 ? 'good' : (totalScore >= 2 ? 'fair' : 'poor'));
+
+    scoreEl.innerHTML = '<span class="score-badge ' + scoreClass + '">' + correct + ' / ' + total + ' scenarios correct</span>';
+
+    if (selectedTriggers.indexOf('trig-sentiment') !== -1) {
+      html += '<div style="margin-top: 12px; padding: 12px; background: rgba(245,158,11,0.12); border-radius: var(--radius-sm); font-size: 0.9rem; color: var(--warning);">' +
+        '<strong>Note:</strong> You selected sentiment-based escalation. While not always wrong, sentiment detection is unreliable ' +
+        'and causes false escalations (as seen in scenario 3). The exam considers this an anti-pattern for primary escalation triggers.' +
+        '</div>';
+    }
+
+    html += '<div style="margin-top: 12px; padding: 12px; background: var(--bg); border-radius: var(--radius-sm); font-size: 0.85rem;">' +
+      '<strong>Handoff Content Completeness:</strong> ' + handoffPct + '% -- ';
+    if (handoffPct >= 70) {
+      html += 'Good coverage of essential handoff information.';
+    } else {
+      html += 'Consider including: customer identity, issue summary, steps taken, offers made, and customer preferences.';
+    }
+    html += '</div>';
+
+    simsEl.innerHTML = html;
+  };
+
+  // ==========================================
+  // FINAL QUIZ
+  // ==========================================
+  var FINAL_QUIZ_KEY = 'claude-training-module-34';
+
+  var finalQuizAnswers = ['b', 'b', 'b', 'b', 'b', 'c', 'b'];
+  var finalQuizSelections = [null, null, null, null, null, null, null];
+  var finalQuizSubmitted = false;
+
+  window.selectFinalOption = function(qIdx, el) {
+    if (finalQuizSubmitted) return;
+
+    var parentQ = el.closest('.final-quiz-question');
+    var opts = parentQ.querySelectorAll('.fq-option');
+    for (var i = 0; i < opts.length; i++) {
+      opts[i].querySelector('input').checked = false;
+      opts[i].style.background = '';
+    }
+
+    el.querySelector('input').checked = true;
+    finalQuizSelections[qIdx] = el.getAttribute('data-fq-val');
+
+    var allAnswered = true;
+    for (var i = 0; i < finalQuizSelections.length; i++) {
+      if (finalQuizSelections[i] === null) { allAnswered = false; break; }
+    }
+    document.getElementById('finalSubmitBtn').disabled = !allAnswered;
+  };
+
+  window.submitFinalQuiz = function() {
+    if (finalQuizSubmitted) return;
+    finalQuizSubmitted = true;
+
+    var score = 0;
+
+    for (var idx = 0; idx < finalQuizSelections.length; idx++) {
+      var sel = finalQuizSelections[idx];
+      var questionEl = document.querySelector('.final-quiz-question[data-fq="' + idx + '"]');
+      var options = questionEl.querySelectorAll('.fq-option');
+
+      for (var j = 0; j < options.length; j++) {
+        var opt = options[j];
+        var val = opt.getAttribute('data-fq-val');
+        opt.style.pointerEvents = 'none';
+
+        if (val === finalQuizAnswers[idx]) {
+          if (sel === val) {
+            opt.classList.add('selected-correct');
+            score++;
+          } else {
+            opt.classList.add('reveal-correct');
+          }
+        } else if (val === sel) {
+          opt.classList.add('selected-wrong');
+        }
+      }
+    }
+
+    var result = document.getElementById('finalResult');
+    var title = document.getElementById('finalResultTitle');
+    var text = document.getElementById('finalResultText');
+
+    result.classList.add('show');
+
+    if (score >= 5) {
+      result.classList.add('pass');
+      result.classList.remove('fail');
+      title.textContent = 'Passed! ' + score + ' / 7 correct';
+      text.textContent = 'Strong performance on Domain 5! You demonstrate solid understanding of context management, escalation patterns, and reliability strategies. Your progress has been saved. Continue to Module 35 for the next certification domain.';
+    } else {
+      result.classList.add('fail');
+      result.classList.remove('pass');
+      title.textContent = score + ' / 7 correct -- Review needed';
+      text.textContent = 'You need at least 5 correct answers to pass. Review the material on progressive summarization risks, escalation triggers (explicit vs. sentiment-based), and the distinction between access failures and valid empty results.';
+    }
+
+    var progressData = {
+      score: score,
+      total: 7,
+      completed: score >= 5,
+      timestamp: new Date().toISOString()
+    };
+    localStorage.setItem(FINAL_QUIZ_KEY, JSON.stringify(progressData));
+
+    document.getElementById('finalSubmitBtn').disabled = true;
+    document.getElementById('finalSubmitBtn').textContent = 'Submitted';
+  };
+
+  function loadExistingProgress() {
+    var saved = localStorage.getItem(FINAL_QUIZ_KEY);
+    if (saved) {
+      try {
+        var data = JSON.parse(saved);
+        if (data.completed) {
+          var fill = document.getElementById('sidebarProgressFill');
+          if (fill) {
+            fill.style.width = '100%';
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+  }
+  loadExistingProgress();
+
+})();
+</script>
+</body>
+</html>

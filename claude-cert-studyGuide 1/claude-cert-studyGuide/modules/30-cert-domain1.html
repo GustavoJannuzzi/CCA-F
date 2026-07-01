@@ -1,0 +1,3655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 30: Cert Prep -- Agentic Architecture &amp; Orchestration | Claude AI Training</title>
+<style>
+/* ============================================
+   CSS CUSTOM PROPERTIES & PREMIUM DESIGN SYSTEM
+   ============================================ */
+:root {
+  --primary: #7C3AED;
+  --primary-light: #A78BFA;
+  --primary-dark: #5B21B6;
+  --accent: #06B6D4;
+  --accent-light: #22D3EE;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  --bg: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --bg-code: #F1F5F9;
+  --text: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --border: #E2E8F0;
+  /* Premium 3-layer shadows with glow */
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.02);
+  --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.02);
+  --shadow-glow: 0 0 20px rgba(124, 58, 237, 0.15);
+  /* Premium radius */
+  --radius: 16px;
+  --radius-sm: 10px;
+  /* Spring transitions */
+  --transition: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --transition-smooth: 0.25s ease;
+  --sidebar-width: 280px;
+  --content-max: 820px;
+}
+
+/* Deep dark mode */
+[data-theme="dark"] {
+  --bg: #0B0F1A;
+  --bg-card: #141926;
+  --bg-code: #1A2035;
+  --text: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --border: #1E293B;
+  --shadow: 0 1px 3px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.03);
+  --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.5), 0 8px 10px -6px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.04);
+  --shadow-glow: 0 0 24px rgba(124, 58, 237, 0.25);
+}
+
+/* Prefers reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  html { scroll-behavior: auto; }
+}
+
+/* ============================================
+   RESET & BASE (Inter + Antialiased)
+   ============================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 24px;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  min-height: 100vh;
+  transition: background var(--transition-smooth), color var(--transition-smooth);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* ============================================
+   THEME TOGGLE
+   ============================================ */
+.theme-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: all var(--transition);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+.theme-toggle:hover {
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+  transform: scale(1.08);
+}
+
+/* ============================================
+   SIDEBAR
+   ============================================ */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  z-index: 900;
+  transition: transform 0.3s ease, background var(--transition-smooth);
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow);
+}
+
+.sidebar-header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.sidebar-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+  margin-bottom: 12px;
+  transition: color var(--transition-smooth);
+}
+.sidebar-back:hover { color: var(--primary-dark); }
+
+.sidebar-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.sidebar-module-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.sidebar-nav {
+  padding: 12px 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.sidebar-section {
+  margin-bottom: 4px;
+}
+
+.sidebar-section-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 20px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  text-align: left;
+  transition: color var(--transition-smooth);
+}
+.sidebar-section-toggle:hover { color: var(--text); }
+.sidebar-section-toggle .chevron {
+  transition: transform 0.2s ease;
+  font-size: 0.65rem;
+}
+.sidebar-section-toggle.collapsed .chevron {
+  transform: rotate(-90deg);
+}
+
+.sidebar-links {
+  list-style: none;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.sidebar-links.collapsed {
+  max-height: 0 !important;
+}
+
+.sidebar-link {
+  display: block;
+  padding: 7px 20px 7px 32px;
+  font-size: 0.86rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: all var(--transition-smooth);
+  line-height: 1.4;
+}
+.sidebar-link:hover {
+  color: var(--text);
+  background: var(--bg);
+}
+.sidebar-link.active {
+  color: var(--primary);
+  border-left-color: var(--primary);
+  background: rgba(124, 58, 237, 0.05);
+  font-weight: 600;
+}
+[data-theme="dark"] .sidebar-link.active {
+  background: rgba(124, 58, 237, 0.12);
+}
+
+.sidebar-progress {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sidebar-progress-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.sidebar-progress-track {
+  height: 6px;
+  background: var(--bg-code);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.sidebar-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 3px;
+  transition: width 0.5s ease;
+  width: 0%;
+}
+
+/* Hamburger button (mobile) */
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1001;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+  transition: all var(--transition-smooth);
+}
+.hamburger span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--text);
+  margin: 4px auto;
+  transition: all 0.3s ease;
+  border-radius: 1px;
+}
+.hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(4px, 4px); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(4px, -4px); }
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 899;
+}
+
+/* ============================================
+   MAIN CONTENT
+   ============================================ */
+.main-content {
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+  transition: margin var(--transition-smooth);
+}
+
+.content-wrapper {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 40px 32px 80px;
+}
+
+/* Module Header */
+.module-header {
+  margin-bottom: 48px;
+}
+.module-header .breadcrumb {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+.module-header .breadcrumb a {
+  color: var(--primary);
+  text-decoration: none;
+}
+.module-header .breadcrumb a:hover { text-decoration: underline; }
+
+.module-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.module-badge .number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: white;
+  font-weight: 700;
+  font-size: 0.85rem;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+}
+.module-badge .label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Gradient h1 */
+.module-header h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 50%, var(--primary-light) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+/* Fallback for browsers that don't support background-clip text */
+@supports not (-webkit-background-clip: text) {
+  .module-header h1 {
+    color: var(--primary);
+  }
+}
+
+.module-header .description {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 660px;
+}
+
+.module-meta {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.module-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  background: var(--bg-code);
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  transition: all var(--transition);
+}
+.module-meta-item:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-glow);
+}
+
+/* ============================================
+   SECTIONS
+   ============================================ */
+.section {
+  margin-bottom: 56px;
+  scroll-margin-top: 24px;
+}
+
+.section-heading {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+  line-height: 1.3;
+}
+
+.section h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-top: 32px;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.section h4 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-top: 24px;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.section p {
+  margin-bottom: 16px;
+  color: var(--text-secondary);
+}
+
+.section ul, .section ol {
+  margin-bottom: 16px;
+  padding-left: 24px;
+}
+.section li {
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+}
+.section li strong {
+  color: var(--text);
+}
+
+/* ============================================
+   CODE BLOCKS
+   ============================================ */
+.code-block {
+  background: #0F172A;
+  color: #E2E8F0;
+  border-radius: var(--radius-sm);
+  padding: 20px 24px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  overflow-x: auto;
+  position: relative;
+  margin: 16px 0 20px;
+  tab-size: 2;
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: var(--shadow);
+}
+.code-block .code-label {
+  position: absolute;
+  top: 8px;
+  left: 16px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #64748B;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+.code-block.has-label {
+  padding-top: 36px;
+}
+.code-block .copy-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255,255,255,0.08);
+  border: none;
+  color: #94A3B8;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  transition: all var(--transition-smooth);
+}
+.code-block .copy-btn:hover { background: rgba(255,255,255,0.15); color: white; }
+.code-block .copy-btn.copied { background: var(--success); color: white; }
+
+/* Syntax highlighting classes */
+.kw { color: #C084FC; }
+.str { color: #6EE7B7; }
+.fn { color: #7DD3FC; }
+.cm { color: #64748B; }
+.num { color: #FDBA74; }
+.op { color: #FCA5A5; }
+.type { color: #67E8F9; }
+.param { color: #FDE68A; }
+.prop { color: #F0ABFC; }
+.punc { color: #94A3B8; }
+.tool-name { color: #FCA5A5; font-weight: 600; }
+.output { color: #64748B; font-style: italic; }
+.path { color: #FDBA74; }
+.flag { color: #67E8F9; }
+
+/* Inline code */
+code {
+  background: var(--bg-code);
+  color: var(--primary);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.88em;
+}
+[data-theme="dark"] code {
+  background: #1E293B;
+}
+.code-block code {
+  background: none;
+  color: inherit;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+  white-space: pre-wrap;
+  display: block;
+}
+
+/* ============================================
+   CALLOUT BOXES (premium)
+   ============================================ */
+.callout {
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  margin: 20px 0;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  transition: all var(--transition);
+  box-shadow: var(--shadow);
+}
+.callout:hover {
+  box-shadow: var(--shadow-lg);
+}
+.callout-icon {
+  flex-shrink: 0;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+.callout-content { flex: 1; }
+.callout-content p { margin-bottom: 6px; color: inherit; }
+.callout-content p:last-child { margin-bottom: 0; }
+
+.callout.info {
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  color: #1E40AF;
+}
+.callout.tip {
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  color: #166534;
+}
+.callout.warning {
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  color: #92400E;
+}
+.callout.important {
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  color: #991B1B;
+}
+.callout.exam {
+  background: linear-gradient(135deg, #F5F3FF, #EDE9FE);
+  border: 1px solid #C4B5FD;
+  color: #5B21B6;
+}
+
+[data-theme="dark"] .callout.info {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.25);
+  color: #93C5FD;
+}
+[data-theme="dark"] .callout.tip {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.25);
+  color: #6EE7B7;
+}
+[data-theme="dark"] .callout.warning {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.25);
+  color: #FCD34D;
+}
+[data-theme="dark"] .callout.important {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.25);
+  color: #FCA5A5;
+}
+[data-theme="dark"] .callout.exam {
+  background: rgba(124, 58, 237, 0.12);
+  border-color: rgba(124, 58, 237, 0.3);
+  color: #C4B5FD;
+}
+
+/* ============================================
+   ACCENT CARDS (premium)
+   ============================================ */
+.accent-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin: 24px 0;
+  box-shadow: var(--shadow);
+  transition: all var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+.accent-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+}
+.accent-card:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+  transform: translateY(-2px);
+}
+.accent-card h4 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 10px 0;
+  color: var(--text);
+}
+.accent-card p {
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+.accent-card p:last-child { margin-bottom: 0; }
+
+/* Task area cards */
+.task-area-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 20px 0;
+}
+.task-area-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  transition: all var(--transition);
+}
+.task-area-card:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-1px);
+}
+.task-area-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: white;
+  font-weight: 700;
+  font-size: 0.7rem;
+  margin-bottom: 8px;
+}
+.task-area-card h5 {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.task-area-card p {
+  font-size: 0.84rem;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* ============================================
+   WEIGHT INDICATOR
+   ============================================ */
+.weight-bar {
+  margin: 20px 0;
+  padding: 20px 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.weight-bar-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+.weight-bar-track {
+  height: 16px;
+  background: var(--bg-code);
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+.weight-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 8px;
+  width: 27%;
+  position: relative;
+  box-shadow: 0 0 16px rgba(124, 58, 237, 0.3);
+}
+.weight-bar-fill::after {
+  content: '27%';
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: white;
+}
+.weight-bar-marks {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+/* ============================================
+   COMPARISON TABLE (premium)
+   ============================================ */
+.comparison-table-wrapper {
+  overflow-x: auto;
+  margin: 20px 0;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+}
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.comparison-table th {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+.comparison-table th:first-child {
+  border-radius: var(--radius-sm) 0 0 0;
+}
+.comparison-table th:last-child {
+  border-radius: 0 var(--radius-sm) 0 0;
+}
+.comparison-table td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+.comparison-table tr:nth-child(even) td {
+  background: var(--bg);
+}
+.comparison-table tr:last-child td:first-child {
+  border-radius: 0 0 0 var(--radius-sm);
+}
+.comparison-table tr:last-child td:last-child {
+  border-radius: 0 0 var(--radius-sm) 0;
+}
+
+/* ============================================
+   QUIZ / INTERACTIVE CONTAINERS (premium)
+   ============================================ */
+.quiz-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  box-shadow: var(--shadow);
+  transition: all var(--transition);
+}
+.quiz-container:hover {
+  box-shadow: var(--shadow-lg);
+}
+.quiz-container h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.quiz-score-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 12px 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+}
+.quiz-score-bar .score-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.quiz-score-track {
+  flex: 1;
+  height: 8px;
+  background: var(--bg-code);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.quiz-score-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--success));
+  border-radius: 4px;
+  transition: width 0.4s ease;
+  width: 0%;
+}
+.quiz-score-text {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  min-width: 50px;
+  text-align: right;
+}
+
+.quiz-question {
+  margin-bottom: 24px;
+  padding: 20px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.quiz-question.correct { border-color: var(--success); box-shadow: 0 0 12px rgba(16,185,129,0.15); }
+.quiz-question.incorrect { border-color: var(--error); box-shadow: 0 0 12px rgba(239,68,68,0.15); }
+
+.quiz-q-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.quiz-q-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  font-weight: 700;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.quiz-q-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+/* Scenario text in quiz */
+.quiz-scenario {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+  padding: 10px 14px;
+  background: var(--bg-card);
+  border-radius: 6px;
+  border-left: 3px solid var(--primary-light);
+  line-height: 1.5;
+}
+
+.quiz-options {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+.quiz-option {
+  padding: 10px 14px;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text);
+  text-align: left;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.quiz-option:hover:not(.disabled) {
+  border-color: var(--primary-light);
+  background: rgba(124, 58, 237, 0.05);
+  transform: translateX(4px);
+}
+.quiz-option.selected {
+  border-color: var(--primary);
+  background: rgba(124, 58, 237, 0.1);
+  color: var(--primary);
+}
+.quiz-option.correct-answer {
+  border-color: var(--success);
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+[data-theme="dark"] .quiz-option.correct-answer {
+  color: #6EE7B7;
+}
+.quiz-option.wrong-answer {
+  border-color: var(--error);
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+}
+.quiz-option.disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+.quiz-option.disabled:not(.correct-answer):not(.wrong-answer) {
+  opacity: 0.5;
+}
+
+.quiz-feedback {
+  margin-top: 10px;
+  font-size: 0.85rem;
+  padding: 10px 14px;
+  border-radius: 6px;
+  display: none;
+  line-height: 1.5;
+}
+.quiz-feedback.show { display: block; }
+.quiz-feedback.correct {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+.quiz-feedback.incorrect {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+}
+[data-theme="dark"] .quiz-feedback.correct { color: #6EE7B7; }
+[data-theme="dark"] .quiz-feedback.incorrect { color: #FCA5A5; }
+
+/* ============================================
+   DECISION TREE INTERACTIVE
+   ============================================ */
+.decision-tree {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  box-shadow: var(--shadow);
+}
+.decision-tree h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+.dt-step {
+  display: none;
+  animation: fadeInUp 0.3s ease both;
+}
+.dt-step.active {
+  display: block;
+}
+.dt-question {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.dt-context {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+.dt-step-num {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+.dt-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.dt-option {
+  padding: 12px 16px;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  text-align: left;
+}
+.dt-option:hover:not(.disabled) {
+  border-color: var(--primary-light);
+  color: var(--text);
+  transform: translateX(4px);
+}
+.dt-option.correct {
+  border-color: var(--success);
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+}
+.dt-option.wrong {
+  border-color: var(--error);
+  background: rgba(239, 68, 68, 0.08);
+  color: var(--error);
+}
+.dt-option.disabled {
+  cursor: default;
+  pointer-events: none;
+}
+[data-theme="dark"] .dt-option.correct { color: #6EE7B7; }
+[data-theme="dark"] .dt-option.wrong { color: #FCA5A5; }
+
+.dt-consequence {
+  margin-top: 12px;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
+  line-height: 1.5;
+  display: none;
+}
+.dt-consequence.show { display: block; }
+.dt-consequence.good {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  color: #059669;
+}
+.dt-consequence.bad {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #B91C1C;
+}
+[data-theme="dark"] .dt-consequence.good { color: #6EE7B7; }
+[data-theme="dark"] .dt-consequence.bad { color: #FCA5A5; }
+
+.dt-score-display {
+  margin-top: 24px;
+  padding: 20px;
+  border-radius: var(--radius-sm);
+  text-align: center;
+  display: none;
+}
+.dt-score-display.show { display: block; }
+.dt-score-display h4 {
+  margin: 0 0 8px;
+  font-size: 1.2rem;
+}
+.dt-score-display p {
+  margin: 0;
+  font-size: 0.95rem;
+}
+.dt-score-display.excellent {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.dt-score-display.excellent h4 { color: var(--success); }
+.dt-score-display.good {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.dt-score-display.good h4 { color: var(--warning); }
+.dt-score-display.needs-work {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+.dt-score-display.needs-work h4 { color: var(--error); }
+.dt-progress-track {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+.dt-progress-dot {
+  width: 24px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--border);
+  transition: background 0.3s ease;
+}
+.dt-progress-dot.done-correct { background: var(--success); }
+.dt-progress-dot.done-wrong { background: var(--error); }
+.dt-progress-dot.current { background: var(--primary); }
+
+/* ============================================
+   AGENTIC LOOP SIMULATOR
+   ============================================ */
+.loop-sim {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  box-shadow: var(--shadow);
+}
+.loop-sim h3 {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+.loop-diagram-area {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto 20px;
+}
+.loop-diagram-area svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.loop-node {
+  transition: all 0.3s ease;
+}
+.loop-node.active text {
+  font-weight: 700;
+}
+
+/* Payload panel */
+.loop-payload {
+  background: #0F172A;
+  color: #E2E8F0;
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  min-height: 120px;
+  max-height: 280px;
+  overflow-y: auto;
+  margin-bottom: 16px;
+  white-space: pre-wrap;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.loop-controls {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.loop-btn {
+  padding: 10px 24px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  font-family: 'Inter', sans-serif;
+}
+.loop-btn.primary {
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: white;
+}
+.loop-btn.primary:hover { transform: translateY(-1px); box-shadow: var(--shadow-lg); }
+.loop-btn.primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.loop-btn.secondary {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+.loop-btn.secondary:hover { border-color: var(--primary-light); color: var(--text); }
+.loop-iteration-label {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+/* Bug hunt */
+.bug-hunt {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+.bug-hunt h4 {
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+.bug-snippet {
+  margin-bottom: 16px;
+  padding: 16px;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: border-color 0.3s ease;
+}
+.bug-snippet.judged-correct { border-color: var(--success); }
+.bug-snippet.judged-incorrect { border-color: var(--error); }
+.bug-snippet-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+.bug-snippet-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+.bug-btn {
+  padding: 6px 16px;
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.bug-btn:hover:not(.disabled) { border-color: var(--primary-light); color: var(--text); }
+.bug-btn.selected-right { border-color: var(--success); background: rgba(16,185,129,0.1); color: #059669; }
+.bug-btn.selected-wrong { border-color: var(--error); background: rgba(239,68,68,0.08); color: var(--error); }
+.bug-btn.disabled { cursor: default; opacity: 0.6; }
+[data-theme="dark"] .bug-btn.selected-right { color: #6EE7B7; }
+[data-theme="dark"] .bug-btn.selected-wrong { color: #FCA5A5; }
+.bug-feedback {
+  margin-top: 8px;
+  font-size: 0.84rem;
+  display: none;
+  line-height: 1.5;
+}
+.bug-feedback.show { display: block; }
+.bug-feedback.correct { color: #059669; }
+.bug-feedback.incorrect { color: var(--error); }
+[data-theme="dark"] .bug-feedback.correct { color: #6EE7B7; }
+[data-theme="dark"] .bug-feedback.incorrect { color: #FCA5A5; }
+
+/* ============================================
+   HOOK EXERCISE
+   ============================================ */
+.hook-exercise {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  box-shadow: var(--shadow);
+}
+.hook-exercise h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+.hook-scenario {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.hook-scenario-num {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+.hook-scenario-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.hook-scenario-hint {
+  font-size: 0.84rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+.hook-textarea {
+  width: 100%;
+  min-height: 120px;
+  background: #0F172A;
+  color: #E2E8F0;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.84rem;
+  line-height: 1.6;
+  resize: vertical;
+  tab-size: 2;
+}
+.hook-textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(124,58,237,0.2);
+}
+.hook-check-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 8px 20px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  font-family: 'Inter', sans-serif;
+}
+.hook-check-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-lg); }
+.hook-feedback {
+  margin-top: 10px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  display: none;
+  line-height: 1.5;
+}
+.hook-feedback.show { display: block; }
+.hook-feedback.pass {
+  background: rgba(16,185,129,0.12);
+  color: #059669;
+}
+.hook-feedback.partial {
+  background: rgba(245,158,11,0.12);
+  color: #92400E;
+}
+.hook-feedback.fail {
+  background: rgba(239,68,68,0.1);
+  color: var(--error);
+}
+[data-theme="dark"] .hook-feedback.pass { color: #6EE7B7; }
+[data-theme="dark"] .hook-feedback.partial { color: #FCD34D; }
+[data-theme="dark"] .hook-feedback.fail { color: #FCA5A5; }
+
+/* ============================================
+   FINAL PRACTICE EXAM
+   ============================================ */
+.final-quiz {
+  background: var(--bg-card);
+  border: 2px solid var(--primary-light);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  box-shadow: var(--shadow), var(--shadow-glow);
+}
+.final-quiz h3 {
+  margin-top: 0;
+}
+
+.final-quiz-question {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.final-quiz-question .fq-number {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+.fq-scenario {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  padding: 10px 14px;
+  background: var(--bg-card);
+  border-radius: 6px;
+  border-left: 3px solid var(--primary-light);
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+.final-quiz-question .fq-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+.fq-options { list-style: none; padding: 0; }
+.fq-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 12px;
+  margin-bottom: 4px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+.fq-option:hover { background: rgba(124, 58, 237, 0.05); }
+.fq-option input[type="radio"] {
+  accent-color: var(--primary);
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+.fq-option.selected-correct {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+.fq-option.selected-wrong {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+}
+.fq-option.reveal-correct {
+  background: rgba(16, 185, 129, 0.08);
+  color: #059669;
+  font-weight: 600;
+}
+[data-theme="dark"] .fq-option.selected-correct { color: #6EE7B7; }
+[data-theme="dark"] .fq-option.selected-wrong { color: #FCA5A5; }
+[data-theme="dark"] .fq-option.reveal-correct { color: #6EE7B7; }
+.fq-explanation {
+  margin-top: 8px;
+  padding: 10px 14px;
+  font-size: 0.84rem;
+  border-radius: 6px;
+  display: none;
+  line-height: 1.5;
+}
+.fq-explanation.show { display: block; }
+.fq-explanation.correct-exp {
+  background: rgba(16,185,129,0.08);
+  color: #059669;
+}
+.fq-explanation.wrong-exp {
+  background: rgba(239,68,68,0.08);
+  color: var(--error);
+}
+[data-theme="dark"] .fq-explanation.correct-exp { color: #6EE7B7; }
+[data-theme="dark"] .fq-explanation.wrong-exp { color: #FCA5A5; }
+
+.final-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 32px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  margin-top: 8px;
+  font-family: 'Inter', sans-serif;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+}
+.final-submit-btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg), var(--shadow-glow); }
+.final-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.final-result {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: var(--radius-sm);
+  display: none;
+}
+.final-result.show { display: block; }
+.final-result.pass {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.final-result.fail {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.final-result h4 {
+  margin-top: 0;
+  margin-bottom: 6px;
+  font-size: 1.1rem;
+}
+.final-result p {
+  margin-bottom: 0;
+  font-size: 0.95rem;
+}
+.final-result.pass h4 { color: var(--success); }
+.final-result.fail h4 { color: var(--warning); }
+
+/* ============================================
+   NAVIGATION FOOTER (premium)
+   ============================================ */
+.module-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 16px;
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 2px solid var(--border);
+}
+.nav-link {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: all var(--transition);
+  min-width: 0;
+  flex: 1;
+  max-width: 50%;
+  box-shadow: var(--shadow);
+}
+.nav-link:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+  transform: translateY(-2px);
+}
+.nav-link.next { align-items: flex-end; text-align: right; }
+.nav-link .nav-dir {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--primary);
+}
+.nav-link .nav-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 1024px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .hamburger {
+    display: flex;
+  }
+  .sidebar-overlay.show {
+    display: block;
+  }
+  .main-content {
+    margin-left: 0;
+  }
+  .theme-toggle {
+    right: 16px;
+  }
+}
+
+@media (max-width: 640px) {
+  .content-wrapper {
+    padding: 24px 16px 60px;
+  }
+  .module-header h1 {
+    font-size: 1.6rem;
+  }
+  .section-heading {
+    font-size: 1.3rem;
+  }
+  .quiz-options {
+    grid-template-columns: 1fr;
+  }
+  .task-area-grid {
+    grid-template-columns: 1fr;
+  }
+  .module-nav {
+    flex-direction: column;
+  }
+  .nav-link {
+    max-width: 100%;
+  }
+  .nav-link.next {
+    align-items: flex-start;
+    text-align: left;
+  }
+  .loop-diagram-area {
+    max-width: 100%;
+  }
+}
+
+/* ============================================
+   SCROLLBAR STYLING
+   ============================================ */
+.sidebar::-webkit-scrollbar,
+.code-block::-webkit-scrollbar,
+.loop-payload::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.sidebar::-webkit-scrollbar-track,
+.code-block::-webkit-scrollbar-track,
+.loop-payload::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+.code-block::-webkit-scrollbar-thumb,
+.loop-payload::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.section {
+  animation: fadeInUp 0.4s ease both;
+}
+
+/* Key concept highlight */
+.key-concept {
+  display: inline-block;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(6, 182, 212, 0.1));
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  color: var(--primary);
+}
+[data-theme="dark"] .key-concept {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(6, 182, 212, 0.15));
+  border-color: rgba(124, 58, 237, 0.35);
+}
+
+/* Anti-pattern / correct pattern markers */
+.pattern-bad, .pattern-good {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.84rem;
+  display: inline-block;
+  margin-right: 4px;
+}
+.pattern-bad {
+  background: rgba(239,68,68,0.1);
+  color: var(--error);
+  border: 1px solid rgba(239,68,68,0.2);
+}
+.pattern-good {
+  background: rgba(16,185,129,0.1);
+  color: var(--success);
+  border: 1px solid rgba(16,185,129,0.2);
+}
+[data-theme="dark"] .pattern-bad { color: #FCA5A5; }
+[data-theme="dark"] .pattern-good { color: #6EE7B7; }
+
+/* Exam weight tags */
+.exam-weight-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(6,182,212,0.12));
+  color: var(--primary);
+  border: 1px solid rgba(124,58,237,0.2);
+}
+</style>
+</head>
+<body>
+<!-- ============================================
+     THEME TOGGLE
+     ============================================ -->
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+  <span id="themeIcon">&#9790;</span>
+</button>
+
+<!-- ============================================
+     HAMBURGER (mobile)
+     ============================================ -->
+<button class="hamburger" id="hamburger" aria-label="Toggle sidebar">
+  <span></span>
+  <span></span>
+  <span></span>
+</button>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ============================================
+     SIDEBAR
+     ============================================ -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="../index.html" class="sidebar-back">&larr; Back to Hub</a>
+    <div class="sidebar-title">Module 30</div>
+    <div class="sidebar-module-name">Cert Prep: Agentic Architecture &amp; Orchestration</div>
+  </div>
+
+  <div class="sidebar-nav">
+    <!-- Section: Content -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="content">
+        Content <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-content">
+        <li><a href="#domain-overview" class="sidebar-link" data-target="domain-overview">Domain Overview</a></li>
+        <li><a href="#agentic-loop" class="sidebar-link" data-target="agentic-loop">Agentic Loop Mastery</a></li>
+        <li><a href="#multi-agent" class="sidebar-link" data-target="multi-agent">Multi-Agent Orchestration</a></li>
+        <li><a href="#context-passing" class="sidebar-link" data-target="context-passing">Context Passing</a></li>
+        <li><a href="#workflow-enforcement" class="sidebar-link" data-target="workflow-enforcement">Workflow Enforcement</a></li>
+        <li><a href="#hooks" class="sidebar-link" data-target="hooks">Hooks for Lifecycle Control</a></li>
+        <li><a href="#task-decomposition" class="sidebar-link" data-target="task-decomposition">Task Decomposition &amp; Sessions</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Interactives -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="interactives">
+        Interactives <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-interactives">
+        <li><a href="#loop-simulator" class="sidebar-link" data-target="loop-simulator">Agentic Loop Simulator</a></li>
+        <li><a href="#decision-tree" class="sidebar-link" data-target="decision-tree">Scenario Decision Tree</a></li>
+        <li><a href="#hook-exercise" class="sidebar-link" data-target="hook-exercise">Hook Implementation</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Assessment -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="assessment">
+        Assessment <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-assessment">
+        <li><a href="#practice-exam" class="sidebar-link" data-target="practice-exam">Practice Exam (10 Qs)</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sidebar-progress">
+    <div class="sidebar-progress-label">Module Progress</div>
+    <div class="sidebar-progress-track">
+      <div class="sidebar-progress-fill" id="sidebarProgressFill"></div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================
+     MAIN CONTENT
+     ============================================ -->
+<main class="main-content">
+  <div class="content-wrapper">
+
+    <!-- Module Header -->
+    <header class="module-header">
+      <div class="breadcrumb">
+        <a href="../index.html">Training Hub</a> &raquo; Module 30
+      </div>
+      <div class="module-badge">
+        <span class="number">30</span>
+        <span class="label">Certification Prep</span>
+      </div>
+      <h1>Agentic Architecture &amp; Orchestration</h1>
+      <p class="description">
+        Master Domain 1 of the Claude Certified Architect exam -- the highest-weighted domain at 27%. Learn to design agentic loops, orchestrate multi-agent systems, enforce workflows programmatically, and manage session state for production-grade AI architectures.
+      </p>
+      <div class="module-meta">
+        <span class="module-meta-item">&#9201; ~90 min</span>
+        <span class="module-meta-item">&#9733; Expert</span>
+        <span class="module-meta-item">&#127919; 3 Interactive Exercises</span>
+        <span class="module-meta-item">&#128221; 10-Question Practice Exam</span>
+      </div>
+    </header>
+
+    <!-- ========================================
+         SECTION 1: DOMAIN OVERVIEW
+         ======================================== -->
+    <section class="section" id="domain-overview">
+      <h2 class="section-heading">1. Domain Overview</h2>
+
+      <p>
+        <strong>Agentic Architecture &amp; Orchestration</strong> is the single most important domain on the
+        Claude Certified Architect exam. At <span class="key-concept">27% of scored content</span>, it carries
+        more weight than any other domain, making it critical for passing the certification.
+      </p>
+
+      <div class="weight-bar">
+        <div class="weight-bar-label">
+          <span>Domain 1: Agentic Architecture &amp; Orchestration</span>
+          <span>27% of exam</span>
+        </div>
+        <div class="weight-bar-track">
+          <div class="weight-bar-fill"></div>
+        </div>
+        <div class="weight-bar-marks">
+          <span>0%</span>
+          <span>25%</span>
+          <span>50%</span>
+          <span>75%</span>
+          <span>100%</span>
+        </div>
+      </div>
+
+      <h3>Seven Task Areas Tested</h3>
+
+      <p>The exam tests your competency across seven specific task areas within this domain:</p>
+
+      <div class="task-area-grid">
+        <div class="task-area-card">
+          <div class="task-area-num">1</div>
+          <h5>Design Agentic Loops</h5>
+          <p>Build loops that use stop_reason for control flow, not text parsing</p>
+        </div>
+        <div class="task-area-card">
+          <div class="task-area-num">2</div>
+          <h5>Orchestrate Multi-Agent Systems</h5>
+          <p>Hub-and-spoke coordinators with isolated subagent context</p>
+        </div>
+        <div class="task-area-card">
+          <div class="task-area-num">3</div>
+          <h5>Configure Subagent Invocation</h5>
+          <p>Context passing, AgentDefinition, and tool restrictions</p>
+        </div>
+        <div class="task-area-card">
+          <div class="task-area-num">4</div>
+          <h5>Multi-Step Workflow Enforcement</h5>
+          <p>Programmatic prerequisites over prompt-based guidance</p>
+        </div>
+        <div class="task-area-card">
+          <div class="task-area-num">5</div>
+          <h5>Apply Agent SDK Hooks</h5>
+          <p>Pre/PostToolUse and Stop hooks for lifecycle control</p>
+        </div>
+        <div class="task-area-card">
+          <div class="task-area-num">6</div>
+          <h5>Task Decomposition Strategies</h5>
+          <p>Fixed pipelines vs dynamic adaptive decomposition</p>
+        </div>
+        <div class="task-area-card">
+          <div class="task-area-num">7</div>
+          <h5>Session State &amp; Resumption</h5>
+          <p>Named sessions, fork_session, and context management</p>
+        </div>
+      </div>
+
+      <h3>Exam Scenarios That Test This Domain</h3>
+
+      <p>The certification exam uses practical scenarios to test your knowledge. Three scenarios specifically target this domain:</p>
+
+      <ul>
+        <li><strong>Customer Support Agent:</strong> Design a multi-agent system that handles billing, returns, and escalations with proper observability and enforcement</li>
+        <li><strong>Multi-Agent Research:</strong> Build a coordinator that dynamically selects subagents, manages context passing, and implements iterative refinement</li>
+        <li><strong>Developer Productivity:</strong> Create agentic loops for code review, testing, and deployment with proper session management and decomposition</li>
+      </ul>
+
+      <div class="callout exam">
+        <span class="callout-icon">&#9733;</span>
+        <div class="callout-content">
+          <p><strong>Exam Strategy:</strong> Because this domain is worth 27%, you should allocate proportionally more study time to it. If you study for 10 hours total, spend at least 2.5-3 hours on agentic architecture patterns. A strong performance here can compensate for weaker areas in lower-weighted domains.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 2: AGENTIC LOOP MASTERY
+         ======================================== -->
+    <section class="section" id="agentic-loop">
+      <h2 class="section-heading">2. Agentic Loop Mastery</h2>
+
+      <p>
+        The <span class="key-concept">agentic loop</span> is the fundamental execution pattern for all Claude-powered agents.
+        Understanding how this loop works -- and more importantly, what can go wrong -- is essential for the exam.
+      </p>
+
+      <h3>The Loop Pattern</h3>
+
+      <p>Every agentic system follows this core cycle:</p>
+
+      <ol>
+        <li><strong>Send request</strong> to Claude with the user query (or continuation) and available tools</li>
+        <li><strong>Check <code>stop_reason</code></strong> on the response to determine what Claude wants to do</li>
+        <li><strong>If <code>"tool_use"</code></strong>: execute the requested tool and append the result to the conversation</li>
+        <li><strong>If <code>"end_turn"</code></strong>: Claude is done -- exit the loop and return the response</li>
+        <li><strong>Repeat</strong> from step 1 with the updated conversation including tool results</li>
+      </ol>
+
+      <h3>Critical: <code>stop_reason</code> Values</h3>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>stop_reason</th>
+              <th>Meaning</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>"end_turn"</code></td>
+              <td>Claude has finished and is ready to present its response</td>
+              <td>Exit the loop, return response to the user</td>
+            </tr>
+            <tr>
+              <td><code>"tool_use"</code></td>
+              <td>Claude wants to call one or more tools</td>
+              <td>Execute the tool(s), append results, continue loop</td>
+            </tr>
+            <tr>
+              <td><code>"max_tokens"</code></td>
+              <td>Output was truncated because max_tokens was reached</td>
+              <td>May need a continuation request with higher limit</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Model-Driven vs Pre-Configured</h3>
+
+      <p>
+        A critical concept for the exam: Claude decides which tool to call based on context. The agent loop
+        does <em>not</em> follow a fixed sequence of tool calls. This is
+        <span class="key-concept">model-driven orchestration</span> -- the model analyzes the situation and
+        dynamically chooses the appropriate action at each step.
+      </p>
+
+      <h3>Anti-Patterns for the Exam</h3>
+
+      <p>The exam specifically tests whether you can identify these common mistakes:</p>
+
+      <ul>
+        <li>
+          <span class="pattern-bad">Anti-Pattern</span>
+          <strong>Parsing natural language for loop termination.</strong> Checking if Claude said "I'm done"
+          or "Task complete" to decide whether to exit the loop. This is unreliable because Claude's phrasing
+          varies and the model could use completion-like language while still intending to call more tools.
+        </li>
+        <li>
+          <span class="pattern-bad">Anti-Pattern</span>
+          <strong>Arbitrary iteration caps as the sole exit condition.</strong> Setting <code>max_iterations = 5</code>
+          without checking <code>stop_reason</code>. This can terminate the loop before Claude finishes or
+          waste iterations after Claude is done.
+        </li>
+        <li>
+          <span class="pattern-bad">Anti-Pattern</span>
+          <strong>Using assistant text content as a completion indicator.</strong> Checking
+          <code>response.content[0].text</code> instead of <code>response.stop_reason</code>. The text content
+          may exist alongside tool_use blocks.
+        </li>
+      </ul>
+
+      <div class="callout important">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Exam Trap:</strong> If a question describes a loop that "works most of the time" by checking
+          Claude's text for phrases like "Here is my final answer," this is ALWAYS the wrong approach.
+          The <code>stop_reason</code> field is the only reliable signal.</p>
+        </div>
+      </div>
+
+      <div class="code-block has-label">
+        <span class="code-label">Correct Agentic Loop (Python)</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="kw">import</span> anthropic
+
+client <span class="op">=</span> anthropic<span class="op">.</span><span class="fn">Anthropic</span>()
+messages <span class="op">=</span> [{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: query}]
+
+<span class="kw">while</span> <span class="num">True</span>:
+    response <span class="op">=</span> client<span class="op">.</span>messages<span class="op">.</span><span class="fn">create</span>(
+        model<span class="op">=</span><span class="str">"claude-sonnet-4-20250514"</span>,
+        max_tokens<span class="op">=</span><span class="num">4096</span>,
+        tools<span class="op">=</span>tools,
+        messages<span class="op">=</span>messages
+    )
+
+    <span class="cm"># The ONLY correct way to control the loop</span>
+    <span class="kw">if</span> response<span class="op">.</span>stop_reason <span class="op">==</span> <span class="str">"end_turn"</span>:
+        <span class="kw">break</span>  <span class="cm"># Claude is done</span>
+
+    <span class="kw">if</span> response<span class="op">.</span>stop_reason <span class="op">==</span> <span class="str">"tool_use"</span>:
+        <span class="cm"># Execute each tool call and collect results</span>
+        tool_results <span class="op">=</span> <span class="fn">execute_tools</span>(response<span class="op">.</span>content)
+        messages<span class="op">.</span><span class="fn">append</span>({<span class="str">"role"</span>: <span class="str">"assistant"</span>, <span class="str">"content"</span>: response<span class="op">.</span>content})
+        messages<span class="op">.</span><span class="fn">append</span>({<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: tool_results})</code></div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 2: AGENTIC LOOP SIMULATOR
+         ======================================== -->
+    <section class="section" id="loop-simulator">
+      <h2 class="section-heading">Agentic Loop Simulator</h2>
+
+      <p>
+        Watch the agentic loop execute step by step. Click <strong>Start</strong> to begin the simulation
+        and see actual JSON payloads at each stage. Then test yourself with Bug Hunt mode.
+      </p>
+
+      <div class="loop-sim" id="loopSimContainer">
+        <h3>Loop Visualization</h3>
+
+        <div class="loop-iteration-label" id="loopIterLabel">Click Start to begin</div>
+
+        <div class="loop-diagram-area" id="loopDiagramArea">
+          <svg viewBox="0 0 460 300" xmlns="http://www.w3.org/2000/svg">
+            <!-- Send Request node -->
+            <g class="loop-node" id="loopNodeSend">
+              <rect x="150" y="10" width="160" height="44" rx="10" fill="#7C3AED" opacity="0.15" stroke="#7C3AED" stroke-width="2"/>
+              <text x="230" y="37" text-anchor="middle" fill="currentColor" font-size="13" font-weight="600">1. Send Request</text>
+            </g>
+            <!-- Check stop_reason node -->
+            <g class="loop-node" id="loopNodeCheck">
+              <polygon points="230,90 330,140 230,190 130,140" fill="#06B6D4" opacity="0.12" stroke="#06B6D4" stroke-width="2"/>
+              <text x="230" y="137" text-anchor="middle" fill="currentColor" font-size="12" font-weight="600">2. Check</text>
+              <text x="230" y="152" text-anchor="middle" fill="currentColor" font-size="11">stop_reason</text>
+            </g>
+            <!-- Execute Tool node -->
+            <g class="loop-node" id="loopNodeExec">
+              <rect x="20" y="218" width="160" height="44" rx="10" fill="#F59E0B" opacity="0.15" stroke="#F59E0B" stroke-width="2"/>
+              <text x="100" y="245" text-anchor="middle" fill="currentColor" font-size="13" font-weight="600">3. Execute Tool</text>
+            </g>
+            <!-- Complete node -->
+            <g class="loop-node" id="loopNodeComplete">
+              <rect x="280" y="218" width="160" height="44" rx="10" fill="#10B981" opacity="0.15" stroke="#10B981" stroke-width="2"/>
+              <text x="360" y="245" text-anchor="middle" fill="currentColor" font-size="13" font-weight="600">Complete!</text>
+            </g>
+            <!-- Arrows -->
+            <!-- Send -> Check -->
+            <line x1="230" y1="54" x2="230" y2="90" stroke="currentColor" stroke-width="1.5" opacity="0.3" marker-end="url(#arrowhead)"/>
+            <!-- Check -> Execute (tool_use) -->
+            <line x1="160" y1="165" x2="120" y2="218" stroke="currentColor" stroke-width="1.5" opacity="0.3" marker-end="url(#arrowhead)"/>
+            <text x="105" y="195" fill="currentColor" font-size="10" opacity="0.5">tool_use</text>
+            <!-- Check -> Complete (end_turn) -->
+            <line x1="300" y1="165" x2="340" y2="218" stroke="currentColor" stroke-width="1.5" opacity="0.3" marker-end="url(#arrowhead)"/>
+            <text x="325" y="195" fill="currentColor" font-size="10" opacity="0.5">end_turn</text>
+            <!-- Execute -> Send (loop back) -->
+            <path d="M 20 240 Q -10 240 -10 130 Q -10 20 150 32" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.3" stroke-dasharray="4 3" marker-end="url(#arrowhead)"/>
+            <text x="-5" y="135" fill="currentColor" font-size="10" opacity="0.5" transform="rotate(-90, -5, 135)">return result</text>
+            <!-- Arrow marker definition -->
+            <defs>
+              <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+                <polygon points="0 0, 8 3, 0 6" fill="currentColor" opacity="0.4"/>
+              </marker>
+            </defs>
+            <!-- Animated message dot -->
+            <circle id="loopDot" cx="230" cy="32" r="6" fill="#7C3AED" opacity="0" />
+          </svg>
+        </div>
+
+        <div class="loop-payload" id="loopPayload"><span style="color:#64748B">// JSON payloads will appear here as the loop executes...</span></div>
+
+        <div class="loop-controls">
+          <button class="loop-btn primary" id="loopStartBtn" onclick="startLoopSim()">Start Simulation</button>
+          <button class="loop-btn secondary" id="loopResetBtn" onclick="resetLoopSim()" style="display:none">Reset</button>
+        </div>
+
+        <!-- Bug Hunt Mode -->
+        <div class="bug-hunt" id="bugHuntSection">
+          <h4>Bug Hunt: Spot the Broken Loops</h4>
+          <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:16px;">
+            Three agentic loop implementations are shown below. For each, decide if it is <strong>correct</strong> or <strong>buggy</strong>.
+          </p>
+
+          <!-- Bug 1 -->
+          <div class="bug-snippet" id="bugSnippet0">
+            <div class="bug-snippet-label">Implementation A</div>
+            <div class="code-block" style="margin:0 0 8px">
+<span class="kw">while</span> <span class="num">True</span>:
+    response <span class="op">=</span> client<span class="op">.</span>messages<span class="op">.</span><span class="fn">create</span>(<span class="op">...</span>)
+    text <span class="op">=</span> response<span class="op">.</span>content[<span class="num">0</span>]<span class="op">.</span>text
+    <span class="kw">if</span> <span class="str">"final answer"</span> <span class="kw">in</span> text<span class="op">.</span><span class="fn">lower</span>():
+        <span class="kw">break</span>
+    <span class="fn">execute_tools</span>(response<span class="op">.</span>content)</div>
+            <div class="bug-snippet-actions">
+              <button class="bug-btn" data-bug="0" data-answer="buggy" onclick="judgeBug(0, 'buggy')">Buggy</button>
+              <button class="bug-btn" data-bug="0" data-answer="correct" onclick="judgeBug(0, 'correct')">Correct</button>
+            </div>
+            <div class="bug-feedback" id="bugFeedback0"></div>
+          </div>
+
+          <!-- Bug 2 -->
+          <div class="bug-snippet" id="bugSnippet1">
+            <div class="bug-snippet-label">Implementation B</div>
+            <div class="code-block" style="margin:0 0 8px">
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">5</span>):
+    response <span class="op">=</span> client<span class="op">.</span>messages<span class="op">.</span><span class="fn">create</span>(<span class="op">...</span>)
+    <span class="kw">if</span> response<span class="op">.</span>stop_reason <span class="op">!=</span> <span class="str">"tool_use"</span>:
+        <span class="kw">break</span>
+    <span class="fn">execute_tools</span>(response<span class="op">.</span>content)
+<span class="cm"># Loop exits silently after 5 iterations regardless</span></div>
+            <div class="bug-snippet-actions">
+              <button class="bug-btn" data-bug="1" data-answer="buggy" onclick="judgeBug(1, 'buggy')">Buggy</button>
+              <button class="bug-btn" data-bug="1" data-answer="correct" onclick="judgeBug(1, 'correct')">Correct</button>
+            </div>
+            <div class="bug-feedback" id="bugFeedback1"></div>
+          </div>
+
+          <!-- Bug 3 -->
+          <div class="bug-snippet" id="bugSnippet2">
+            <div class="bug-snippet-label">Implementation C</div>
+            <div class="code-block" style="margin:0 0 8px">
+<span class="kw">while</span> <span class="num">True</span>:
+    response <span class="op">=</span> client<span class="op">.</span>messages<span class="op">.</span><span class="fn">create</span>(<span class="op">...</span>)
+    <span class="kw">if</span> response<span class="op">.</span>stop_reason <span class="op">==</span> <span class="str">"end_turn"</span>:
+        <span class="kw">break</span>
+    <span class="kw">if</span> response<span class="op">.</span>stop_reason <span class="op">==</span> <span class="str">"tool_use"</span>:
+        <span class="fn">execute_tools</span>(response<span class="op">.</span>content)</div>
+            <div class="bug-snippet-actions">
+              <button class="bug-btn" data-bug="2" data-answer="buggy" onclick="judgeBug(2, 'buggy')">Buggy</button>
+              <button class="bug-btn" data-bug="2" data-answer="correct" onclick="judgeBug(2, 'correct')">Correct</button>
+            </div>
+            <div class="bug-feedback" id="bugFeedback2"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 3: MULTI-AGENT ORCHESTRATION
+         ======================================== -->
+    <section class="section" id="multi-agent">
+      <h2 class="section-heading">3. Multi-Agent Orchestration for the Exam</h2>
+
+      <p>
+        The <span class="key-concept">hub-and-spoke</span> pattern is the primary multi-agent architecture
+        tested on the certification exam. Understanding when and how to apply it is essential.
+      </p>
+
+      <h3>Hub-and-Spoke Architecture</h3>
+
+      <div class="accent-card">
+        <h4>Coordinator (Hub)</h4>
+        <p>The coordinator agent manages ALL inter-agent communication. It acts as the central decision-maker:</p>
+        <ul>
+          <li>Analyzes incoming queries and determines which subagents are needed</li>
+          <li>Routes tasks to appropriate subagents based on query complexity</li>
+          <li>Collects and synthesizes results from multiple subagents</li>
+          <li>Implements iterative refinement loops to fill gaps</li>
+          <li>Maintains observability by routing all communication through a single point</li>
+        </ul>
+      </div>
+
+      <div class="accent-card">
+        <h4>Subagents (Spokes)</h4>
+        <p>Subagents are specialized workers with isolated context:</p>
+        <ul>
+          <li>Each subagent has its own conversation history -- it does NOT inherit the coordinator's context</li>
+          <li>Subagents have restricted tool access based on their role</li>
+          <li>They receive explicit instructions and context from the coordinator</li>
+          <li>Results are returned to the coordinator for synthesis</li>
+        </ul>
+      </div>
+
+      <h3>Key Exam Concepts</h3>
+
+      <ul>
+        <li>
+          <strong>Dynamic subagent selection:</strong> The coordinator must analyze query requirements and
+          select which subagents to invoke. Not every query needs every subagent.
+        </li>
+        <li>
+          <strong>Parallel execution:</strong> Partition research across subagents to minimize duplication.
+          When subagents have independent tasks, spawn them simultaneously.
+        </li>
+        <li>
+          <strong>Communication routing:</strong> ALL inter-agent communication goes through the coordinator.
+          Direct peer-to-peer communication between subagents breaks observability.
+        </li>
+        <li>
+          <strong>Iterative refinement:</strong> The coordinator evaluates synthesis output for completeness.
+          If gaps are found, it re-delegates targeted queries to specific subagents and re-synthesizes.
+        </li>
+      </ul>
+
+      <div class="callout warning">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Common Exam Trap:</strong> Questions may present a system where subagents communicate
+          directly with each other (peer-to-peer). This is almost always the wrong answer because it
+          breaks observability and makes the system harder to debug and monitor.</p>
+        </div>
+      </div>
+
+      <div class="code-block has-label">
+        <span class="code-label">Coordinator System Prompt Pattern</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="str">"""
+You are a customer support coordinator. Your GOAL is to resolve
+customer issues completely and accurately.
+
+Available subagents:
+- billing_agent: Handles invoice queries, payment issues, charges
+- returns_agent: Processes return requests, refund eligibility
+- technical_agent: Troubleshoots product/service issues
+
+For each customer request:
+1. Analyze what types of issues are present
+2. Determine which subagents are needed
+3. Delegate to appropriate subagents with full context
+4. Synthesize responses into a unified resolution
+5. If gaps remain, re-delegate targeted follow-ups
+
+IMPORTANT: Design your delegations around GOALS, not procedures.
+Tell subagents WHAT to accomplish, not HOW to do it step-by-step.
+"""</span></code></div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 1: SCENARIO DECISION TREE
+         ======================================== -->
+    <section class="section" id="decision-tree">
+      <h2 class="section-heading">Scenario Decision Tree</h2>
+
+      <p>
+        You are building the <strong>Customer Support Agent</strong> system from the certification exam.
+        Make 8 architectural decisions and see the consequences. Each choice reveals whether you would
+        pass or fail this portion of the exam.
+      </p>
+
+      <div class="decision-tree" id="dtContainer">
+        <h3>Customer Support Agent -- Architecture Decisions</h3>
+
+        <div class="dt-progress-track" id="dtProgress">
+          <div class="dt-progress-dot" id="dtDot0"></div>
+          <div class="dt-progress-dot" id="dtDot1"></div>
+          <div class="dt-progress-dot" id="dtDot2"></div>
+          <div class="dt-progress-dot" id="dtDot3"></div>
+          <div class="dt-progress-dot" id="dtDot4"></div>
+          <div class="dt-progress-dot" id="dtDot5"></div>
+          <div class="dt-progress-dot" id="dtDot6"></div>
+          <div class="dt-progress-dot" id="dtDot7"></div>
+        </div>
+
+        <!-- Steps injected by JS -->
+        <div id="dtSteps"></div>
+
+        <div class="dt-score-display" id="dtScoreDisplay">
+          <h4 id="dtScoreTitle"></h4>
+          <p id="dtScoreText"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 4: CONTEXT PASSING
+         ======================================== -->
+    <section class="section" id="context-passing">
+      <h2 class="section-heading">4. Context Passing and Subagent Configuration</h2>
+
+      <p>
+        One of the most frequently tested areas is how context flows between agents. The exam assumes
+        you understand that <span class="key-concept">subagents have isolated context</span> and requires
+        you to design proper context passing strategies.
+      </p>
+
+      <h3>The Task Tool</h3>
+
+      <p>
+        The <code>Task</code> tool spawns subagents in the Claude Agent SDK. For coordinators to use this
+        tool, their <code>allowedTools</code> configuration must explicitly include <code>"Task"</code>.
+      </p>
+
+      <h3>Context Does NOT Inherit</h3>
+
+      <div class="callout important">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Exam Trap:</strong> Subagents do NOT automatically see the parent coordinator's
+          conversation history. If a search subagent found 5 research papers, and you want a synthesis
+          subagent to use those findings, you must explicitly include those findings in the synthesis
+          subagent's prompt. Simply assuming "the synthesis agent will know about the research" is wrong.</p>
+        </div>
+      </div>
+
+      <h3>AgentDefinition Configuration</h3>
+
+      <p>Each subagent is defined with specific configuration:</p>
+
+      <ul>
+        <li><strong>Description:</strong> What the agent does (used by the coordinator to decide which agent to invoke)</li>
+        <li><strong>System prompt:</strong> Instructions, constraints, and persona for the subagent</li>
+        <li><strong>Tool restrictions:</strong> Each subagent should only have access to tools it needs</li>
+      </ul>
+
+      <h3>Best Practices for Context Passing</h3>
+
+      <ul>
+        <li>
+          <span class="pattern-good">Correct</span>
+          <strong>Pass complete findings in the prompt.</strong> Include all relevant data from prior agents
+          directly in the subagent's task description.
+        </li>
+        <li>
+          <span class="pattern-good">Correct</span>
+          <strong>Use structured data formats.</strong> Separate content from metadata (source URLs, document
+          names, timestamps) to preserve attribution and enable the subagent to cite its sources.
+        </li>
+        <li>
+          <span class="pattern-good">Correct</span>
+          <strong>Spawn parallel subagents.</strong> Emit multiple Task calls in one response to execute
+          independent research tasks simultaneously.
+        </li>
+        <li>
+          <span class="pattern-good">Correct</span>
+          <strong>Design coordinator prompts with goals, not step-by-step procedures.</strong> Tell the
+          coordinator what outcome you want, and let it decide the optimal delegation strategy.
+        </li>
+      </ul>
+
+      <div class="code-block has-label">
+        <span class="code-label">Explicit Context Passing Example</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm"># Coordinator passes search results explicitly to synthesis agent</span>
+<span class="fn">Task</span>(
+    agent<span class="op">=</span><span class="str">"synthesis_agent"</span>,
+    prompt<span class="op">=</span><span class="str">"""Synthesize a comprehensive report from these findings:
+
+## Research Agent Findings:
+- Paper: "Scaling Laws for Neural LMs" (Kaplan et al.)
+  Key insight: Loss scales as power law with compute
+  Source: arxiv.org/abs/2001.08361
+
+- Paper: "Chinchilla Scaling" (Hoffmann et al.)
+  Key insight: Models are significantly undertrained
+  Source: arxiv.org/abs/2203.15556
+
+## Analysis Agent Findings:
+- Trend: Training compute has increased 10x per year
+- Gap: Limited data on multi-modal scaling behavior
+
+Create a report that covers all findings and identifies
+remaining research gaps.
+"""</span>
+)</code></div>
+    </section>
+
+    <!-- ========================================
+         SECTION 5: WORKFLOW ENFORCEMENT
+         ======================================== -->
+    <section class="section" id="workflow-enforcement">
+      <h2 class="section-heading">5. Workflow Enforcement Patterns</h2>
+
+      <p>
+        This section covers one of the most critical distinctions on the exam:
+        <span class="key-concept">programmatic enforcement vs prompt-based guidance</span>.
+        Understanding when each approach is appropriate -- and when prompt-based guidance is insufficient --
+        separates passing from failing scores.
+      </p>
+
+      <h3>The Critical Distinction</h3>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Approach</th>
+              <th>Reliability</th>
+              <th>When to Use</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Prompt-based guidance</strong></td>
+              <td>High but non-deterministic (95-99%)</td>
+              <td>Preferences, style, soft constraints</td>
+            </tr>
+            <tr>
+              <td><strong>Programmatic enforcement</strong></td>
+              <td>Deterministic (100%)</td>
+              <td>Security, compliance, business rules</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        Prompt instructions have a <strong>non-zero failure rate</strong> for compliance. When you need
+        guaranteed behavior -- such as verifying customer identity before issuing refunds -- you must use
+        programmatic enforcement through hooks or prerequisite gates.
+      </p>
+
+      <h3>Prerequisite Gates</h3>
+
+      <p>
+        A prerequisite gate blocks a downstream tool call until a prior condition is met. For example,
+        blocking <code>process_refund</code> until <code>get_customer</code> returns a verified customer ID:
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Prerequisite Gate Pattern</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm"># PreToolUse hook that enforces identity verification</span>
+<span class="kw">def</span> <span class="fn">pre_tool_use</span>(tool_name, tool_input, state):
+    <span class="kw">if</span> tool_name <span class="op">==</span> <span class="str">"process_refund"</span>:
+        <span class="kw">if not</span> state<span class="op">.</span><span class="fn">get</span>(<span class="str">"customer_verified"</span>):
+            <span class="kw">return</span> {
+                <span class="str">"action"</span>: <span class="str">"block"</span>,
+                <span class="str">"message"</span>: <span class="str">"Customer identity must be verified "</span>
+                           <span class="str">"before processing refunds. Call "</span>
+                           <span class="str">"get_customer first."</span>
+            }
+    <span class="kw">return</span> {<span class="str">"action"</span>: <span class="str">"allow"</span>}</code></div>
+
+      <h3>Multi-Concern Request Decomposition</h3>
+
+      <p>
+        When a customer raises multiple issues in a single message (e.g., billing AND returns), the system
+        must decompose the request into distinct items. Each item should be investigated independently --
+        potentially in parallel -- before synthesizing a unified resolution.
+      </p>
+
+      <h3>Structured Handoff for Escalation</h3>
+
+      <p>
+        When an agent needs to escalate to a human, it must provide a structured summary that includes:
+      </p>
+
+      <ul>
+        <li><strong>Customer ID</strong> -- for the human agent to pull up the account</li>
+        <li><strong>Root cause analysis</strong> -- what the AI agent determined about the issue</li>
+        <li><strong>Actions already taken</strong> -- what steps the AI completed</li>
+        <li><strong>Refund amount (if applicable)</strong> -- the calculated or requested amount</li>
+        <li><strong>Recommended action</strong> -- the AI's suggestion for the human agent</li>
+      </ul>
+
+      <div class="callout exam">
+        <span class="callout-icon">&#9733;</span>
+        <div class="callout-content">
+          <p><strong>Exam Key:</strong> If a question asks "what should the agent include in a human handoff?"
+          and one option says "just the refund amount" while another says "customer ID, root cause, actions
+          taken, and recommendation," the comprehensive option is always correct.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 6: HOOKS
+         ======================================== -->
+    <section class="section" id="hooks">
+      <h2 class="section-heading">6. Hooks for Lifecycle Control</h2>
+
+      <p>
+        Hooks are the programmatic mechanism for intercepting and controlling agent behavior at specific
+        points in the execution lifecycle. The exam tests three types of hooks:
+      </p>
+
+      <h3>Hook Types</h3>
+
+      <div class="accent-card">
+        <h4>PreToolUse Hooks</h4>
+        <p>Execute <strong>before</strong> a tool call runs. Use cases:</p>
+        <ul>
+          <li>Block policy-violating commands (e.g., <code>rm -rf</code>, <code>DROP TABLE</code>)</li>
+          <li>Enforce prerequisite conditions (identity verification before refund)</li>
+          <li>Add required parameters or headers to API calls</li>
+          <li>Redirect to alternative tools when primary tools are unavailable</li>
+        </ul>
+      </div>
+
+      <div class="accent-card">
+        <h4>PostToolUse Hooks</h4>
+        <p>Execute <strong>after</strong> a tool call returns. Use cases:</p>
+        <ul>
+          <li>Normalize data formats from different MCP tools (e.g., timestamps from Unix to ISO 8601)</li>
+          <li>Validate tool outputs against expected schemas</li>
+          <li>Strip sensitive information from tool results before Claude processes them</li>
+          <li>Run quality checks (e.g., eslint after code edits)</li>
+        </ul>
+      </div>
+
+      <div class="accent-card">
+        <h4>Stop Hooks</h4>
+        <p>Execute when Claude signals <code>end_turn</code>. Use cases:</p>
+        <ul>
+          <li>Force continuation when multi-phase work is incomplete (e.g., only 3 of 5 build phases done)</li>
+          <li>Check completion criteria against a state file or progress tracker</li>
+          <li>Append summary or reporting information before the session ends</li>
+        </ul>
+      </div>
+
+      <h3>When to Choose Hooks Over Prompts</h3>
+
+      <p>
+        The exam specifically asks you to distinguish between situations that need hooks versus prompt instructions:
+      </p>
+
+      <ul>
+        <li>
+          <span class="pattern-good">Use Hooks</span> when business rules require <strong>guaranteed compliance</strong>
+          (financial operations, security boundaries, data retention policies)
+        </li>
+        <li>
+          <span class="pattern-good">Use Prompts</span> when you want to <strong>guide behavior</strong>
+          (code style preferences, response formatting, communication tone)
+        </li>
+      </ul>
+
+      <div class="callout exam">
+        <span class="callout-icon">&#9733;</span>
+        <div class="callout-content">
+          <p><strong>Exam Key:</strong> If the question involves money, security, or compliance, the answer
+          is almost always hooks/programmatic enforcement. If it involves style, preferences, or soft
+          guidelines, prompt instructions are acceptable.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 3: HOOK EXERCISE
+         ======================================== -->
+    <section class="section" id="hook-exercise">
+      <h2 class="section-heading">Hook Implementation Exercise</h2>
+
+      <p>
+        For each scenario, write a hook configuration in JSON. Click <strong>Check</strong> to validate
+        your answer against expected patterns. You are scored on correct hook type, correct matcher,
+        and reasonable command/script logic.
+      </p>
+
+      <div class="hook-exercise" id="hookExercise">
+        <h3>Write the Hook Configurations</h3>
+
+        <!-- Scenario 1 -->
+        <div class="hook-scenario" id="hookScenario0">
+          <div class="hook-scenario-num">Scenario 1 of 3</div>
+          <div class="hook-scenario-text">Prevent Claude from running <code>rm -rf</code> or <code>DROP TABLE</code> commands</div>
+          <div class="hook-scenario-hint">Hint: Which hook type runs BEFORE a tool executes? What tool would run shell commands?</div>
+          <textarea class="hook-textarea" id="hookTextarea0" placeholder='Example format:
+{
+  "type": "PreToolUse or PostToolUse or Stop",
+  "matcher": "tool_name_here",
+  "script": "description of what the hook checks..."
+}'></textarea>
+          <button class="hook-check-btn" onclick="checkHook(0)">Check Answer</button>
+          <div class="hook-feedback" id="hookFeedback0"></div>
+        </div>
+
+        <!-- Scenario 2 -->
+        <div class="hook-scenario" id="hookScenario1">
+          <div class="hook-scenario-num">Scenario 2 of 3</div>
+          <div class="hook-scenario-text">Ensure all code edits pass eslint before being accepted</div>
+          <div class="hook-scenario-hint">Hint: Which hook type runs AFTER a tool completes? What tool edits files?</div>
+          <textarea class="hook-textarea" id="hookTextarea1" placeholder='Write your hook configuration JSON here...'></textarea>
+          <button class="hook-check-btn" onclick="checkHook(1)">Check Answer</button>
+          <div class="hook-feedback" id="hookFeedback1"></div>
+        </div>
+
+        <!-- Scenario 3 -->
+        <div class="hook-scenario" id="hookScenario2">
+          <div class="hook-scenario-num">Scenario 3 of 3</div>
+          <div class="hook-scenario-text">Force Claude to continue working until all 5 build phases complete</div>
+          <div class="hook-scenario-hint">Hint: Which hook type intercepts Claude's attempt to stop? How would you check progress?</div>
+          <textarea class="hook-textarea" id="hookTextarea2" placeholder='Write your hook configuration JSON here...'></textarea>
+          <button class="hook-check-btn" onclick="checkHook(2)">Check Answer</button>
+          <div class="hook-feedback" id="hookFeedback2"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 7: TASK DECOMPOSITION & SESSIONS
+         ======================================== -->
+    <section class="section" id="task-decomposition">
+      <h2 class="section-heading">7. Task Decomposition and Session Management</h2>
+
+      <p>
+        The final task areas in this domain test your ability to choose the right decomposition strategy
+        and manage session state across complex workflows.
+      </p>
+
+      <h3>Decomposition Strategies</h3>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Strategy</th>
+              <th>How It Works</th>
+              <th>Best For</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Fixed Sequential (Prompt Chaining)</strong></td>
+              <td>Predefined pipeline: Step A then Step B then Step C</td>
+              <td>Well-understood workflows with predictable steps</td>
+            </tr>
+            <tr>
+              <td><strong>Dynamic Adaptive</strong></td>
+              <td>The coordinator decides next steps based on results</td>
+              <td>Open-ended research, complex debugging, unknown scope</td>
+            </tr>
+            <tr>
+              <td><strong>Per-File + Integration</strong></td>
+              <td>Local passes on individual files, then cross-file integration</td>
+              <td>Code review, large-scale refactoring, multi-file analysis</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Code Review Example: Per-File + Integration</h3>
+
+      <p>
+        For a 500-line PR across 8 files, the recommended approach splits the review into:
+      </p>
+
+      <ul>
+        <li><strong>Per-file local analysis passes:</strong> Each file is reviewed independently for file-specific
+        issues (logic errors, style violations, single-file bugs). This avoids attention dilution.</li>
+        <li><strong>Cross-file integration pass:</strong> A separate pass examines data flow between files,
+        API contract mismatches, and consistency problems that only emerge when looking at multiple files together.</li>
+      </ul>
+
+      <h3>Session Management</h3>
+
+      <p>
+        The exam tests your understanding of session lifecycle management:
+      </p>
+
+      <ul>
+        <li>
+          <strong><code>--resume &lt;session-name&gt;</code>:</strong> Continue a named session where you left off.
+          Useful for long-running tasks that span multiple work periods.
+        </li>
+        <li>
+          <strong><code>fork_session</code>:</strong> Create parallel exploration branches from a shared baseline.
+          Ideal for comparing two approaches without re-doing the initial analysis.
+        </li>
+        <li>
+          <strong>Fresh session with injected summaries:</strong> When tool results are stale (e.g., files have
+          changed since the last session), start fresh but inject key summaries from prior work to avoid
+          full re-exploration.
+        </li>
+      </ul>
+
+      <div class="callout warning">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Exam Trap:</strong> The exam rewards candidates who match the approach to the task.
+          Always choosing "dynamic adaptive" is wrong -- simple, well-understood tasks benefit from
+          fixed pipelines. Always choosing "fixed sequential" is also wrong -- complex research tasks
+          need adaptive decomposition. The correct answer depends on the specific scenario.</p>
+        </div>
+      </div>
+
+      <h3>Resuming After Code Changes</h3>
+
+      <p>
+        When resuming a session after files have been modified:
+      </p>
+
+      <ul>
+        <li>
+          <span class="pattern-good">Correct</span>
+          Inform the resumed session about specific file changes for targeted re-analysis
+        </li>
+        <li>
+          <span class="pattern-good">Correct</span>
+          If many files changed, start fresh with injected summaries instead of resuming
+        </li>
+        <li>
+          <span class="pattern-bad">Anti-Pattern</span>
+          Assuming Claude will automatically detect what changed in files
+        </li>
+      </ul>
+    </section>
+
+    <!-- ========================================
+         PRACTICE EXAM (10 QUESTIONS)
+         ======================================== -->
+    <section class="section" id="practice-exam">
+      <h2 class="section-heading">End-of-Module Practice Exam</h2>
+
+      <p>
+        Complete this 10-question practice exam in the style of the actual certification. Each question
+        presents a scenario and asks you to select the best answer. You need at least 7 out of 10 to pass.
+        Your score will be saved to track your progress.
+      </p>
+
+      <div class="final-quiz" id="finalQuizContainer">
+        <h3>Domain 1: Practice Assessment &nbsp; <span class="exam-weight-tag">27% of Exam</span></h3>
+
+        <!-- Questions injected by JS -->
+        <div id="finalQuizQuestions"></div>
+
+        <button class="final-submit-btn" id="finalSubmitBtn" onclick="submitFinalQuiz()" disabled>
+          Submit Answers
+        </button>
+
+        <div class="final-result" id="finalResult">
+          <h4 id="finalResultTitle"></h4>
+          <p id="finalResultText"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         NAVIGATION FOOTER
+         ======================================== -->
+    <nav class="module-nav">
+      <a href="25-evals-reliability.html" class="nav-link prev">
+        <span class="nav-dir">&larr; Previous</span>
+        <span class="nav-title">Module 25: Evals &amp; Reliability</span>
+      </a>
+      <a href="31-cert-domain2.html" class="nav-link next">
+        <span class="nav-dir">Next &rarr;</span>
+        <span class="nav-title">Module 31: Cert Prep -- Tool Design &amp; Integration</span>
+      </a>
+    </nav>
+
+  </div>
+</main>
+
+<!-- ============================================
+     JAVASCRIPT (ES5 Compatible)
+     ============================================ -->
+<script>
+(function() {
+  'use strict';
+
+  // ==========================================
+  // THEME MANAGEMENT
+  // ==========================================
+  var THEME_KEY = 'claude-training-theme';
+
+  function getTheme() {
+    return localStorage.getItem(THEME_KEY) || 'light';
+  }
+
+  function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem(THEME_KEY, theme);
+    var icon = document.getElementById('themeIcon');
+    if (icon) {
+      icon.textContent = theme === 'dark' ? '\u2600' : '\u263E';
+    }
+  }
+
+  setTheme(getTheme());
+
+  document.getElementById('themeToggle').addEventListener('click', function() {
+    var current = getTheme();
+    setTheme(current === 'dark' ? 'light' : 'dark');
+  });
+
+  // ==========================================
+  // SIDEBAR MOBILE TOGGLE
+  // ==========================================
+  var hamburger = document.getElementById('hamburger');
+  var sidebar = document.getElementById('sidebar');
+  var overlay = document.getElementById('sidebarOverlay');
+
+  function toggleSidebar() {
+    var isOpen = sidebar.classList.contains('open');
+    sidebar.classList.toggle('open');
+    hamburger.classList.toggle('open');
+    if (isOpen) {
+      overlay.classList.remove('show');
+    } else {
+      overlay.classList.add('show');
+    }
+  }
+
+  hamburger.addEventListener('click', toggleSidebar);
+  overlay.addEventListener('click', toggleSidebar);
+
+  // ==========================================
+  // SIDEBAR SECTION COLLAPSING
+  // ==========================================
+  var sectionToggles = document.querySelectorAll('.sidebar-section-toggle');
+  for (var st = 0; st < sectionToggles.length; st++) {
+    (function(btn) {
+      btn.addEventListener('click', function() {
+        var sectionName = this.getAttribute('data-section');
+        var linksList = document.getElementById('nav-' + sectionName);
+        var isCollapsed = this.classList.contains('collapsed');
+
+        if (isCollapsed) {
+          this.classList.remove('collapsed');
+          linksList.classList.remove('collapsed');
+          linksList.style.maxHeight = linksList.scrollHeight + 'px';
+        } else {
+          this.classList.add('collapsed');
+          linksList.style.maxHeight = linksList.scrollHeight + 'px';
+          linksList.offsetHeight; // force reflow
+          linksList.classList.add('collapsed');
+        }
+      });
+
+      var sectionName = btn.getAttribute('data-section');
+      var linksList = document.getElementById('nav-' + sectionName);
+      if (linksList) {
+        linksList.style.maxHeight = linksList.scrollHeight + 'px';
+      }
+    })(sectionToggles[st]);
+  }
+
+  // ==========================================
+  // SCROLLSPY
+  // ==========================================
+  var sidebarLinks = document.querySelectorAll('.sidebar-link');
+  var sections = [];
+
+  for (var sl = 0; sl < sidebarLinks.length; sl++) {
+    var targetId = sidebarLinks[sl].getAttribute('data-target');
+    var section = document.getElementById(targetId);
+    if (section) {
+      sections.push({ el: section, link: sidebarLinks[sl], id: targetId });
+    }
+  }
+
+  function updateScrollspy() {
+    var scrollPos = window.scrollY + 100;
+    var active = null;
+
+    for (var i = sections.length - 1; i >= 0; i--) {
+      if (sections[i].el.offsetTop <= scrollPos) {
+        active = sections[i];
+        break;
+      }
+    }
+
+    for (var j = 0; j < sidebarLinks.length; j++) {
+      sidebarLinks[j].classList.remove('active');
+    }
+    if (active) {
+      active.link.classList.add('active');
+    }
+
+    updateSidebarProgress();
+  }
+
+  var scrollTimer = null;
+  window.addEventListener('scroll', function() {
+    if (scrollTimer) return;
+    scrollTimer = setTimeout(function() {
+      scrollTimer = null;
+      updateScrollspy();
+    }, 50);
+  });
+  updateScrollspy();
+
+  // Close mobile sidebar on link click
+  for (var lk = 0; lk < sidebarLinks.length; lk++) {
+    sidebarLinks[lk].addEventListener('click', function() {
+      if (window.innerWidth <= 1024) {
+        sidebar.classList.remove('open');
+        hamburger.classList.remove('open');
+        overlay.classList.remove('show');
+      }
+    });
+  }
+
+  // ==========================================
+  // SIDEBAR PROGRESS
+  // ==========================================
+  function updateSidebarProgress() {
+    var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    var scrolled = window.scrollY;
+    var pct = docHeight > 0 ? Math.min(100, (scrolled / docHeight) * 100) : 0;
+
+    var fill = document.getElementById('sidebarProgressFill');
+    if (fill) {
+      fill.style.width = pct + '%';
+    }
+  }
+
+  // ==========================================
+  // COPY TO CLIPBOARD
+  // ==========================================
+  window.copyCode = function(btn) {
+    var block = btn.closest('.code-block');
+    var codeEl = block.cloneNode(true);
+    var labelEl = codeEl.querySelector('.code-label');
+    var btnEl = codeEl.querySelector('.copy-btn');
+    if (labelEl) labelEl.remove();
+    if (btnEl) btnEl.remove();
+
+    var text = codeEl.textContent.trim();
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function() {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(function() {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      }).catch(function() {
+        btn.textContent = 'Failed';
+        setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+      });
+    } else {
+      btn.textContent = 'Failed';
+      setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+    }
+  };
+
+  // ==========================================
+  // AGENTIC LOOP SIMULATOR
+  // ==========================================
+  var loopSteps = [
+    {
+      iteration: 1,
+      node: 'Send',
+      label: 'Iteration 1 -- Sending initial request...',
+      payload: '{\n  "model": "claude-sonnet-4-20250514",\n  "max_tokens": 4096,\n  "tools": [{"name": "search_files", ...}, {"name": "read_file", ...}],\n  "messages": [\n    {"role": "user", "content": "Find the authentication bug in auth.py"}\n  ]\n}'
+    },
+    {
+      iteration: 1,
+      node: 'Check',
+      label: 'Iteration 1 -- Checking stop_reason...',
+      payload: '// Response received:\n{\n  "stop_reason": "tool_use",   // <-- Claude wants to call a tool\n  "content": [\n    {"type": "text", "text": "Let me search for auth.py..."},\n    {"type": "tool_use", "name": "search_files",\n     "input": {"pattern": "**/auth.py"}}\n  ]\n}'
+    },
+    {
+      iteration: 1,
+      node: 'Exec',
+      label: 'Iteration 1 -- Executing search_files tool...',
+      payload: '// Tool execution:\n// search_files(pattern="**/auth.py")\n//\n// Result:\n{\n  "type": "tool_result",\n  "content": "Found: src/services/auth.py (142 lines)"\n}\n\n// Appending result to messages and looping back...'
+    },
+    {
+      iteration: 2,
+      node: 'Send',
+      label: 'Iteration 2 -- Sending with tool result...',
+      payload: '// Messages now include the tool result.\n// Sending to Claude for next decision...\n{\n  "messages": [\n    {"role": "user", "content": "Find the authentication bug..."},\n    {"role": "assistant", "content": [/* tool_use block */]},\n    {"role": "user", "content": [{"type": "tool_result", ...}]}\n  ]\n}'
+    },
+    {
+      iteration: 2,
+      node: 'Check',
+      label: 'Iteration 2 -- Checking stop_reason...',
+      payload: '// Response received:\n{\n  "stop_reason": "tool_use",   // <-- Another tool call\n  "content": [\n    {"type": "text", "text": "Let me read auth.py to find the bug..."},\n    {"type": "tool_use", "name": "read_file",\n     "input": {"path": "src/services/auth.py", "offset": 40, "limit": 20}}\n  ]\n}'
+    },
+    {
+      iteration: 2,
+      node: 'Exec',
+      label: 'Iteration 2 -- Executing read_file tool...',
+      payload: '// Tool execution:\n// read_file(path="src/services/auth.py", offset=40, limit=20)\n//\n// Result:\n{\n  "type": "tool_result",\n  "content": "41: def verify_token(token):\\n42:     payload = jwt.decode(token)  # BUG: no secret key!\\n43:     return payload"\n}'
+    },
+    {
+      iteration: 3,
+      node: 'Send',
+      label: 'Iteration 3 -- Sending with file contents...',
+      payload: '// Messages now include both tool results.\n// Claude has enough info to answer...'
+    },
+    {
+      iteration: 3,
+      node: 'Check',
+      label: 'Iteration 3 -- Checking stop_reason...',
+      payload: '// Response received:\n{\n  "stop_reason": "end_turn",   // <-- Claude is done!\n  "content": [\n    {"type": "text", "text": "Found the bug on line 42 of auth.py:\\n\\njwt.decode(token) is called without a secret key\\nparameter, which means the token signature is not\\nverified. Fix: jwt.decode(token, SECRET_KEY,\\nalgorithms=[\\"HS256\\"])"}\n  ]\n}'
+    },
+    {
+      iteration: 3,
+      node: 'Complete',
+      label: 'Loop complete! stop_reason was "end_turn" -- exiting.',
+      payload: '// Final result returned to user:\n//\n// "Found the bug on line 42 of auth.py:\n//  jwt.decode(token) is called without a secret key\n//  parameter, which means the token signature is not\n//  verified.\n//\n//  Fix: jwt.decode(token, SECRET_KEY, algorithms=[\\"HS256\\"])"\n//\n// Total iterations: 3\n// Tools called: search_files (1x), read_file (1x)'
+    }
+  ];
+
+  var loopStepIndex = 0;
+  var loopRunning = false;
+
+  function highlightNode(nodeName) {
+    var nodeIds = ['loopNodeSend', 'loopNodeCheck', 'loopNodeExec', 'loopNodeComplete'];
+    var colors = { Send: '#7C3AED', Check: '#06B6D4', Exec: '#F59E0B', Complete: '#10B981' };
+
+    for (var n = 0; n < nodeIds.length; n++) {
+      var node = document.getElementById(nodeIds[n]);
+      var shapes = node.querySelectorAll('rect, polygon');
+      for (var s = 0; s < shapes.length; s++) {
+        shapes[s].setAttribute('opacity', '0.15');
+        shapes[s].setAttribute('stroke-width', '2');
+      }
+    }
+
+    var nodeMap = { Send: 'loopNodeSend', Check: 'loopNodeCheck', Exec: 'loopNodeExec', Complete: 'loopNodeComplete' };
+    var activeNode = document.getElementById(nodeMap[nodeName]);
+    if (activeNode) {
+      var activeShapes = activeNode.querySelectorAll('rect, polygon');
+      for (var a = 0; a < activeShapes.length; a++) {
+        activeShapes[a].setAttribute('opacity', '0.35');
+        activeShapes[a].setAttribute('stroke-width', '3');
+      }
+    }
+  }
+
+  window.startLoopSim = function() {
+    if (loopRunning) return;
+    loopRunning = true;
+    loopStepIndex = 0;
+    document.getElementById('loopStartBtn').disabled = true;
+    document.getElementById('loopResetBtn').style.display = 'inline-flex';
+    advanceLoop();
+  };
+
+  function advanceLoop() {
+    if (loopStepIndex >= loopSteps.length) {
+      loopRunning = false;
+      document.getElementById('loopStartBtn').disabled = false;
+      return;
+    }
+
+    var step = loopSteps[loopStepIndex];
+    document.getElementById('loopIterLabel').textContent = step.label;
+    document.getElementById('loopPayload').textContent = step.payload;
+    highlightNode(step.node);
+
+    loopStepIndex++;
+
+    if (loopStepIndex < loopSteps.length) {
+      setTimeout(advanceLoop, 2200);
+    } else {
+      loopRunning = false;
+      document.getElementById('loopStartBtn').disabled = false;
+    }
+  }
+
+  window.resetLoopSim = function() {
+    loopRunning = false;
+    loopStepIndex = 0;
+    document.getElementById('loopIterLabel').textContent = 'Click Start to begin';
+    document.getElementById('loopPayload').innerHTML = '<span style="color:#64748B">// JSON payloads will appear here as the loop executes...</span>';
+    document.getElementById('loopStartBtn').disabled = false;
+    highlightNode('');
+  };
+
+  // ==========================================
+  // BUG HUNT
+  // ==========================================
+  var bugAnswers = ['buggy', 'buggy', 'correct'];
+  var bugExplanations = [
+    'Buggy! This implementation checks response.content[0].text for "final answer" instead of using stop_reason. This is the natural-language-parsing anti-pattern -- unreliable because Claude\'s phrasing varies and tool_use blocks may coexist with text.',
+    'Buggy! This uses a fixed iteration cap (5) as the primary exit condition. While it does check stop_reason != "tool_use", the for loop silently exits after 5 iterations even if Claude still has tool calls to make. The loop should use while True with stop_reason as the sole exit.',
+    'Correct! This implementation properly checks stop_reason == "end_turn" to exit and stop_reason == "tool_use" to continue. It uses while True, letting Claude\'s stop_reason be the sole control signal.'
+  ];
+
+  window.judgeBug = function(idx, judgment) {
+    var snippet = document.getElementById('bugSnippet' + idx);
+    var feedback = document.getElementById('bugFeedback' + idx);
+    var buttons = snippet.querySelectorAll('.bug-btn');
+
+    // Prevent re-answering
+    if (snippet.classList.contains('judged-correct') || snippet.classList.contains('judged-incorrect')) {
+      return;
+    }
+
+    var isCorrect = judgment === bugAnswers[idx];
+
+    for (var b = 0; b < buttons.length; b++) {
+      buttons[b].classList.add('disabled');
+      if (buttons[b].getAttribute('data-answer') === judgment) {
+        buttons[b].classList.add(isCorrect ? 'selected-right' : 'selected-wrong');
+      }
+    }
+
+    snippet.classList.add(isCorrect ? 'judged-correct' : 'judged-incorrect');
+    feedback.className = 'bug-feedback show ' + (isCorrect ? 'correct' : 'incorrect');
+    feedback.textContent = (isCorrect ? 'Correct! ' : 'Incorrect. ') + bugExplanations[idx];
+  };
+
+  // ==========================================
+  // DECISION TREE
+  // ==========================================
+  var dtData = [
+    {
+      question: 'How many agents do you need for this customer support system?',
+      context: 'The system must handle billing inquiries, return requests, and technical troubleshooting.',
+      options: [
+        { text: 'One agent that handles everything', correct: false, consequence: 'A single agent cannot specialize. It will struggle with complex queries that span multiple domains, leading to shallow or incomplete resolutions.' },
+        { text: '3 specialized agents (billing, returns, technical) + coordinator', correct: true, consequence: 'Correct! Specialized subagents provide domain expertise while the coordinator manages routing and synthesis. This is the hub-and-spoke pattern.' },
+        { text: '10 ultra-specialized agents (one per sub-task)', correct: false, consequence: 'Over-engineering! Too many agents increases coordination overhead and latency without proportional quality gains.' }
+      ]
+    },
+    {
+      question: 'How should the agents communicate with each other?',
+      context: 'The billing agent found that a charge is valid, but the customer also wants to return the item.',
+      options: [
+        { text: 'Direct peer-to-peer between billing and returns agents', correct: false, consequence: 'Direct P2P breaks observability. The coordinator cannot monitor, log, or intervene in inter-agent communication if it is not routed through the hub.' },
+        { text: 'All communication routed through the coordinator', correct: true, consequence: 'Correct! Routing through the coordinator ensures full observability, enables the coordinator to contextualize findings, and keeps inter-agent dependencies manageable.' },
+        { text: 'Shared database that all agents read/write to', correct: false, consequence: 'Shared mutable state creates race conditions and makes it impossible to reconstruct the decision history. The coordinator loses visibility into agent reasoning.' }
+      ]
+    },
+    {
+      question: 'Customer asks about both a billing issue AND a return. What do you do?',
+      context: '"I was charged twice for order #1234 and I also want to return the item because it is defective."',
+      options: [
+        { text: 'Handle sequentially: billing first, then returns', correct: false, consequence: 'Sequential handling is slow. These are independent concerns that could be investigated in parallel, reducing wait time for the customer.' },
+        { text: 'Decompose into parallel sub-tasks via coordinator', correct: true, consequence: 'Correct! The coordinator decomposes the multi-concern request, delegates billing and returns investigations in parallel, then synthesizes a unified resolution.' },
+        { text: 'Ask the customer to pick one issue to resolve first', correct: false, consequence: 'Forcing the customer to fragment their request is a poor experience. The system should handle multi-concern requests gracefully.' }
+      ]
+    },
+    {
+      question: 'The customer says "I want to talk to a human."',
+      context: 'The agent has identified the billing error and has a resolution ready.',
+      options: [
+        { text: 'Try to resolve the issue first before escalating', correct: false, consequence: 'When a customer explicitly requests a human, the agent should escalate immediately. Ignoring the request damages trust, even if the agent has the correct answer.' },
+        { text: 'Escalate immediately with structured handoff', correct: true, consequence: 'Correct! Immediate escalation with a structured summary (customer ID, root cause, actions taken, recommendation) ensures the human agent can continue seamlessly.' }
+      ]
+    },
+    {
+      question: 'The customer lookup tool returns 3 matches for "John Smith."',
+      context: 'The agent needs to verify customer identity before proceeding with the refund.',
+      options: [
+        { text: 'Pick the first result', correct: false, consequence: 'Dangerous! Selecting the wrong customer could expose sensitive data or process a refund to the wrong account. This is a security and compliance risk.' },
+        { text: 'Ask the customer for additional identifiers (email, order number)', correct: true, consequence: 'Correct! When multiple matches exist, ask for disambiguating information. This ensures accuracy and prevents cross-account data leakage.' }
+      ]
+    },
+    {
+      question: 'A refund request exceeds the $500 automatic approval limit.',
+      context: 'The customer wants a $750 refund. Policy says refunds over $500 need supervisor approval.',
+      options: [
+        { text: 'Deny via system prompt instruction: "Never approve refunds over $500"', correct: false, consequence: 'Prompt instructions have a non-zero failure rate. For financial compliance boundaries, this is unacceptable. A prompt could be bypassed through adversarial framing.' },
+        { text: 'Block via PreToolUse hook + redirect to supervisor queue', correct: true, consequence: 'Correct! A programmatic hook deterministically blocks the refund tool when the amount exceeds $500 and routes to a supervisor approval queue. 100% compliance.' }
+      ]
+    },
+    {
+      question: 'The customer is frustrated and angry, but their issue is within the agent\'s capability.',
+      context: '"This is ridiculous! I have been waiting for days! Fix this NOW!" -- but the issue is a simple billing correction.',
+      options: [
+        { text: 'Escalate to human because the customer is frustrated', correct: false, consequence: 'Escalating every frustrated customer wastes human agent time. Frustration alone is not an escalation criterion -- the agent should acknowledge the emotion and resolve the issue.' },
+        { text: 'Acknowledge frustration, then resolve the issue directly', correct: true, consequence: 'Correct! The agent should validate the customer\'s frustration ("I understand this has been frustrating") and then proceed to resolve the issue it is capable of handling.' }
+      ]
+    },
+    {
+      question: 'The agent needs to hand off to a human. What should the handoff include?',
+      context: 'A $300 refund for order #1234 has been approved. The customer wants confirmation via email.',
+      options: [
+        { text: 'Just the refund amount ($300)', correct: false, consequence: 'Incomplete! The human agent would need to re-discover the customer, the order, the root cause, and what has already been done. This wastes time and frustrates the customer.' },
+        { text: 'Customer ID, root cause, actions taken, refund amount, and recommendation', correct: true, consequence: 'Correct! A comprehensive structured handoff enables the human agent to pick up exactly where the AI left off without redundant investigation.' }
+      ]
+    }
+  ];
+
+  var dtState = { step: 0, score: 0, total: dtData.length };
+
+  function renderDTStep(stepIdx) {
+    var container = document.getElementById('dtSteps');
+    container.innerHTML = '';
+
+    if (stepIdx >= dtData.length) {
+      showDTScore();
+      return;
+    }
+
+    var step = dtData[stepIdx];
+    var html = '<div class="dt-step active" id="dtStep' + stepIdx + '">';
+    html += '<div class="dt-step-num">Decision ' + (stepIdx + 1) + ' of ' + dtData.length + '</div>';
+    html += '<div class="dt-question">' + step.question + '</div>';
+    html += '<div class="dt-context">' + step.context + '</div>';
+    html += '<div class="dt-options">';
+
+    for (var o = 0; o < step.options.length; o++) {
+      html += '<button class="dt-option" data-dt-step="' + stepIdx + '" data-dt-opt="' + o + '" onclick="dtChoose(' + stepIdx + ',' + o + ')">';
+      html += step.options[o].text;
+      html += '</button>';
+    }
+
+    html += '</div>';
+    html += '<div class="dt-consequence" id="dtConsequence' + stepIdx + '"></div>';
+    html += '</div>';
+
+    container.innerHTML = html;
+
+    // Update progress dots
+    var dot = document.getElementById('dtDot' + stepIdx);
+    if (dot) dot.classList.add('current');
+  }
+
+  window.dtChoose = function(stepIdx, optIdx) {
+    var step = dtData[stepIdx];
+    var option = step.options[optIdx];
+    var buttons = document.querySelectorAll('.dt-option[data-dt-step="' + stepIdx + '"]');
+    var consequence = document.getElementById('dtConsequence' + stepIdx);
+
+    // Disable buttons
+    for (var b = 0; b < buttons.length; b++) {
+      buttons[b].classList.add('disabled');
+      if (step.options[parseInt(buttons[b].getAttribute('data-dt-opt'))].correct) {
+        buttons[b].classList.add('correct');
+      }
+      if (parseInt(buttons[b].getAttribute('data-dt-opt')) === optIdx && !option.correct) {
+        buttons[b].classList.add('wrong');
+      }
+    }
+
+    // Show consequence
+    consequence.textContent = option.consequence;
+    consequence.className = 'dt-consequence show ' + (option.correct ? 'good' : 'bad');
+
+    // Update score
+    var dot = document.getElementById('dtDot' + stepIdx);
+    if (dot) {
+      dot.classList.remove('current');
+      dot.classList.add(option.correct ? 'done-correct' : 'done-wrong');
+    }
+
+    if (option.correct) {
+      dtState.score++;
+    }
+    dtState.step++;
+
+    // Advance after delay
+    setTimeout(function() {
+      renderDTStep(dtState.step);
+    }, 2000);
+  };
+
+  function showDTScore() {
+    var display = document.getElementById('dtScoreDisplay');
+    var title = document.getElementById('dtScoreTitle');
+    var text = document.getElementById('dtScoreText');
+
+    display.classList.add('show');
+
+    var pct = Math.round((dtState.score / dtState.total) * 100);
+
+    if (pct >= 88) {
+      display.classList.add('excellent');
+      title.textContent = 'Excellent! ' + dtState.score + ' / ' + dtState.total + ' correct (' + pct + '%)';
+      text.textContent = 'You have a strong grasp of multi-agent architecture decisions. You would likely pass the Customer Support Agent scenario on the exam.';
+    } else if (pct >= 63) {
+      display.classList.add('good');
+      title.textContent = 'Good: ' + dtState.score + ' / ' + dtState.total + ' correct (' + pct + '%)';
+      text.textContent = 'You understand the basics but missed some key patterns. Review the sections on hub-and-spoke routing, programmatic enforcement, and structured handoffs before the exam.';
+    } else {
+      display.classList.add('needs-work');
+      title.textContent = 'Needs Work: ' + dtState.score + ' / ' + dtState.total + ' correct (' + pct + '%)';
+      text.textContent = 'Review all sections in this module carefully. Focus on: coordinator routing (not P2P), programmatic enforcement (not prompt-based), and parallel decomposition of multi-concern requests.';
+    }
+  }
+
+  // Initialize decision tree
+  renderDTStep(0);
+
+  // ==========================================
+  // HOOK EXERCISE
+  // ==========================================
+  var hookExpected = [
+    {
+      hookType: ['pretooluse', 'pre_tool_use', 'pre-tool-use', 'pretool'],
+      matcher: ['bash', 'shell', 'command', 'execute'],
+      logic: ['rm -rf', 'drop table', 'rm', 'drop', 'block', 'deny', 'reject', 'dangerous', 'destructive'],
+      explanation: 'A PreToolUse hook on the Bash tool that inspects the command content for dangerous patterns like "rm -rf" or "DROP TABLE" and blocks execution.'
+    },
+    {
+      hookType: ['posttooluse', 'post_tool_use', 'post-tool-use', 'posttool'],
+      matcher: ['edit', 'write', 'file_edit', 'code'],
+      logic: ['eslint', 'lint', 'validate', 'check', 'run eslint', 'quality'],
+      explanation: 'A PostToolUse hook on the Edit tool that runs eslint on the modified file after the edit completes. If eslint fails, the hook rejects the edit.'
+    },
+    {
+      hookType: ['stop', 'onstop', 'on_stop'],
+      matcher: ['stop', 'end', 'end_turn', 'completion'],
+      logic: ['phase', 'state', '5', 'complete', 'all', 'build', 'check', 'progress', 'file'],
+      explanation: 'A Stop hook that checks a state file or progress tracker for completed build phases. If fewer than 5 phases are done, it forces Claude to continue instead of stopping.'
+    }
+  ];
+
+  window.checkHook = function(idx) {
+    var textarea = document.getElementById('hookTextarea' + idx);
+    var feedback = document.getElementById('hookFeedback' + idx);
+    var input = textarea.value.toLowerCase();
+
+    if (!input.trim()) {
+      feedback.className = 'hook-feedback show fail';
+      feedback.textContent = 'Please write a hook configuration before checking.';
+      return;
+    }
+
+    var expected = hookExpected[idx];
+    var score = 0;
+    var maxScore = 3;
+    var details = [];
+
+    // Check hook type
+    var hasType = false;
+    for (var t = 0; t < expected.hookType.length; t++) {
+      if (input.indexOf(expected.hookType[t]) !== -1) { hasType = true; break; }
+    }
+    if (hasType) {
+      score++;
+      details.push('Hook type: correct');
+    } else {
+      details.push('Hook type: not detected -- expected ' + expected.hookType[0]);
+    }
+
+    // Check matcher
+    var hasMatcher = false;
+    for (var m = 0; m < expected.matcher.length; m++) {
+      if (input.indexOf(expected.matcher[m]) !== -1) { hasMatcher = true; break; }
+    }
+    if (hasMatcher) {
+      score++;
+      details.push('Matcher: correct');
+    } else {
+      details.push('Matcher: not detected -- should target the right tool');
+    }
+
+    // Check logic
+    var logicMatches = 0;
+    for (var l = 0; l < expected.logic.length; l++) {
+      if (input.indexOf(expected.logic[l]) !== -1) { logicMatches++; }
+    }
+    if (logicMatches >= 2) {
+      score++;
+      details.push('Logic: reasonable');
+    } else if (logicMatches >= 1) {
+      score += 0.5;
+      details.push('Logic: partially correct');
+    } else {
+      details.push('Logic: needs more detail about what the hook checks');
+    }
+
+    // Display result
+    var resultClass = score >= 2.5 ? 'pass' : (score >= 1.5 ? 'partial' : 'fail');
+    var resultPrefix = score >= 2.5 ? 'Good! ' : (score >= 1.5 ? 'Partial credit. ' : 'Needs improvement. ');
+
+    feedback.className = 'hook-feedback show ' + resultClass;
+    feedback.textContent = resultPrefix + 'Score: ' + score + '/' + maxScore + '. ' + details.join(' | ') + '. Expected: ' + expected.explanation;
+  };
+
+  // ==========================================
+  // PRACTICE EXAM (10 QUESTIONS)
+  // ==========================================
+  var FINAL_QUIZ_KEY = 'claude-training-module-30';
+
+  var practiceExamData = [
+    {
+      scenario: "You are building a customer support agent. A customer asks about both a billing issue and a return request in the same message.",
+      question: "What is the best architectural approach?",
+      options: [
+        "Handle both issues in a single agent response sequentially",
+        "Decompose into distinct items, investigate each in parallel using shared context, then synthesize a unified resolution",
+        "Ask the customer to submit separate tickets for each issue",
+        "Route to the billing agent only, ignoring the return request"
+      ],
+      correct: 1,
+      explanation: "The coordinator should decompose multi-concern requests into distinct items and investigate each (potentially in parallel) before synthesizing a unified response. This ensures completeness without forcing the customer to repeat themselves."
+    },
+    {
+      scenario: "Your agentic loop processes tool results. Currently, the loop terminates by checking if Claude's response text contains the phrase 'Task complete'.",
+      question: "What is wrong with this approach?",
+      options: [
+        "Nothing -- this is the recommended pattern",
+        "It should check for 'Done' instead of 'Task complete'",
+        "It uses natural language parsing for loop termination instead of checking the stop_reason field, which is unreliable",
+        "The loop should never terminate automatically"
+      ],
+      correct: 2,
+      explanation: "Parsing natural language signals is an anti-pattern. The stop_reason field ('end_turn' vs 'tool_use') is the reliable, deterministic signal for loop control."
+    },
+    {
+      scenario: "A coordinator agent always routes all queries through its full pipeline of 5 subagents (web search, document analysis, data processing, synthesis, formatting), even for simple questions.",
+      question: "What is the primary issue?",
+      options: [
+        "The pipeline needs more subagents",
+        "The coordinator should dynamically select which subagents to invoke based on query complexity",
+        "Simple questions should be routed to a different coordinator",
+        "All 5 subagents should run in parallel instead of sequentially"
+      ],
+      correct: 1,
+      explanation: "Coordinators should analyze query requirements and dynamically select subagents. Always running the full pipeline wastes resources on simple queries that only need 1-2 agents."
+    },
+    {
+      scenario: "A refund processing agent must verify customer identity before issuing refunds. Currently, this is enforced via a system prompt instruction: 'Always verify identity before processing refunds.'",
+      question: "Why is this approach insufficient for production?",
+      options: [
+        "System prompts are not read by the agent",
+        "Prompt instructions have non-zero failure rate -- programmatic enforcement via hooks/prerequisite gates is needed for deterministic compliance",
+        "The instruction should be in CLAUDE.md instead",
+        "The system prompt needs to be longer and more detailed"
+      ],
+      correct: 1,
+      explanation: "When deterministic compliance is required (like identity verification before financial operations), prompt-based enforcement is insufficient. Use programmatic prerequisites that block downstream tool calls until prerequisites complete."
+    },
+    {
+      scenario: "Your research system's synthesis agent consistently produces reports with gaps in certain topic areas.",
+      question: "What coordinator-level change would address this?",
+      options: [
+        "Use a larger model for the synthesis agent",
+        "Implement iterative refinement loops where the coordinator evaluates synthesis output for gaps and re-delegates targeted queries",
+        "Add more subagents to the pipeline",
+        "Increase the synthesis agent's token budget"
+      ],
+      correct: 1,
+      explanation: "Iterative refinement loops are key: the coordinator evaluates synthesis output, identifies gaps, re-delegates to search/analysis subagents with targeted queries, and re-invokes synthesis until coverage is sufficient."
+    },
+    {
+      scenario: "You are designing a multi-agent code review system. You want to review a 500-line PR across 8 files.",
+      question: "What is the most effective decomposition strategy?",
+      options: [
+        "One agent reviews all 8 files in a single pass",
+        "Split into per-file local analysis passes plus a separate cross-file integration pass to avoid attention dilution",
+        "One agent per line of code",
+        "Random assignment of files to available agents"
+      ],
+      correct: 1,
+      explanation: "Per-file local passes catch file-specific issues, while a separate cross-file integration pass catches data flow issues, API contract mismatches, and consistency problems. This avoids attention dilution that occurs when reviewing everything at once."
+    },
+    {
+      scenario: "A subagent needs access to findings from a prior web search agent. The coordinator has these results in its conversation history.",
+      question: "How should the coordinator pass this context?",
+      options: [
+        "The subagent automatically inherits the coordinator's conversation history",
+        "Include complete findings directly in the subagent's prompt with structured data formats separating content from metadata",
+        "Save to a shared database and tell the subagent the table name",
+        "Use fork_session to share memory between agents"
+      ],
+      correct: 1,
+      explanation: "Subagents do NOT inherit parent context. Context must be explicitly provided in the prompt. Use structured formats to separate content from metadata (source URLs, document names) to preserve attribution."
+    },
+    {
+      scenario: "You need to explore two different testing strategies from a shared codebase analysis.",
+      question: "Which session management approach is most appropriate?",
+      options: [
+        "Start two completely new sessions with no shared context",
+        "Use fork_session to create independent branches from the shared analysis baseline",
+        "Run both strategies sequentially in the same session",
+        "Use --resume to switch between two named sessions"
+      ],
+      correct: 1,
+      explanation: "fork_session creates parallel exploration branches from a shared baseline, ideal for comparing approaches without redundant analysis."
+    },
+    {
+      scenario: "A PostToolUse hook normalizes timestamps from different MCP tools. One tool returns Unix timestamps, another returns ISO 8601, and a third returns 'MM/DD/YYYY'.",
+      question: "What is the primary benefit of this normalization hook?",
+      options: [
+        "It makes the timestamps display better in logs",
+        "It ensures the agent processes consistent data formats, preventing errors from heterogeneous tool outputs",
+        "It reduces the number of tokens used",
+        "It speeds up tool execution"
+      ],
+      correct: 1,
+      explanation: "PostToolUse hooks that normalize heterogeneous data formats prevent the agent from processing inconsistent inputs, which could lead to errors in reasoning about temporal relationships."
+    },
+    {
+      scenario: "You are resuming a Claude Code session after making changes to files the agent previously analyzed.",
+      question: "What is the recommended approach?",
+      options: [
+        "Just resume and Claude will detect the changes automatically",
+        "Inform the resumed session about specific file changes for targeted re-analysis rather than requiring full re-exploration",
+        "Delete the session and start from scratch",
+        "Roll back the file changes before resuming"
+      ],
+      correct: 1,
+      explanation: "When resuming sessions after code modifications, inform the agent about specific changes. This enables targeted re-analysis without the cost of full re-exploration. If many files changed, starting fresh with injected summaries may be more reliable."
+    }
+  ];
+
+  var finalQuizSelections = [];
+  var finalQuizSubmitted = false;
+
+  for (var fi = 0; fi < practiceExamData.length; fi++) {
+    finalQuizSelections.push(null);
+  }
+
+  function renderFinalQuiz() {
+    var container = document.getElementById('finalQuizQuestions');
+    var html = '';
+
+    for (var qi = 0; qi < practiceExamData.length; qi++) {
+      var q = practiceExamData[qi];
+      html += '<div class="final-quiz-question" data-fq="' + qi + '">';
+      html += '<div class="fq-number">Question ' + (qi + 1) + ' of ' + practiceExamData.length + '</div>';
+      html += '<div class="fq-scenario">' + q.scenario + '</div>';
+      html += '<div class="fq-text">' + q.question + '</div>';
+      html += '<ul class="fq-options">';
+
+      for (var oi = 0; oi < q.options.length; oi++) {
+        html += '<li class="fq-option" data-fq-idx="' + qi + '" data-fq-val="' + oi + '" onclick="selectFinalOption(' + qi + ', this)">';
+        html += '<input type="radio" name="fq' + qi + '" value="' + oi + '"> ';
+        html += q.options[oi];
+        html += '</li>';
+      }
+
+      html += '</ul>';
+      html += '<div class="fq-explanation" id="fqExplanation' + qi + '"></div>';
+      html += '</div>';
+    }
+
+    container.innerHTML = html;
+  }
+
+  window.selectFinalOption = function(qIdx, el) {
+    if (finalQuizSubmitted) return;
+
+    var parentQ = el.closest('.final-quiz-question');
+    var options = parentQ.querySelectorAll('.fq-option');
+    for (var o = 0; o < options.length; o++) {
+      options[o].querySelector('input').checked = false;
+      options[o].style.background = '';
+    }
+
+    el.querySelector('input').checked = true;
+    finalQuizSelections[qIdx] = parseInt(el.getAttribute('data-fq-val'));
+
+    // Enable submit if all answered
+    var allAnswered = true;
+    for (var a = 0; a < finalQuizSelections.length; a++) {
+      if (finalQuizSelections[a] === null) { allAnswered = false; break; }
+    }
+    document.getElementById('finalSubmitBtn').disabled = !allAnswered;
+  };
+
+  window.submitFinalQuiz = function() {
+    if (finalQuizSubmitted) return;
+    finalQuizSubmitted = true;
+
+    var score = 0;
+
+    for (var idx = 0; idx < practiceExamData.length; idx++) {
+      var sel = finalQuizSelections[idx];
+      var correct = practiceExamData[idx].correct;
+      var questionEl = document.querySelector('.final-quiz-question[data-fq="' + idx + '"]');
+      var options = questionEl.querySelectorAll('.fq-option');
+      var explanationEl = document.getElementById('fqExplanation' + idx);
+
+      for (var oi = 0; oi < options.length; oi++) {
+        var val = parseInt(options[oi].getAttribute('data-fq-val'));
+        options[oi].style.pointerEvents = 'none';
+
+        if (val === correct) {
+          if (sel === val) {
+            options[oi].classList.add('selected-correct');
+            score++;
+          } else {
+            options[oi].classList.add('reveal-correct');
+          }
+        } else if (val === sel) {
+          options[oi].classList.add('selected-wrong');
+        }
+      }
+
+      // Show explanation
+      var isCorrect = sel === correct;
+      explanationEl.className = 'fq-explanation show ' + (isCorrect ? 'correct-exp' : 'wrong-exp');
+      explanationEl.textContent = (isCorrect ? 'Correct! ' : 'Incorrect. ') + practiceExamData[idx].explanation;
+    }
+
+    // Show result
+    var result = document.getElementById('finalResult');
+    var title = document.getElementById('finalResultTitle');
+    var text = document.getElementById('finalResultText');
+
+    result.classList.add('show');
+
+    var pct = Math.round((score / practiceExamData.length) * 100);
+
+    if (score >= 7) {
+      result.classList.add('pass');
+      result.classList.remove('fail');
+      title.textContent = 'Passed! ' + score + ' / ' + practiceExamData.length + ' correct (' + pct + '%)';
+      text.textContent = 'Strong performance on Domain 1. You demonstrate solid understanding of agentic architecture patterns, orchestration, and enforcement strategies. Your progress has been saved. Continue to Module 31 for the next certification domain.';
+    } else {
+      result.classList.add('fail');
+      result.classList.remove('pass');
+      title.textContent = score + ' / ' + practiceExamData.length + ' correct (' + pct + '%) -- Review needed';
+      text.textContent = 'You need at least 7 correct answers to pass. Review the sections above, focusing on: agentic loop control via stop_reason, hub-and-spoke orchestration, programmatic enforcement vs prompts, context passing to subagents, and task decomposition strategies.';
+    }
+
+    // Save progress
+    var progressData = {
+      score: score,
+      total: practiceExamData.length,
+      completed: score >= 7,
+      pct: pct,
+      timestamp: new Date().toISOString()
+    };
+
+    try {
+      localStorage.setItem(FINAL_QUIZ_KEY, JSON.stringify(progressData));
+    } catch (e) {
+      // localStorage may be unavailable
+    }
+
+    // Disable submit button
+    document.getElementById('finalSubmitBtn').disabled = true;
+    document.getElementById('finalSubmitBtn').textContent = 'Submitted';
+  };
+
+  renderFinalQuiz();
+
+  // Check for existing progress
+  function loadExistingProgress() {
+    try {
+      var saved = localStorage.getItem(FINAL_QUIZ_KEY);
+      if (saved) {
+        var data = JSON.parse(saved);
+        if (data.completed) {
+          var fill = document.getElementById('sidebarProgressFill');
+          if (fill) {
+            fill.style.width = '100%';
+          }
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+  }
+  loadExistingProgress();
+
+})();
+</script>
+</body>
+</html>

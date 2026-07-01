@@ -1,0 +1,11 @@
+# Documentos que NÃO devem ir para o repositório
+*.pdf
+*.pptx
+*.ppt
+
+# Backups
+*.bak
+
+# Sistema
+.DS_Store
+Thumbs.db

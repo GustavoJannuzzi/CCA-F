@@ -1,0 +1,3675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 99: Capstone Project | Claude AI Training</title>
+<style>
+/* ============================================
+   CSS CUSTOM PROPERTIES & DESIGN SYSTEM
+   Premium Edition with 3-layer shadows, spring
+   transitions, gradient headings, deep dark mode
+   ============================================ */
+:root {
+  --primary: #7C3AED;
+  --primary-light: #A78BFA;
+  --primary-dark: #5B21B6;
+  --accent: #06B6D4;
+  --accent-light: #22D3EE;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  --bg: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --bg-code: #F1F5F9;
+  --text: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --border: #E2E8F0;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04), 0 0px 0px rgba(124,58,237,0);
+  --shadow-lg: 0 4px 12px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.06), 0 0 0 rgba(124,58,237,0);
+  --shadow-glow: 0 4px 12px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.06), 0 0 24px rgba(124,58,237,0.12);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --transition: 0.2s ease;
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --sidebar-width: 280px;
+  --content-max: 800px;
+}
+
+[data-theme="dark"] {
+  --bg: #0B0F1A;
+  --bg-card: #141926;
+  --bg-code: #1A2030;
+  --text: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --border: #1E293B;
+  --shadow: 0 1px 3px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.2), 0 0 0 rgba(124,58,237,0);
+  --shadow-lg: 0 4px 12px rgba(0,0,0,0.4), 0 12px 32px rgba(0,0,0,0.3), 0 0 0 rgba(124,58,237,0);
+  --shadow-glow: 0 4px 12px rgba(0,0,0,0.4), 0 12px 32px rgba(0,0,0,0.3), 0 0 32px rgba(124,58,237,0.15);
+}
+
+/* ============================================
+   REDUCED MOTION
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  html { scroll-behavior: auto; }
+}
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 24px;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  min-height: 100vh;
+  transition: background var(--transition), color var(--transition);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   THEME TOGGLE
+   ============================================ */
+.theme-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: all 0.3s var(--spring);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+.theme-toggle:hover {
+  box-shadow: var(--shadow-glow);
+  transform: scale(1.08);
+}
+
+/* ============================================
+   SIDEBAR
+   ============================================ */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  z-index: 900;
+  transition: transform 0.3s ease, background var(--transition);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.sidebar-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+  margin-bottom: 12px;
+  transition: color var(--transition);
+}
+.sidebar-back:hover { color: var(--primary-dark); }
+
+.sidebar-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.sidebar-module-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.sidebar-nav {
+  padding: 12px 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.sidebar-section {
+  margin-bottom: 4px;
+}
+
+.sidebar-section-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 20px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  text-align: left;
+  transition: color var(--transition);
+}
+.sidebar-section-toggle:hover { color: var(--text); }
+.sidebar-section-toggle .chevron {
+  transition: transform 0.2s ease;
+  font-size: 0.65rem;
+}
+.sidebar-section-toggle.collapsed .chevron {
+  transform: rotate(-90deg);
+}
+
+.sidebar-links {
+  list-style: none;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.sidebar-links.collapsed {
+  max-height: 0 !important;
+}
+
+.sidebar-link {
+  display: block;
+  padding: 7px 20px 7px 32px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: all var(--transition);
+  line-height: 1.4;
+}
+.sidebar-link:hover {
+  color: var(--text);
+  background: var(--bg);
+}
+.sidebar-link.active {
+  color: var(--primary);
+  border-left-color: var(--primary);
+  background: rgba(124, 58, 237, 0.05);
+  font-weight: 600;
+}
+[data-theme="dark"] .sidebar-link.active {
+  background: rgba(124, 58, 237, 0.12);
+}
+
+.sidebar-progress {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sidebar-progress-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.sidebar-progress-track {
+  height: 6px;
+  background: var(--bg-code);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.sidebar-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 3px;
+  transition: width 0.5s ease;
+  width: 0%;
+}
+
+/* Hamburger button (mobile) */
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1001;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+  transition: all var(--transition);
+}
+.hamburger span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--text);
+  margin: 4px auto;
+  transition: all 0.3s ease;
+  border-radius: 1px;
+}
+.hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(4px, 4px); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(4px, -4px); }
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 899;
+}
+
+/* ============================================
+   MAIN CONTENT
+   ============================================ */
+.main-content {
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+  transition: margin var(--transition);
+}
+
+.content-wrapper {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 40px 32px 80px;
+}
+
+/* Module Header */
+.module-header {
+  margin-bottom: 48px;
+}
+.module-header .breadcrumb {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+.module-header .breadcrumb a {
+  color: var(--primary);
+  text-decoration: none;
+}
+.module-header .breadcrumb a:hover { text-decoration: underline; }
+
+.module-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.module-badge .number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.module-badge .label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.module-header h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.module-header .description {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 640px;
+}
+
+.module-meta {
+  display: flex;
+  gap: 16px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.module-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  background: var(--bg-code);
+  padding: 6px 14px;
+  border-radius: 20px;
+}
+
+/* ============================================
+   SECTIONS
+   ============================================ */
+.section {
+  margin-bottom: 56px;
+  scroll-margin-top: 24px;
+}
+
+.section-heading {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+  line-height: 1.3;
+}
+
+.section h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-top: 32px;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.section h4 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-top: 24px;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.section p {
+  margin-bottom: 16px;
+  color: var(--text-secondary);
+}
+
+.section ul, .section ol {
+  margin-bottom: 16px;
+  padding-left: 24px;
+}
+.section li {
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+}
+.section li strong {
+  color: var(--text);
+}
+
+/* ============================================
+   ACCENT CARDS with ::before gradient bars
+   ============================================ */
+.accent-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin: 20px 0;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s var(--spring), box-shadow 0.3s var(--spring), transform 0.3s var(--spring);
+}
+.accent-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.accent-card:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+}
+.accent-card h4 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.accent-card p {
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+.accent-card p:last-child { margin-bottom: 0; }
+.accent-card ul {
+  padding-left: 20px;
+  margin-bottom: 12px;
+}
+.accent-card li {
+  margin-bottom: 6px;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+}
+
+/* ============================================
+   CALLOUT BOXES
+   ============================================ */
+.callout {
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  margin: 20px 0;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.callout-icon {
+  flex-shrink: 0;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+.callout-content { flex: 1; }
+.callout-content p { margin-bottom: 6px; color: inherit; }
+.callout-content p:last-child { margin-bottom: 0; }
+
+.callout.info {
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  color: #1E40AF;
+}
+.callout.tip {
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  color: #166534;
+}
+.callout.warning {
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  color: #92400E;
+}
+.callout.important {
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  color: #991B1B;
+}
+
+[data-theme="dark"] .callout.info {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: #93C5FD;
+}
+[data-theme="dark"] .callout.tip {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #6EE7B7;
+}
+[data-theme="dark"] .callout.warning {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #FCD34D;
+}
+[data-theme="dark"] .callout.important {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #FCA5A5;
+}
+
+/* ============================================
+   TRACK SELECTOR CARDS
+   ============================================ */
+.track-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 24px 0;
+}
+.track-card {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s var(--spring), box-shadow 0.3s var(--spring), transform 0.3s var(--spring);
+}
+.track-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: var(--radius) var(--radius) 0 0;
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
+}
+.track-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-glow);
+}
+.track-card:hover::before {
+  opacity: 1;
+}
+.track-card.selected {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-glow);
+}
+.track-card.selected::before {
+  opacity: 1;
+}
+
+.track-card.business::before { background: linear-gradient(90deg, #7C3AED, #A78BFA); }
+.track-card.developer::before { background: linear-gradient(90deg, #06B6D4, #22D3EE); }
+.track-card.architect::before { background: linear-gradient(90deg, #F59E0B, #FBBF24); }
+.track-card.consultant::before { background: linear-gradient(90deg, #10B981, #34D399); }
+
+.track-card.business.selected { border-color: #7C3AED; }
+.track-card.developer.selected { border-color: #06B6D4; }
+.track-card.architect.selected { border-color: #F59E0B; }
+.track-card.consultant.selected { border-color: #10B981; }
+
+.track-card-icon {
+  font-size: 2rem;
+  margin-bottom: 12px;
+  display: block;
+}
+.track-card-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.track-card-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+.track-card-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.track-tag {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 12px;
+  background: var(--bg-code);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.track-recommended {
+  display: none;
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.track-recommended.show { display: inline-block; }
+
+.track-selected-indicator {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.track-card.selected .track-selected-indicator { display: flex; }
+.track-card.selected .track-recommended { display: none; }
+
+/* ============================================
+   TRACK CONTENT PANELS
+   ============================================ */
+.track-panel {
+  display: none;
+}
+.track-panel.active {
+  display: block;
+}
+
+/* ============================================
+   FORM ELEMENTS
+   ============================================ */
+.form-group {
+  margin-bottom: 20px;
+}
+.form-label {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.form-sublabel {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+.form-input,
+.form-textarea,
+.form-select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+}
+.form-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+.form-row {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.form-row.cols-2 { grid-template-columns: 1fr 1fr; }
+.form-row.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+.form-row.cols-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+.form-row.cols-5 { grid-template-columns: 2fr 3fr 2fr 2fr 1fr; }
+
+/* ============================================
+   INTERACTIVE TABLE (editable rows)
+   ============================================ */
+.interactive-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  margin: 16px 0;
+}
+.interactive-table th {
+  background: var(--primary);
+  color: white;
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.82rem;
+}
+.interactive-table th:first-child {
+  border-radius: var(--radius-sm) 0 0 0;
+}
+.interactive-table th:last-child {
+  border-radius: 0 var(--radius-sm) 0 0;
+}
+.interactive-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+}
+.interactive-table td input,
+.interactive-table td select,
+.interactive-table td textarea {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.85rem;
+  transition: border-color 0.2s ease;
+}
+.interactive-table td input:focus,
+.interactive-table td select:focus,
+.interactive-table td textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+.interactive-table td textarea {
+  resize: vertical;
+  min-height: 36px;
+}
+
+/* ============================================
+   ROI CALCULATOR
+   ============================================ */
+.roi-calc {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  margin: 24px 0;
+}
+.roi-result {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  margin-top: 24px;
+}
+.roi-metric {
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  text-align: center;
+}
+.roi-metric-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+.roi-metric-value.positive { color: var(--success); }
+.roi-metric-value.negative { color: var(--error); }
+.roi-metric-value.neutral { color: var(--primary); }
+.roi-metric-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ============================================
+   TIMELINE BUILDER
+   ============================================ */
+.timeline {
+  position: relative;
+  padding-left: 32px;
+  margin: 24px 0;
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 14px;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--primary), var(--accent));
+  border-radius: 1px;
+}
+.timeline-phase {
+  position: relative;
+  margin-bottom: 24px;
+  padding: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: border-color 0.3s var(--spring), box-shadow 0.3s var(--spring);
+}
+.timeline-phase:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow);
+}
+.timeline-phase::before {
+  content: '';
+  position: absolute;
+  left: -26px;
+  top: 24px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--primary);
+  border: 2px solid var(--bg);
+  box-shadow: 0 0 0 2px var(--primary);
+}
+.timeline-phase-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.timeline-phase-weeks {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 10px;
+  background: rgba(124, 58, 237, 0.08);
+  border-radius: 12px;
+}
+.timeline-phase-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* ============================================
+   RUBRIC / SELF-ASSESSMENT
+   ============================================ */
+.rubric {
+  background: var(--bg-card);
+  border: 2px solid var(--primary-light);
+  border-radius: var(--radius);
+  padding: 28px;
+  margin: 32px 0;
+}
+.rubric h3 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 1.15rem;
+}
+.rubric-dimension {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+.rubric-dimension:last-of-type {
+  border-bottom: none;
+}
+.rubric-dimension-label {
+  flex: 1;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.rubric-stars {
+  display: flex;
+  gap: 4px;
+}
+.rubric-star {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  transition: all 0.2s var(--spring);
+  font-weight: 600;
+}
+.rubric-star:hover {
+  border-color: var(--primary-light);
+  color: var(--primary);
+  transform: scale(1.1);
+}
+.rubric-star.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+.rubric-score-display {
+  text-align: center;
+  padding: 20px;
+  margin-top: 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+}
+.rubric-score-value {
+  font-size: 2rem;
+  font-weight: 800;
+}
+.rubric-score-value.pass { color: var(--success); }
+.rubric-score-value.needs-work { color: var(--warning); }
+.rubric-score-value.fail { color: var(--error); }
+.rubric-score-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+.rubric-pass-msg {
+  margin-top: 12px;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 0.92rem;
+  display: none;
+}
+.rubric-pass-msg.show { display: block; }
+.rubric-pass-msg.pass {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #059669;
+}
+.rubric-pass-msg.needs-work {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #92400E;
+}
+[data-theme="dark"] .rubric-pass-msg.pass { color: #6EE7B7; }
+[data-theme="dark"] .rubric-pass-msg.needs-work { color: #FCD34D; }
+
+/* ============================================
+   CERTIFICATE
+   ============================================ */
+.certificate-section {
+  display: none;
+  margin-top: 48px;
+}
+.certificate-section.show {
+  display: block;
+}
+.certificate-name-input {
+  margin-bottom: 24px;
+}
+.certificate {
+  background: linear-gradient(135deg, #F8FAFC 0%, #EDE9FE 30%, #DBEAFE 70%, #F0FDF4 100%);
+  border: 3px solid var(--primary);
+  border-radius: var(--radius);
+  padding: 48px 40px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+[data-theme="dark"] .certificate {
+  background: linear-gradient(135deg, #141926 0%, #1E1B4B 30%, #0C1929 70%, #0D2818 100%);
+}
+.certificate::before,
+.certificate::after {
+  content: '';
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border: 3px solid rgba(124, 58, 237, 0.15);
+  border-radius: 50%;
+}
+.certificate::before {
+  top: -20px;
+  left: -20px;
+}
+.certificate::after {
+  bottom: -20px;
+  right: -20px;
+}
+.certificate-header {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--primary);
+  margin-bottom: 8px;
+}
+.certificate-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+}
+.certificate-subtitle {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+}
+.certificate-name {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text);
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--primary);
+  display: inline-block;
+  margin-bottom: 24px;
+  min-width: 250px;
+}
+.certificate-details {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.certificate-detail {
+  text-align: center;
+}
+.certificate-detail-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+.certificate-detail-value {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.certificate-footer {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 16px;
+}
+
+/* ============================================
+   EXPANDABLE SECTIONS
+   ============================================ */
+.expandable {
+  margin: 16px 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.expandable-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: var(--bg-card);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text);
+  transition: background 0.2s ease;
+}
+.expandable-header:hover {
+  background: var(--bg);
+}
+.expandable-chevron {
+  transition: transform 0.3s var(--spring);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+.expandable.open .expandable-chevron {
+  transform: rotate(180deg);
+}
+.expandable-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+.expandable.open .expandable-body {
+  max-height: 3000px;
+}
+.expandable-content {
+  padding: 18px;
+  border-top: 1px solid var(--border);
+}
+
+/* ============================================
+   REVEAL BUTTON (show example after user writes)
+   ============================================ */
+.reveal-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 8px;
+}
+.reveal-btn:hover {
+  border-color: var(--primary-light);
+  color: var(--primary);
+}
+.reveal-content {
+  display: none;
+  margin-top: 12px;
+  padding: 16px;
+  background: rgba(16, 185, 129, 0.06);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+.reveal-content.show { display: block; }
+[data-theme="dark"] .reveal-content {
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.25);
+}
+
+/* ============================================
+   WORD COUNTER
+   ============================================ */
+.word-count {
+  text-align: right;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s var(--spring);
+  font-family: inherit;
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow);
+}
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  background: var(--bg-card);
+  color: var(--primary);
+  border: 1px solid var(--primary-light);
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s var(--spring);
+  font-family: inherit;
+  text-decoration: none;
+}
+.btn-secondary:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+  background: rgba(124, 58, 237, 0.05);
+}
+
+/* ============================================
+   PROMPT QUALITY SCORER
+   ============================================ */
+.prompt-scorer {
+  margin-top: 12px;
+  padding: 12px 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+}
+.prompt-scorer-bar {
+  height: 8px;
+  background: var(--bg-code);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 8px 0;
+}
+.prompt-scorer-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.4s ease, background 0.4s ease;
+  width: 0%;
+}
+.prompt-scorer-fill.low { background: var(--error); }
+.prompt-scorer-fill.medium { background: var(--warning); }
+.prompt-scorer-fill.high { background: var(--success); }
+.prompt-scorer-tips {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* ============================================
+   NAVIGATION FOOTER
+   ============================================ */
+.module-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 16px;
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 2px solid var(--border);
+}
+.nav-link {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: all 0.3s var(--spring);
+  min-width: 0;
+  flex: 1;
+  max-width: 50%;
+}
+.nav-link:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow);
+  transform: translateY(-2px);
+}
+.nav-link.next { align-items: flex-end; text-align: right; }
+.nav-link .nav-dir {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--primary);
+}
+.nav-link .nav-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================
+   KEY CONCEPT HIGHLIGHT
+   ============================================ */
+.key-concept {
+  display: inline-block;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(6, 182, 212, 0.1));
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  color: var(--primary);
+}
+[data-theme="dark"] .key-concept {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(6, 182, 212, 0.15));
+  border-color: rgba(124, 58, 237, 0.35);
+}
+
+/* ============================================
+   PRINT STYLES (for certificate)
+   ============================================ */
+@media print {
+  .sidebar, .hamburger, .sidebar-overlay, .theme-toggle,
+  .module-nav, .module-header, .section:not(#certificate-area),
+  .btn-primary, .btn-secondary, .no-print { display: none !important; }
+  .main-content { margin-left: 0 !important; }
+  .certificate-section { display: block !important; }
+  .certificate { border-width: 2px; page-break-inside: avoid; }
+  body { background: white; }
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 1024px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .hamburger { display: flex; }
+  .sidebar-overlay.show { display: block; }
+  .main-content { margin-left: 0; }
+  .theme-toggle { right: 16px; }
+}
+
+@media (max-width: 768px) {
+  .track-grid { grid-template-columns: 1fr; }
+  .roi-result { grid-template-columns: 1fr; }
+  .form-row.cols-2,
+  .form-row.cols-3,
+  .form-row.cols-4,
+  .form-row.cols-5 { grid-template-columns: 1fr; }
+  .certificate-details { flex-direction: column; gap: 12px; }
+}
+
+@media (max-width: 640px) {
+  .content-wrapper { padding: 24px 16px 60px; }
+  .module-header h1 { font-size: 1.6rem; }
+  .section-heading { font-size: 1.3rem; }
+  .module-nav { flex-direction: column; }
+  .nav-link { max-width: 100%; }
+  .nav-link.next { align-items: flex-start; text-align: left; }
+  .certificate { padding: 32px 20px; }
+  .certificate-title { font-size: 1.3rem; }
+  .certificate-name { font-size: 1.2rem; }
+}
+
+/* ============================================
+   SCROLLBAR STYLING
+   ============================================ */
+.sidebar::-webkit-scrollbar { width: 6px; height: 6px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.section {
+  animation: fadeInUp 0.4s ease both;
+}
+
+/* ============================================
+   HIDDEN UTILITY
+   ============================================ */
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+<!-- ============================================
+     THEME TOGGLE
+     ============================================ -->
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+  <span id="themeIcon">&#9790;</span>
+</button>
+
+<!-- ============================================
+     HAMBURGER (mobile)
+     ============================================ -->
+<button class="hamburger" id="hamburger" aria-label="Toggle sidebar">
+  <span></span>
+  <span></span>
+  <span></span>
+</button>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ============================================
+     SIDEBAR
+     ============================================ -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="../index.html" class="sidebar-back">&larr; Back to Hub</a>
+    <div class="sidebar-title">Module 99</div>
+    <div class="sidebar-module-name">Capstone Project</div>
+  </div>
+
+  <div class="sidebar-nav">
+    <!-- Section: Getting Started -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="start">
+        Getting Started <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-start">
+        <li><a href="#track-selector" class="sidebar-link" data-target="track-selector">Choose Your Track</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Business Track -->
+    <div class="sidebar-section" id="sidebar-business">
+      <button class="sidebar-section-toggle" data-section="business">
+        Business Track <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-business">
+        <li><a href="#b-use-cases" class="sidebar-link" data-target="b-use-cases">Use Case Identification</a></li>
+        <li><a href="#b-governance" class="sidebar-link" data-target="b-governance">Governance Framework</a></li>
+        <li><a href="#b-roi" class="sidebar-link" data-target="b-roi">ROI Projection</a></li>
+        <li><a href="#b-rollout" class="sidebar-link" data-target="b-rollout">Rollout Timeline</a></li>
+        <li><a href="#b-rubric" class="sidebar-link" data-target="b-rubric">Self-Assessment</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Developer Track -->
+    <div class="sidebar-section" id="sidebar-developer">
+      <button class="sidebar-section-toggle" data-section="developer">
+        Developer Track <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-developer">
+        <li><a href="#d-architecture" class="sidebar-link" data-target="d-architecture">Architecture Design</a></li>
+        <li><a href="#d-prompts" class="sidebar-link" data-target="d-prompts">Prompt Engineering</a></li>
+        <li><a href="#d-errors" class="sidebar-link" data-target="d-errors">Error Handling</a></li>
+        <li><a href="#d-evaluation" class="sidebar-link" data-target="d-evaluation">Evaluation Plan</a></li>
+        <li><a href="#d-rubric" class="sidebar-link" data-target="d-rubric">Self-Assessment</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Architect Track -->
+    <div class="sidebar-section" id="sidebar-architect">
+      <button class="sidebar-section-toggle" data-section="architect">
+        Architect Track <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-architect">
+        <li><a href="#a-agents" class="sidebar-link" data-target="a-agents">Agent Architecture</a></li>
+        <li><a href="#a-tools" class="sidebar-link" data-target="a-tools">Tool &amp; MCP Design</a></li>
+        <li><a href="#a-reliability" class="sidebar-link" data-target="a-reliability">Reliability Design</a></li>
+        <li><a href="#a-eval" class="sidebar-link" data-target="a-eval">Evaluation Framework</a></li>
+        <li><a href="#a-rubric" class="sidebar-link" data-target="a-rubric">Self-Assessment</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Consultant Track -->
+    <div class="sidebar-section" id="sidebar-consultant">
+      <button class="sidebar-section-toggle" data-section="consultant">
+        Consultant Track <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-consultant">
+        <li><a href="#c-summary" class="sidebar-link" data-target="c-summary">Executive Summary</a></li>
+        <li><a href="#c-showcase" class="sidebar-link" data-target="c-showcase">Use Case Showcase</a></li>
+        <li><a href="#c-positioning" class="sidebar-link" data-target="c-positioning">Competitive Positioning</a></li>
+        <li><a href="#c-objections" class="sidebar-link" data-target="c-objections">Objection Handling</a></li>
+        <li><a href="#c-rubric" class="sidebar-link" data-target="c-rubric">Self-Assessment</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Certificate -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="completion">
+        Completion <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-completion">
+        <li><a href="#certificate-area" class="sidebar-link" data-target="certificate-area">Certificate</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sidebar-progress">
+    <div class="sidebar-progress-label">Module Progress</div>
+    <div class="sidebar-progress-track">
+      <div class="sidebar-progress-fill" id="sidebarProgressFill"></div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================
+     MAIN CONTENT
+     ============================================ -->
+<main class="main-content">
+  <div class="content-wrapper">
+
+    <!-- Module Header -->
+    <header class="module-header">
+      <div class="breadcrumb">
+        <a href="../index.html">Training Hub</a> &raquo; Module 99
+      </div>
+      <div class="module-badge">
+        <span class="number">99</span>
+        <span class="label">Capstone</span>
+      </div>
+      <h1>Capstone Project</h1>
+      <p class="description">
+        Apply everything you have learned across the training program in a comprehensive, hands-on project tailored to your role. Choose from four tracks -- Business, Developer, Architect, or Consultant -- and create a real-world deliverable that demonstrates your Claude AI mastery.
+      </p>
+      <div class="module-meta">
+        <span class="module-meta-item">&#9201; ~120 min</span>
+        <span class="module-meta-item">&#127919; All Levels (4 Tracks)</span>
+        <span class="module-meta-item">&#127891; Certificate on Completion</span>
+      </div>
+    </header>
+
+
+    <!-- ========================================
+         SECTION: TRACK SELECTOR
+         ======================================== -->
+    <section class="section" id="track-selector">
+      <h2 class="section-heading">Choose Your Track</h2>
+
+      <p>
+        Select the capstone track that best matches your role and goals. Each track provides a structured project with clear deliverables and a self-assessment rubric. Your assessment profile recommendation (if available) is shown below.
+      </p>
+
+      <div class="callout info">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>Tip:</strong> You can complete multiple tracks if you want to build cross-functional skills. Your progress for each track is saved independently.</p>
+        </div>
+      </div>
+
+      <div class="track-grid">
+        <!-- Business Track Card -->
+        <div class="track-card business" onclick="selectTrack('business')" id="track-card-business">
+          <span class="track-recommended" id="rec-business">Recommended</span>
+          <span class="track-selected-indicator">&#10003;</span>
+          <span class="track-card-icon">&#128188;</span>
+          <div class="track-card-title">Business Track</div>
+          <div class="track-card-subtitle">Design a Claude Deployment Plan for a mid-size insurance company</div>
+          <div class="track-card-meta">
+            <span class="track-tag">Leaders</span>
+            <span class="track-tag">Business Users</span>
+          </div>
+        </div>
+
+        <!-- Developer Track Card -->
+        <div class="track-card developer" onclick="selectTrack('developer')" id="track-card-developer">
+          <span class="track-recommended" id="rec-developer">Recommended</span>
+          <span class="track-selected-indicator">&#10003;</span>
+          <span class="track-card-icon">&#128187;</span>
+          <div class="track-card-title">Developer Track</div>
+          <div class="track-card-subtitle">Build a Claude-Powered Customer Support Application</div>
+          <div class="track-card-meta">
+            <span class="track-tag">Developers</span>
+            <span class="track-tag">Engineers</span>
+          </div>
+        </div>
+
+        <!-- Architect Track Card -->
+        <div class="track-card architect" onclick="selectTrack('architect')" id="track-card-architect">
+          <span class="track-recommended" id="rec-architect">Recommended</span>
+          <span class="track-selected-indicator">&#10003;</span>
+          <span class="track-card-icon">&#127959;</span>
+          <div class="track-card-title">Architect Track</div>
+          <div class="track-card-subtitle">Design a Multi-Agent Document Processing System</div>
+          <div class="track-card-meta">
+            <span class="track-tag">Architects</span>
+            <span class="track-tag">Certification</span>
+          </div>
+        </div>
+
+        <!-- Consultant Track Card -->
+        <div class="track-card consultant" onclick="selectTrack('consultant')" id="track-card-consultant">
+          <span class="track-recommended" id="rec-consultant">Recommended</span>
+          <span class="track-selected-indicator">&#10003;</span>
+          <span class="track-card-icon">&#128202;</span>
+          <div class="track-card-title">Consultant Track</div>
+          <div class="track-card-subtitle">Create a Client Recommendation and Presentation for a Retail Company</div>
+          <div class="track-card-meta">
+            <span class="track-tag">Consultants</span>
+            <span class="track-tag">Client-Facing</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ================================================================
+         TRACK 1: BUSINESS TRACK
+         ================================================================ -->
+    <div class="track-panel" id="panel-business">
+
+      <!-- B1: Use Case Identification -->
+      <section class="section" id="b-use-cases">
+        <h2 class="section-heading">1. Use Case Identification</h2>
+
+        <div class="accent-card">
+          <h4>Scenario</h4>
+          <p>You are the AI transformation lead at a mid-size insurance company (500 employees). The CEO has asked you to propose a Claude deployment plan. Begin by identifying 5 high-value use cases across departments.</p>
+        </div>
+
+        <p>For each use case, specify the target department, describe what Claude would do, the expected impact, which Claude surface (Browser, Code, or Cowork) best fits, and the priority level.</p>
+
+        <div style="overflow-x:auto;">
+          <table class="interactive-table" id="use-case-table">
+            <thead>
+              <tr>
+                <th style="width:12%">#</th>
+                <th style="width:18%">Department</th>
+                <th style="width:28%">Use Case</th>
+                <th style="width:16%">Impact</th>
+                <th style="width:14%">Surface</th>
+                <th style="width:12%">Priority</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td><input type="text" placeholder="e.g. Claims" id="b-uc-dept-1"></td>
+                <td><textarea placeholder="Describe the use case..." id="b-uc-desc-1"></textarea></td>
+                <td><input type="text" placeholder="e.g. 30% faster" id="b-uc-impact-1"></td>
+                <td><select id="b-uc-surface-1"><option value="">Select</option><option value="browser">Browser</option><option value="code">Code</option><option value="cowork">Cowork</option></select></td>
+                <td><select id="b-uc-priority-1"><option value="">Select</option><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select></td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td><input type="text" placeholder="e.g. Underwriting" id="b-uc-dept-2"></td>
+                <td><textarea placeholder="Describe the use case..." id="b-uc-desc-2"></textarea></td>
+                <td><input type="text" placeholder="e.g. 50% reduction" id="b-uc-impact-2"></td>
+                <td><select id="b-uc-surface-2"><option value="">Select</option><option value="browser">Browser</option><option value="code">Code</option><option value="cowork">Cowork</option></select></td>
+                <td><select id="b-uc-priority-2"><option value="">Select</option><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select></td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td><input type="text" placeholder="e.g. IT" id="b-uc-dept-3"></td>
+                <td><textarea placeholder="Describe the use case..." id="b-uc-desc-3"></textarea></td>
+                <td><input type="text" placeholder="e.g. 2x throughput" id="b-uc-impact-3"></td>
+                <td><select id="b-uc-surface-3"><option value="">Select</option><option value="browser">Browser</option><option value="code">Code</option><option value="cowork">Cowork</option></select></td>
+                <td><select id="b-uc-priority-3"><option value="">Select</option><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select></td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td><input type="text" placeholder="e.g. HR" id="b-uc-dept-4"></td>
+                <td><textarea placeholder="Describe the use case..." id="b-uc-desc-4"></textarea></td>
+                <td><input type="text" placeholder="e.g. 40% cost save" id="b-uc-impact-4"></td>
+                <td><select id="b-uc-surface-4"><option value="">Select</option><option value="browser">Browser</option><option value="code">Code</option><option value="cowork">Cowork</option></select></td>
+                <td><select id="b-uc-priority-4"><option value="">Select</option><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select></td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td><input type="text" placeholder="e.g. Finance" id="b-uc-dept-5"></td>
+                <td><textarea placeholder="Describe the use case..." id="b-uc-desc-5"></textarea></td>
+                <td><input type="text" placeholder="e.g. 60% faster" id="b-uc-impact-5"></td>
+                <td><select id="b-uc-surface-5"><option value="">Select</option><option value="browser">Browser</option><option value="code">Code</option><option value="cowork">Cowork</option></select></td>
+                <td><select id="b-uc-priority-5"><option value="">Select</option><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- B2: Governance Framework -->
+      <section class="section" id="b-governance">
+        <h2 class="section-heading">2. Governance Framework</h2>
+
+        <p>Define the boundaries for Claude usage across your organization. A strong governance framework clarifies what is encouraged, what requires review, and what is off-limits.</p>
+
+        <h3>Approved Uses (list 5)</h3>
+        <p class="form-sublabel">Describe 5 uses that are approved without additional review for all employees.</p>
+        <div class="form-group">
+          <input type="text" class="form-input" id="b-gov-approved-1" placeholder="1. e.g. Drafting internal emails and meeting summaries">
+        </div>
+        <div class="form-group">
+          <input type="text" class="form-input" id="b-gov-approved-2" placeholder="2. e.g. Analyzing public data for market research">
+        </div>
+        <div class="form-group">
+          <input type="text" class="form-input" id="b-gov-approved-3" placeholder="3. e.g. Generating code for internal tools">
+        </div>
+        <div class="form-group">
+          <input type="text" class="form-input" id="b-gov-approved-4" placeholder="4.">
+        </div>
+        <div class="form-group">
+          <input type="text" class="form-input" id="b-gov-approved-5" placeholder="5.">
+        </div>
+
+        <h3>Restricted Uses Requiring Review (list 3)</h3>
+        <p class="form-sublabel">Uses that need manager or compliance team approval before proceeding.</p>
+        <div class="form-group">
+          <input type="text" class="form-input" id="b-gov-restricted-1" placeholder="1. e.g. Processing customer PII for analysis">
+        </div>
+        <div class="form-group">
+          <input type="text" class="form-input" id="b-gov-restricted-2" placeholder="2.">
+        </div>
+        <div class="form-group">
+          <input type="text" class="form-input" id="b-gov-restricted-3" placeholder="3.">
+        </div>
+
+        <h3>Prohibited Uses (list 3)</h3>
+        <p class="form-sublabel">Uses that are never allowed under any circumstances.</p>
+        <div class="form-group">
+          <input type="text" class="form-input" id="b-gov-prohibited-1" placeholder="1. e.g. Automated claims decisions without human review">
+        </div>
+        <div class="form-group">
+          <input type="text" class="form-input" id="b-gov-prohibited-2" placeholder="2.">
+        </div>
+        <div class="form-group">
+          <input type="text" class="form-input" id="b-gov-prohibited-3" placeholder="3.">
+        </div>
+
+        <h3>Data Classification Rules</h3>
+        <div class="form-group">
+          <label class="form-label">How should employees classify data before using Claude?</label>
+          <textarea class="form-textarea" id="b-gov-data" rows="4" placeholder="Describe your data classification tiers (e.g. Public, Internal, Confidential, Restricted) and the rules for each when used with Claude..."></textarea>
+        </div>
+      </section>
+
+      <!-- B3: ROI Projection -->
+      <section class="section" id="b-roi">
+        <h2 class="section-heading">3. ROI Projection</h2>
+
+        <p>Build a business case with concrete numbers. Use the calculator below to estimate the return on investment for your Claude deployment.</p>
+
+        <div class="roi-calc">
+          <h3 style="margin-top:0; margin-bottom:16px;">ROI Calculator</h3>
+
+          <div class="form-row cols-3">
+            <div class="form-group">
+              <label class="form-label">Team Size (users)</label>
+              <input type="number" class="form-input" id="b-roi-team" value="50" min="1" max="500" onchange="calculateROI()" oninput="calculateROI()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Avg. Hourly Rate ($)</label>
+              <input type="number" class="form-input" id="b-roi-rate" value="65" min="1" max="500" onchange="calculateROI()" oninput="calculateROI()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Hours Saved / User / Week</label>
+              <input type="number" class="form-input" id="b-roi-hours" value="5" min="0" max="40" step="0.5" onchange="calculateROI()" oninput="calculateROI()">
+            </div>
+          </div>
+
+          <div class="form-row cols-3">
+            <div class="form-group">
+              <label class="form-label">Claude License $/User/Month</label>
+              <input type="number" class="form-input" id="b-roi-license" value="60" min="0" max="500" onchange="calculateROI()" oninput="calculateROI()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Training Cost (One-time $)</label>
+              <input type="number" class="form-input" id="b-roi-training" value="15000" min="0" max="500000" step="1000" onchange="calculateROI()" oninput="calculateROI()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Deployment Period (Months)</label>
+              <input type="number" class="form-input" id="b-roi-months" value="12" min="1" max="36" onchange="calculateROI()" oninput="calculateROI()">
+            </div>
+          </div>
+
+          <div class="roi-result" id="b-roi-result">
+            <div class="roi-metric">
+              <div class="roi-metric-value neutral" id="b-roi-savings">$0</div>
+              <div class="roi-metric-label">Annual Savings</div>
+            </div>
+            <div class="roi-metric">
+              <div class="roi-metric-value neutral" id="b-roi-cost">$0</div>
+              <div class="roi-metric-label">Total Cost</div>
+            </div>
+            <div class="roi-metric">
+              <div class="roi-metric-value positive" id="b-roi-pct">0%</div>
+              <div class="roi-metric-label">ROI</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- B4: Rollout Timeline -->
+      <section class="section" id="b-rollout">
+        <h2 class="section-heading">4. Rollout Timeline</h2>
+
+        <p>Define a phased 12-week rollout plan. For each phase, describe the key activities, success metrics, and risks to monitor.</p>
+
+        <div class="timeline">
+          <!-- Phase 1 -->
+          <div class="timeline-phase">
+            <div class="timeline-phase-header">
+              <span class="timeline-phase-weeks">Weeks 1-2</span>
+              <span class="timeline-phase-title">Pilot Team (10 users)</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Key Activities</label>
+              <textarea class="form-textarea" id="b-tl-act-1" rows="2" placeholder="e.g. Select 10 power users from Claims and IT. Deploy Claude Browser licenses. Conduct onboarding workshop..."></textarea>
+            </div>
+            <div class="form-row cols-2">
+              <div class="form-group">
+                <label class="form-label">Success Metrics</label>
+                <input type="text" class="form-input" id="b-tl-metrics-1" placeholder="e.g. 80% daily active usage">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Risks to Monitor</label>
+                <input type="text" class="form-input" id="b-tl-risks-1" placeholder="e.g. Low adoption, data concerns">
+              </div>
+            </div>
+          </div>
+
+          <!-- Phase 2 -->
+          <div class="timeline-phase">
+            <div class="timeline-phase-header">
+              <span class="timeline-phase-weeks">Weeks 3-4</span>
+              <span class="timeline-phase-title">Department Expansion (50 users)</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Key Activities</label>
+              <textarea class="form-textarea" id="b-tl-act-2" rows="2" placeholder="e.g. Expand to 3 departments. Train team champions. Collect pilot feedback..."></textarea>
+            </div>
+            <div class="form-row cols-2">
+              <div class="form-group">
+                <label class="form-label">Success Metrics</label>
+                <input type="text" class="form-input" id="b-tl-metrics-2" placeholder="e.g. 5+ hrs saved/user/week">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Risks to Monitor</label>
+                <input type="text" class="form-input" id="b-tl-risks-2" placeholder="e.g. Governance gaps">
+              </div>
+            </div>
+          </div>
+
+          <!-- Phase 3 -->
+          <div class="timeline-phase">
+            <div class="timeline-phase-header">
+              <span class="timeline-phase-weeks">Weeks 5-8</span>
+              <span class="timeline-phase-title">Organization-Wide (200 users)</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Key Activities</label>
+              <textarea class="form-textarea" id="b-tl-act-3" rows="2" placeholder="e.g. Company-wide rollout. Deploy Claude Code for IT/Engineering. Launch self-service help center..."></textarea>
+            </div>
+            <div class="form-row cols-2">
+              <div class="form-group">
+                <label class="form-label">Success Metrics</label>
+                <input type="text" class="form-input" id="b-tl-metrics-3" placeholder="e.g. 60% org adoption">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Risks to Monitor</label>
+                <input type="text" class="form-input" id="b-tl-risks-3" placeholder="e.g. Scaling support needs">
+              </div>
+            </div>
+          </div>
+
+          <!-- Phase 4 -->
+          <div class="timeline-phase">
+            <div class="timeline-phase-header">
+              <span class="timeline-phase-weeks">Weeks 9-12</span>
+              <span class="timeline-phase-title">Optimization &amp; Advanced Training</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Key Activities</label>
+              <textarea class="form-textarea" id="b-tl-act-4" rows="2" placeholder="e.g. Advanced prompt engineering workshops. Deploy Cowork for cross-functional projects. Measure ROI..."></textarea>
+            </div>
+            <div class="form-row cols-2">
+              <div class="form-group">
+                <label class="form-label">Success Metrics</label>
+                <input type="text" class="form-input" id="b-tl-metrics-4" placeholder="e.g. Measurable ROI > 200%">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Risks to Monitor</label>
+                <input type="text" class="form-input" id="b-tl-risks-4" placeholder="e.g. Budget overrun">
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- B5: Self-Assessment Rubric -->
+      <section class="section" id="b-rubric">
+        <h2 class="section-heading">5. Self-Assessment</h2>
+        <p>Rate yourself honestly on each dimension. You need an average score of 3.0 or higher to unlock the certificate.</p>
+
+        <div class="rubric" id="rubric-business">
+          <h3>Business Track Rubric</h3>
+          <div class="rubric-dimension">
+            <span class="rubric-dimension-label">Use Case Breadth &amp; Impact</span>
+            <div class="rubric-stars" data-rubric="business" data-dim="0">
+              <button class="rubric-star" data-val="1" onclick="rateRubric('business',0,1)">1</button>
+              <button class="rubric-star" data-val="2" onclick="rateRubric('business',0,2)">2</button>
+              <button class="rubric-star" data-val="3" onclick="rateRubric('business',0,3)">3</button>
+              <button class="rubric-star" data-val="4" onclick="rateRubric('business',0,4)">4</button>
+              <button class="rubric-star" data-val="5" onclick="rateRubric('business',0,5)">5</button>
+            </div>
+          </div>
+          <div class="rubric-dimension">
+            <span class="rubric-dimension-label">Governance Completeness</span>
+            <div class="rubric-stars" data-rubric="business" data-dim="1">
+              <button class="rubric-star" data-val="1" onclick="rateRubric('business',1,1)">1</button>
+              <button class="rubric-star" data-val="2" onclick="rateRubric('business',1,2)">2</button>
+              <button class="rubric-star" data-val="3" onclick="rateRubric('business',1,3)">3</button>
+              <button class="rubric-star" data-val="4" onclick="rateRubric('business',1,4)">4</button>
+              <button class="rubric-star" data-val="5" onclick="rateRubric('business',1,5)">5</button>
+            </div>
+          </div>
+          <div class="rubric-dimension">
+            <span class="rubric-dimension-label">ROI Rigor</span>
+            <div class="rubric-stars" data-rubric="business" data-dim="2">
+              <button class="rubric-star" data-val="1" onclick="rateRubric('business',2,1)">1</button>
+              <button class="rubric-star" data-val="2" onclick="rateRubric('business',2,2)">2</button>
+              <button class="rubric-star" data-val="3" onclick="rateRubric('business',2,3)">3</button>
+              <button class="rubric-star" data-val="4" onclick="rateRubric('business',2,4)">4</button>
+              <button class="rubric-star" data-val="5" onclick="rateRubric('business',2,5)">5</button>
+            </div>
+          </div>
+          <div class="rubric-dimension">
+            <span class="rubric-dimension-label">Timeline Feasibility</span>
+            <div class="rubric-stars" data-rubric="business" data-dim="3">
+              <button class="rubric-star" data-val="1" onclick="rateRubric('business',3,1)">1</button>
+              <button class="rubric-star" data-val="2" onclick="rateRubric('business',3,2)">2</button>
+              <button class="rubric-star" data-val="3" onclick="rateRubric('business',3,3)">3</button>
+              <button class="rubric-star" data-val="4" onclick="rateRubric('business',3,4)">4</button>
+              <button class="rubric-star" data-val="5" onclick="rateRubric('business',3,5)">5</button>
+            </div>
+          </div>
+          <div class="rubric-dimension">
+            <span class="rubric-dimension-label">Overall Professionalism</span>
+            <div class="rubric-stars" data-rubric="business" data-dim="4">
+              <button class="rubric-star" data-val="1" onclick="rateRubric('business',4,1)">1</button>
+              <button class="rubric-star" data-val="2" onclick="rateRubric('business',4,2)">2</button>
+              <button class="rubric-star" data-val="3" onclick="rateRubric('business',4,3)">3</button>
+              <button class="rubric-star" data-val="4" onclick="rateRubric('business',4,4)">4</button>
+              <button class="rubric-star" data-val="5" onclick="rateRubric('business',4,5)">5</button>
+            </div>
+          </div>
+          <div class="rubric-score-display">
+            <div class="rubric-score-value needs-work" id="score-business">-- / 5.0</div>
+            <div class="rubric-score-label">Average Score (need 3.0 to pass)</div>
+          </div>
+          <div class="rubric-pass-msg" id="msg-business"></div>
+        </div>
+      </section>
+    </div><!-- end panel-business -->
+
+
+    <!-- ================================================================
+         TRACK 2: DEVELOPER TRACK
+         ================================================================ -->
+    <div class="track-panel" id="panel-developer">
+
+      <!-- D1: Architecture Design -->
+      <section class="section" id="d-architecture">
+        <h2 class="section-heading">1. Architecture Design</h2>
+
+        <div class="accent-card">
+          <h4>Scenario</h4>
+          <p>You are building a customer support assistant that handles ticket triage, response generation, and escalation. Design the architecture for this Claude-powered application.</p>
+        </div>
+
+        <h3>API Integration Approach</h3>
+        <div class="form-row cols-2">
+          <div class="form-group">
+            <label class="form-label">Model Selection</label>
+            <select class="form-select" id="d-arch-model">
+              <option value="">Select model...</option>
+              <option value="opus">Claude Opus 4 (complex reasoning)</option>
+              <option value="sonnet">Claude Sonnet 4 (balanced)</option>
+              <option value="haiku">Claude Haiku 3.5 (fast, cheap)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Streaming?</label>
+            <select class="form-select" id="d-arch-streaming">
+              <option value="">Select...</option>
+              <option value="yes">Yes - stream responses</option>
+              <option value="no">No - wait for complete response</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Error Handling Strategy</label>
+          <textarea class="form-textarea" id="d-arch-errors" rows="3" placeholder="Describe how you will handle API errors, timeouts, and rate limits..."></textarea>
+        </div>
+
+        <h3>Tool Definitions</h3>
+        <p>Define 3 tools your support assistant will use. For each, specify the name, description, and input schema.</p>
+
+        <!-- Tool 1 -->
+        <div class="accent-card">
+          <h4>Tool 1: search_knowledge_base</h4>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <input type="text" class="form-input" id="d-tool1-desc" placeholder="e.g. Search the company knowledge base for relevant articles and FAQs">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Input Parameters (JSON schema)</label>
+            <textarea class="form-textarea" id="d-tool1-schema" rows="4" placeholder='e.g. { "query": "string (required) - search query", "max_results": "number (optional, default 5)", "category": "string (optional) - filter by category" }'></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Return Type</label>
+            <input type="text" class="form-input" id="d-tool1-return" placeholder="e.g. Array of {title, content, relevance_score, url}">
+          </div>
+        </div>
+
+        <!-- Tool 2 -->
+        <div class="accent-card">
+          <h4>Tool 2: get_customer_info</h4>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <input type="text" class="form-input" id="d-tool2-desc" placeholder="e.g. Retrieve customer account details and history">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Input Parameters (JSON schema)</label>
+            <textarea class="form-textarea" id="d-tool2-schema" rows="4" placeholder='e.g. { "customer_id": "string (required)", "include_history": "boolean (optional, default false)" }'></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Return Type</label>
+            <input type="text" class="form-input" id="d-tool2-return" placeholder="e.g. {name, email, plan, account_age, recent_tickets[]}">
+          </div>
+        </div>
+
+        <!-- Tool 3 -->
+        <div class="accent-card">
+          <h4>Tool 3: create_ticket</h4>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <input type="text" class="form-input" id="d-tool3-desc" placeholder="e.g. Create or escalate a support ticket in the ticketing system">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Input Parameters (JSON schema)</label>
+            <textarea class="form-textarea" id="d-tool3-schema" rows="4" placeholder='e.g. { "subject": "string (required)", "priority": "enum: low|medium|high|urgent", "assignee": "string (optional)", "description": "string (required)" }'></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Return Type</label>
+            <input type="text" class="form-input" id="d-tool3-return" placeholder="e.g. {ticket_id, status, created_at, url}">
+          </div>
+        </div>
+      </section>
+
+      <!-- D2: Prompt Engineering -->
+      <section class="section" id="d-prompts">
+        <h2 class="section-heading">2. Prompt Engineering</h2>
+
+        <h3>System Prompt</h3>
+        <p>Write the system prompt for your customer support assistant. A good system prompt defines the role, tone, boundaries, and tool usage guidelines.</p>
+        <div class="form-group">
+          <textarea class="form-textarea" id="d-system-prompt" rows="8" placeholder="You are a helpful customer support assistant for [Company]. Your role is to...&#10;&#10;Guidelines:&#10;- Always greet the customer by name when available&#10;- Search the knowledge base before generating answers&#10;- Escalate to a human agent when...&#10;- Never share internal system details..."></textarea>
+          <div class="prompt-scorer" id="d-prompt-scorer">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <strong>Prompt Quality Score</strong>
+              <span id="d-prompt-score-text">Type to see score</span>
+            </div>
+            <div class="prompt-scorer-bar">
+              <div class="prompt-scorer-fill" id="d-prompt-score-fill"></div>
+            </div>
+            <div class="prompt-scorer-tips" id="d-prompt-tips">Start typing your system prompt above.</div>
+          </div>
+        </div>
+
+        <h3>Few-Shot Examples</h3>
+        <p>Write 3 example interactions showing how the assistant should handle different ticket types.</p>
+
+        <div class="expandable" id="d-fewshot-1">
+          <div class="expandable-header" onclick="toggleExpand('d-fewshot-1')">
+            Example 1: Billing Inquiry <span class="expandable-chevron">&#9660;</span>
+          </div>
+          <div class="expandable-body">
+            <div class="expandable-content">
+              <div class="form-group">
+                <label class="form-label">Customer Message</label>
+                <textarea class="form-textarea" id="d-ex1-user" rows="2" placeholder="e.g. Hi, I was charged twice for my subscription last month. Can you help?"></textarea>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Ideal Assistant Response</label>
+                <textarea class="form-textarea" id="d-ex1-assistant" rows="4" placeholder="Show the ideal response including tool usage (e.g. first calls get_customer_info, then searches knowledge base for refund policy)..."></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="expandable" id="d-fewshot-2">
+          <div class="expandable-header" onclick="toggleExpand('d-fewshot-2')">
+            Example 2: Technical Issue <span class="expandable-chevron">&#9660;</span>
+          </div>
+          <div class="expandable-body">
+            <div class="expandable-content">
+              <div class="form-group">
+                <label class="form-label">Customer Message</label>
+                <textarea class="form-textarea" id="d-ex2-user" rows="2" placeholder="e.g. My dashboard is showing an error 500 when I try to export reports."></textarea>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Ideal Assistant Response</label>
+                <textarea class="form-textarea" id="d-ex2-assistant" rows="4" placeholder="Show the ideal response..."></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="expandable" id="d-fewshot-3">
+          <div class="expandable-header" onclick="toggleExpand('d-fewshot-3')">
+            Example 3: Escalation Scenario <span class="expandable-chevron">&#9660;</span>
+          </div>
+          <div class="expandable-body">
+            <div class="expandable-content">
+              <div class="form-group">
+                <label class="form-label">Customer Message</label>
+                <textarea class="form-textarea" id="d-ex3-user" rows="2" placeholder="e.g. I want to cancel my enterprise account immediately and get a full refund for the year."></textarea>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Ideal Assistant Response</label>
+                <textarea class="form-textarea" id="d-ex3-assistant" rows="4" placeholder="Show the ideal response with escalation..."></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h3>Escalation Criteria</h3>
+        <div class="form-group">
+          <textarea class="form-textarea" id="d-escalation" rows="3" placeholder="Define when the assistant should escalate to a human agent. e.g.&#10;- Customer requests account cancellation&#10;- Legal or regulatory questions&#10;- Customer has expressed frustration 3+ times"></textarea>
+        </div>
+      </section>
+
+      <!-- D3: Error Handling -->
+      <section class="section" id="d-errors">
+        <h2 class="section-heading">3. Error Handling</h2>
+
+        <h3>Retry Strategy for API Errors</h3>
+        <div class="form-row cols-2">
+          <div class="form-group">
+            <label class="form-label">Max Retries</label>
+            <select class="form-select" id="d-err-retries">
+              <option value="">Select...</option>
+              <option value="1">1 retry</option>
+              <option value="2">2 retries</option>
+              <option value="3">3 retries (recommended)</option>
+              <option value="5">5 retries</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Backoff Strategy</label>
+            <select class="form-select" id="d-err-backoff">
+              <option value="">Select...</option>
+              <option value="fixed">Fixed delay</option>
+              <option value="exponential">Exponential backoff (recommended)</option>
+              <option value="jitter">Exponential + jitter</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Describe your retry approach</label>
+          <textarea class="form-textarea" id="d-err-retry-desc" rows="3" placeholder="e.g. On 429/500/502/503 errors, retry with exponential backoff starting at 1s, doubling each attempt. On 400/401/403, do not retry -- these are client errors..."></textarea>
+        </div>
+
+        <h3>Fallback Behavior When Tools Fail</h3>
+        <div class="form-group">
+          <textarea class="form-textarea" id="d-err-fallback" rows="4" placeholder="e.g. If search_knowledge_base fails:&#10;- Inform the customer that search is temporarily unavailable&#10;- Attempt to answer from the system prompt context only&#10;- Offer to create a ticket for follow-up&#10;&#10;If get_customer_info fails:&#10;- Ask the customer for their account details manually..."></textarea>
+        </div>
+
+        <h3>Rate Limit Handling</h3>
+        <div class="form-group">
+          <textarea class="form-textarea" id="d-err-ratelimit" rows="3" placeholder="e.g. Implement a token bucket rate limiter. Queue requests when approaching limits. Show users a 'high demand' message with estimated wait time..."></textarea>
+        </div>
+      </section>
+
+      <!-- D4: Evaluation Plan -->
+      <section class="section" id="d-evaluation">
+        <h2 class="section-heading">4. Evaluation Plan</h2>
+
+        <h3>Test Cases</h3>
+        <p>Define 5 test cases to validate your support assistant works correctly.</p>
+
+        <div style="overflow-x:auto;">
+          <table class="interactive-table">
+            <thead>
+              <tr>
+                <th style="width:8%">#</th>
+                <th style="width:30%">Input Ticket</th>
+                <th style="width:30%">Expected Behavior</th>
+                <th style="width:16%">Tools Used</th>
+                <th style="width:16%">Pass Criteria</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td><textarea id="d-tc-input-1" placeholder="Describe the test input..."></textarea></td>
+                <td><textarea id="d-tc-expected-1" placeholder="What should happen..."></textarea></td>
+                <td><input type="text" id="d-tc-tools-1" placeholder="e.g. search_kb"></td>
+                <td><input type="text" id="d-tc-pass-1" placeholder="e.g. Correct answer"></td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td><textarea id="d-tc-input-2" placeholder="Describe the test input..."></textarea></td>
+                <td><textarea id="d-tc-expected-2" placeholder="What should happen..."></textarea></td>
+                <td><input type="text" id="d-tc-tools-2" placeholder=""></td>
+                <td><input type="text" id="d-tc-pass-2" placeholder=""></td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td><textarea id="d-tc-input-3" placeholder="Describe the test input..."></textarea></td>
+                <td><textarea id="d-tc-expected-3" placeholder="What should happen..."></textarea></td>
+                <td><input type="text" id="d-tc-tools-3" placeholder=""></td>
+                <td><input type="text" id="d-tc-pass-3" placeholder=""></td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td><textarea id="d-tc-input-4" placeholder="Describe the test input..."></textarea></td>
+                <td><textarea id="d-tc-expected-4" placeholder="What should happen..."></textarea></td>
+                <td><input type="text" id="d-tc-tools-4" placeholder=""></td>
+                <td><input type="text" id="d-tc-pass-4" placeholder=""></td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td><textarea id="d-tc-input-5" placeholder="Describe the test input..."></textarea></td>
+                <td><textarea id="d-tc-expected-5" placeholder="What should happen..."></textarea></td>
+                <td><input type="text" id="d-tc-tools-5" placeholder=""></td>
+                <td><input type="text" id="d-tc-pass-5" placeholder=""></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Quality Rubric for Response Evaluation</h3>
+        <div class="form-group">
+          <textarea class="form-textarea" id="d-quality-rubric" rows="4" placeholder="e.g. Rate each response on:&#10;- Accuracy (1-5): Is the information correct?&#10;- Helpfulness (1-5): Does it solve the problem?&#10;- Tone (1-5): Is it professional and empathetic?&#10;- Tool Usage (1-5): Were the right tools called?"></textarea>
+        </div>
+
+        <h3>Monitoring Metrics</h3>
+        <div class="form-group">
+          <textarea class="form-textarea" id="d-monitoring" rows="3" placeholder="e.g. Track: avg response time, escalation rate, customer satisfaction score, tool call failure rate, cost per conversation..."></textarea>
+        </div>
+      </section>
+
+      <!-- D5: Self-Assessment -->
+      <section class="section" id="d-rubric">
+        <h2 class="section-heading">5. Self-Assessment</h2>
+        <p>Rate yourself honestly on each dimension. You need an average score of 3.0 or higher to unlock the certificate.</p>
+
+        <div class="rubric" id="rubric-developer">
+          <h3>Developer Track Rubric</h3>
+          <div class="rubric-dimension">
+            <span class="rubric-dimension-label">Architecture Soundness</span>
+            <div class="rubric-stars" data-rubric="developer" data-dim="0">
+              <button class="rubric-star" data-val="1" onclick="rateRubric('developer',0,1)">1</button>
+              <button class="rubric-star" data-val="2" onclick="rateRubric('developer',0,2)">2</button>
+              <button class="rubric-star" data-val="3" onclick="rateRubric('developer',0,3)">3</button>
+              <button class="rubric-star" data-val="4" onclick="rateRubric('developer',0,4)">4</button>
+              <button class="rubric-star" data-val="5" onclick="rateRubric('developer',0,5)">5</button>
+            </div>
+          </div>
+          <div class="rubric-dimension">
+            <span class="rubric-dimension-label">Tool Design Quality</span>
+            <div class="rubric-stars" data-rubric="developer" data-dim="1">
+              <button class="rubric-star" data-val="1" onclick="rateRubric('developer',1,1)">1</button>
+              <button class="rubric-star" data-val="2" onclick="rateRubric('developer',1,2)">2</button>
+              <button class="rubric-star" data-val="3" onclick="rateRubric('developer',1,3)">3</button>
+              <button class="rubric-star" data-val="4" onclick="rateRubric('developer',1,4)">4</button>
+              <button class="rubric-star" data-val="5" onclick="rateRubric('developer',1,5)">5</button>
+            </div>
+          </div>
+          <div class="rubric-dimension">
+            <span class="rubric-dimension-label">Prompt Effectiveness</span>
+            <div class="rubric-stars" data-rubric="developer" data-dim="2">
+              <button class="rubric-star" data-val="1" onclick="rateRubric('developer',2,1)">1</button>
+              <button class="rubric-star" data-val="2" onclick="rateRubric('developer',2,2)">2</button>
+              <button class="rubric-star" data-val="3" onclick="rateRubric('developer',2,3)">3</button>
+              <button class="rubric-star" data-val="4" onclick="rateRubric('developer',2,4)">4</button>
+              <button class="rubric-star" data-val="5" onclick="rateRubric('developer',2,5)">5</button>
+            </div>
+          </div>
+          <div class="rubric-dimension">
+            <span class="rubric-dimension-label">Error Handling Robustness</span>
+            <div class="rubric-stars" data-rubric="developer" data-dim="3">
+              <button class="rubric-star" data-val="1" onclick="rateRubric('developer',3,1)">1</button>
+              <button class="rubric-star" data-val="2" onclick="rateRubric('developer',3,2)">2</button>
+              <button class="rubric-star" data-val="3" onclick="rateRubric('developer',3,3)">3</button>
+              <button class="rubric-star" data-val="4" onclick="rateRubric('developer',3,4)">4</button>
+              <button class="rubric-star" data-val="5" onclick="rateRubric('developer',3,5)">5</button>
+            </div>
+          </div>
+          <div class="rubric-dimension">
+            <span class="rubric-dimension-label">Evaluation Thoroughness</span>
+            <div class="rubric-stars" data-rubric="developer" data-dim="4">
+              <button class="rubric-star" data-val="1" onclick="rateRubric('developer',4,1)">1</button>
+              <button class="rubric-star" data-val="2" onclick="rateRubric('developer',4,2)">2</button>
+              <button class="rubric-star" data-val="3" onclick="rateRubric('developer',4,3)">3</button>
+              <button class="rubric-star" data-val="4" onclick="rateRubric('developer',4,4)">4</button>
+              <button class="rubric-star" data-val="5" onclick="rateRubric('developer',4,5)">5</button>
+            </div>
+          </div>
+          <div class="rubric-score-display">
+            <div class="rubric-score-value needs-work" id="score-developer">-- / 5.0</div>
+            <div class="rubric-score-label">Average Score (need 3.0 to pass)</div>
+          </div>
+          <div class="rubric-pass-msg" id="msg-developer"></div>
+        </div>
+      </section>
+    </div><!-- end panel-developer -->
+
+
+    <!-- ================================================================
+         TRACK 3: ARCHITECT TRACK
+         ================================================================ -->
+    <div class="track-panel" id="panel-architect">
+
+      <!-- A1: Agent Architecture -->
+      <section class="section" id="a-agents">
+        <h2 class="section-heading">1. Agent Architecture</h2>
+
+        <div class="accent-card">
+          <h4>Scenario</h4>
+          <p>Design a document processing pipeline that extracts data from invoices, validates against business rules, enriches with external data, and stores results. Define a multi-agent system to handle this end-to-end.</p>
+        </div>
+
+        <h3>Agent Inventory</h3>
+        <p>How many agents does your system need? Define each agent's role.</p>
+
+        <div class="form-group">
+          <label class="form-label">Number of Agents</label>
+          <select class="form-select" id="a-agent-count" onchange="updateAgentFields()">
+            <option value="2">2 agents</option>
+            <option value="3" selected>3 agents</option>
+            <option value="4">4 agents</option>
+            <option value="5">5 agents</option>
+          </select>
+        </div>
+
+        <div id="a-agent-list">
+          <div class="accent-card" id="a-agent-1">
+            <h4>Agent 1</h4>
+            <div class="form-row cols-2">
+              <div class="form-group">
+                <label class="form-label">Name</label>
+                <input type="text" class="form-input" id="a-agent-1-name" placeholder="e.g. Extraction Agent">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Model</label>
+                <select class="form-select" id="a-agent-1-model">
+                  <option value="">Select...</option>
+                  <option value="opus">Claude Opus 4</option>
+                  <option value="sonnet">Claude Sonnet 4</option>
+                  <option value="haiku">Claude Haiku 3.5</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Role &amp; Responsibilities</label>
+              <textarea class="form-textarea" id="a-agent-1-role" rows="2" placeholder="e.g. Extracts structured data (vendor, amount, date, line items) from raw invoice documents..."></textarea>
+            </div>
+          </div>
+
+          <div class="accent-card" id="a-agent-2">
+            <h4>Agent 2</h4>
+            <div class="form-row cols-2">
+              <div class="form-group">
+                <label class="form-label">Name</label>
+                <input type="text" class="form-input" id="a-agent-2-name" placeholder="e.g. Validation Agent">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Model</label>
+                <select class="form-select" id="a-agent-2-model">
+                  <option value="">Select...</option>
+                  <option value="opus">Claude Opus 4</option>
+                  <option value="sonnet">Claude Sonnet 4</option>
+                  <option value="haiku">Claude Haiku 3.5</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Role &amp; Responsibilities</label>
+              <textarea class="form-textarea" id="a-agent-2-role" rows="2" placeholder="e.g. Validates extracted data against business rules (amount thresholds, vendor approval lists)..."></textarea>
+            </div>
+          </div>
+
+          <div class="accent-card" id="a-agent-3">
+            <h4>Agent 3</h4>
+            <div class="form-row cols-2">
+              <div class="form-group">
+                <label class="form-label">Name</label>
+                <input type="text" class="form-input" id="a-agent-3-name" placeholder="e.g. Enrichment Agent">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Model</label>
+                <select class="form-select" id="a-agent-3-model">
+                  <option value="">Select...</option>
+                  <option value="opus">Claude Opus 4</option>
+                  <option value="sonnet">Claude Sonnet 4</option>
+                  <option value="haiku">Claude Haiku 3.5</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Role &amp; Responsibilities</label>
+              <textarea class="form-textarea" id="a-agent-3-role" rows="2" placeholder="e.g. Enriches validated data with external lookups (vendor database, exchange rates, tax codes)..."></textarea>
+            </div>
+          </div>
+
+          <div class="accent-card hidden" id="a-agent-4">
+            <h4>Agent 4</h4>
+            <div class="form-row cols-2">
+              <div class="form-group">
+                <label class="form-label">Name</label>
+                <input type="text" class="form-input" id="a-agent-4-name" placeholder="e.g. Storage Agent">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Model</label>
+                <select class="form-select" id="a-agent-4-model">
+                  <option value="">Select...</option>
+                  <option value="opus">Claude Opus 4</option>
+                  <option value="sonnet">Claude Sonnet 4</option>
+                  <option value="haiku">Claude Haiku 3.5</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Role &amp; Responsibilities</label>
+              <textarea class="form-textarea" id="a-agent-4-role" rows="2" placeholder="Describe this agent's role..."></textarea>
+            </div>
+          </div>
+
+          <div class="accent-card hidden" id="a-agent-5">
+            <h4>Agent 5</h4>
+            <div class="form-row cols-2">
+              <div class="form-group">
+                <label class="form-label">Name</label>
+                <input type="text" class="form-input" id="a-agent-5-name" placeholder="e.g. Orchestrator Agent">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Model</label>
+                <select class="form-select" id="a-agent-5-model">
+                  <option value="">Select...</option>
+                  <option value="opus">Claude Opus 4</option>
+                  <option value="sonnet">Claude Sonnet 4</option>
+                  <option value="haiku">Claude Haiku 3.5</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Role &amp; Responsibilities</label>
+              <textarea class="form-textarea" id="a-agent-5-role" rows="2" placeholder="Describe this agent's role..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <h3>Orchestration Pattern</h3>
+        <div class="form-row cols-2">
+          <div class="form-group">
+            <label class="form-label">Pattern</label>
+            <select class="form-select" id="a-orch-pattern">
+              <option value="">Select...</option>
+              <option value="sequential">Sequential (A then B then C)</option>
+              <option value="parallel">Parallel (A + B + C simultaneously)</option>
+              <option value="hybrid">Hybrid (some sequential, some parallel)</option>
+              <option value="dag">DAG-based (directed acyclic graph)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Communication Pattern</label>
+            <select class="form-select" id="a-comm-pattern">
+              <option value="">Select...</option>
+              <option value="direct">Direct handoff (agent-to-agent)</option>
+              <option value="orchestrator">Central orchestrator</option>
+              <option value="event">Event-driven (pub/sub)</option>
+              <option value="shared">Shared state / blackboard</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Explain your orchestration design</label>
+          <textarea class="form-textarea" id="a-orch-explain" rows="4" placeholder="Describe why you chose this pattern. How do agents communicate? What data flows between them? Draw the flow: Agent 1 -> Agent 2 -> Agent 3..."></textarea>
+        </div>
+      </section>
+
+      <!-- A2: Tool & MCP Design -->
+      <section class="section" id="a-tools">
+        <h2 class="section-heading">2. Tool &amp; MCP Design</h2>
+
+        <p>Define 4 MCP tools your pipeline will use. Each tool should map to a specific capability in the document processing flow.</p>
+
+        <!-- Tool 1 -->
+        <div class="accent-card">
+          <h4>MCP Tool: extract_fields</h4>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <input type="text" class="form-input" id="a-tool1-desc" placeholder="e.g. Extract structured fields from an invoice document using OCR and NLP">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Input Parameters</label>
+            <textarea class="form-textarea" id="a-tool1-params" rows="3" placeholder='e.g. document_url: string (required), document_type: enum [invoice, receipt, po], extraction_config: object (optional)'></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Error Handling</label>
+            <input type="text" class="form-input" id="a-tool1-errors" placeholder="e.g. Returns partial results with confidence scores; flags low-confidence fields for human review">
+          </div>
+        </div>
+
+        <!-- Tool 2 -->
+        <div class="accent-card">
+          <h4>MCP Tool: validate_rules</h4>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <input type="text" class="form-input" id="a-tool2-desc" placeholder="e.g. Validate extracted data against configurable business rules">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Input Parameters</label>
+            <textarea class="form-textarea" id="a-tool2-params" rows="3" placeholder='e.g. extracted_data: object (required), rule_set_id: string (required), strict_mode: boolean (optional, default true)'></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Error Handling</label>
+            <input type="text" class="form-input" id="a-tool2-errors" placeholder="e.g. Returns validation_result with pass/fail per rule, error details for failures">
+          </div>
+        </div>
+
+        <!-- Tool 3 -->
+        <div class="accent-card">
+          <h4>MCP Tool: enrich_data</h4>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <input type="text" class="form-input" id="a-tool3-desc" placeholder="e.g. Enrich document data with external sources (vendor DB, exchange rates)">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Input Parameters</label>
+            <textarea class="form-textarea" id="a-tool3-params" rows="3" placeholder='e.g. document_data: object (required), enrichment_sources: string[] (required), timeout_ms: number (optional, default 5000)'></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Error Handling</label>
+            <input type="text" class="form-input" id="a-tool3-errors" placeholder="e.g. Gracefully degrades if external sources are unavailable; returns available enrichments">
+          </div>
+        </div>
+
+        <!-- Tool 4 -->
+        <div class="accent-card">
+          <h4>MCP Tool: store_results</h4>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <input type="text" class="form-input" id="a-tool4-desc" placeholder="e.g. Store processed document data and metadata in the data warehouse">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Input Parameters</label>
+            <textarea class="form-textarea" id="a-tool4-params" rows="3" placeholder='e.g. document_id: string (required), processed_data: object (required), metadata: object (optional), destination: enum [warehouse, archive]'></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Error Handling</label>
+            <input type="text" class="form-input" id="a-tool4-errors" placeholder="e.g. Implements write-ahead log; retries on transient failures; dead-letter queue for persistent failures">
+          </div>
+        </div>
+
+        <h3>MCP Server Configuration</h3>
+        <div class="form-group">
+          <textarea class="form-textarea" id="a-mcp-config" rows="4" placeholder="Describe your MCP server setup:&#10;- Transport type (stdio, SSE, HTTP)&#10;- Authentication approach&#10;- Tool registration strategy&#10;- Server lifecycle management"></textarea>
+        </div>
+      </section>
+
+      <!-- A3: Reliability Design -->
+      <section class="section" id="a-reliability">
+        <h2 class="section-heading">3. Reliability Design</h2>
+
+        <h3>Failure Handling Strategy</h3>
+        <div class="form-group">
+          <textarea class="form-textarea" id="a-failure" rows="4" placeholder="Describe how your system handles failures at each stage:&#10;- What happens if extraction fails?&#10;- What if validation finds critical errors?&#10;- What if enrichment sources are down?&#10;- What if storage fails mid-write?"></textarea>
+        </div>
+
+        <h3>Escalation Triggers</h3>
+        <div class="form-group">
+          <textarea class="form-textarea" id="a-escalation" rows="3" placeholder="When does the system escalate to human operators?&#10;e.g. Low extraction confidence (<70%), validation failures on high-value invoices, repeated processing failures for same document..."></textarea>
+        </div>
+
+        <h3>Context Management Approach</h3>
+        <div class="form-group">
+          <textarea class="form-textarea" id="a-context" rows="3" placeholder="How do you manage context across agents?&#10;e.g. Shared state store with versioning, context window budgets per agent, summarization between stages to prevent context overflow..."></textarea>
+        </div>
+
+        <h3>Checkpoint &amp; Recovery Pattern</h3>
+        <div class="form-group">
+          <textarea class="form-textarea" id="a-checkpoint" rows="3" placeholder="Describe your checkpoint strategy:&#10;e.g. Checkpoint after each pipeline stage, store intermediate results in durable storage, enable replay from any checkpoint on failure..."></textarea>
+        </div>
+      </section>
+
+      <!-- A4: Evaluation Framework -->
+      <section class="section" id="a-eval">
+        <h2 class="section-heading">4. Evaluation Framework</h2>
+
+        <h3>Accuracy Metrics Per Pipeline Stage</h3>
+        <div style="overflow-x:auto;">
+          <table class="interactive-table">
+            <thead>
+              <tr>
+                <th style="width:20%">Stage</th>
+                <th style="width:30%">Metric</th>
+                <th style="width:20%">Target</th>
+                <th style="width:30%">Measurement Method</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Extraction</td>
+                <td><input type="text" id="a-eval-m1" placeholder="e.g. Field accuracy"></td>
+                <td><input type="text" id="a-eval-t1" placeholder="e.g. >95%"></td>
+                <td><input type="text" id="a-eval-method1" placeholder="e.g. Compare to ground truth"></td>
+              </tr>
+              <tr>
+                <td>Validation</td>
+                <td><input type="text" id="a-eval-m2" placeholder="e.g. False positive rate"></td>
+                <td><input type="text" id="a-eval-t2" placeholder="e.g. <2%"></td>
+                <td><input type="text" id="a-eval-method2" placeholder="e.g. Manual audit sample"></td>
+              </tr>
+              <tr>
+                <td>Enrichment</td>
+                <td><input type="text" id="a-eval-m3" placeholder="e.g. Enrichment coverage"></td>
+                <td><input type="text" id="a-eval-t3" placeholder="e.g. >90%"></td>
+                <td><input type="text" id="a-eval-method3" placeholder="e.g. Source availability check"></td>
+              </tr>
+              <tr>
+                <td>Storage</td>
+                <td><input type="text" id="a-eval-m4" placeholder="e.g. Write success rate"></td>
+                <td><input type="text" id="a-eval-t4" placeholder="e.g. >99.9%"></td>
+                <td><input type="text" id="a-eval-method4" placeholder="e.g. Reconciliation job"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>End-to-End Test Cases</h3>
+        <div class="form-group">
+          <textarea class="form-textarea" id="a-e2e-tests" rows="4" placeholder="Describe 3-5 end-to-end test cases:&#10;1. Standard invoice (single vendor, USD, all fields present)&#10;2. Multi-currency invoice with missing fields&#10;3. Invoice that should fail validation (exceeds threshold)&#10;4. Invoice requiring enrichment from multiple sources&#10;5. Corrupted document that should trigger escalation"></textarea>
+        </div>
+
+        <h3>Monitoring Dashboard Metrics</h3>
+        <div class="form-group">
+          <textarea class="form-textarea" id="a-dashboard" rows="3" placeholder="What metrics would you display on your monitoring dashboard?&#10;e.g. Pipeline throughput (docs/hour), average latency per stage, error rate by stage, escalation rate, cost per document processed..."></textarea>
+        </div>
+      </section>
+
+      <!-- A5: Self-Assessment -->
+      <section class="section" id="a-rubric">
+        <h2 class="section-heading">5. Self-Assessment</h2>
+        <p>Rate yourself honestly on each dimension. You need an average score of 3.0 or higher to unlock the certificate.</p>
+
+        <div class="rubric" id="rubric-architect">
+          <h3>Architect Track Rubric</h3>
+          <div class="rubric-dimension">
+            <span class="rubric-dimension-label">Architecture Elegance</span>
+            <div class="rubric-stars" data-rubric="architect" data-dim="0">
+              <button class="rubric-star" data-val="1" onclick="rateRubric('architect',0,1)">1</button>
+              <button class="rubric-star" data-val="2" onclick="rateRubric('architect',0,2)">2</button>
+              <button class="rubric-star" data-val="3" onclick="rateRubric('architect',0,3)">3</button>
+              <button class="rubric-star" data-val="4" onclick="rateRubric('architect',0,4)">4</button>
+              <button class="rubric-star" data-val="5" onclick="rateRubric('architect',0,5)">5</button>
+            </div>
+          </div>
+          <div class="rubric-dimension">
+            <span class="rubric-dimension-label">Tool Design Precision</span>
+            <div class="rubric-stars" data-rubric="architect" data-dim="1">
+              <button class="rubric-star" data-val="1" onclick="rateRubric('architect',1,1)">1</button>
+              <button class="rubric-star" data-val="2" onclick="rateRubric('architect',1,2)">2</button>
+              <button class="rubric-star" data-val="3" onclick="rateRubric('architect',1,3)">3</button>
+              <button class="rubric-star" data-val="4" onclick="rateRubric('architect',1,4)">4</button>
+              <button class="rubric-star" data-val="5" onclick="rateRubric('architect',1,5)">5</button>
+            </div>
+          </div>
+          <div class="rubric-dimension">
+            <span class="rubric-dimension-label">Reliability Coverage</span>
+            <div class="rubric-stars" data-rubric="architect" data-dim="2">
+              <button class="rubric-star" data-val="1" onclick="rateRubric('architect',2,1)">1</button>
+              <button class="rubric-star" data-val="2" onclick="rateRubric('architect',2,2)">2</button>
+              <button class="rubric-star" data-val="3" onclick="rateRubric('architect',2,3)">3</button>
+              <button class="rubric-star" data-val="4" onclick="rateRubric('architect',2,4)">4</button>
+              <button class="rubric-star" data-val="5" onclick="rateRubric('architect',2,5)">5</button>
+            </div>
+          </div>
+          <div class="rubric-dimension">
+            <span class="rubric-dimension-label">Evaluation Rigor</span>
+            <div class="rubric-stars" data-rubric="architect" data-dim="3">
+              <button class="rubric-star" data-val="1" onclick="rateRubric('architect',3,1)">1</button>
+              <button class="rubric-star" data-val="2" onclick="rateRubric('architect',3,2)">2</button>
+              <button class="rubric-star" data-val="3" onclick="rateRubric('architect',3,3)">3</button>
+              <button class="rubric-star" data-val="4" onclick="rateRubric('architect',3,4)">4</button>
+              <button class="rubric-star" data-val="5" onclick="rateRubric('architect',3,5)">5</button>
+            </div>
+          </div>
+          <div class="rubric-dimension">
+            <span class="rubric-dimension-label">Production Readiness</span>
+            <div class="rubric-stars" data-rubric="architect" data-dim="4">
+              <button class="rubric-star" data-val="1" onclick="rateRubric('architect',4,1)">1</button>
+              <button class="rubric-star" data-val="2" onclick="rateRubric('architect',4,2)">2</button>
+              <button class="rubric-star" data-val="3" onclick="rateRubric('architect',4,3)">3</button>
+              <button class="rubric-star" data-val="4" onclick="rateRubric('architect',4,4)">4</button>
+              <button class="rubric-star" data-val="5" onclick="rateRubric('architect',4,5)">5</button>
+            </div>
+          </div>
+          <div class="rubric-score-display">
+            <div class="rubric-score-value needs-work" id="score-architect">-- / 5.0</div>
+            <div class="rubric-score-label">Average Score (need 3.0 to pass)</div>
+          </div>
+          <div class="rubric-pass-msg" id="msg-architect"></div>
+        </div>
+      </section>
+    </div><!-- end panel-architect -->
+
+
+    <!-- ================================================================
+         TRACK 4: CONSULTANT TRACK
+         ================================================================ -->
+    <div class="track-panel" id="panel-consultant">
+
+      <!-- C1: Executive Summary -->
+      <section class="section" id="c-summary">
+        <h2 class="section-heading">1. Executive Summary</h2>
+
+        <div class="accent-card">
+          <h4>Scenario</h4>
+          <p>A retail company (2,000 employees) wants to evaluate Claude for customer-facing and internal use. You are presenting to the CTO. Write a compelling executive summary.</p>
+        </div>
+
+        <p>Write a 3-paragraph executive summary covering: (1) current pain points Claude addresses, (2) recommended approach, and (3) expected outcomes.</p>
+
+        <div class="form-group">
+          <textarea class="form-textarea" id="c-exec-summary" rows="12" placeholder="Paragraph 1: Current Pain Points&#10;[Company name] faces significant challenges in... Customer support response times average... Internal teams spend X hours per week on...&#10;&#10;Paragraph 2: Recommended Approach&#10;We recommend a phased Claude deployment starting with... The platform's unique strengths in... make it ideal for...&#10;&#10;Paragraph 3: Expected Outcomes&#10;Based on similar deployments, we project... Within 6 months, the company can expect..." oninput="updateWordCount('c-exec-summary','c-exec-wc')"></textarea>
+          <div class="word-count" id="c-exec-wc">0 words</div>
+        </div>
+      </section>
+
+      <!-- C2: Use Case Showcase -->
+      <section class="section" id="c-showcase">
+        <h2 class="section-heading">2. Use Case Showcase</h2>
+
+        <p>Define 3 high-impact use cases for the retail company. Each should tell a compelling story of problem, solution, and expected impact.</p>
+
+        <!-- Use Case 1 -->
+        <div class="expandable open" id="c-uc-1">
+          <div class="expandable-header" onclick="toggleExpand('c-uc-1')">
+            Use Case 1: Customer-Facing <span class="expandable-chevron">&#9660;</span>
+          </div>
+          <div class="expandable-body">
+            <div class="expandable-content">
+              <div class="form-group">
+                <label class="form-label">Problem Statement</label>
+                <textarea class="form-textarea" id="c-uc1-problem" rows="2" placeholder="e.g. Customer support handles 10,000 tickets/month. Average response time is 24 hours. 40% are repetitive FAQ questions."></textarea>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Claude Solution Approach</label>
+                <textarea class="form-textarea" id="c-uc1-solution" rows="3" placeholder="e.g. Deploy Claude as first-line support assistant. It handles FAQ questions instantly, triages complex issues, and drafts responses for agents to review."></textarea>
+              </div>
+              <div class="form-row cols-2">
+                <div class="form-group">
+                  <label class="form-label">Expected ROI</label>
+                  <input type="text" class="form-input" id="c-uc1-roi" placeholder="e.g. 60% faster response, $500K/yr savings">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Demo Walkthrough (outline)</label>
+                  <input type="text" class="form-input" id="c-uc1-demo" placeholder="e.g. Live demo: submit ticket, Claude triages in 2s">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Use Case 2 -->
+        <div class="expandable" id="c-uc-2">
+          <div class="expandable-header" onclick="toggleExpand('c-uc-2')">
+            Use Case 2: Internal Operations <span class="expandable-chevron">&#9660;</span>
+          </div>
+          <div class="expandable-body">
+            <div class="expandable-content">
+              <div class="form-group">
+                <label class="form-label">Problem Statement</label>
+                <textarea class="form-textarea" id="c-uc2-problem" rows="2" placeholder="e.g. Merchandising team spends 20 hrs/week creating product descriptions for 500+ new SKUs monthly."></textarea>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Claude Solution Approach</label>
+                <textarea class="form-textarea" id="c-uc2-solution" rows="3" placeholder="Describe how Claude would solve this..."></textarea>
+              </div>
+              <div class="form-row cols-2">
+                <div class="form-group">
+                  <label class="form-label">Expected ROI</label>
+                  <input type="text" class="form-input" id="c-uc2-roi" placeholder="">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Demo Walkthrough (outline)</label>
+                  <input type="text" class="form-input" id="c-uc2-demo" placeholder="">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Use Case 3 -->
+        <div class="expandable" id="c-uc-3">
+          <div class="expandable-header" onclick="toggleExpand('c-uc-3')">
+            Use Case 3: Strategic / Developer <span class="expandable-chevron">&#9660;</span>
+          </div>
+          <div class="expandable-body">
+            <div class="expandable-content">
+              <div class="form-group">
+                <label class="form-label">Problem Statement</label>
+                <textarea class="form-textarea" id="c-uc3-problem" rows="2" placeholder="e.g. Engineering team has 6-month backlog. Manual code review averages 2 days per PR."></textarea>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Claude Solution Approach</label>
+                <textarea class="form-textarea" id="c-uc3-solution" rows="3" placeholder="Describe how Claude would solve this..."></textarea>
+              </div>
+              <div class="form-row cols-2">
+                <div class="form-group">
+                  <label class="form-label">Expected ROI</label>
+                  <input type="text" class="form-input" id="c-uc3-roi" placeholder="">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Demo Walkthrough (outline)</label>
+                  <input type="text" class="form-input" id="c-uc3-demo" placeholder="">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- C3: Competitive Positioning -->
+      <section class="section" id="c-positioning">
+        <h2 class="section-heading">3. Competitive Positioning</h2>
+
+        <h3>Why Claude vs. ChatGPT / Copilot?</h3>
+        <div class="form-group">
+          <textarea class="form-textarea" id="c-vs-chatgpt" rows="4" placeholder="Address the CTO's likely question: 'Why not just use ChatGPT or Copilot?'&#10;&#10;Consider: safety, enterprise features, context window, coding ability, tool use, output quality, cost..."></textarea>
+        </div>
+
+        <h3>Claude's Enterprise Advantages</h3>
+        <div class="form-group">
+          <textarea class="form-textarea" id="c-enterprise" rows="4" placeholder="List Claude's key enterprise differentiators:&#10;- Safety and alignment (Constitutional AI)&#10;- Long context window (200K tokens)&#10;- Tool use and MCP ecosystem&#10;- Enterprise API with guaranteed SLAs&#10;- SOC 2 compliance..."></textarea>
+        </div>
+
+        <h3>Risk Mitigation Approach</h3>
+        <div class="form-group">
+          <textarea class="form-textarea" id="c-risk" rows="3" placeholder="How will you help the client mitigate risks?&#10;e.g. Data residency options, human-in-the-loop for high-stakes decisions, gradual rollout plan, monitoring and guardrails..."></textarea>
+        </div>
+      </section>
+
+      <!-- C4: Objection Handling -->
+      <section class="section" id="c-objections">
+        <h2 class="section-heading">4. Objection Handling</h2>
+
+        <p>Prepare responses for 5 common objections you might hear from the CTO. Write your response first, then reveal the example response to compare.</p>
+
+        <!-- Objection 1 -->
+        <div class="accent-card">
+          <h4>"AI will replace our employees"</h4>
+          <div class="form-group">
+            <label class="form-label">Your Response</label>
+            <textarea class="form-textarea" id="c-obj1-response" rows="3" placeholder="Write your response to this objection..."></textarea>
+          </div>
+          <button class="reveal-btn" onclick="revealExample('c-obj1-example')">Show Example Response</button>
+          <div class="reveal-content" id="c-obj1-example">
+            <strong>Example:</strong> "Claude is designed to augment your team, not replace them. Think of it as giving every employee a highly capable assistant. In practice, companies that deploy Claude see their employees handling higher-value work -- customer support agents resolve complex issues instead of answering FAQs, developers build features instead of writing boilerplate. The goal is to make your 2,000 employees as productive as 3,000, not to reduce headcount to 1,000."
+          </div>
+        </div>
+
+        <!-- Objection 2 -->
+        <div class="accent-card">
+          <h4>"We are concerned about data security"</h4>
+          <div class="form-group">
+            <label class="form-label">Your Response</label>
+            <textarea class="form-textarea" id="c-obj2-response" rows="3" placeholder="Write your response to this objection..."></textarea>
+          </div>
+          <button class="reveal-btn" onclick="revealExample('c-obj2-example')">Show Example Response</button>
+          <div class="reveal-content" id="c-obj2-example">
+            <strong>Example:</strong> "Data security is our top priority as well. Anthropic's enterprise offering includes SOC 2 Type II compliance, zero data retention on API calls -- your data is never used for training. We can deploy with your existing SSO, enforce data classification policies, and set up audit logging. We recommend starting with a pilot using only non-sensitive data, then expanding as you verify the security posture meets your requirements."
+          </div>
+        </div>
+
+        <!-- Objection 3 -->
+        <div class="accent-card">
+          <h4>"How do we measure ROI?"</h4>
+          <div class="form-group">
+            <label class="form-label">Your Response</label>
+            <textarea class="form-textarea" id="c-obj3-response" rows="3" placeholder="Write your response to this objection..."></textarea>
+          </div>
+          <button class="reveal-btn" onclick="revealExample('c-obj3-example')">Show Example Response</button>
+          <div class="reveal-content" id="c-obj3-example">
+            <strong>Example:</strong> "We will establish clear baseline metrics before deployment -- average ticket resolution time, developer velocity, content production throughput. During the pilot (first 2 weeks, 10 users), we measure these same metrics with Claude and calculate the delta. Most enterprise clients see 3-5x ROI within the first quarter. We will build a dashboard tracking time saved per user, cost per AI-assisted task, and quality metrics so you have real-time visibility."
+          </div>
+        </div>
+
+        <!-- Objection 4 -->
+        <div class="accent-card">
+          <h4>"Our team will not adopt it"</h4>
+          <div class="form-group">
+            <label class="form-label">Your Response</label>
+            <textarea class="form-textarea" id="c-obj4-response" rows="3" placeholder="Write your response to this objection..."></textarea>
+          </div>
+          <button class="reveal-btn" onclick="revealExample('c-obj4-example')">Show Example Response</button>
+          <div class="reveal-content" id="c-obj4-example">
+            <strong>Example:</strong> "Adoption is about making the tool feel like a natural part of their workflow, not an extra step. We start with your most enthusiastic team -- the ones already experimenting with AI. They become champions who demonstrate real wins. We provide role-specific training (not generic 'AI 101') and focus on immediate, tangible time savings. The key is showing someone that the task they dreaded (writing that report, reviewing that code, answering those emails) now takes 10 minutes instead of 2 hours."
+          </div>
+        </div>
+
+        <!-- Objection 5 -->
+        <div class="accent-card">
+          <h4>"What if Claude gives wrong answers?"</h4>
+          <div class="form-group">
+            <label class="form-label">Your Response</label>
+            <textarea class="form-textarea" id="c-obj5-response" rows="3" placeholder="Write your response to this objection..."></textarea>
+          </div>
+          <button class="reveal-btn" onclick="revealExample('c-obj5-example')">Show Example Response</button>
+          <div class="reveal-content" id="c-obj5-example">
+            <strong>Example:</strong> "This is exactly the right question to ask. Claude can make mistakes, just like any tool or employee. The mitigation strategy is layered: First, Claude is trained to say 'I don't know' rather than guess -- it has the best calibration of any AI model. Second, for high-stakes outputs, we implement human-in-the-loop review. Third, we use tool-grounding -- Claude retrieves facts from your knowledge base rather than relying on training data. Fourth, we set up eval suites that continuously test accuracy. The goal is not perfection; it is being measurably better than the status quo."
+          </div>
+        </div>
+      </section>
+
+      <!-- C5: Self-Assessment -->
+      <section class="section" id="c-rubric">
+        <h2 class="section-heading">5. Self-Assessment</h2>
+        <p>Rate yourself honestly on each dimension. You need an average score of 3.0 or higher to unlock the certificate.</p>
+
+        <div class="rubric" id="rubric-consultant">
+          <h3>Consultant Track Rubric</h3>
+          <div class="rubric-dimension">
+            <span class="rubric-dimension-label">Persuasiveness</span>
+            <div class="rubric-stars" data-rubric="consultant" data-dim="0">
+              <button class="rubric-star" data-val="1" onclick="rateRubric('consultant',0,1)">1</button>
+              <button class="rubric-star" data-val="2" onclick="rateRubric('consultant',0,2)">2</button>
+              <button class="rubric-star" data-val="3" onclick="rateRubric('consultant',0,3)">3</button>
+              <button class="rubric-star" data-val="4" onclick="rateRubric('consultant',0,4)">4</button>
+              <button class="rubric-star" data-val="5" onclick="rateRubric('consultant',0,5)">5</button>
+            </div>
+          </div>
+          <div class="rubric-dimension">
+            <span class="rubric-dimension-label">Technical Accuracy</span>
+            <div class="rubric-stars" data-rubric="consultant" data-dim="1">
+              <button class="rubric-star" data-val="1" onclick="rateRubric('consultant',1,1)">1</button>
+              <button class="rubric-star" data-val="2" onclick="rateRubric('consultant',1,2)">2</button>
+              <button class="rubric-star" data-val="3" onclick="rateRubric('consultant',1,3)">3</button>
+              <button class="rubric-star" data-val="4" onclick="rateRubric('consultant',1,4)">4</button>
+              <button class="rubric-star" data-val="5" onclick="rateRubric('consultant',1,5)">5</button>
+            </div>
+          </div>
+          <div class="rubric-dimension">
+            <span class="rubric-dimension-label">Business Acumen</span>
+            <div class="rubric-stars" data-rubric="consultant" data-dim="2">
+              <button class="rubric-star" data-val="1" onclick="rateRubric('consultant',2,1)">1</button>
+              <button class="rubric-star" data-val="2" onclick="rateRubric('consultant',2,2)">2</button>
+              <button class="rubric-star" data-val="3" onclick="rateRubric('consultant',2,3)">3</button>
+              <button class="rubric-star" data-val="4" onclick="rateRubric('consultant',2,4)">4</button>
+              <button class="rubric-star" data-val="5" onclick="rateRubric('consultant',2,5)">5</button>
+            </div>
+          </div>
+          <div class="rubric-dimension">
+            <span class="rubric-dimension-label">Objection Preparation</span>
+            <div class="rubric-stars" data-rubric="consultant" data-dim="3">
+              <button class="rubric-star" data-val="1" onclick="rateRubric('consultant',3,1)">1</button>
+              <button class="rubric-star" data-val="2" onclick="rateRubric('consultant',3,2)">2</button>
+              <button class="rubric-star" data-val="3" onclick="rateRubric('consultant',3,3)">3</button>
+              <button class="rubric-star" data-val="4" onclick="rateRubric('consultant',3,4)">4</button>
+              <button class="rubric-star" data-val="5" onclick="rateRubric('consultant',3,5)">5</button>
+            </div>
+          </div>
+          <div class="rubric-dimension">
+            <span class="rubric-dimension-label">Presentation Quality</span>
+            <div class="rubric-stars" data-rubric="consultant" data-dim="4">
+              <button class="rubric-star" data-val="1" onclick="rateRubric('consultant',4,1)">1</button>
+              <button class="rubric-star" data-val="2" onclick="rateRubric('consultant',4,2)">2</button>
+              <button class="rubric-star" data-val="3" onclick="rateRubric('consultant',4,3)">3</button>
+              <button class="rubric-star" data-val="4" onclick="rateRubric('consultant',4,4)">4</button>
+              <button class="rubric-star" data-val="5" onclick="rateRubric('consultant',4,5)">5</button>
+            </div>
+          </div>
+          <div class="rubric-score-display">
+            <div class="rubric-score-value needs-work" id="score-consultant">-- / 5.0</div>
+            <div class="rubric-score-label">Average Score (need 3.0 to pass)</div>
+          </div>
+          <div class="rubric-pass-msg" id="msg-consultant"></div>
+        </div>
+      </section>
+    </div><!-- end panel-consultant -->
+
+
+    <!-- ================================================================
+         CERTIFICATE SECTION
+         ================================================================ -->
+    <section class="section certificate-section" id="certificate-area">
+      <h2 class="section-heading">Certificate of Completion</h2>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#127891;</span>
+        <div class="callout-content">
+          <p><strong>Congratulations!</strong> You have earned your certificate. Enter your name below and use the Download/Print button to save it.</p>
+        </div>
+      </div>
+
+      <div class="certificate-name-input">
+        <div class="form-group">
+          <label class="form-label">Your Full Name</label>
+          <input type="text" class="form-input" id="cert-name-input" placeholder="Enter your name for the certificate" oninput="updateCertificate()">
+        </div>
+      </div>
+
+      <div class="certificate" id="certificate-display">
+        <div class="certificate-header">Claude AI Mastery Training</div>
+        <div class="certificate-title">Certificate of Completion</div>
+        <div class="certificate-subtitle">This certifies that</div>
+        <div class="certificate-name" id="cert-display-name">Your Name</div>
+        <div class="certificate-subtitle">has successfully completed the Capstone Project</div>
+        <div class="certificate-details">
+          <div class="certificate-detail">
+            <div class="certificate-detail-label">Track</div>
+            <div class="certificate-detail-value" id="cert-track">--</div>
+          </div>
+          <div class="certificate-detail">
+            <div class="certificate-detail-label">Score</div>
+            <div class="certificate-detail-value" id="cert-score">--</div>
+          </div>
+          <div class="certificate-detail">
+            <div class="certificate-detail-label">Date</div>
+            <div class="certificate-detail-value" id="cert-date">--</div>
+          </div>
+        </div>
+        <div class="certificate-footer">Issued by Claude AI Training Program</div>
+      </div>
+
+      <div style="text-align:center;margin-top:24px;" class="no-print">
+        <button class="btn-primary" onclick="window.print()">Download / Print Certificate</button>
+      </div>
+    </section>
+
+
+    <!-- ========================================
+         NAVIGATION FOOTER
+         ======================================== -->
+    <nav class="module-nav no-print">
+      <a href="35-cert-practice-exam.html" class="nav-link prev">
+        <span class="nav-dir">&larr; Previous</span>
+        <span class="nav-title">Module 35: Practice Exam Engine</span>
+      </a>
+      <a href="../index.html" class="nav-link next">
+        <span class="nav-dir">Return to Hub &rarr;</span>
+        <span class="nav-title">Training Hub Home</span>
+      </a>
+    </nav>
+
+  </div><!-- end content-wrapper -->
+</main>
+
+
+<!-- ============================================
+     JAVASCRIPT
+     ============================================ -->
+<script>
+(function() {
+  'use strict';
+
+  var STORAGE_KEY = 'claude-training-module-99';
+
+  // ==========================================
+  // THEME TOGGLE
+  // ==========================================
+  var themeToggle = document.getElementById('themeToggle');
+  var themeIcon = document.getElementById('themeIcon');
+  var html = document.documentElement;
+
+  function getPreferredTheme() {
+    var saved = localStorage.getItem('claude-training-theme');
+    if (saved) return saved;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+
+  function setTheme(theme) {
+    html.setAttribute('data-theme', theme);
+    localStorage.setItem('claude-training-theme', theme);
+    themeIcon.innerHTML = theme === 'dark' ? '&#9788;' : '&#9790;';
+  }
+
+  setTheme(getPreferredTheme());
+
+  themeToggle.addEventListener('click', function() {
+    var current = html.getAttribute('data-theme');
+    setTheme(current === 'dark' ? 'light' : 'dark');
+  });
+
+  // ==========================================
+  // HAMBURGER / MOBILE SIDEBAR
+  // ==========================================
+  var hamburger = document.getElementById('hamburger');
+  var sidebar = document.getElementById('sidebar');
+  var overlay = document.getElementById('sidebarOverlay');
+
+  hamburger.addEventListener('click', function() {
+    sidebar.classList.toggle('open');
+    hamburger.classList.toggle('open');
+    overlay.classList.toggle('show');
+  });
+
+  overlay.addEventListener('click', function() {
+    sidebar.classList.remove('open');
+    hamburger.classList.remove('open');
+    overlay.classList.remove('show');
+  });
+
+  // ==========================================
+  // SIDEBAR SECTION TOGGLES
+  // ==========================================
+  var sectionToggles = document.querySelectorAll('.sidebar-section-toggle');
+  sectionToggles.forEach(function(toggle) {
+    toggle.addEventListener('click', function() {
+      var sectionName = this.getAttribute('data-section');
+      var links = document.getElementById('nav-' + sectionName);
+      if (!links) return;
+
+      this.classList.toggle('collapsed');
+      links.classList.toggle('collapsed');
+    });
+  });
+
+  // ==========================================
+  // SCROLL SPY
+  // ==========================================
+  var sidebarLinks = document.querySelectorAll('.sidebar-link');
+
+  function updateScrollspy() {
+    var scrollY = window.scrollY;
+    var active = null;
+
+    sidebarLinks.forEach(function(link) {
+      var targetId = link.getAttribute('data-target');
+      var target = document.getElementById(targetId);
+      if (target) {
+        var top = target.getBoundingClientRect().top + scrollY - 100;
+        if (scrollY >= top) {
+          active = { link: link, top: top };
+        }
+      }
+    });
+
+    sidebarLinks.forEach(function(l) { l.classList.remove('active'); });
+    if (active) {
+      active.link.classList.add('active');
+    }
+
+    updateSidebarProgress();
+  }
+
+  var scrollTimer = null;
+  window.addEventListener('scroll', function() {
+    if (scrollTimer) return;
+    scrollTimer = setTimeout(function() {
+      scrollTimer = null;
+      updateScrollspy();
+    }, 50);
+  });
+  updateScrollspy();
+
+  // Close mobile sidebar on link click
+  sidebarLinks.forEach(function(link) {
+    link.addEventListener('click', function() {
+      if (window.innerWidth <= 1024) {
+        sidebar.classList.remove('open');
+        hamburger.classList.remove('open');
+        overlay.classList.remove('show');
+      }
+    });
+  });
+
+  // ==========================================
+  // SIDEBAR PROGRESS
+  // ==========================================
+  function updateSidebarProgress() {
+    var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    var scrolled = window.scrollY;
+    var pct = docHeight > 0 ? Math.min(100, (scrolled / docHeight) * 100) : 0;
+
+    var fill = document.getElementById('sidebarProgressFill');
+    if (fill) {
+      fill.style.width = pct + '%';
+    }
+  }
+
+  // ==========================================
+  // TRACK SELECTION
+  // ==========================================
+  var selectedTrack = null;
+  var trackNames = {
+    business: 'Business',
+    developer: 'Developer',
+    architect: 'Architect',
+    consultant: 'Consultant'
+  };
+
+  window.selectTrack = function(track) {
+    selectedTrack = track;
+
+    // Update card selection state
+    var cards = document.querySelectorAll('.track-card');
+    cards.forEach(function(card) { card.classList.remove('selected'); });
+    var selectedCard = document.getElementById('track-card-' + track);
+    if (selectedCard) selectedCard.classList.add('selected');
+
+    // Show the correct panel, hide others
+    var panels = document.querySelectorAll('.track-panel');
+    panels.forEach(function(p) { p.classList.remove('active'); });
+    var panel = document.getElementById('panel-' + track);
+    if (panel) panel.classList.add('active');
+
+    // Highlight matching sidebar section
+    var allTracks = ['business', 'developer', 'architect', 'consultant'];
+    allTracks.forEach(function(t) {
+      var sidebarSection = document.getElementById('sidebar-' + t);
+      if (sidebarSection) {
+        sidebarSection.style.opacity = (t === track) ? '1' : '0.5';
+      }
+    });
+
+    // Save selection
+    saveProgress();
+
+    // Scroll to first section of selected track
+    var firstSection = panel ? panel.querySelector('.section') : null;
+    if (firstSection) {
+      setTimeout(function() {
+        firstSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  };
+
+  // ==========================================
+  // RECOMMEND TRACK BASED ON ASSESSMENT
+  // ==========================================
+  function recommendTrack() {
+    var assessmentData = null;
+    try {
+      var raw = localStorage.getItem('claude-training-assessment');
+      if (raw) assessmentData = JSON.parse(raw);
+    } catch (e) { /* ignore */ }
+
+    if (!assessmentData || !assessmentData.profile) return;
+
+    var profile = assessmentData.profile.toLowerCase();
+    var recommended = 'business';
+
+    if (profile.indexOf('developer') !== -1 || profile.indexOf('engineer') !== -1) {
+      recommended = 'developer';
+    } else if (profile.indexOf('architect') !== -1 || profile.indexOf('technical lead') !== -1) {
+      recommended = 'architect';
+    } else if (profile.indexOf('consultant') !== -1 || profile.indexOf('advisor') !== -1) {
+      recommended = 'consultant';
+    } else if (profile.indexOf('leader') !== -1 || profile.indexOf('manager') !== -1 || profile.indexOf('business') !== -1) {
+      recommended = 'business';
+    }
+
+    var recEl = document.getElementById('rec-' + recommended);
+    if (recEl) recEl.classList.add('show');
+  }
+  recommendTrack();
+
+  // ==========================================
+  // EXPANDABLE SECTIONS
+  // ==========================================
+  window.toggleExpand = function(id) {
+    var el = document.getElementById(id);
+    if (el) {
+      el.classList.toggle('open');
+    }
+  };
+
+  // ==========================================
+  // REVEAL EXAMPLE RESPONSE
+  // ==========================================
+  window.revealExample = function(id) {
+    var el = document.getElementById(id);
+    if (el) {
+      el.classList.toggle('show');
+    }
+  };
+
+  // ==========================================
+  // WORD COUNT
+  // ==========================================
+  window.updateWordCount = function(textareaId, wcId) {
+    var textarea = document.getElementById(textareaId);
+    var wcEl = document.getElementById(wcId);
+    if (!textarea || !wcEl) return;
+
+    var text = textarea.value.trim();
+    var words = text.length > 0 ? text.split(/\s+/).length : 0;
+    wcEl.textContent = words + ' word' + (words !== 1 ? 's' : '');
+  };
+
+  // ==========================================
+  // ROI CALCULATOR
+  // ==========================================
+  window.calculateROI = function() {
+    var team = parseInt(document.getElementById('b-roi-team').value) || 0;
+    var rate = parseInt(document.getElementById('b-roi-rate').value) || 0;
+    var hours = parseFloat(document.getElementById('b-roi-hours').value) || 0;
+    var license = parseInt(document.getElementById('b-roi-license').value) || 0;
+    var training = parseInt(document.getElementById('b-roi-training').value) || 0;
+    var months = parseInt(document.getElementById('b-roi-months').value) || 12;
+
+    var weeksPerYear = 52;
+    var annualSavings = team * hours * rate * weeksPerYear;
+    var annualLicenseCost = team * license * 12;
+    var totalCost = (annualLicenseCost * (months / 12)) + training;
+    var periodSavings = annualSavings * (months / 12);
+    var roi = totalCost > 0 ? ((periodSavings - totalCost) / totalCost) * 100 : 0;
+
+    var savingsEl = document.getElementById('b-roi-savings');
+    var costEl = document.getElementById('b-roi-cost');
+    var pctEl = document.getElementById('b-roi-pct');
+
+    savingsEl.textContent = '$' + formatNumber(Math.round(periodSavings));
+    costEl.textContent = '$' + formatNumber(Math.round(totalCost));
+
+    var roiRounded = Math.round(roi);
+    pctEl.textContent = roiRounded + '%';
+
+    if (roi >= 100) {
+      pctEl.className = 'roi-metric-value positive';
+    } else if (roi > 0) {
+      pctEl.className = 'roi-metric-value neutral';
+    } else {
+      pctEl.className = 'roi-metric-value negative';
+    }
+
+    savingsEl.className = 'roi-metric-value positive';
+    costEl.className = 'roi-metric-value negative';
+  };
+
+  function formatNumber(n) {
+    return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+
+  // Initialize ROI
+  calculateROI();
+
+  // ==========================================
+  // PROMPT QUALITY SCORER
+  // ==========================================
+  var systemPromptEl = document.getElementById('d-system-prompt');
+  if (systemPromptEl) {
+    systemPromptEl.addEventListener('input', function() {
+      scorePrompt(this.value);
+    });
+  }
+
+  function scorePrompt(text) {
+    var scoreFill = document.getElementById('d-prompt-score-fill');
+    var scoreText = document.getElementById('d-prompt-score-text');
+    var tips = document.getElementById('d-prompt-tips');
+    if (!scoreFill || !scoreText || !tips) return;
+
+    var score = 0;
+    var maxScore = 10;
+    var feedback = [];
+
+    // Length check
+    if (text.length > 50) { score += 1; }
+    if (text.length > 200) { score += 1; }
+    if (text.length > 500) { score += 1; }
+
+    // Role definition
+    if (/you are|your role|as a/i.test(text)) {
+      score += 1;
+    } else {
+      feedback.push('Define a clear role (e.g. "You are a...")');
+    }
+
+    // Tone/behavior instructions
+    if (/tone|professional|friendly|empathetic|polite/i.test(text)) {
+      score += 1;
+    } else {
+      feedback.push('Specify tone and behavior guidelines');
+    }
+
+    // Tool usage references
+    if (/tool|search|knowledge|database|api/i.test(text)) {
+      score += 1;
+    } else {
+      feedback.push('Include tool usage instructions');
+    }
+
+    // Boundaries
+    if (/never|do not|don'?t|must not|prohibited|forbidden/i.test(text)) {
+      score += 1;
+    } else {
+      feedback.push('Set clear boundaries (what NOT to do)');
+    }
+
+    // Escalation
+    if (/escalat|human|agent|transfer|handoff/i.test(text)) {
+      score += 1;
+    } else {
+      feedback.push('Define escalation criteria');
+    }
+
+    // Formatting instructions
+    if (/format|markdown|bullet|step|structured/i.test(text)) {
+      score += 1;
+    } else {
+      feedback.push('Add formatting instructions');
+    }
+
+    // Examples or specifics
+    if (/example|e\.g\.|for instance|such as/i.test(text)) {
+      score += 1;
+    } else {
+      feedback.push('Include specific examples');
+    }
+
+    var pct = (score / maxScore) * 100;
+    scoreFill.style.width = pct + '%';
+
+    var level = 'low';
+    if (pct >= 70) level = 'high';
+    else if (pct >= 40) level = 'medium';
+
+    scoreFill.className = 'prompt-scorer-fill ' + level;
+    scoreText.textContent = score + ' / ' + maxScore;
+
+    if (feedback.length > 0) {
+      tips.textContent = 'Improve: ' + feedback.slice(0, 3).join(' | ');
+    } else {
+      tips.textContent = 'Excellent prompt! Comprehensive and well-structured.';
+    }
+  }
+
+  // ==========================================
+  // ARCHITECT: AGENT COUNT UPDATER
+  // ==========================================
+  window.updateAgentFields = function() {
+    var count = parseInt(document.getElementById('a-agent-count').value) || 3;
+    for (var i = 1; i <= 5; i++) {
+      var agentEl = document.getElementById('a-agent-' + i);
+      if (agentEl) {
+        if (i <= count) {
+          agentEl.classList.remove('hidden');
+        } else {
+          agentEl.classList.add('hidden');
+        }
+      }
+    }
+  };
+
+  // ==========================================
+  // RUBRIC SCORING
+  // ==========================================
+  var rubricScores = {
+    business: [0, 0, 0, 0, 0],
+    developer: [0, 0, 0, 0, 0],
+    architect: [0, 0, 0, 0, 0],
+    consultant: [0, 0, 0, 0, 0]
+  };
+
+  window.rateRubric = function(track, dim, val) {
+    rubricScores[track][dim] = val;
+
+    // Update star visuals
+    var stars = document.querySelectorAll('.rubric-stars[data-rubric="' + track + '"][data-dim="' + dim + '"] .rubric-star');
+    stars.forEach(function(star) {
+      var starVal = parseInt(star.getAttribute('data-val'));
+      if (starVal <= val) {
+        star.classList.add('active');
+      } else {
+        star.classList.remove('active');
+      }
+    });
+
+    // Calculate average
+    var scores = rubricScores[track];
+    var filled = scores.filter(function(s) { return s > 0; });
+    var avg = filled.length > 0 ? filled.reduce(function(a, b) { return a + b; }, 0) / filled.length : 0;
+
+    var scoreEl = document.getElementById('score-' + track);
+    var msgEl = document.getElementById('msg-' + track);
+
+    if (filled.length === 5) {
+      var avgDisplay = avg.toFixed(1);
+      scoreEl.textContent = avgDisplay + ' / 5.0';
+
+      if (avg >= 3.0) {
+        scoreEl.className = 'rubric-score-value pass';
+        msgEl.className = 'rubric-pass-msg show pass';
+        msgEl.innerHTML = '<strong>Passed!</strong> Your average score of ' + avgDisplay + ' qualifies you for the certificate. Scroll down to generate it.';
+
+        // Show certificate section
+        var certSection = document.getElementById('certificate-area');
+        if (certSection) {
+          certSection.classList.add('show');
+          updateCertificateDetails(track, avgDisplay);
+        }
+      } else {
+        scoreEl.className = 'rubric-score-value needs-work';
+        msgEl.className = 'rubric-pass-msg show needs-work';
+        msgEl.innerHTML = '<strong>Needs improvement.</strong> Your average score of ' + avgDisplay + ' is below the 3.0 threshold. Review your work and re-assess the areas where you scored lowest.';
+      }
+
+      // Save progress
+      saveProgress();
+    } else {
+      scoreEl.textContent = (filled.length > 0 ? avg.toFixed(1) : '--') + ' / 5.0';
+      scoreEl.className = 'rubric-score-value needs-work';
+      msgEl.className = 'rubric-pass-msg';
+      msgEl.innerHTML = '';
+    }
+  };
+
+  function updateCertificateDetails(track, score) {
+    var trackEl = document.getElementById('cert-track');
+    var scoreEl = document.getElementById('cert-score');
+    var dateEl = document.getElementById('cert-date');
+
+    if (trackEl) trackEl.textContent = trackNames[track] || track;
+    if (scoreEl) scoreEl.textContent = score + ' / 5.0';
+    if (dateEl) {
+      var now = new Date();
+      var options = { year: 'numeric', month: 'long', day: 'numeric' };
+      dateEl.textContent = now.toLocaleDateString('en-US', options);
+    }
+  }
+
+  // ==========================================
+  // CERTIFICATE NAME UPDATE
+  // ==========================================
+  window.updateCertificate = function() {
+    var nameInput = document.getElementById('cert-name-input');
+    var nameDisplay = document.getElementById('cert-display-name');
+    if (nameInput && nameDisplay) {
+      nameDisplay.textContent = nameInput.value || 'Your Name';
+    }
+    saveProgress();
+  };
+
+  // ==========================================
+  // SAVE / LOAD PROGRESS
+  // ==========================================
+  function saveProgress() {
+    var data = {
+      selectedTrack: selectedTrack,
+      rubricScores: rubricScores,
+      certName: (document.getElementById('cert-name-input') || {}).value || '',
+      timestamp: new Date().toISOString()
+    };
+
+    // Calculate if any track is completed
+    var completed = false;
+    var completedTrack = null;
+    var completedScore = 0;
+
+    ['business', 'developer', 'architect', 'consultant'].forEach(function(track) {
+      var scores = rubricScores[track];
+      var filled = scores.filter(function(s) { return s > 0; });
+      if (filled.length === 5) {
+        var avg = filled.reduce(function(a, b) { return a + b; }, 0) / filled.length;
+        if (avg >= 3.0) {
+          completed = true;
+          completedTrack = track;
+          completedScore = avg;
+        }
+      }
+    });
+
+    data.completed = completed;
+    data.completedTrack = completedTrack;
+    data.completedScore = completedScore;
+
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch (e) { /* ignore quota errors */ }
+  }
+
+  function loadProgress() {
+    var raw = null;
+    try {
+      raw = localStorage.getItem(STORAGE_KEY);
+    } catch (e) { /* ignore */ }
+
+    if (!raw) return;
+
+    var data = null;
+    try {
+      data = JSON.parse(raw);
+    } catch (e) { return; }
+
+    // Restore rubric scores
+    if (data.rubricScores) {
+      rubricScores = data.rubricScores;
+      ['business', 'developer', 'architect', 'consultant'].forEach(function(track) {
+        if (!rubricScores[track]) return;
+        rubricScores[track].forEach(function(val, dim) {
+          if (val > 0) {
+            // Restore star visuals
+            var stars = document.querySelectorAll('.rubric-stars[data-rubric="' + track + '"][data-dim="' + dim + '"] .rubric-star');
+            stars.forEach(function(star) {
+              var starVal = parseInt(star.getAttribute('data-val'));
+              if (starVal <= val) {
+                star.classList.add('active');
+              }
+            });
+          }
+        });
+
+        // Recalculate scores display
+        var filled = rubricScores[track].filter(function(s) { return s > 0; });
+        if (filled.length > 0) {
+          var avg = filled.reduce(function(a, b) { return a + b; }, 0) / filled.length;
+          var scoreEl = document.getElementById('score-' + track);
+          if (scoreEl) {
+            scoreEl.textContent = avg.toFixed(1) + ' / 5.0';
+            if (filled.length === 5 && avg >= 3.0) {
+              scoreEl.className = 'rubric-score-value pass';
+              var msgEl = document.getElementById('msg-' + track);
+              if (msgEl) {
+                msgEl.className = 'rubric-pass-msg show pass';
+                msgEl.innerHTML = '<strong>Passed!</strong> Your average score of ' + avg.toFixed(1) + ' qualifies you for the certificate.';
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Restore selected track
+    if (data.selectedTrack) {
+      selectTrack(data.selectedTrack);
+    }
+
+    // Restore certificate
+    if (data.certName) {
+      var nameInput = document.getElementById('cert-name-input');
+      if (nameInput) nameInput.value = data.certName;
+      updateCertificate();
+    }
+
+    // Show certificate if completed
+    if (data.completed && data.completedTrack) {
+      var certSection = document.getElementById('certificate-area');
+      if (certSection) certSection.classList.add('show');
+      updateCertificateDetails(data.completedTrack, data.completedScore ? data.completedScore.toFixed(1) : '3.0');
+    }
+
+    // Update progress bar if completed
+    if (data.completed) {
+      var fill = document.getElementById('sidebarProgressFill');
+      if (fill) fill.style.width = '100%';
+    }
+  }
+
+  loadProgress();
+
+})();
+</script>
+</body>
+</html>

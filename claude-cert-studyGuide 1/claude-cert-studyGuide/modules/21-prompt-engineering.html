@@ -1,0 +1,4100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 21: Prompt Engineering Lab | Claude AI Training</title>
+<style>
+/* ============================================
+   CSS CUSTOM PROPERTIES & DESIGN SYSTEM
+   Premium Edition with 3-layer shadows, spring
+   transitions, gradient headings, deep dark mode
+   ============================================ */
+:root {
+  --primary: #7C3AED;
+  --primary-light: #A78BFA;
+  --primary-dark: #5B21B6;
+  --accent: #06B6D4;
+  --accent-light: #22D3EE;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  --bg: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --bg-code: #F1F5F9;
+  --text: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --border: #E2E8F0;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04), 0 0px 0px rgba(124,58,237,0);
+  --shadow-lg: 0 4px 12px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.06), 0 0 0 rgba(124,58,237,0);
+  --shadow-glow: 0 4px 12px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.06), 0 0 24px rgba(124,58,237,0.12);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --transition: 0.2s ease;
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --sidebar-width: 280px;
+  --content-max: 800px;
+}
+
+[data-theme="dark"] {
+  --bg: #0B0F1A;
+  --bg-card: #141926;
+  --bg-code: #1A2030;
+  --text: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --border: #1E293B;
+  --shadow: 0 1px 3px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.2), 0 0 0 rgba(124,58,237,0);
+  --shadow-lg: 0 4px 12px rgba(0,0,0,0.4), 0 12px 32px rgba(0,0,0,0.3), 0 0 0 rgba(124,58,237,0);
+  --shadow-glow: 0 4px 12px rgba(0,0,0,0.4), 0 12px 32px rgba(0,0,0,0.3), 0 0 32px rgba(124,58,237,0.15);
+}
+
+/* ============================================
+   REDUCED MOTION
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  html { scroll-behavior: auto; }
+}
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 24px;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  min-height: 100vh;
+  transition: background var(--transition), color var(--transition);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   THEME TOGGLE
+   ============================================ */
+.theme-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: all 0.3s var(--spring);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+.theme-toggle:hover {
+  box-shadow: var(--shadow-glow);
+  transform: scale(1.1);
+}
+
+/* ============================================
+   SIDEBAR
+   ============================================ */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  z-index: 900;
+  transition: transform 0.3s ease, background var(--transition);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.sidebar-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+  margin-bottom: 12px;
+  transition: color var(--transition);
+}
+.sidebar-back:hover { color: var(--primary-dark); }
+
+.sidebar-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.sidebar-module-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.sidebar-nav {
+  padding: 12px 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.sidebar-section {
+  margin-bottom: 4px;
+}
+
+.sidebar-section-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 20px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  text-align: left;
+  transition: color var(--transition);
+}
+.sidebar-section-toggle:hover { color: var(--text); }
+.sidebar-section-toggle .chevron {
+  transition: transform 0.2s ease;
+  font-size: 0.65rem;
+}
+.sidebar-section-toggle.collapsed .chevron {
+  transform: rotate(-90deg);
+}
+
+.sidebar-links {
+  list-style: none;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.sidebar-links.collapsed {
+  max-height: 0 !important;
+}
+
+.sidebar-link {
+  display: block;
+  padding: 7px 20px 7px 32px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: all var(--transition);
+  line-height: 1.4;
+}
+.sidebar-link:hover {
+  color: var(--text);
+  background: var(--bg);
+}
+.sidebar-link.active {
+  color: var(--primary);
+  border-left-color: var(--primary);
+  background: rgba(124, 58, 237, 0.05);
+  font-weight: 600;
+}
+[data-theme="dark"] .sidebar-link.active {
+  background: rgba(124, 58, 237, 0.12);
+}
+
+.sidebar-progress {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sidebar-progress-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.sidebar-progress-track {
+  height: 6px;
+  background: var(--bg-code);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.sidebar-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 3px;
+  transition: width 0.5s ease;
+  width: 0%;
+}
+
+/* Hamburger button (mobile) */
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1001;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+  transition: all var(--transition);
+}
+.hamburger span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--text);
+  margin: 4px auto;
+  transition: all 0.3s ease;
+  border-radius: 1px;
+}
+.hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(4px, 4px); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(4px, -4px); }
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 899;
+}
+
+/* ============================================
+   MAIN CONTENT
+   ============================================ */
+.main-content {
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+  transition: margin var(--transition);
+}
+
+.content-wrapper {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 40px 32px 80px;
+}
+
+/* Module Header */
+.module-header {
+  margin-bottom: 48px;
+}
+.module-header .breadcrumb {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+.module-header .breadcrumb a {
+  color: var(--primary);
+  text-decoration: none;
+}
+.module-header .breadcrumb a:hover { text-decoration: underline; }
+
+.module-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.module-badge .number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.module-badge .label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.module-header h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.module-header .description {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 640px;
+}
+
+.module-meta {
+  display: flex;
+  gap: 16px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.module-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  background: var(--bg-code);
+  padding: 6px 14px;
+  border-radius: 20px;
+}
+
+/* ============================================
+   SECTIONS
+   ============================================ */
+.section {
+  margin-bottom: 56px;
+  scroll-margin-top: 24px;
+}
+
+.section-heading {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+  line-height: 1.3;
+}
+
+.section h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-top: 32px;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.section h4 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-top: 24px;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.section p {
+  margin-bottom: 16px;
+  color: var(--text-secondary);
+}
+
+.section ul, .section ol {
+  margin-bottom: 16px;
+  padding-left: 24px;
+}
+.section li {
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+}
+.section li strong {
+  color: var(--text);
+}
+
+/* ============================================
+   CODE BLOCKS
+   ============================================ */
+.code-block {
+  background: #1E293B;
+  color: #E2E8F0;
+  border-radius: var(--radius-sm);
+  padding: 20px 24px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  overflow-x: auto;
+  position: relative;
+  margin: 16px 0 20px;
+  tab-size: 2;
+}
+.code-block .code-label {
+  position: absolute;
+  top: 8px;
+  left: 16px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #64748B;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+.code-block.has-label {
+  padding-top: 36px;
+}
+.code-block .copy-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: #94A3B8;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  transition: all var(--transition);
+}
+.code-block .copy-btn:hover { background: rgba(255,255,255,0.2); color: white; }
+.code-block .copy-btn.copied { background: var(--success); color: white; }
+
+/* Syntax highlighting classes */
+.kw { color: #C084FC; }
+.str { color: #6EE7B7; }
+.fn { color: #7DD3FC; }
+.cm { color: #64748B; }
+.num { color: #FDBA74; }
+.op { color: #FCA5A5; }
+.type { color: #67E8F9; }
+.param { color: #FDE68A; }
+.prop { color: #F0ABFC; }
+.punc { color: #94A3B8; }
+.tag { color: #FCA5A5; font-weight: 600; }
+.output { color: #64748B; font-style: italic; }
+
+/* Inline code */
+code {
+  background: var(--bg-code);
+  color: var(--primary);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.88em;
+}
+[data-theme="dark"] code {
+  background: #334155;
+}
+.code-block code {
+  background: none;
+  color: inherit;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+  white-space: pre-wrap;
+  display: block;
+}
+
+/* ============================================
+   CALLOUT BOXES
+   ============================================ */
+.callout {
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  margin: 20px 0;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.callout-icon {
+  flex-shrink: 0;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+.callout-content { flex: 1; }
+.callout-content p { margin-bottom: 6px; color: inherit; }
+.callout-content p:last-child { margin-bottom: 0; }
+
+.callout.info {
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  color: #1E40AF;
+}
+.callout.tip {
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  color: #166534;
+}
+.callout.warning {
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  color: #92400E;
+}
+.callout.important {
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  color: #991B1B;
+}
+
+[data-theme="dark"] .callout.info {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: #93C5FD;
+}
+[data-theme="dark"] .callout.tip {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #6EE7B7;
+}
+[data-theme="dark"] .callout.warning {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #FCD34D;
+}
+[data-theme="dark"] .callout.important {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #FCA5A5;
+}
+
+/* ============================================
+   ACCENT CARDS with ::before gradient bars
+   ============================================ */
+.accent-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin: 24px 0;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s var(--spring), box-shadow 0.3s var(--spring), transform 0.3s var(--spring);
+}
+.accent-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.accent-card:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+}
+.accent-card h4 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.accent-card p {
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+.accent-card p:last-child { margin-bottom: 0; }
+.accent-card ul {
+  padding-left: 20px;
+  margin-bottom: 12px;
+}
+.accent-card li {
+  margin-bottom: 6px;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+}
+
+/* ============================================
+   TECHNIQUE CARDS (numbered)
+   ============================================ */
+.technique-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px 24px 24px 80px;
+  margin: 20px 0;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s var(--spring), box-shadow 0.3s var(--spring), transform 0.3s var(--spring);
+}
+.technique-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, var(--primary), var(--accent));
+}
+.technique-card:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+}
+.technique-number {
+  position: absolute;
+  left: 20px;
+  top: 24px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+.technique-card h4 {
+  margin-top: 0;
+  margin-bottom: 6px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.technique-card .technique-when {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+.technique-card p {
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+.technique-card p:last-child { margin-bottom: 0; }
+
+/* ============================================
+   BEFORE/AFTER GALLERY
+   ============================================ */
+.gallery-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+}
+.gallery-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+}
+.gallery-pair:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+.gallery-card {
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  position: relative;
+}
+.gallery-card.before {
+  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+.gallery-card.after {
+  background: rgba(16, 185, 129, 0.06);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+[data-theme="dark"] .gallery-card.before {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.25);
+}
+[data-theme="dark"] .gallery-card.after {
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.25);
+}
+.gallery-card-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+}
+.gallery-card.before .gallery-card-label { color: var(--error); }
+.gallery-card.after .gallery-card-label { color: var(--success); }
+.gallery-card-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.gallery-card pre {
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--text-secondary);
+  margin: 0;
+}
+.gallery-why {
+  grid-column: 1 / -1;
+  margin-top: -8px;
+}
+.gallery-why-toggle {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 0;
+  transition: color var(--transition);
+}
+.gallery-why-toggle:hover { color: var(--primary-dark); }
+.gallery-why-content {
+  display: none;
+  padding: 12px 16px;
+  margin-top: 8px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+.gallery-why-content.show { display: block; }
+.improvement-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(6, 182, 212, 0.1));
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.78rem;
+  color: var(--primary);
+  margin: 2px 4px 2px 0;
+}
+[data-theme="dark"] .improvement-badge {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(6, 182, 212, 0.15));
+  border-color: rgba(124, 58, 237, 0.35);
+}
+
+/* ============================================
+   PROMPT LAB (Flagship Interactive)
+   ============================================ */
+.lab-container {
+  background: var(--bg-card);
+  border: 2px solid var(--primary-light);
+  border-radius: var(--radius);
+  padding: 0;
+  margin: 32px 0;
+  overflow: hidden;
+}
+.lab-header {
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  padding: 20px 28px;
+  color: white;
+}
+.lab-header h3 {
+  font-size: 1.3rem;
+  font-weight: 800;
+  margin: 0 0 4px;
+  color: white;
+}
+.lab-header p {
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.85);
+  margin: 0;
+}
+.lab-body {
+  padding: 24px 28px;
+}
+.lab-panels {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+@media (min-width: 641px) {
+  .lab-panels {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.lab-panel {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.lab-panel-header {
+  background: var(--bg-code);
+  padding: 10px 16px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+}
+.lab-panel-body {
+  padding: 16px;
+}
+
+/* Editor panel */
+.lab-editor-textarea {
+  width: 100%;
+  min-height: 280px;
+  padding: 16px;
+  background: #1E293B;
+  color: #E2E8F0;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.85rem;
+  line-height: 1.7;
+  resize: vertical;
+  tab-size: 2;
+  outline: none;
+}
+.lab-editor-textarea:focus {
+  box-shadow: 0 0 0 2px var(--primary);
+}
+.lab-editor-textarea::placeholder {
+  color: #475569;
+}
+
+.lab-scenario-select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: border-color var(--transition);
+}
+.lab-scenario-select:focus {
+  border-color: var(--primary);
+  outline: none;
+}
+.lab-load-better-btn {
+  margin-top: 8px;
+  padding: 8px 16px;
+  background: var(--bg);
+  border: 1px solid var(--primary-light);
+  border-radius: var(--radius-sm);
+  color: var(--primary);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.lab-load-better-btn:hover {
+  background: rgba(124, 58, 237, 0.08);
+}
+
+/* Parameter controls */
+.lab-control-group {
+  margin-bottom: 16px;
+}
+.lab-control-group:last-child { margin-bottom: 0; }
+.lab-control-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.lab-control-value {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--primary);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+.lab-radio-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.lab-radio-option {
+  padding: 6px 14px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s var(--spring);
+  color: var(--text-secondary);
+  user-select: none;
+}
+.lab-radio-option.selected {
+  border-color: var(--primary);
+  background: rgba(124, 58, 237, 0.1);
+  color: var(--primary);
+}
+.lab-radio-option:hover:not(.selected) {
+  border-color: var(--primary-light);
+}
+.lab-slider {
+  width: 100%;
+  accent-color: var(--primary);
+  margin-top: 4px;
+}
+.lab-system-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+.lab-system-toggle input[type="checkbox"] {
+  accent-color: var(--primary);
+}
+.lab-system-toggle span {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.lab-system-prompt-area {
+  display: none;
+  margin-top: 8px;
+}
+.lab-system-prompt-area.show { display: block; }
+.lab-system-textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 12px;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+}
+.lab-system-textarea:focus {
+  border-color: var(--primary);
+}
+
+/* Generate button */
+.lab-generate-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 32px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s var(--spring);
+  margin: 16px 0;
+}
+.lab-generate-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow);
+}
+.lab-generate-btn:active {
+  transform: translateY(0);
+}
+
+/* Response viewer */
+.lab-response-area {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 20px;
+  min-height: 200px;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  overflow-x: auto;
+}
+.lab-response-area.typing {
+  border-color: var(--primary-light);
+}
+.lab-response-meta {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+.lab-response-tag {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 10px;
+  background: var(--bg-code);
+  color: var(--text-muted);
+}
+
+/* Quality scorer */
+.lab-scorer {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 20px;
+  margin-top: 20px;
+}
+.lab-scorer-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+.lab-score-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.lab-score-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  min-width: 90px;
+}
+.lab-score-track {
+  flex: 1;
+  height: 8px;
+  background: var(--bg-code);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.lab-score-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s var(--spring), background 0.3s ease;
+}
+.lab-score-fill.low { background: linear-gradient(90deg, var(--error), #F87171); }
+.lab-score-fill.medium { background: linear-gradient(90deg, var(--warning), #FBBF24); }
+.lab-score-fill.high { background: linear-gradient(90deg, var(--success), #34D399); }
+.lab-score-value {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  min-width: 36px;
+  text-align: right;
+  font-family: 'SF Mono', monospace;
+}
+.lab-overall-score {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+.lab-overall-label {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.lab-overall-grade {
+  font-size: 1.8rem;
+  font-weight: 800;
+  line-height: 1;
+}
+.lab-overall-grade.grade-a { color: var(--success); }
+.lab-overall-grade.grade-b { color: #06B6D4; }
+.lab-overall-grade.grade-c { color: var(--warning); }
+.lab-overall-grade.grade-d { color: #F97316; }
+.lab-overall-grade.grade-f { color: var(--error); }
+
+/* ============================================
+   TOOL DESCRIPTION WORKSHOP
+   ============================================ */
+.workshop-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+}
+.workshop-scenario {
+  margin-bottom: 28px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--border);
+}
+.workshop-scenario:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+.workshop-scenario-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.workshop-scenario-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: white;
+  font-weight: 700;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+.workshop-scenario-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.workshop-scenario-desc {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+.workshop-textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 12px 16px;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+  transition: border-color var(--transition);
+}
+.workshop-textarea:focus { border-color: var(--primary); }
+.workshop-score-btn {
+  margin-top: 8px;
+  padding: 8px 20px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s var(--spring);
+}
+.workshop-score-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+.workshop-result {
+  display: none;
+  margin-top: 16px;
+}
+.workshop-result.show { display: block; }
+.workshop-result-scores {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.workshop-result-item {
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  text-align: center;
+}
+.workshop-result-item .label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+.workshop-result-item .value {
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+.workshop-result-item .value.high { color: var(--success); }
+.workshop-result-item .value.medium { color: var(--warning); }
+.workshop-result-item .value.low { color: var(--error); }
+.workshop-expert {
+  display: none;
+  margin-top: 12px;
+  padding: 16px;
+  background: rgba(16, 185, 129, 0.06);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: var(--radius-sm);
+}
+[data-theme="dark"] .workshop-expert {
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.25);
+}
+.workshop-expert.show { display: block; }
+.workshop-expert-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--success);
+  margin-bottom: 8px;
+}
+.workshop-expert pre {
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ============================================
+   COMPARISON TABLE
+   ============================================ */
+.comparison-table-wrapper {
+  overflow-x: auto;
+  margin: 20px 0;
+}
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.comparison-table th {
+  background: var(--primary);
+  color: white;
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+.comparison-table th:first-child {
+  border-radius: var(--radius-sm) 0 0 0;
+}
+.comparison-table th:last-child {
+  border-radius: 0 var(--radius-sm) 0 0;
+}
+.comparison-table td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+.comparison-table tr:nth-child(even) td {
+  background: var(--bg);
+}
+.comparison-table tr:last-child td:first-child {
+  border-radius: 0 0 0 var(--radius-sm);
+}
+.comparison-table tr:last-child td:last-child {
+  border-radius: 0 0 var(--radius-sm) 0;
+}
+
+/* ============================================
+   END-OF-MODULE QUIZ
+   ============================================ */
+.final-quiz {
+  background: var(--bg-card);
+  border: 2px solid var(--primary-light);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+}
+.final-quiz h3 {
+  margin-top: 0;
+}
+
+.final-quiz-question {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.final-quiz-question .fq-number {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+.final-quiz-question .fq-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+.fq-options { list-style: none; padding: 0; }
+.fq-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 12px;
+  margin-bottom: 4px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+.fq-option:hover { background: rgba(124, 58, 237, 0.05); }
+.fq-option input[type="radio"] {
+  accent-color: var(--primary);
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+.fq-option.selected-correct {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+.fq-option.selected-wrong {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+}
+.fq-option.reveal-correct {
+  background: rgba(16, 185, 129, 0.08);
+  color: #059669;
+  font-weight: 600;
+}
+[data-theme="dark"] .fq-option.selected-correct { color: #6EE7B7; }
+[data-theme="dark"] .fq-option.selected-wrong { color: #FCA5A5; }
+[data-theme="dark"] .fq-option.reveal-correct { color: #6EE7B7; }
+
+.final-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 32px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  margin-top: 8px;
+}
+.final-submit-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-lg); }
+.final-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.final-result {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: var(--radius-sm);
+  display: none;
+}
+.final-result.show { display: block; }
+.final-result.pass {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.final-result.fail {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.final-result h4 {
+  margin-top: 0;
+  margin-bottom: 6px;
+  font-size: 1.1rem;
+}
+.final-result p {
+  margin-bottom: 0;
+  font-size: 0.95rem;
+}
+.final-result.pass h4 { color: var(--success); }
+.final-result.fail h4 { color: var(--warning); }
+
+/* ============================================
+   NAVIGATION FOOTER
+   ============================================ */
+.module-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 16px;
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 2px solid var(--border);
+}
+.nav-link {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: all 0.3s var(--spring);
+  min-width: 0;
+  flex: 1;
+  max-width: 50%;
+}
+.nav-link:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+}
+.nav-link.next { align-items: flex-end; text-align: right; }
+.nav-link .nav-dir {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--primary);
+}
+.nav-link .nav-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 1024px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .hamburger {
+    display: flex;
+  }
+  .sidebar-overlay.show {
+    display: block;
+  }
+  .main-content {
+    margin-left: 0;
+  }
+  .theme-toggle {
+    right: 16px;
+  }
+}
+
+@media (max-width: 640px) {
+  .content-wrapper {
+    padding: 24px 16px 60px;
+  }
+  .module-header h1 {
+    font-size: 1.6rem;
+  }
+  .section-heading {
+    font-size: 1.3rem;
+  }
+  .gallery-pair {
+    grid-template-columns: 1fr;
+  }
+  .lab-panels {
+    grid-template-columns: 1fr;
+  }
+  .technique-card {
+    padding-left: 24px;
+    padding-top: 64px;
+  }
+  .technique-number {
+    top: 16px;
+    left: 16px;
+  }
+  .module-nav {
+    flex-direction: column;
+  }
+  .nav-link {
+    max-width: 100%;
+  }
+  .nav-link.next {
+    align-items: flex-start;
+    text-align: left;
+  }
+}
+
+/* ============================================
+   SCROLLBAR STYLING
+   ============================================ */
+.sidebar::-webkit-scrollbar,
+.code-block::-webkit-scrollbar,
+.lab-editor-textarea::-webkit-scrollbar,
+.lab-response-area::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.sidebar::-webkit-scrollbar-track,
+.code-block::-webkit-scrollbar-track,
+.lab-editor-textarea::-webkit-scrollbar-track,
+.lab-response-area::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+.code-block::-webkit-scrollbar-thumb,
+.lab-editor-textarea::-webkit-scrollbar-thumb,
+.lab-response-area::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.section {
+  animation: fadeInUp 0.4s ease both;
+}
+
+@keyframes typing-cursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.typing-cursor::after {
+  content: '|';
+  animation: typing-cursor 0.8s infinite;
+  color: var(--primary);
+}
+
+/* Key concept highlight */
+.key-concept {
+  display: inline-block;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(6, 182, 212, 0.1));
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  color: var(--primary);
+}
+[data-theme="dark"] .key-concept {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(6, 182, 212, 0.15));
+  border-color: rgba(124, 58, 237, 0.35);
+}
+</style>
+</head>
+<body>
+<!-- ============================================
+     THEME TOGGLE
+     ============================================ -->
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+  <span id="themeIcon">&#9790;</span>
+</button>
+
+<!-- ============================================
+     HAMBURGER (mobile)
+     ============================================ -->
+<button class="hamburger" id="hamburger" aria-label="Toggle sidebar">
+  <span></span>
+  <span></span>
+  <span></span>
+</button>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ============================================
+     SIDEBAR
+     ============================================ -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="../index.html" class="sidebar-back">&larr; Back to Hub</a>
+    <div class="sidebar-title">Module 21</div>
+    <div class="sidebar-module-name">Prompt Engineering Lab</div>
+  </div>
+
+  <div class="sidebar-nav">
+    <!-- Section: Techniques -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="techniques">
+        Core Techniques <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-techniques">
+        <li><a href="#five-techniques" class="sidebar-link" data-target="five-techniques">The 5 Core Techniques</a></li>
+        <li><a href="#explicit-criteria" class="sidebar-link" data-target="explicit-criteria">Explicit Criteria</a></li>
+        <li><a href="#before-after-gallery" class="sidebar-link" data-target="before-after-gallery">Before/After Gallery</a></li>
+        <li><a href="#few-shot" class="sidebar-link" data-target="few-shot">Few-Shot Prompting</a></li>
+        <li><a href="#chain-of-thought" class="sidebar-link" data-target="chain-of-thought">Chain-of-Thought</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Patterns -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="patterns">
+        Output Patterns <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-patterns">
+        <li><a href="#structured-output" class="sidebar-link" data-target="structured-output">Structured Output</a></li>
+        <li><a href="#tool-descriptions" class="sidebar-link" data-target="tool-descriptions">Tool Descriptions</a></li>
+        <li><a href="#multi-pass" class="sidebar-link" data-target="multi-pass">Multi-Pass Review</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Exercises -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="exercises">
+        Exercises <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-exercises">
+        <li><a href="#prompt-lab" class="sidebar-link" data-target="prompt-lab">Prompt Engineering Lab</a></li>
+        <li><a href="#tool-workshop" class="sidebar-link" data-target="tool-workshop">Tool Description Workshop</a></li>
+        <li><a href="#final-quiz" class="sidebar-link" data-target="final-quiz">End-of-Module Quiz</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sidebar-progress">
+    <div class="sidebar-progress-label">Module Progress</div>
+    <div class="sidebar-progress-track">
+      <div class="sidebar-progress-fill" id="sidebarProgressFill"></div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================
+     MAIN CONTENT
+     ============================================ -->
+<main class="main-content">
+  <div class="content-wrapper">
+
+    <!-- Module Header -->
+    <header class="module-header">
+      <div class="breadcrumb">
+        <a href="../index.html">Training Hub</a> &raquo; Module 21
+      </div>
+      <div class="module-badge">
+        <span class="number">21</span>
+        <span class="label">Intermediate</span>
+      </div>
+      <h1>Prompt Engineering Lab</h1>
+      <p class="description">
+        Master the art and science of crafting effective prompts for Claude. From explicit criteria and few-shot examples to structured output patterns and multi-pass review -- learn the techniques that transform vague requests into precise, reliable AI interactions.
+      </p>
+      <div class="module-meta">
+        <span class="module-meta-item">&#9201; ~90 min</span>
+        <span class="module-meta-item">&#128218; Intermediate</span>
+        <span class="module-meta-item">&#127919; 3 Interactive Exercises</span>
+        <span class="module-meta-item">&#128101; Developers, Architects &amp; Consultants</span>
+      </div>
+    </header>
+
+    <!-- ========================================
+         SECTION 1: THE 5 CORE PROMPTING TECHNIQUES
+         ======================================== -->
+    <section class="section" id="five-techniques">
+      <h2 class="section-heading">1. The 5 Core Prompting Techniques</h2>
+
+      <p>
+        Prompt engineering is not guesswork. There are <strong>five core techniques</strong> that, when applied systematically, transform unreliable AI responses into consistent, high-quality output. These techniques compound -- the best prompts combine multiple approaches, and understanding each individually lets you know exactly which lever to pull when results fall short.
+      </p>
+
+      <p>
+        Here is an overview of each technique and when it delivers the most value.
+      </p>
+
+      <div class="technique-card">
+        <span class="technique-number">1</span>
+        <h4>Explicit Criteria</h4>
+        <div class="technique-when">Use when: You need predictable, consistent output quality</div>
+        <p>Tell Claude exactly what to include, what to exclude, how to format, and what quality means. "Summarize this" is a wish. "Summarize in 3 bullets, each under 20 words, focusing on financial impact" is a specification.</p>
+      </div>
+
+      <div class="technique-card">
+        <span class="technique-number">2</span>
+        <h4>Few-Shot Examples</h4>
+        <div class="technique-when">Use when: Output format is nuanced or non-obvious</div>
+        <p>Show Claude 2-3 examples of input/output pairs. This is far more effective than describing the format in words. Include one "edge case" example to establish how Claude should handle ambiguity.</p>
+      </div>
+
+      <div class="technique-card">
+        <span class="technique-number">3</span>
+        <h4>Chain-of-Thought</h4>
+        <div class="technique-when">Use when: The problem requires multi-step reasoning</div>
+        <p>Ask Claude to reason step by step before answering. This dramatically improves accuracy on math, logic, debugging, and analysis tasks. For complex problems, use Claude's Extended Thinking mode.</p>
+      </div>
+
+      <div class="technique-card">
+        <span class="technique-number">4</span>
+        <h4>Role Assignment</h4>
+        <div class="technique-when">Use when: You need domain-specific depth or a particular communication style</div>
+        <p>Give Claude a specific persona: "You are a senior database architect with 15 years of PostgreSQL experience." This focuses the model's knowledge distribution and adjusts tone, vocabulary, and depth.</p>
+      </div>
+
+      <div class="technique-card">
+        <span class="technique-number">5</span>
+        <h4>Structured Output</h4>
+        <div class="technique-when">Use when: Your code needs to parse the response programmatically</div>
+        <p>Define the exact format -- JSON schema, XML tags, markdown template. For guaranteed structure, use <code>tool_use</code> with a JSON Schema definition. Never rely on Claude "usually" returning the right format.</p>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>The power is in combination.</strong> The best prompts typically use 3-4 of these techniques together. For example: a role assignment + explicit criteria + structured output + one example. The next sections break down each technique in depth.</p>
+        </div>
+      </div>
+
+      <h3>Combined Example: All 5 Techniques in One Prompt</h3>
+
+      <p>
+        Here is a real-world prompt that combines all five techniques. Notice how each technique plays a specific role:
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">5 Techniques Combined</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm"># Technique 4: Role Assignment</span>
+You are a senior security engineer specializing in
+web application security (OWASP Top 10).
+
+<span class="cm"># Technique 1: Explicit Criteria</span>
+Analyze this HTTP endpoint for security vulnerabilities.
+
+Evaluate ONLY these categories:
+1. Injection (SQL, XSS, command injection)
+2. Broken Authentication
+3. Sensitive Data Exposure
+4. Missing Rate Limiting
+
+For each vulnerability found, provide:
+- Severity: CRITICAL / HIGH / MEDIUM / LOW
+- CWE number (if applicable)
+- Specific line reference
+- Exploitation scenario (one sentence)
+- Remediation code
+
+If a category has no issues, state "No issues found."
+Do not invent vulnerabilities.
+
+<span class="cm"># Technique 5: Structured Output</span>
+Return your analysis as JSON matching this schema:
+{
+  "vulnerabilities": [{
+    "category": "string",
+    "severity": "CRITICAL|HIGH|MEDIUM|LOW",
+    "cwe": "CWE-xxx or null",
+    "line": "number",
+    "description": "string",
+    "exploitation": "string",
+    "remediation": "string (code)"
+  }],
+  "overall_risk": "CRITICAL|HIGH|MEDIUM|LOW",
+  "summary": "string (max 50 words)"
+}
+
+<span class="cm"># Technique 2: Few-Shot Example</span>
+Example output for a SQL injection vulnerability:
+{
+  "category": "Injection",
+  "severity": "CRITICAL",
+  "cwe": "CWE-89",
+  "line": 15,
+  "description": "User input concatenated into SQL query",
+  "exploitation": "Attacker can extract entire database",
+  "remediation": "Use parameterized queries"
+}
+
+<span class="cm"># Technique 3: Chain-of-Thought</span>
+Before producing the JSON, think through each
+endpoint parameter and trace how user input flows
+through the code to identify taint paths.
+
+Code to analyze:
+[paste code here]</code></div>
+
+      <p>
+        This prompt leaves almost nothing to chance. The role focuses Claude's knowledge. The criteria define the scope. The structure ensures parseability. The example shows the expected format. The CoT instruction ensures thorough analysis.
+      </p>
+    </section>
+
+    <!-- ========================================
+         SECTION 2: EXPLICIT CRITERIA
+         ======================================== -->
+    <section class="section" id="explicit-criteria">
+      <h2 class="section-heading">2. Explicit Criteria -- The Foundation</h2>
+
+      <p>
+        Explicit criteria is the single most impactful technique in your prompt engineering toolkit. It is the difference between "Claude gave me something okay" and "Claude gave me exactly what I needed." Every underperforming prompt can be improved by adding more specific criteria.
+      </p>
+
+      <h3>Why Vague Prompts Fail</h3>
+
+      <p>
+        When you write "Summarize this article," you are leaving <strong>every decision to Claude</strong>: How long should it be? What format? What should it emphasize? Should it include quotes? What about statistics? Each of those decisions is a coin flip that might not land the way you want.
+      </p>
+
+      <p>
+        Compare these two prompts:
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Vague Prompt</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>Summarize this article.</code></div>
+
+      <div class="code-block has-label">
+        <span class="code-label">Criteria-Driven Prompt</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>Summarize this article in 3 bullet points.
+For each bullet:
+- State the key finding or decision (max 20 words)
+- Include the supporting data point or statistic
+- Note the source/speaker if attributed
+
+Focus on financial impact. Ignore editorial opinions.
+If a statistic is approximate, prefix with "~".</code></div>
+
+      <p>
+        The second prompt leaves almost nothing to chance. Claude knows the length, format, focus, what to include, what to exclude, and how to handle edge cases.
+      </p>
+
+      <h3>The Criteria Framework</h3>
+
+      <p>
+        Every effective criteria-driven prompt addresses four dimensions:
+      </p>
+
+      <div class="accent-card">
+        <h4>WHAT to Include (and Exclude)</h4>
+        <p>Be specific about what information should appear in the output. Equally important: tell Claude what to leave out. "Focus on technical risks. Do not include marketing language or competitive positioning." Exclusions prevent Claude from padding the response with irrelevant content.</p>
+      </div>
+
+      <div class="accent-card">
+        <h4>HOW to Format It</h4>
+        <p>Define the structure (bullets, table, JSON), length (word count, number of items), and style (formal, conversational, technical). "Return as a markdown table with columns: Risk, Likelihood, Impact, Mitigation." The more structural detail you provide, the less variance in the output.</p>
+      </div>
+
+      <div class="accent-card">
+        <h4>Quality Standards</h4>
+        <p>Set explicit quality bars. "Every claim must reference the specific section of the document it comes from." "Do not speculate -- only include information explicitly stated in the input." "If you are less than 80% confident in a classification, mark it as 'UNCERTAIN'."</p>
+      </div>
+
+      <div class="accent-card">
+        <h4>Edge Case Handling</h4>
+        <p>Tell Claude what to do when information is missing, ambiguous, or contradictory. "If no deadline is specified, write 'TBD' rather than guessing." "If two sources conflict, present both with a note about the discrepancy." This is the dimension most people forget -- and where most prompt failures occur.</p>
+      </div>
+
+      <h3>Criteria Across Domains</h3>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Domain</th>
+              <th>Example Criteria</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Code Review</strong></td>
+              <td>Categorize issues as: Bug / Performance / Style / Security. Show the line number and a fix for each.</td>
+            </tr>
+            <tr>
+              <td><strong>Data Extraction</strong></td>
+              <td>Return JSON. Use null for missing fields. All dates in ISO 8601. Monetary values as numbers without currency symbols.</td>
+            </tr>
+            <tr>
+              <td><strong>Document Summary</strong></td>
+              <td>3 bullets, max 20 words each, focusing on action items. Note the responsible person and deadline.</td>
+            </tr>
+            <tr>
+              <td><strong>Classification</strong></td>
+              <td>Exactly one category from the provided list. Include confidence (high/medium/low) and one-sentence reasoning.</td>
+            </tr>
+            <tr>
+              <td><strong>Risk Assessment</strong></td>
+              <td>Likelihood x Impact matrix. Sorted by risk score descending. Include specific mitigation steps, not generic advice.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Building Criteria Iteratively</h3>
+
+      <p>
+        You rarely get criteria perfect on the first try. The most effective workflow is iterative:
+      </p>
+
+      <ol>
+        <li><strong>Start with a minimal prompt</strong> and observe what Claude produces.</li>
+        <li><strong>Identify the gaps</strong> -- where did the output diverge from your expectations?</li>
+        <li><strong>Add criteria for each gap</strong> -- format rules, inclusion/exclusion lists, edge case handlers.</li>
+        <li><strong>Test again</strong> with the same input. Did the new criteria fix the issue?</li>
+        <li><strong>Repeat</strong> until the output is consistent across 3-5 runs.</li>
+      </ol>
+
+      <div class="callout info">
+        <span class="callout-icon">&#128712;</span>
+        <div class="callout-content">
+          <p><strong>The 3-run test:</strong> Run your prompt 3 times with the same input. If the outputs are structurally consistent (same format, similar length, same types of information), your criteria are working. If they vary significantly, you need more explicit criteria in the areas where they diverge.</p>
+        </div>
+      </div>
+
+      <h3>Complete Example: Criteria-Driven Code Review</h3>
+
+      <p>
+        Here is a full, production-quality criteria-driven prompt for code review. Notice how every aspect of the expected output is specified.
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Production Criteria-Driven Prompt</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>Review this pull request diff for a Python FastAPI backend.
+
+Evaluate across these 4 categories (in order):
+
+## 1. Correctness
+- Logic errors that would cause incorrect behavior
+- Unhandled exceptions that would crash the process
+- Race conditions in async code
+- Missing await keywords on async functions
+
+## 2. Security
+- SQL injection (raw string interpolation in queries)
+- Path traversal (user input in file paths)
+- Missing authentication/authorization checks
+- Sensitive data exposure in logs or error messages
+- Hardcoded secrets or credentials
+
+## 3. Performance
+- N+1 query patterns (queries inside loops)
+- Missing database indexes for frequent query patterns
+- Unbounded result sets (no LIMIT clause)
+- Blocking I/O in async handlers
+
+## 4. Maintainability
+- Functions longer than 50 lines
+- Missing type annotations on public functions
+- Unclear variable names (single letters, abbreviations)
+- Duplicated logic that should be extracted
+
+For each issue:
+1. Quote the exact line(s) from the diff
+2. Explain the risk in one sentence
+3. Rate severity: CRITICAL / HIGH / MEDIUM / LOW
+4. Provide a corrected code snippet
+
+If no issues are found in a category, state:
+"No issues found in [category]."
+
+Do NOT invent issues. Only report problems you can
+demonstrate with specific code references.
+
+At the end, provide:
+- Overall assessment: APPROVE / REQUEST_CHANGES / BLOCK
+- Summary: 2-3 sentences explaining your recommendation</code></div>
+
+      <p>
+        This prompt is long, but every line serves a purpose. The review will be structured, consistent, and actionable. Compare this to "Review this PR" -- which could produce anything from a one-liner to a novel.
+      </p>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE: BEFORE/AFTER GALLERY
+         ======================================== -->
+    <section class="section" id="before-after-gallery">
+      <h2 class="section-heading">Before/After Prompt Gallery</h2>
+
+      <p>
+        See the difference that explicit criteria, examples, and structure make. Each pair shows a naive prompt alongside an optimized version for the same task. Click "Why It's Better" to see the specific improvements annotated.
+      </p>
+
+      <p>
+        Pay attention to the pattern: every "After" prompt specifies the output format, defines what to include and exclude, handles edge cases, and sets quality standards. These are not suggestions -- they are the minimum requirements for reliable prompt engineering.
+      </p>
+
+      <div class="gallery-container" id="galleryContainer">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 3: FEW-SHOT PROMPTING
+         ======================================== -->
+    <section class="section" id="few-shot">
+      <h2 class="section-heading">3. Few-Shot Prompting</h2>
+
+      <p>
+        <span class="key-concept">Few-shot prompting</span> means providing Claude with 2-3 examples of the input/output pattern you want, directly in the prompt. Instead of <em>describing</em> the desired output format, you <em>show</em> it. This is one of the most reliable techniques for getting consistent, correctly-formatted responses.
+      </p>
+
+      <h3>When to Use Few-Shot</h3>
+
+      <ul>
+        <li><strong>Output format is not obvious</strong> -- when you need a specific JSON structure, classification schema, or custom format that Claude would not default to.</li>
+        <li><strong>Classification tasks</strong> -- sentiment analysis, ticket routing, priority assignment. Examples establish the decision boundary far better than descriptions.</li>
+        <li><strong>Nuanced judgment calls</strong> -- when the "right answer" depends on contextual factors that are hard to describe in rules.</li>
+        <li><strong>Tone or style matching</strong> -- when you need output that matches an existing voice (e.g., your company's writing style).</li>
+      </ul>
+
+      <h3>How Many Examples?</h3>
+
+      <p>
+        <strong>2-3 examples is the sweet spot.</strong> One example is often ambiguous -- Claude might latch onto incidental features. Two examples establish a pattern. Three examples with an edge case solidify it. More than three rarely helps and wastes context tokens.
+      </p>
+
+      <div class="callout warning">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Example quality matters more than quantity.</strong> Three carefully-chosen examples (covering common case, edge case, and negative case) outperform ten sloppy ones. Make sure your examples are correct -- Claude will faithfully reproduce errors in your examples.</p>
+        </div>
+      </div>
+
+      <h3>Include Negative Examples</h3>
+
+      <p>
+        Negative examples -- showing Claude what <strong>not</strong> to do -- are surprisingly powerful. They define the boundary of acceptable output and prevent common failure modes.
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Few-Shot with Negative Example</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>Classify customer feedback into exactly ONE category.
+
+Categories: BUG, FEATURE_REQUEST, PRAISE, COMPLAINT, QUESTION
+
+Example 1 (common case):
+Input: "The app crashes when I upload a PDF"
+Output: {"category": "BUG", "confidence": "high"}
+
+Example 2 (edge case -- mixed signals):
+Input: "I love the new dashboard, but it would be even
+better with dark mode"
+Output: {"category": "FEATURE_REQUEST", "confidence": "medium"}
+Note: Even though there is praise, the primary intent
+is requesting a feature.
+
+Example 3 (what NOT to do):
+Input: "How do I reset my password?"
+WRONG: {"category": "COMPLAINT", "confidence": "low"}
+CORRECT: {"category": "QUESTION", "confidence": "high"}
+Reason: Asking for help is not a complaint.</code></div>
+
+      <h3>Example: Full Classification Prompt</h3>
+
+      <div class="code-block has-label">
+        <span class="code-label">Production-Ready Few-Shot Prompt</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>Classify this customer feedback.
+
+Return JSON with these fields:
+- category: exactly one of BUG | FEATURE_REQUEST | PRAISE
+           | COMPLAINT | QUESTION
+- confidence: high | medium | low
+- sentiment: 1 (very negative) to 5 (very positive)
+- summary: max 15 words
+
+Example:
+Input: "Your app crashes every time I try to upload a PDF.
+This is so frustrating!"
+Output: {"category": "BUG", "confidence": "high",
+"sentiment": 1, "summary": "App crashes on PDF upload,
+user frustrated"}
+
+Example:
+Input: "Just wanted to say the new search feature is
+incredible. Saves me hours every week!"
+Output: {"category": "PRAISE", "confidence": "high",
+"sentiment": 5, "summary": "User loves new search feature,
+significant time savings"}
+
+Example:
+Input: "Can you add Slack integration? Our team lives in
+Slack and switching tools is painful."
+Output: {"category": "FEATURE_REQUEST", "confidence": "high",
+"sentiment": 2, "summary": "Requests Slack integration due
+to workflow friction"}
+
+Now classify this feedback:
+[paste feedback here]</code></div>
+
+      <h3>Anti-Pattern: Too Many Examples</h3>
+
+      <p>
+        A common mistake is including 8-10 examples "to be thorough." This backfires for two reasons:
+      </p>
+
+      <ul>
+        <li><strong>Token waste:</strong> Each example consumes context tokens. Ten examples might use 2,000+ tokens that would be better spent on actual input data.</li>
+        <li><strong>Overfitting:</strong> With many examples, Claude can start matching surface patterns (keyword similarity) rather than understanding the underlying classification logic. Three diverse examples encourage generalization.</li>
+      </ul>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Number of Examples</th>
+              <th>When to Use</th>
+              <th>Risk</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>0 (zero-shot)</strong></td>
+              <td>Simple, well-understood tasks. Claude already knows the format.</td>
+              <td>Format variance across runs</td>
+            </tr>
+            <tr>
+              <td><strong>1</strong></td>
+              <td>The format is unusual but the logic is simple.</td>
+              <td>Claude may latch onto incidental features of the single example</td>
+            </tr>
+            <tr>
+              <td><strong>2-3 (sweet spot)</strong></td>
+              <td>Classification, extraction, generation with specific format.</td>
+              <td>Minimal -- this is the recommended range</td>
+            </tr>
+            <tr>
+              <td><strong>4-6</strong></td>
+              <td>Highly nuanced judgment where boundaries are subtle.</td>
+              <td>Increased token cost; diminishing returns</td>
+            </tr>
+            <tr>
+              <td><strong>7+</strong></td>
+              <td>Almost never. Consider fine-tuning or few-shot with retrieval instead.</td>
+              <td>Token waste, overfitting, reduced input capacity</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Choosing Your Examples</h3>
+
+      <p>
+        Select examples that maximize coverage across the decision space:
+      </p>
+
+      <ol>
+        <li><strong>Example 1: The common case.</strong> Pick the most frequent input type. This anchors Claude's default behavior.</li>
+        <li><strong>Example 2: The edge case.</strong> Pick an input that is ambiguous or sits at the boundary between two categories. This teaches Claude how to handle uncertainty.</li>
+        <li><strong>Example 3: The negative case (optional).</strong> Show what the output should NOT look like. This is especially valuable for preventing common misclassifications.</li>
+      </ol>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>Pro tip: Use real data.</strong> If you are building a classification system, pull your examples from actual production data rather than inventing synthetic inputs. Real data captures the messiness and ambiguity that Claude will encounter in practice.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 4: CHAIN-OF-THOUGHT & EXTENDED THINKING
+         ======================================== -->
+    <section class="section" id="chain-of-thought">
+      <h2 class="section-heading">4. Chain-of-Thought &amp; Extended Thinking</h2>
+
+      <p>
+        <span class="key-concept">Chain-of-Thought (CoT)</span> prompting asks Claude to reason through a problem step by step before giving a final answer. This is not a trick -- it fundamentally changes how the model processes the problem, allocating more computation to each reasoning step rather than jumping directly to a conclusion.
+      </p>
+
+      <h3>The Simplest CoT Trigger</h3>
+
+      <p>
+        Adding <strong>"Think step by step"</strong> to the end of a prompt is the simplest form of CoT. It works because it forces Claude to generate intermediate reasoning tokens before the final answer. Each reasoning token conditions the next, creating a chain of logical dependencies.
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Without CoT</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>A store has 3 shelves. Each shelf holds 4 boxes.
+Each box contains 6 red balls and 2 blue balls.
+If I remove all blue balls from the top shelf,
+how many balls remain in the entire store?</code></div>
+
+      <div class="code-block has-label">
+        <span class="code-label">With CoT</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>A store has 3 shelves. Each shelf holds 4 boxes.
+Each box contains 6 red balls and 2 blue balls.
+If I remove all blue balls from the top shelf,
+how many balls remain in the entire store?
+
+Think step by step before giving your final answer.</code></div>
+
+      <h3>When CoT Helps</h3>
+
+      <ul>
+        <li><strong>Math and arithmetic</strong> -- multi-step calculations where intermediate results matter.</li>
+        <li><strong>Logic puzzles</strong> -- constraint satisfaction, deduction, syllogisms.</li>
+        <li><strong>Multi-step reasoning</strong> -- "Given A and B, what follows? Given that, what else follows?"</li>
+        <li><strong>Debugging</strong> -- tracing through code execution to find where behavior diverges from expectation.</li>
+        <li><strong>Analysis</strong> -- weighing pros and cons, comparing multiple options, risk assessment.</li>
+      </ul>
+
+      <h3>When CoT Hurts</h3>
+
+      <div class="callout warning">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>CoT is not always better.</strong> For simple factual recall ("What is the capital of France?"), simple classification, or straightforward formatting tasks, CoT adds latency and token cost without improving accuracy. Use it selectively.</p>
+        </div>
+      </div>
+
+      <h3>Extended Thinking</h3>
+
+      <p>
+        Claude's <span class="key-concept">Extended Thinking</span> mode is a built-in, more powerful version of CoT. When enabled, Claude allocates a separate "thinking" budget before responding. The thinking is more thorough than a simple "think step by step" instruction and is especially effective for:
+      </p>
+
+      <ul>
+        <li><strong>Complex architecture decisions</strong> -- weighing trade-offs across multiple dimensions.</li>
+        <li><strong>Long-form code generation</strong> -- planning the structure before writing.</li>
+        <li><strong>Multi-file refactoring</strong> -- understanding cascading impacts before making changes.</li>
+        <li><strong>Ambiguous requirements</strong> -- identifying and resolving ambiguities before proceeding.</li>
+      </ul>
+
+      <h3>Example: Debugging with CoT</h3>
+
+      <div class="code-block has-label">
+        <span class="code-label">CoT Debugging Prompt</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>This function should return the average of a list of numbers,
+but it sometimes returns incorrect results.
+
+```python
+def calculate_average(scores):
+    total = sum(scores)
+    return total / len(scores)
+```
+
+Trace through the execution for these inputs and identify
+the bug:
+1. scores = [80, 90, 70] (expected: 80.0)
+2. scores = [] (expected: 0.0)
+3. scores = None (expected: error message)
+
+Think step by step for each case. Then provide a fixed
+version that handles all three cases correctly.</code></div>
+
+      <h3>CoT vs Direct Response: Side-by-Side</h3>
+
+      <p>
+        The difference is dramatic on problems that require reasoning. Here is what happens when Claude answers the ball-counting problem from above with and without CoT:
+      </p>
+
+      <div class="accent-card">
+        <h4>Without CoT</h4>
+        <p><strong>Claude's response:</strong> "There are 88 balls remaining in the store."</p>
+        <p><em>This answer is wrong. Claude jumped to a conclusion without working through the steps. The actual answer requires careful counting: 3 shelves x 4 boxes x 8 balls = 96 total, minus 4 boxes x 2 blue balls = 8 removed, leaving 88. In this case the answer happens to be 88, but without showing the work, there is no way to verify the reasoning -- and on slightly more complex problems, the error rate climbs significantly.</em></p>
+      </div>
+
+      <div class="accent-card">
+        <h4>With CoT</h4>
+        <p><strong>Claude's response:</strong></p>
+        <p>"Let me work through this step by step:</p>
+        <p>1. Total boxes: 3 shelves x 4 boxes = 12 boxes<br>
+        2. Balls per box: 6 red + 2 blue = 8 balls per box<br>
+        3. Total balls: 12 boxes x 8 balls = 96 balls<br>
+        4. Blue balls on top shelf: 4 boxes x 2 blue = 8 blue balls removed<br>
+        5. Remaining: 96 - 8 = 88 balls</p>
+        <p>There are 88 balls remaining in the store."</p>
+      </div>
+
+      <p>
+        The CoT version not only gets the right answer but <strong>shows its work</strong>, making it easy to verify and debug. If the answer were wrong, you could pinpoint exactly which step went astray.
+      </p>
+
+      <h3>Structured CoT: Beyond "Think Step by Step"</h3>
+
+      <p>
+        For complex problems, you can structure the reasoning process itself. Instead of generic "think step by step," give Claude a specific reasoning framework:
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Structured CoT for Architecture Decisions</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>Should we use a message queue or direct API calls for
+our microservice communication?
+
+Analyze this decision using this framework:
+
+## 1. Requirements Analysis
+- What are the throughput requirements?
+- What are the latency requirements?
+- Is ordering important?
+- Is exactly-once delivery required?
+
+## 2. Evaluate Option A: Message Queue
+- Pros (with specific technical reasoning)
+- Cons (with specific technical reasoning)
+- Best suited when: [conditions]
+
+## 3. Evaluate Option B: Direct API Calls
+- Pros (with specific technical reasoning)
+- Cons (with specific technical reasoning)
+- Best suited when: [conditions]
+
+## 4. Recommendation
+- State your recommendation
+- Justify it against the requirements from step 1
+- Note what would change your recommendation</code></div>
+
+      <div class="callout info">
+        <span class="callout-icon">&#128712;</span>
+        <div class="callout-content">
+          <p><strong>When to use Extended Thinking vs manual CoT:</strong> Use Extended Thinking (API parameter) when the problem is genuinely complex and you want Claude to reason deeply without consuming visible output tokens for thinking. Use manual CoT ("think step by step") when you want to <em>see</em> the reasoning as part of the output -- useful for debugging, auditing, and building trust with stakeholders.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 5: STRUCTURED OUTPUT PATTERNS
+         ======================================== -->
+    <section class="section" id="structured-output">
+      <h2 class="section-heading">5. Structured Output Patterns</h2>
+
+      <p>
+        When your code needs to parse Claude's response programmatically, you need <strong>guaranteed structure</strong> -- not "Claude usually returns JSON." This section covers the patterns for ensuring Claude's output matches your schema every time.
+      </p>
+
+      <h3>JSON Output with <code>tool_use</code></h3>
+
+      <p>
+        The most reliable way to get structured JSON from Claude is to define a <span class="key-concept">tool</span> with a JSON Schema and ask Claude to call it. Combined with <code>tool_choice: "any"</code>, this <strong>guarantees</strong> that Claude will return valid JSON matching your schema.
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Guaranteed JSON via tool_use</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm">// Define a tool with your desired output schema</span>
+tools: [{
+  name: <span class="str">"extract_invoice_data"</span>,
+  description: <span class="str">"Extract structured data from an invoice"</span>,
+  input_schema: {
+    type: <span class="str">"object"</span>,
+    properties: {
+      invoice_number: { type: <span class="str">"string"</span> },
+      date: { type: <span class="str">"string"</span>, format: <span class="str">"date"</span> },
+      vendor_name: { type: <span class="str">"string"</span> },
+      line_items: {
+        type: <span class="str">"array"</span>,
+        items: {
+          type: <span class="str">"object"</span>,
+          properties: {
+            description: { type: <span class="str">"string"</span> },
+            quantity: { type: <span class="str">"number"</span> },
+            unit_price: { type: <span class="str">"number"</span> },
+            total: { type: <span class="str">"number"</span> }
+          },
+          required: [<span class="str">"description"</span>, <span class="str">"quantity"</span>,
+                     <span class="str">"unit_price"</span>, <span class="str">"total"</span>]
+        }
+      },
+      total: { type: <span class="str">"number"</span> }
+    },
+    required: [<span class="str">"invoice_number"</span>, <span class="str">"vendor_name"</span>,
+               <span class="str">"total"</span>]
+  }
+}]
+
+<span class="cm">// Force Claude to call the tool</span>
+tool_choice: { type: <span class="str">"any"</span> }</code></div>
+
+      <h3>XML Tags for Parsing</h3>
+
+      <p>
+        XML tags provide lightweight structure without requiring tool definitions. They are especially useful for separating reasoning from answers, or for multi-part responses.
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">XML Tag Pattern</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>Analyze this code for security vulnerabilities.
+
+Structure your response using these XML tags:
+
+<span class="tag">&lt;thinking&gt;</span>
+Your analysis process (I will use this for logging)
+<span class="tag">&lt;/thinking&gt;</span>
+
+<span class="tag">&lt;vulnerabilities&gt;</span>
+  <span class="tag">&lt;vuln severity="high|medium|low"&gt;</span>
+    <span class="tag">&lt;description&gt;</span>What the vulnerability is<span class="tag">&lt;/description&gt;</span>
+    <span class="tag">&lt;line&gt;</span>Line number<span class="tag">&lt;/line&gt;</span>
+    <span class="tag">&lt;fix&gt;</span>How to fix it<span class="tag">&lt;/fix&gt;</span>
+  <span class="tag">&lt;/vuln&gt;</span>
+<span class="tag">&lt;/vulnerabilities&gt;</span>
+
+<span class="tag">&lt;summary&gt;</span>
+One-paragraph executive summary
+<span class="tag">&lt;/summary&gt;</span></code></div>
+
+      <h3>Markdown Templates</h3>
+
+      <p>
+        For human-readable output, define the exact heading structure and bullet format. Claude follows markdown templates very reliably.
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Markdown Template</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>Generate a technical design document using this template:
+
+## Overview
+[1-2 sentences describing the feature]
+
+## Requirements
+- [Bulleted list of requirements]
+
+## Technical Approach
+### Architecture
+[Describe the high-level architecture]
+
+### Data Model
+| Field | Type | Description |
+|-------|------|-------------|
+| ...   | ...  | ...         |
+
+### API Endpoints
+#### `METHOD /path`
+- **Request:** [describe]
+- **Response:** [describe]
+
+## Risks and Mitigations
+| Risk | Likelihood | Mitigation |
+|------|-----------|------------|
+| ...  | ...       | ...        |</code></div>
+
+      <h3>The Validation-Retry Loop</h3>
+
+      <p>
+        Even with <code>tool_use</code>, sometimes you need additional validation beyond what JSON Schema can express (business logic, cross-field dependencies, etc.). The validation-retry pattern handles this:
+      </p>
+
+      <ol>
+        <li><strong>Claude generates output</strong> -- using your tool or structured prompt.</li>
+        <li><strong>Your code validates</strong> -- check against schema, business rules, cross-field constraints.</li>
+        <li><strong>If invalid, send back with specific errors</strong> -- include the original output AND the specific validation failures.</li>
+        <li><strong>Claude fixes and retries</strong> -- with the error context, Claude almost always fixes the issue.</li>
+        <li><strong>Max 3 retries</strong> -- if it fails after 3 attempts, flag for human review.</li>
+      </ol>
+
+      <div class="callout important">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Always include the specific validation error.</strong> "Try again" is useless. "The 'date' field '2024-13-01' is invalid -- month cannot be 13. Please use a valid ISO 8601 date." tells Claude exactly what to fix.</p>
+        </div>
+      </div>
+
+      <h3>Validation-Retry in Practice</h3>
+
+      <div class="code-block has-label">
+        <span class="code-label">Validation-Retry Implementation</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="kw">async function</span> <span class="fn">extractWithRetry</span>(input, maxRetries) {
+  maxRetries = maxRetries || <span class="num">3</span>;
+  <span class="kw">var</span> attempt = <span class="num">0</span>;
+  <span class="kw">var</span> lastError = <span class="kw">null</span>;
+  <span class="kw">var</span> lastOutput = <span class="kw">null</span>;
+
+  <span class="kw">while</span> (attempt &lt; maxRetries) {
+    <span class="kw">var</span> prompt = attempt === <span class="num">0</span>
+      ? buildInitialPrompt(input)
+      : buildRetryPrompt(input, lastOutput, lastError);
+
+    <span class="kw">var</span> response = <span class="kw">await</span> claude.generate({
+      prompt: prompt,
+      tools: [extractionTool],
+      tool_choice: { type: <span class="str">"any"</span> }
+    });
+
+    <span class="kw">var</span> data = response.tool_calls[<span class="num">0</span>].input;
+    <span class="kw">var</span> validationResult = validate(data);
+
+    <span class="kw">if</span> (validationResult.valid) {
+      <span class="kw">return</span> data; <span class="cm">// Success!</span>
+    }
+
+    lastOutput = data;
+    lastError = validationResult.errors;
+    attempt++;
+  }
+
+  <span class="cm">// All retries exhausted -- flag for human review</span>
+  <span class="kw">throw new</span> Error(<span class="str">"Extraction failed after "</span>
+    + maxRetries + <span class="str">" attempts: "</span>
+    + lastError.join(<span class="str">", "</span>));
+}
+
+<span class="kw">function</span> <span class="fn">buildRetryPrompt</span>(input, failedOutput, errors) {
+  <span class="kw">return</span> <span class="str">"Your previous extraction had errors.\n\n"</span>
+    + <span class="str">"Original input:\n"</span> + input + <span class="str">"\n\n"</span>
+    + <span class="str">"Your previous output:\n"</span>
+    + JSON.stringify(failedOutput, <span class="kw">null</span>, <span class="num">2</span>) + <span class="str">"\n\n"</span>
+    + <span class="str">"Validation errors:\n"</span>
+    + errors.map(<span class="kw">function</span>(e) {
+        <span class="kw">return</span> <span class="str">"- "</span> + e;
+      }).join(<span class="str">"\n"</span>) + <span class="str">"\n\n"</span>
+    + <span class="str">"Please fix these specific errors and try again."</span>;
+}</code></div>
+
+      <h3>Choosing the Right Output Pattern</h3>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Pattern</th>
+              <th>Best For</th>
+              <th>Guarantees</th>
+              <th>Tradeoff</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>tool_use + JSON Schema</strong></td>
+              <td>API integrations, data pipelines</td>
+              <td>Valid JSON, correct field types</td>
+              <td>Requires tool definition; adds complexity</td>
+            </tr>
+            <tr>
+              <td><strong>XML tags</strong></td>
+              <td>Multi-part responses, reasoning + answer separation</td>
+              <td>Parseable sections; flexible content within tags</td>
+              <td>No schema validation; content within tags is unstructured</td>
+            </tr>
+            <tr>
+              <td><strong>Markdown template</strong></td>
+              <td>Human-readable documents, reports</td>
+              <td>Consistent structure; easy to render</td>
+              <td>Hard to parse programmatically; headings may vary</td>
+            </tr>
+            <tr>
+              <td><strong>Prompt-only JSON</strong></td>
+              <td>Quick prototyping; low-stakes applications</td>
+              <td>Usually correct format</td>
+              <td>No guarantee; may include markdown fences or extra text</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>Rule of thumb:</strong> If your code will parse the output (JSON.parse, XML parser, regex), use <code>tool_use</code>. If a human will read the output, use markdown templates. If you need both (code parses it, then displays to human), use <code>tool_use</code> for extraction and render the parsed data in your UI.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         FLAGSHIP INTERACTIVE: PROMPT ENGINEERING LAB
+         ======================================== -->
+    <section class="section" id="prompt-lab">
+      <h2 class="section-heading">Prompt Engineering Lab</h2>
+
+      <p>
+        This is the centerpiece interactive. Write a prompt, adjust parameters, and see how prompt quality affects the response. Load pre-built scenarios to compare naive prompts against optimized versions. The quality scorer analyzes your prompt in real time across 5 dimensions.
+      </p>
+
+      <h3>How to Use the Lab</h3>
+
+      <ol>
+        <li><strong>Load a scenario</strong> from the dropdown to see a naive prompt pre-filled.</li>
+        <li><strong>Click "Generate Response"</strong> to see what Claude would return for a low-quality prompt.</li>
+        <li><strong>Click "Load Optimized Version"</strong> to see the improved prompt for that scenario.</li>
+        <li><strong>Generate again</strong> to see the dramatic difference in response quality.</li>
+        <li><strong>Edit the prompt yourself</strong> and watch the Quality Score update in real time.</li>
+        <li><strong>Experiment with parameters</strong> -- try different models, temperatures, and max tokens.</li>
+      </ol>
+
+      <h3>How the Quality Scorer Works</h3>
+
+      <p>
+        The scorer evaluates your prompt across 5 dimensions, each scored 0-100:
+      </p>
+
+      <ul>
+        <li><strong>Clarity (0-100):</strong> Length, specificity, detail level. Longer, more specific prompts score higher. Presence of words like "exactly," "specific," "for each" boost the score.</li>
+        <li><strong>Structure (0-100):</strong> Does the prompt define an output format? Keywords like "JSON," "table," "bullet," "template," "format," or Markdown syntax (##, |) indicate structural intent.</li>
+        <li><strong>Context (0-100):</strong> Does it provide background? Role assignments ("you are"), domain context ("given that"), and analytical verbs ("analyze," "evaluate") score higher.</li>
+        <li><strong>Examples (0-100):</strong> Are there few-shot examples? Presence of "Example:", "Input:", "Output:", "e.g." indicates examples. Multiple examples score higher. Negative examples ("wrong," "incorrect") earn bonus points.</li>
+        <li><strong>Constraints (0-100):</strong> Are there explicit quality rules? Words like "must," "never," "always," "max," "limit," "only," "exactly," "if missing" indicate constraints.</li>
+      </ul>
+
+      <p>
+        The <strong>Overall Score</strong> is the average of all 5 dimensions, mapped to a letter grade: A (80+), B (65-79), C (50-64), D (35-49), F (below 35).
+      </p>
+
+      <div class="lab-container">
+        <div class="lab-header">
+          <h3>Prompt Engineering Lab</h3>
+          <p>Craft, test, and score your prompts. Load a scenario or write your own.</p>
+        </div>
+        <div class="lab-body">
+          <div class="lab-panels">
+            <!-- Left: Prompt Editor -->
+            <div class="lab-panel" style="grid-column: 1 / -1;">
+              <div class="lab-panel-header">Prompt Editor</div>
+              <div class="lab-panel-body">
+                <textarea class="lab-editor-textarea" id="labEditor" placeholder="Write your prompt here...&#10;&#10;Try being specific about:&#10;- What output format you want&#10;- What to include and exclude&#10;- How to handle edge cases&#10;- Quality standards and constraints&#10;&#10;Or load a scenario below to see examples." rows="16"></textarea>
+                <select class="lab-scenario-select" id="labScenarioSelect">
+                  <option value="">-- Load a Scenario --</option>
+                </select>
+                <button class="lab-load-better-btn" id="labLoadBetter" style="display:none;">Load Optimized Version</button>
+              </div>
+            </div>
+
+            <!-- Left bottom: Parameters -->
+            <div class="lab-panel">
+              <div class="lab-panel-header">Parameters</div>
+              <div class="lab-panel-body">
+                <div class="lab-control-group">
+                  <div class="lab-control-label">Model</div>
+                  <div class="lab-radio-group" id="labModelGroup">
+                    <span class="lab-radio-option" data-model="haiku">Haiku</span>
+                    <span class="lab-radio-option selected" data-model="sonnet">Sonnet</span>
+                    <span class="lab-radio-option" data-model="opus">Opus</span>
+                  </div>
+                </div>
+                <div class="lab-control-group">
+                  <div class="lab-control-label">
+                    <span>Temperature</span>
+                    <span class="lab-control-value" id="labTempValue">0.5</span>
+                  </div>
+                  <input type="range" class="lab-slider" id="labTempSlider" min="0" max="10" value="5" step="1">
+                </div>
+                <div class="lab-control-group">
+                  <div class="lab-control-label">
+                    <span>Max Tokens</span>
+                    <span class="lab-control-value" id="labTokensValue">500</span>
+                  </div>
+                  <input type="range" class="lab-slider" id="labTokensSlider" min="50" max="2000" value="500" step="50">
+                </div>
+                <label class="lab-system-toggle">
+                  <input type="checkbox" id="labSystemToggle">
+                  <span>System Prompt</span>
+                </label>
+                <div class="lab-system-prompt-area" id="labSystemArea">
+                  <textarea class="lab-system-textarea" id="labSystemPrompt" placeholder="Enter a system prompt..."></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Response Viewer -->
+            <div class="lab-panel">
+              <div class="lab-panel-header">Simulated Response</div>
+              <div class="lab-panel-body">
+                <div class="lab-response-area" id="labResponse">Click "Generate Response" to see a simulated Claude response based on your prompt and the selected scenario.</div>
+                <div class="lab-response-meta" id="labResponseMeta" style="display:none;">
+                  <span class="lab-response-tag" id="labRespModel">Sonnet</span>
+                  <span class="lab-response-tag" id="labRespTemp">Temp: 0.5</span>
+                  <span class="lab-response-tag" id="labRespTokens">Max: 500</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button class="lab-generate-btn" id="labGenerateBtn">&#9654; Generate Response</button>
+
+          <!-- Quality Scorer -->
+          <div class="lab-scorer" id="labScorer">
+            <div class="lab-scorer-title">Prompt Quality Score</div>
+            <div class="lab-score-row">
+              <span class="lab-score-label">Clarity</span>
+              <div class="lab-score-track"><div class="lab-score-fill low" id="labScoreClarity" style="width:0%"></div></div>
+              <span class="lab-score-value" id="labScoreClarityVal">0</span>
+            </div>
+            <div class="lab-score-row">
+              <span class="lab-score-label">Structure</span>
+              <div class="lab-score-track"><div class="lab-score-fill low" id="labScoreStructure" style="width:0%"></div></div>
+              <span class="lab-score-value" id="labScoreStructureVal">0</span>
+            </div>
+            <div class="lab-score-row">
+              <span class="lab-score-label">Context</span>
+              <div class="lab-score-track"><div class="lab-score-fill low" id="labScoreContext" style="width:0%"></div></div>
+              <span class="lab-score-value" id="labScoreContextVal">0</span>
+            </div>
+            <div class="lab-score-row">
+              <span class="lab-score-label">Examples</span>
+              <div class="lab-score-track"><div class="lab-score-fill low" id="labScoreExamples" style="width:0%"></div></div>
+              <span class="lab-score-value" id="labScoreExamplesVal">0</span>
+            </div>
+            <div class="lab-score-row">
+              <span class="lab-score-label">Constraints</span>
+              <div class="lab-score-track"><div class="lab-score-fill low" id="labScoreConstraints" style="width:0%"></div></div>
+              <span class="lab-score-value" id="labScoreConstraintsVal">0</span>
+            </div>
+            <div class="lab-overall-score">
+              <span class="lab-overall-label">Overall Score: <span id="labOverallNum">0</span>/100</span>
+              <span class="lab-overall-grade grade-f" id="labOverallGrade">F</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 6: TOOL DESCRIPTIONS
+         ======================================== -->
+    <section class="section" id="tool-descriptions">
+      <h2 class="section-heading">6. Tool Descriptions -- The Art of Tool Design</h2>
+
+      <p>
+        If you are building applications that use Claude's <span class="key-concept">tool use</span> capability, the quality of your tool descriptions is the <strong>number one factor</strong> in whether Claude selects the right tool. A well-described tool gets selected correctly 95%+ of the time. A poorly-described tool causes misrouting, hallucinated parameters, and user frustration.
+      </p>
+
+      <h3>The 5 Rules of Effective Tool Descriptions</h3>
+
+      <div class="technique-card">
+        <span class="technique-number">1</span>
+        <h4>Explain WHAT the Tool Does</h4>
+        <p>The tool name alone is not enough. "search_database" could mean full-text search, SQL query execution, or vector similarity search. The description should make the tool's purpose unambiguous: "Executes a read-only SQL query against the PostgreSQL analytics database. Returns results as an array of row objects."</p>
+      </div>
+
+      <div class="technique-card">
+        <span class="technique-number">2</span>
+        <h4>Explain WHEN to Use It</h4>
+        <p>Differentiate this tool from similar tools. "Use this tool when the user asks about historical data or trends. For real-time metrics, use the 'get_live_dashboard' tool instead." Without this guidance, Claude will guess when tools overlap.</p>
+      </div>
+
+      <div class="technique-card">
+        <span class="technique-number">3</span>
+        <h4>Define Input Formats with Examples</h4>
+        <p>Do not just say "query: string." Say "query: A SQL SELECT statement. Example: 'SELECT name, revenue FROM customers WHERE region = 'EMEA' ORDER BY revenue DESC LIMIT 10'." Examples in descriptions are just as powerful as examples in prompts.</p>
+      </div>
+
+      <div class="technique-card">
+        <span class="technique-number">4</span>
+        <h4>Describe Output Format</h4>
+        <p>"Returns a JSON object with 'results' (array of rows), 'row_count' (integer), and 'execution_time_ms' (integer). If no results match, returns an empty array -- not null." This prevents Claude from making incorrect assumptions about the return format.</p>
+      </div>
+
+      <div class="technique-card">
+        <span class="technique-number">5</span>
+        <h4>Note Edge Cases and Limitations</h4>
+        <p>"Maximum 1000 rows per query. Queries that take longer than 30 seconds will timeout. This tool only has read access -- INSERT, UPDATE, and DELETE statements will return an error." These boundaries prevent Claude from attempting impossible operations.</p>
+      </div>
+
+      <h3>Common Pitfall: Overlapping Descriptions</h3>
+
+      <div class="callout important">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>The #1 cause of tool misrouting is overlapping descriptions.</strong> If you have both "search_knowledge_base" and "search_documents" and their descriptions sound similar, Claude will randomly pick one. Fix this by making the WHEN clause explicit: "search_knowledge_base: For FAQ-style questions where the answer exists in pre-curated articles." vs "search_documents: For research queries that need to scan raw uploaded documents."</p>
+        </div>
+      </div>
+
+      <h3>A/B Testing Tool Descriptions</h3>
+
+      <p>
+        Treat tool descriptions like you treat code: test, measure, iterate. Log which tool Claude selects for each query type. If misrouting exceeds 5%, revise the description. Small wording changes can produce large accuracy improvements.
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Logging Tool Selection for A/B Testing</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm">// Log every tool selection for analysis</span>
+<span class="kw">function</span> <span class="fn">logToolSelection</span>(query, selectedTool, expectedTool) {
+  <span class="kw">var</span> entry = {
+    timestamp: <span class="kw">new</span> Date().toISOString(),
+    query: query,
+    selected: selectedTool,
+    expected: expectedTool,
+    correct: selectedTool === expectedTool,
+    description_version: toolDescriptionVersion
+  };
+  analytics.log(<span class="str">"tool_selection"</span>, entry);
+}
+
+<span class="cm">// After collecting 100+ entries, analyze accuracy</span>
+<span class="cm">// If accuracy &lt; 95% for a tool, revise its description</span>
+<span class="cm">// Focus on the WHEN clause -- that is where most</span>
+<span class="cm">// misrouting originates</span></code></div>
+
+      <h3>Good vs Poor Tool Descriptions</h3>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Tool</th>
+              <th>Poor Description</th>
+              <th>Good Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>search_db</strong></td>
+              <td>Searches the database.</td>
+              <td>Executes a read-only SQL SELECT query against the PostgreSQL analytics DB. Returns up to 1000 rows. Use for historical data and aggregations. For real-time data, use get_live_metrics instead.</td>
+            </tr>
+            <tr>
+              <td><strong>send_email</strong></td>
+              <td>Sends an email.</td>
+              <td>Sends an email via the company SMTP server. Requires: to (email address), subject (max 200 chars), body (plain text or HTML). Attachments not supported. Rate limited to 10/minute. Cannot send to external domains.</td>
+            </tr>
+            <tr>
+              <td><strong>get_weather</strong></td>
+              <td>Gets weather data.</td>
+              <td>Returns current weather conditions for a given city. Input: city name (e.g., "San Francisco, CA"). Returns: temp_f, temp_c, conditions, humidity, wind_speed_mph. Updates every 15 minutes. For forecasts, use get_forecast instead.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE: TOOL DESCRIPTION WORKSHOP
+         ======================================== -->
+    <section class="section" id="tool-workshop">
+      <h2 class="section-heading">Tool Description Workshop</h2>
+
+      <p>
+        Practice writing effective tool descriptions. For each scenario, write a description in the textarea, then click "Score My Description" to see how it rates against 5 criteria. Compare your version with the expert description.
+      </p>
+
+      <p>
+        The scorer evaluates your description on 5 dimensions:
+      </p>
+
+      <ul>
+        <li><strong>Completeness:</strong> Does it explain what the tool does, what it accepts, and what it returns?</li>
+        <li><strong>Specificity:</strong> Does it define data types, formats, defaults, and constraints?</li>
+        <li><strong>Examples:</strong> Does it include concrete input/output examples?</li>
+        <li><strong>Edge Cases:</strong> Does it mention errors, limitations, timeouts, and boundaries?</li>
+        <li><strong>Differentiation:</strong> Does it explain when to use this tool vs similar alternatives?</li>
+      </ul>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>Challenge:</strong> Try to score 70+ on all 5 criteria before looking at the expert description. The expert descriptions represent production-quality tool documentation used in real applications.</p>
+        </div>
+      </div>
+
+      <div class="workshop-container" id="workshopContainer">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 7: MULTI-PASS REVIEW PATTERNS
+         ======================================== -->
+    <section class="section" id="multi-pass">
+      <h2 class="section-heading">7. Multi-Pass Review Patterns</h2>
+
+      <p>
+        A common misconception is that Claude can effectively review its own output within the same session. While Claude <em>can</em> self-critique, the review is biased by the reasoning context that produced the original output. The model tends to justify its earlier decisions rather than critically re-evaluate them. Multi-pass patterns solve this.
+      </p>
+
+      <h3>Solution 1: Two-Pass Generation</h3>
+
+      <div class="accent-card">
+        <h4>How It Works</h4>
+        <p><strong>Pass 1 (Generate):</strong> Claude produces an initial output -- code, document, analysis, etc.</p>
+        <p><strong>Pass 2 (Critique and Improve):</strong> In the same session or a new one, ask Claude to review the output with a specific rubric. "Review this code for: (1) edge cases not handled, (2) performance issues, (3) security vulnerabilities. For each issue, explain the risk and provide a fix."</p>
+        <p>This works best when the critique rubric is different from the generation criteria, forcing Claude to evaluate from a new perspective.</p>
+      </div>
+
+      <h3>Solution 2: Independent Reviewer</h3>
+
+      <div class="accent-card">
+        <h4>How It Works</h4>
+        <p>Send the output to a <strong>fresh Claude instance</strong> (new conversation, no shared context) for review. The reviewing instance does not retain the reasoning that produced the original output, so it is not biased toward justifying earlier decisions.</p>
+        <p>This is more effective at catching subtle issues because the reviewer approaches the output cold -- the same way a human code reviewer would.</p>
+      </div>
+
+      <h3>Solution 3: Specialized Passes</h3>
+
+      <div class="accent-card">
+        <h4>How It Works</h4>
+        <p><strong>Pass 1 (Local Analysis):</strong> Review each file or component individually. Focus on correctness within that unit.</p>
+        <p><strong>Pass 2 (Cross-file Integration):</strong> Review how the components interact. Look for interface mismatches, missing error propagation, inconsistent naming, and integration gaps.</p>
+        <p>This pattern avoids <span class="key-concept">attention dilution</span> -- when Claude tries to review everything at once, it spreads its attention too thin and misses issues that would be obvious in a focused review.</p>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>When to use which pattern:</strong> Two-pass is sufficient for most tasks. Use an independent reviewer when accuracy is critical (production code, legal documents, financial analysis). Use specialized passes for large codebases (10+ files) where a single review would exceed context limits.</p>
+        </div>
+      </div>
+
+      <h3>Implementation Example</h3>
+
+      <div class="code-block has-label">
+        <span class="code-label">Independent Reviewer Pattern</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm">// Step 1: Generate code in Session A</span>
+<span class="kw">const</span> generatedCode = <span class="kw">await</span> claude.generate({
+  prompt: <span class="str">"Write a function that validates email addresses..."</span>
+});
+
+<span class="cm">// Step 2: Review in Session B (fresh context)</span>
+<span class="kw">const</span> review = <span class="kw">await</span> claude.generate({
+  prompt: <span class="str">`Review this code. You did NOT write this code.
+Evaluate it objectively for:
+1. Correctness (does it handle all valid RFC 5322 emails?)
+2. Security (ReDoS vulnerability in regex?)
+3. Edge cases (empty string, null, unicode, very long input)
+4. Performance (is the regex efficient?)
+
+Code to review:
+\`\`\`
+${generatedCode}
+\`\`\`
+
+For each issue, show the problematic line and a fix.
+If the code is correct for a category, say "No issues found."
+`</span>
+});</code></div>
+
+      <h3>When to Use Each Pattern</h3>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Pattern</th>
+              <th>Best For</th>
+              <th>Cost (API calls)</th>
+              <th>Effectiveness</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Two-Pass</strong></td>
+              <td>Most tasks: drafts, code, analysis</td>
+              <td>2 calls (same session)</td>
+              <td>Good -- catches obvious errors</td>
+            </tr>
+            <tr>
+              <td><strong>Independent Reviewer</strong></td>
+              <td>Critical output: production code, legal, finance</td>
+              <td>2 calls (separate sessions)</td>
+              <td>Very good -- catches subtle bias</td>
+            </tr>
+            <tr>
+              <td><strong>Specialized Passes</strong></td>
+              <td>Large scope: 10+ files, full codebase reviews</td>
+              <td>N+1 calls (one per unit + integration)</td>
+              <td>Excellent -- avoids attention dilution</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>The Attention Dilution Problem</h3>
+
+      <p>
+        When Claude reviews a large codebase in a single pass, it divides its attention across all files simultaneously. A subtle bug in file 7 of 20 may get less scrutiny than the same bug would receive if file 7 were reviewed in isolation. This is not a model limitation -- it is a fundamental property of how attention mechanisms work across large contexts.
+      </p>
+
+      <p>
+        The specialized passes pattern directly addresses this by ensuring each file gets <strong>full attention</strong> during its local analysis pass. The integration pass then focuses exclusively on cross-cutting concerns, where the context of inter-file relationships is what matters most.
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Specialized Passes for Large Codebase Review</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm">// Pass 1: Review each file individually</span>
+<span class="kw">var</span> fileReviews = [];
+<span class="kw">for</span> (<span class="kw">var</span> i = <span class="num">0</span>; i &lt; files.length; i++) {
+  <span class="kw">var</span> review = <span class="kw">await</span> claude.generate({
+    prompt: <span class="str">"Review this single file for correctness,\n"</span>
+      + <span class="str">"security, and performance issues.\n\n"</span>
+      + <span class="str">"File: "</span> + files[i].name + <span class="str">"\n"</span>
+      + files[i].content
+  });
+  fileReviews.push({
+    file: files[i].name,
+    review: review
+  });
+}
+
+<span class="cm">// Pass 2: Cross-file integration review</span>
+<span class="kw">var</span> integrationReview = <span class="kw">await</span> claude.generate({
+  prompt: <span class="str">"Given these individual file reviews,\n"</span>
+    + <span class="str">"identify cross-file issues:\n"</span>
+    + <span class="str">"- Interface mismatches between modules\n"</span>
+    + <span class="str">"- Inconsistent error handling patterns\n"</span>
+    + <span class="str">"- Missing error propagation\n"</span>
+    + <span class="str">"- Naming inconsistencies\n\n"</span>
+    + fileReviews.map(<span class="kw">function</span>(r) {
+        <span class="kw">return</span> <span class="str">"## "</span> + r.file + <span class="str">"\n"</span> + r.review;
+      }).join(<span class="str">"\n\n"</span>)
+});</code></div>
+
+      <div class="callout warning">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Cost consideration:</strong> Multi-pass patterns multiply your API costs. Use two-pass for general quality improvement. Reserve independent reviewer and specialized passes for high-stakes output where the cost of an error exceeds the cost of additional API calls.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SUMMARY: KEY TAKEAWAYS
+         ======================================== -->
+    <section class="section" id="key-takeaways">
+      <h2 class="section-heading">Key Takeaways</h2>
+
+      <p>
+        Before you take the quiz, here is a summary of the most important concepts from this module:
+      </p>
+
+      <div class="accent-card">
+        <h4>1. Explicit criteria is the highest-leverage technique</h4>
+        <p>Every underperforming prompt can be improved by adding more specific criteria. Define <strong>what</strong> to include, <strong>how</strong> to format it, <strong>quality standards</strong>, and <strong>edge case handling</strong>. This single technique accounts for more improvement than all others combined.</p>
+      </div>
+
+      <div class="accent-card">
+        <h4>2. Few-shot examples: 2-3 is optimal</h4>
+        <p>Show, do not describe. Choose examples that cover the common case, an edge case, and optionally a negative case. Quality matters more than quantity. Pull from real data when possible.</p>
+      </div>
+
+      <div class="accent-card">
+        <h4>3. Chain-of-Thought is not always better</h4>
+        <p>Use CoT for multi-step reasoning, math, debugging, and analysis. Skip it for simple factual recall and classification. Extended Thinking is the more powerful alternative for genuinely complex problems.</p>
+      </div>
+
+      <div class="accent-card">
+        <h4>4. Use tool_use for guaranteed structured output</h4>
+        <p>JSON Schema + <code>tool_choice: "any"</code> guarantees valid JSON matching your schema. Combine with a validation-retry loop for business logic that JSON Schema cannot express.</p>
+      </div>
+
+      <div class="accent-card">
+        <h4>5. Tool descriptions determine tool selection accuracy</h4>
+        <p>Explain what the tool does, when to use it (vs alternatives), input formats with examples, output format, and edge cases. The #1 cause of misrouting is overlapping descriptions.</p>
+      </div>
+
+      <div class="accent-card">
+        <h4>6. Multi-pass review catches what self-review misses</h4>
+        <p>An independent Claude instance is less biased than self-review. For large codebases, use specialized passes (local + integration) to avoid attention dilution.</p>
+      </div>
+    </section>
+
+    <!-- ========================================
+         END-OF-MODULE QUIZ
+         ======================================== -->
+    <section class="section" id="final-quiz">
+      <h2 class="section-heading">End-of-Module Quiz</h2>
+
+      <p>
+        Test your understanding of prompt engineering techniques. You need at least 6 out of 8 correct to pass.
+      </p>
+
+      <div class="final-quiz" id="finalQuizContainer">
+        <h3>Module 21 Assessment</h3>
+        <p style="color:var(--text-secondary); margin-bottom: 20px;">Select the best answer for each question.</p>
+        <div id="finalQuizQuestions"></div>
+        <button class="final-submit-btn" id="finalSubmitBtn" disabled onclick="submitFinalQuiz()">Submit Answers</button>
+        <div class="final-result" id="finalResult">
+          <h4 id="finalResultTitle"></h4>
+          <p id="finalResultText"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         NAVIGATION FOOTER
+         ======================================== -->
+    <nav class="module-nav">
+      <a href="20-api-fundamentals.html" class="nav-link prev">
+        <span class="nav-dir">&larr; Previous</span>
+        <span class="nav-title">Module 20: Claude API Fundamentals</span>
+      </a>
+      <a href="22-tool-design-mcp.html" class="nav-link next">
+        <span class="nav-dir">Next &rarr;</span>
+        <span class="nav-title">Module 22: Tool Design &amp; MCP</span>
+      </a>
+    </nav>
+
+  </div>
+</main>
+
+<!-- ============================================
+     JAVASCRIPT
+     ============================================ -->
+<script>
+(function() {
+  'use strict';
+
+  // ==========================================
+  // THEME TOGGLE
+  // ==========================================
+  var themeToggle = document.getElementById('themeToggle');
+  var themeIcon = document.getElementById('themeIcon');
+  var savedTheme = localStorage.getItem('claude-training-theme');
+  if (savedTheme === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    themeIcon.innerHTML = '&#9728;';
+  }
+
+  themeToggle.addEventListener('click', function() {
+    var current = document.documentElement.getAttribute('data-theme');
+    if (current === 'dark') {
+      document.documentElement.removeAttribute('data-theme');
+      themeIcon.innerHTML = '&#9790;';
+      localStorage.setItem('claude-training-theme', 'light');
+    } else {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      themeIcon.innerHTML = '&#9728;';
+      localStorage.setItem('claude-training-theme', 'dark');
+    }
+  });
+
+  // ==========================================
+  // SIDEBAR TOGGLE (mobile)
+  // ==========================================
+  var hamburger = document.getElementById('hamburger');
+  var sidebar = document.getElementById('sidebar');
+  var overlay = document.getElementById('sidebarOverlay');
+
+  hamburger.addEventListener('click', function() {
+    sidebar.classList.toggle('open');
+    hamburger.classList.toggle('open');
+    overlay.classList.toggle('show');
+  });
+
+  overlay.addEventListener('click', function() {
+    sidebar.classList.remove('open');
+    hamburger.classList.remove('open');
+    overlay.classList.remove('show');
+  });
+
+  // ==========================================
+  // SIDEBAR SECTION TOGGLES
+  // ==========================================
+  var sectionToggles = document.querySelectorAll('.sidebar-section-toggle');
+  sectionToggles.forEach(function(toggle) {
+    toggle.addEventListener('click', function() {
+      var section = this.getAttribute('data-section');
+      var linksList = this.nextElementSibling;
+      var isCollapsed = this.classList.contains('collapsed');
+
+      if (isCollapsed) {
+        this.classList.remove('collapsed');
+        linksList.classList.remove('collapsed');
+        linksList.style.maxHeight = linksList.scrollHeight + 'px';
+      } else {
+        this.classList.add('collapsed');
+        linksList.style.maxHeight = '0';
+        linksList.classList.add('collapsed');
+      }
+    });
+
+    // Set initial max-height
+    var linksList = toggle.nextElementSibling;
+    if (linksList) {
+      linksList.style.maxHeight = linksList.scrollHeight + 'px';
+    }
+  });
+
+  // ==========================================
+  // SCROLLSPY
+  // ==========================================
+  var sidebarLinks = document.querySelectorAll('.sidebar-link');
+  var sections = [];
+
+  sidebarLinks.forEach(function(link) {
+    var targetId = link.getAttribute('data-target');
+    var targetEl = document.getElementById(targetId);
+    if (targetEl) {
+      sections.push({ id: targetId, el: targetEl, link: link });
+    }
+  });
+
+  function updateScrollspy() {
+    var scrollPos = window.scrollY + 100;
+    var active = null;
+
+    for (var i = sections.length - 1; i >= 0; i--) {
+      if (sections[i].el.offsetTop <= scrollPos) {
+        active = sections[i];
+        break;
+      }
+    }
+
+    sidebarLinks.forEach(function(l) { l.classList.remove('active'); });
+    if (active) {
+      active.link.classList.add('active');
+    }
+    updateSidebarProgress();
+  }
+
+  var scrollTimer = null;
+  window.addEventListener('scroll', function() {
+    if (scrollTimer) return;
+    scrollTimer = setTimeout(function() {
+      scrollTimer = null;
+      updateScrollspy();
+    }, 50);
+  });
+  updateScrollspy();
+
+  // Close mobile sidebar on link click
+  sidebarLinks.forEach(function(link) {
+    link.addEventListener('click', function() {
+      if (window.innerWidth <= 1024) {
+        sidebar.classList.remove('open');
+        hamburger.classList.remove('open');
+        overlay.classList.remove('show');
+      }
+    });
+  });
+
+  // ==========================================
+  // SIDEBAR PROGRESS
+  // ==========================================
+  function updateSidebarProgress() {
+    var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    var scrolled = window.scrollY;
+    var pct = docHeight > 0 ? Math.min(100, (scrolled / docHeight) * 100) : 0;
+
+    var fill = document.getElementById('sidebarProgressFill');
+    if (fill) {
+      fill.style.width = pct + '%';
+    }
+  }
+
+  // ==========================================
+  // COPY TO CLIPBOARD
+  // ==========================================
+  window.copyCode = function(btn) {
+    var block = btn.closest('.code-block');
+    var codeEl = block.cloneNode(true);
+    var labelEl = codeEl.querySelector('.code-label');
+    var btnEl = codeEl.querySelector('.copy-btn');
+    if (labelEl) labelEl.remove();
+    if (btnEl) btnEl.remove();
+
+    var text = codeEl.textContent.trim();
+
+    navigator.clipboard.writeText(text).then(function() {
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() {
+        btn.textContent = 'Copy';
+        btn.classList.remove('copied');
+      }, 2000);
+    }).catch(function() {
+      btn.textContent = 'Failed';
+      setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+    });
+  };
+
+  // ==========================================
+  // LAB SCENARIOS DATA
+  // ==========================================
+  var labScenarios = [
+    {
+      name: "Email Summarization",
+      prompt: "Summarize this email thread.",
+      betterPrompt: "Summarize this email thread in 3 bullet points. For each bullet:\n- State the key decision or action item\n- Note who is responsible\n- Include any deadline mentioned\n\nIf no deadline is specified, note 'No deadline stated'.\n\nEmail thread:\n[paste email here]",
+      responses: {
+        basic: "The email discusses a project update. There are some action items mentioned. The team needs to follow up.",
+        good: "- **Database migration deadline extended** -- Sarah (DB team) will complete PostgreSQL migration by March 15 (moved from March 8 due to schema complexity)\n- **API documentation review needed** -- Marcus (API team) to review and approve OpenAPI spec by March 10. No deadline stated for publishing.\n- **Client demo scheduled** -- Elena (PM) confirmed demo for March 20 at 2pm EST. Requires staging environment ready by March 18."
+      },
+      whyBetter: ["Specifies output format (3 bullets)", "Defines content per bullet (decision, owner, deadline)", "Handles edge case (missing deadline)", "Sets clear scope boundaries"]
+    },
+    {
+      name: "Code Review",
+      prompt: "Review this code.",
+      betterPrompt: "Review this Python function for:\n1. **Logic errors** that could cause incorrect results\n2. **Edge cases** not handled (empty input, None values, negative numbers, very large inputs)\n3. **Security issues** (injection, data exposure)\n4. **Performance** problems with large datasets (>10K items)\n\nFor each issue found:\n- Show the problematic line\n- Explain the risk\n- Provide a corrected version\n\nIf the code looks correct for a category, say 'No issues found' rather than inventing problems.\n\n```python\ndef calculate_average(scores):\n    total = sum(scores)\n    return total / len(scores)\n```",
+      responses: {
+        basic: "The code looks mostly fine. You might want to add some error handling. Consider using try/except blocks.",
+        good: "## Code Review: `calculate_average()`\n\n### 1. Logic Errors\n**ZeroDivisionError on empty list** (Line 3)\n```python\n# Bug: len(scores) is 0 when scores is []\nreturn total / len(scores)  # ZeroDivisionError\n\n# Fix:\nif not scores:\n    return 0.0\nreturn total / len(scores)\n```\n\n### 2. Edge Cases\n**TypeError on None input**\n```python\n# Bug: sum(None) raises TypeError\n# Fix: Add input validation\ndef calculate_average(scores):\n    if scores is None or not isinstance(scores, (list, tuple)):\n        raise ValueError('scores must be a list or tuple')\n```\n\n### 3. Security Issues\nNo issues found -- pure computation with no external I/O.\n\n### 4. Performance\nNo issues found -- sum() and len() are O(n), optimal."
+      },
+      whyBetter: ["Defines 4 specific review categories", "Requires line-level specificity", "Demands fixes, not just observations", "Prevents invented problems"]
+    },
+    {
+      name: "Data Extraction",
+      prompt: "Extract data from this invoice.",
+      betterPrompt: "Extract the following fields from this invoice. Return as JSON.\n\nRequired fields:\n- invoice_number (string)\n- date (ISO 8601 format: YYYY-MM-DD)\n- vendor_name (string)\n- line_items (array of {description, quantity, unit_price, total})\n- subtotal (number)\n- tax (number, 0 if not stated)\n- total (number)\n\nRules:\n- If a field is not found in the invoice, set it to null\n- All monetary values should be numbers (not strings), without currency symbols\n- Verify that line_item totals sum to subtotal (flag discrepancy if they don't)\n\nInvoice:\n[paste invoice text here]",
+      responses: {
+        basic: "The invoice is from ABC Corp. The total is $5,000. There are several line items.",
+        good: "```json\n{\n  \"invoice_number\": \"INV-2024-0847\",\n  \"date\": \"2024-03-15\",\n  \"vendor_name\": \"ABC Corp\",\n  \"line_items\": [\n    {\"description\": \"Consulting hours\", \"quantity\": 40, \"unit_price\": 100, \"total\": 4000},\n    {\"description\": \"Software license\", \"quantity\": 1, \"unit_price\": 500, \"total\": 500},\n    {\"description\": \"Travel expenses\", \"quantity\": 1, \"unit_price\": 350, \"total\": 350}\n  ],\n  \"subtotal\": 4850,\n  \"tax\": 388,\n  \"total\": 5238,\n  \"_validation\": \"Line items sum to 4850 -- matches subtotal\"\n}\n```"
+      },
+      whyBetter: ["Specifies exact JSON schema", "Defines data types per field", "Sets date format standard", "Handles missing data (null)", "Includes validation rule"]
+    },
+    {
+      name: "Classification",
+      prompt: "Classify this customer feedback.",
+      betterPrompt: "Classify this customer feedback into exactly ONE category:\n\nCategories:\n- BUG: Product malfunction or error\n- FEATURE_REQUEST: Suggestion for new functionality\n- PRAISE: Positive feedback about existing features\n- COMPLAINT: Dissatisfaction with service, pricing, or experience\n- QUESTION: Seeking information or help\n\nAlso provide:\n- confidence: high / medium / low\n- sentiment: positive / neutral / negative (1-5 scale)\n- summary: one sentence description (max 15 words)\n\nExample:\nInput: \"Your app crashes every time I try to upload a PDF. This is so frustrating!\"\nOutput: {\"category\": \"BUG\", \"confidence\": \"high\", \"sentiment\": 1, \"summary\": \"App crashes on PDF upload, user frustrated\"}\n\nNow classify:\n[paste feedback here]",
+      responses: {
+        basic: "This is negative feedback about the product.",
+        good: "```json\n{\n  \"category\": \"BUG\",\n  \"confidence\": \"high\",\n  \"sentiment\": 1,\n  \"summary\": \"App crashes on PDF upload, user frustrated\"\n}\n```"
+      },
+      whyBetter: ["Lists exact category options", "Defines each category's meaning", "Includes few-shot example", "Specifies output format (JSON)", "Adds confidence and sentiment"]
+    },
+    {
+      name: "Meeting Notes",
+      prompt: "Write meeting notes.",
+      betterPrompt: "Convert this meeting transcript into structured notes.\n\nFormat:\n## Meeting: [Topic]\n**Date:** [date] | **Duration:** [length] | **Attendees:** [names]\n\n### Key Decisions\n- [Decision] -- Decided by: [who]\n\n### Action Items\n| Item | Owner | Deadline | Priority |\n|------|-------|----------|----------|\n| ... | ... | ... | High/Med/Low |\n\n### Discussion Summary\n[2-3 paragraph summary of main topics discussed]\n\n### Open Questions\n- [Questions that were raised but not resolved]\n\nRules:\n- Extract ONLY information present in the transcript\n- If a deadline was not specified, put 'TBD'\n- Flag any conflicting statements\n\nTranscript:\n[paste transcript here]",
+      responses: {
+        basic: "The meeting covered several topics. Action items were discussed. The team will follow up.",
+        good: "## Meeting: Q4 Product Roadmap Review\n**Date:** March 10, 2024 | **Duration:** 45 min | **Attendees:** Sarah (PM), Marcus (Eng Lead), Elena (Design)\n\n### Key Decisions\n- Ship search feature in v3.2 instead of v3.1 -- Decided by: Sarah\n- Use Elasticsearch over Postgres full-text search -- Decided by: Marcus\n\n### Action Items\n| Item | Owner | Deadline | Priority |\n|------|-------|----------|----------|\n| Create search API design doc | Marcus | March 15 | High |\n| Design search UI mockups | Elena | March 17 | High |\n| Update roadmap in Linear | Sarah | March 11 | Medium |\n| Benchmark Elasticsearch perf | Marcus | March 20 | Medium |\n\n### Discussion Summary\nThe team reviewed the Q4 product roadmap focusing on the search feature timeline...\n\n### Open Questions\n- Should search results include archived items?\n- Budget for Elasticsearch hosting not yet approved by finance"
+      },
+      whyBetter: ["Defines exact output template", "Specifies table format for action items", "Requires attribution (decided by)", "Handles missing deadlines (TBD)", "Separates open questions from decisions"]
+    },
+    {
+      name: "Technical Documentation",
+      prompt: "Document this API.",
+      betterPrompt: "Write API documentation for this endpoint.\n\nFormat for each endpoint:\n### `METHOD /path`\n**Description:** One sentence.\n**Authentication:** Required/Optional + type\n**Parameters:**\n| Name | Type | Required | Description |\n|------|------|----------|-------------|\n\n**Request Example:**\n```json\n{...}\n```\n\n**Response (200):**\n```json\n{...}\n```\n\n**Error Responses:**\n| Code | Description |\n|------|-------------|\n\n**Notes:** Any edge cases or important behavior.\n\nCode to document:\n[paste code here]",
+      responses: {
+        basic: "This API endpoint handles user data. It accepts POST requests and returns JSON.",
+        good: "### `POST /api/users`\n**Description:** Create a new user account.\n**Authentication:** Required -- Bearer token (admin role)\n\n**Parameters:**\n| Name | Type | Required | Description |\n|------|------|----------|-------------|\n| email | string | Yes | Valid email address |\n| name | string | Yes | Full name (2-100 chars) |\n| role | string | No | Default: 'member'. Options: 'member', 'admin' |\n\n**Request Example:**\n```json\n{\"email\": \"jane@example.com\", \"name\": \"Jane Doe\", \"role\": \"member\"}\n```\n\n**Response (201):**\n```json\n{\"id\": \"usr_abc123\", \"email\": \"jane@example.com\", \"name\": \"Jane Doe\", \"role\": \"member\", \"created_at\": \"2024-03-15T10:30:00Z\"}\n```\n\n**Error Responses:**\n| Code | Description |\n|------|-------------|\n| 400 | Invalid email format or missing required fields |\n| 409 | Email already registered |\n| 403 | Insufficient permissions (admin required) |\n\n**Notes:** Email uniqueness is case-insensitive. Rate limited to 10 creations/minute."
+      },
+      whyBetter: ["Defines complete documentation template", "Includes request AND response examples", "Requires error response table", "Specifies parameter types and defaults", "Notes section for edge cases"]
+    },
+    {
+      name: "Competitive Analysis",
+      prompt: "Compare these two products.",
+      betterPrompt: "Perform a competitive analysis comparing Product A and Product B.\n\nStructure:\n1. **Executive Summary** (3 sentences: key differentiator, target market, winner for what)\n2. **Feature Comparison Matrix**\n   | Feature | Product A | Product B | Advantage |\n   |---------|-----------|-----------|----------|\n3. **Pricing Analysis** (per-seat, per-usage, enterprise tiers)\n4. **Target Market Fit** (who should buy which and why)\n5. **Risks of Each** (lock-in, scalability, support quality)\n\nRules:\n- Be objective -- note where EACH product is stronger\n- Cite specific features, not general impressions\n- If information is unavailable, say 'Not publicly disclosed'\n\nProducts:\n[paste details here]",
+      responses: {
+        basic: "Product A is generally better than Product B. It has more features and better pricing.",
+        good: "## Executive Summary\nProduct A excels in enterprise-grade security and compliance features, while Product B offers superior developer experience and faster time-to-value. Mid-market companies prioritizing ease of use should choose Product B; enterprises with strict compliance requirements should choose Product A.\n\n## Feature Comparison\n| Feature | Product A | Product B | Advantage |\n|---------|-----------|-----------|----------|\n| SSO/SAML | Full SAML 2.0 + SCIM | SAML only (no SCIM) | Product A |\n| API rate limits | 10K/min | 50K/min | Product B |\n| Audit logging | SOC 2 certified | Basic logs only | Product A |\n| SDK languages | Python, Java | Python, JS, Go, Rust | Product B |\n| Uptime SLA | 99.99% | 99.9% | Product A |"
+      },
+      whyBetter: ["Defines 5-section structure", "Requires comparison matrix", "Demands objectivity (both sides)", "Handles missing info explicitly", "Separates analysis from opinion"]
+    },
+    {
+      name: "Risk Assessment",
+      prompt: "Assess the risks of this project.",
+      betterPrompt: "Perform a risk assessment for this project.\n\nFor each risk identified:\n- **Risk:** One-sentence description\n- **Likelihood:** High / Medium / Low (with reasoning)\n- **Impact:** High / Medium / Low (with reasoning)\n- **Risk Score:** Likelihood x Impact (H*H=Critical, H*M or M*H=High, M*M=Medium, else Low)\n- **Mitigation:** Specific actionable steps to reduce the risk\n- **Owner:** Suggested role responsible for mitigation\n\nPresent as a risk register table, sorted by Risk Score (Critical first).\n\nInclude at minimum:\n- Technical risks (architecture, integration, performance)\n- Schedule risks (dependencies, resource availability)\n- Business risks (market, regulatory, budget)\n\nProject description:\n[paste description here]",
+      responses: {
+        basic: "There are several risks to consider. The project might be delayed. There could be technical issues. Budget overruns are possible.",
+        good: "## Risk Register\n\n| # | Risk | Likelihood | Impact | Score | Mitigation | Owner |\n|---|------|-----------|--------|-------|------------|-------|\n| 1 | Third-party API vendor discontinues service | Medium | High | **HIGH** | Implement adapter pattern; identify backup vendors | Tech Lead |\n| 2 | Key developer leaves during critical phase | Low | High | **MEDIUM** | Cross-train on critical modules; document architecture | Eng Manager |\n| 3 | Regulatory requirements change mid-project | Low | High | **MEDIUM** | Subscribe to regulatory updates; build compliance review into sprint | Legal/PM |\n| 4 | Integration testing reveals performance bottleneck | Medium | Medium | **MEDIUM** | Conduct load testing in Sprint 2; set perf benchmarks early | Tech Lead |\n| 5 | Scope creep from stakeholder requests | High | Medium | **HIGH** | Strict change request process; monthly scope review with sponsor | PM |"
+      },
+      whyBetter: ["Defines risk scoring formula", "Requires reasoning for likelihood/impact", "Demands actionable mitigations", "Specifies ownership per risk", "Covers 3 risk categories minimum"]
+    }
+  ];
+
+  // ==========================================
+  // BEFORE/AFTER GALLERY
+  // ==========================================
+  function renderGallery() {
+    var container = document.getElementById('galleryContainer');
+    var html = '';
+
+    for (var i = 0; i < labScenarios.length; i++) {
+      var sc = labScenarios[i];
+      html += '<div class="gallery-pair">';
+      html += '<div class="gallery-card before">';
+      html += '<div class="gallery-card-label">Before -- ' + sc.name + '</div>';
+      html += '<pre>' + escapeHtml(sc.prompt) + '</pre>';
+      html += '</div>';
+      html += '<div class="gallery-card after">';
+      html += '<div class="gallery-card-label">After -- ' + sc.name + '</div>';
+      html += '<pre>' + escapeHtml(truncate(sc.betterPrompt, 300)) + '</pre>';
+      html += '</div>';
+      html += '<div class="gallery-why">';
+      html += '<button class="gallery-why-toggle" onclick="toggleGalleryWhy(' + i + ')">Why It\'s Better &#9660;</button>';
+      html += '<div class="gallery-why-content" id="gallery-why-' + i + '">';
+      if (sc.whyBetter) {
+        for (var j = 0; j < sc.whyBetter.length; j++) {
+          html += '<span class="improvement-badge">' + escapeHtml(sc.whyBetter[j]) + '</span> ';
+        }
+      }
+      html += '</div>';
+      html += '</div>';
+      html += '</div>';
+    }
+
+    container.innerHTML = html;
+  }
+
+  window.toggleGalleryWhy = function(idx) {
+    var el = document.getElementById('gallery-why-' + idx);
+    el.classList.toggle('show');
+  };
+
+  function escapeHtml(text) {
+    var div = document.createElement('div');
+    div.appendChild(document.createTextNode(text));
+    return div.innerHTML;
+  }
+
+  function truncate(str, maxLen) {
+    if (str.length <= maxLen) return str;
+    return str.substring(0, maxLen) + '...';
+  }
+
+  renderGallery();
+
+  // ==========================================
+  // PROMPT ENGINEERING LAB
+  // ==========================================
+  var labEditor = document.getElementById('labEditor');
+  var labScenarioSelect = document.getElementById('labScenarioSelect');
+  var labLoadBetter = document.getElementById('labLoadBetter');
+  var labResponse = document.getElementById('labResponse');
+  var labResponseMeta = document.getElementById('labResponseMeta');
+  var labGenerateBtn = document.getElementById('labGenerateBtn');
+  var labTempSlider = document.getElementById('labTempSlider');
+  var labTokensSlider = document.getElementById('labTokensSlider');
+  var labSystemToggle = document.getElementById('labSystemToggle');
+  var labSystemArea = document.getElementById('labSystemArea');
+  var currentScenarioIdx = -1;
+  var selectedModel = 'sonnet';
+
+  // Populate scenario dropdown
+  for (var i = 0; i < labScenarios.length; i++) {
+    var opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = labScenarios[i].name;
+    labScenarioSelect.appendChild(opt);
+  }
+
+  labScenarioSelect.addEventListener('change', function() {
+    var idx = parseInt(this.value);
+    if (isNaN(idx) || idx < 0) {
+      currentScenarioIdx = -1;
+      labLoadBetter.style.display = 'none';
+      return;
+    }
+    currentScenarioIdx = idx;
+    labEditor.value = labScenarios[idx].prompt;
+    labLoadBetter.style.display = 'inline-block';
+    scorePrompt();
+  });
+
+  labLoadBetter.addEventListener('click', function() {
+    if (currentScenarioIdx >= 0) {
+      labEditor.value = labScenarios[currentScenarioIdx].betterPrompt;
+      scorePrompt();
+    }
+  });
+
+  // Model selection
+  var modelBtns = document.querySelectorAll('.lab-radio-option[data-model]');
+  modelBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      modelBtns.forEach(function(b) { b.classList.remove('selected'); });
+      this.classList.add('selected');
+      selectedModel = this.getAttribute('data-model');
+    });
+  });
+
+  // Temperature slider
+  labTempSlider.addEventListener('input', function() {
+    document.getElementById('labTempValue').textContent = (parseFloat(this.value) / 10).toFixed(1);
+  });
+
+  // Tokens slider
+  labTokensSlider.addEventListener('input', function() {
+    document.getElementById('labTokensValue').textContent = this.value;
+  });
+
+  // System prompt toggle
+  labSystemToggle.addEventListener('change', function() {
+    if (this.checked) {
+      labSystemArea.classList.add('show');
+    } else {
+      labSystemArea.classList.remove('show');
+    }
+  });
+
+  // Score prompt on input
+  labEditor.addEventListener('input', function() {
+    scorePrompt();
+  });
+
+  // Generate button
+  labGenerateBtn.addEventListener('click', function() {
+    generateLabResponse();
+  });
+
+  function scorePrompt() {
+    var text = labEditor.value.toLowerCase();
+    var len = labEditor.value.length;
+
+    // Clarity: based on length, specificity words, line count
+    var clarity = 0;
+    if (len > 20) clarity += 10;
+    if (len > 50) clarity += 10;
+    if (len > 100) clarity += 15;
+    if (len > 200) clarity += 15;
+    if (len > 400) clarity += 15;
+    if (len > 600) clarity += 10;
+    if (text.indexOf('specific') >= 0 || text.indexOf('exactly') >= 0) clarity += 10;
+    if (text.indexOf('for each') >= 0 || text.indexOf('per ') >= 0) clarity += 5;
+    var lineCount = (labEditor.value.match(/\n/g) || []).length + 1;
+    if (lineCount > 3) clarity += 5;
+    if (lineCount > 8) clarity += 5;
+    clarity = Math.min(100, clarity);
+
+    // Structure: format keywords
+    var structure = 0;
+    var structureKeywords = ['bullet', 'format', 'structure', 'table', 'json', 'xml', 'markdown', 'heading', 'column', 'row', 'template', 'section', 'list', '```', '|', '###', '##'];
+    for (var si = 0; si < structureKeywords.length; si++) {
+      if (text.indexOf(structureKeywords[si]) >= 0) {
+        structure += 12;
+      }
+    }
+    if (text.indexOf('return as') >= 0 || text.indexOf('format:') >= 0 || text.indexOf('output format') >= 0) structure += 15;
+    structure = Math.min(100, structure);
+
+    // Context: background, role, domain
+    var context = 0;
+    var contextKeywords = ['you are', 'your role', 'acting as', 'as a', 'background', 'context', 'given that', 'assuming', 'scenario', 'situation', 'domain', 'expertise'];
+    for (var ci = 0; ci < contextKeywords.length; ci++) {
+      if (text.indexOf(contextKeywords[ci]) >= 0) {
+        context += 15;
+      }
+    }
+    if (len > 200) context += 10;
+    if (len > 400) context += 10;
+    if (text.indexOf('review') >= 0 || text.indexOf('analyze') >= 0 || text.indexOf('evaluate') >= 0) context += 10;
+    context = Math.min(100, context);
+
+    // Examples: few-shot patterns
+    var examples = 0;
+    var exampleKeywords = ['example:', 'example 1', 'example 2', 'input:', 'output:', 'e.g.', 'for instance', 'sample:', 'like this:', 'such as:'];
+    for (var ei = 0; ei < exampleKeywords.length; ei++) {
+      if (text.indexOf(exampleKeywords[ei]) >= 0) {
+        examples += 20;
+      }
+    }
+    if ((text.match(/example/g) || []).length > 1) examples += 20;
+    if (text.indexOf('wrong') >= 0 || text.indexOf('incorrect') >= 0 || text.indexOf('do not') >= 0) examples += 10;
+    examples = Math.min(100, examples);
+
+    // Constraints: quality rules
+    var constraints = 0;
+    var constraintKeywords = ['never', 'must', 'always', 'do not', 'don\'t', 'avoid', 'required', 'mandatory', 'max', 'min', 'at least', 'at most', 'no more than', 'limit', 'only', 'exactly', 'if not found', 'if missing', 'edge case', 'null'];
+    for (var ki = 0; ki < constraintKeywords.length; ki++) {
+      if (text.indexOf(constraintKeywords[ki]) >= 0) {
+        constraints += 10;
+      }
+    }
+    constraints = Math.min(100, constraints);
+
+    // Update UI
+    updateScoreBar('labScoreClarity', 'labScoreClarityVal', clarity);
+    updateScoreBar('labScoreStructure', 'labScoreStructureVal', structure);
+    updateScoreBar('labScoreContext', 'labScoreContextVal', context);
+    updateScoreBar('labScoreExamples', 'labScoreExamplesVal', examples);
+    updateScoreBar('labScoreConstraints', 'labScoreConstraintsVal', constraints);
+
+    var overall = Math.round((clarity + structure + context + examples + constraints) / 5);
+    document.getElementById('labOverallNum').textContent = overall;
+
+    var gradeEl = document.getElementById('labOverallGrade');
+    var grade = 'F';
+    var gradeClass = 'grade-f';
+    if (overall >= 80) { grade = 'A'; gradeClass = 'grade-a'; }
+    else if (overall >= 65) { grade = 'B'; gradeClass = 'grade-b'; }
+    else if (overall >= 50) { grade = 'C'; gradeClass = 'grade-c'; }
+    else if (overall >= 35) { grade = 'D'; gradeClass = 'grade-d'; }
+
+    gradeEl.textContent = grade;
+    gradeEl.className = 'lab-overall-grade ' + gradeClass;
+  }
+
+  function updateScoreBar(fillId, valId, score) {
+    var fillEl = document.getElementById(fillId);
+    var valEl = document.getElementById(valId);
+
+    fillEl.style.width = score + '%';
+    valEl.textContent = score;
+
+    fillEl.classList.remove('low', 'medium', 'high');
+    if (score >= 60) {
+      fillEl.classList.add('high');
+    } else if (score >= 30) {
+      fillEl.classList.add('medium');
+    } else {
+      fillEl.classList.add('low');
+    }
+  }
+
+  function generateLabResponse() {
+    var prompt = labEditor.value.trim();
+    if (!prompt) {
+      labResponse.textContent = 'Please enter a prompt first.';
+      return;
+    }
+
+    // Determine response quality
+    var overallScore = parseInt(document.getElementById('labOverallNum').textContent) || 0;
+    var temp = parseFloat(labTempSlider.value) / 10;
+    var model = selectedModel;
+
+    // Simulate typing effect
+    labResponse.textContent = '';
+    labResponse.classList.add('typing');
+    labResponseMeta.style.display = 'none';
+
+    var responseText = '';
+
+    if (currentScenarioIdx >= 0) {
+      var scenario = labScenarios[currentScenarioIdx];
+      if (overallScore >= 50) {
+        responseText = scenario.responses.good;
+      } else {
+        responseText = scenario.responses.basic;
+      }
+    } else {
+      // Generic response based on score
+      if (overallScore >= 70) {
+        responseText = "Based on your well-structured prompt, here is a detailed response:\n\nYour prompt includes clear criteria, structure, and constraints. In a real interaction, Claude would follow your specified format precisely, handle the edge cases you defined, and produce output matching your quality standards.\n\nThe explicit criteria in your prompt (format specifications, inclusion/exclusion rules, and edge case handling) would result in a highly predictable, consistent response across multiple runs.\n\nKey strengths of your prompt:\n- Clear output format definition\n- Specific quality constraints\n- Edge case handling instructions";
+      } else if (overallScore >= 40) {
+        responseText = "Here is a response based on your prompt:\n\nYour prompt provides some structure but could benefit from more specific criteria. Claude would produce a reasonable response, but there is room for variance in format and content coverage.\n\nTo improve consistency, consider adding:\n- Explicit output format (JSON, bullets, table)\n- Quality constraints (length limits, required fields)\n- Edge case instructions (what to do when data is missing)";
+      } else {
+        responseText = "Here is a general response to your request.\n\nYour prompt is quite open-ended, which means Claude will make many decisions on its own about format, depth, and focus. Each time you run this prompt, you may get different results.\n\nTip: Add explicit criteria about format, length, what to include/exclude, and how to handle missing information.";
+      }
+    }
+
+    // Add model/temperature flavor
+    if (model === 'haiku' && responseText.length > 300) {
+      responseText = responseText.substring(0, 300) + '\n\n[Haiku: faster but shorter responses]';
+    }
+    if (model === 'opus') {
+      responseText += '\n\n[Opus: most capable model, best for complex reasoning]';
+    }
+    if (temp > 0.7) {
+      responseText += '\n\n[Note: High temperature (>' + temp.toFixed(1) + ') increases creativity but may reduce consistency]';
+    }
+
+    // Simulate typing
+    var charIdx = 0;
+    var typingInterval = setInterval(function() {
+      if (charIdx < responseText.length) {
+        var chunkSize = Math.min(3, responseText.length - charIdx);
+        labResponse.textContent += responseText.substring(charIdx, charIdx + chunkSize);
+        charIdx += chunkSize;
+      } else {
+        clearInterval(typingInterval);
+        labResponse.classList.remove('typing');
+
+        // Show meta
+        labResponseMeta.style.display = 'flex';
+        document.getElementById('labRespModel').textContent = model.charAt(0).toUpperCase() + model.slice(1);
+        document.getElementById('labRespTemp').textContent = 'Temp: ' + (parseFloat(labTempSlider.value) / 10).toFixed(1);
+        document.getElementById('labRespTokens').textContent = 'Max: ' + labTokensSlider.value;
+      }
+    }, 8);
+  }
+
+  // Initial score
+  scorePrompt();
+
+  // ==========================================
+  // TOOL DESCRIPTION WORKSHOP
+  // ==========================================
+  var workshopScenarios = [
+    {
+      name: "Weather Lookup Tool",
+      toolName: "get_weather",
+      desc: "Write a tool description for a weather lookup tool that returns current conditions for a given location.",
+      expert: "Returns current weather conditions for a specified city or location. Input: 'location' (string) -- city name with optional state/country (e.g., 'San Francisco, CA' or 'London, UK'). Returns: temperature (Fahrenheit and Celsius), conditions (sunny/cloudy/rain/snow), humidity (%), wind speed (mph), and 'feels like' temperature. Data updates every 15 minutes. Returns an error for unrecognized locations. For multi-day forecasts, use get_forecast instead. Does not support coordinates (lat/lng) -- use geocode_location first if you only have coordinates."
+    },
+    {
+      name: "Database Query Tool",
+      toolName: "query_database",
+      desc: "Write a tool description for a database query tool that executes SQL against an analytics database.",
+      expert: "Executes a read-only SQL SELECT query against the PostgreSQL analytics database (contains sales, customers, and inventory tables). Input: 'query' (string) -- a valid SQL SELECT statement. Example: 'SELECT customer_name, total_revenue FROM customers WHERE region = ''EMEA'' ORDER BY total_revenue DESC LIMIT 10'. Returns: array of row objects with column names as keys, plus row_count and execution_time_ms. Maximum 1000 rows per query. Queries exceeding 30 seconds will timeout. Only SELECT statements are allowed -- INSERT, UPDATE, DELETE will return permission error. For schema information, use describe_table tool. For real-time operational data, use get_live_metrics instead."
+    },
+    {
+      name: "Email Sender Tool",
+      toolName: "send_email",
+      desc: "Write a tool description for a tool that sends emails through the company mail system.",
+      expert: "Sends an email via the company SMTP relay (outgoing only -- cannot read inbox). Required inputs: 'to' (string, valid email address), 'subject' (string, max 200 characters), 'body' (string, plain text or HTML). Optional: 'cc' (string, comma-separated emails), 'priority' (string: 'normal' or 'high'). Attachments are NOT supported -- use share_file tool to generate a link instead. Rate limited to 10 emails per minute. Can only send to @company.com and pre-approved external domains. Returns: message_id on success, error details on failure. Always confirm with the user before sending."
+    },
+    {
+      name: "File Analyzer Tool",
+      toolName: "analyze_file",
+      desc: "Write a tool description for a tool that analyzes uploaded files and extracts metadata and content.",
+      expert: "Analyzes an uploaded file and returns structured metadata plus content extraction. Input: 'file_id' (string, from the upload response). Supported formats: PDF, DOCX, XLSX, CSV, PNG, JPG. Returns: file_name, file_size_bytes, mime_type, page_count (for documents), and extracted_text (first 10,000 characters). For images, returns OCR text and detected_objects list. For spreadsheets, returns sheet_names and first 50 rows of data as JSON. Maximum file size: 25MB. Processing time: 2-15 seconds depending on file type and size. For full text extraction beyond 10K chars, use extract_full_text tool."
+    },
+    {
+      name: "Calendar Scheduler Tool",
+      toolName: "schedule_meeting",
+      desc: "Write a tool description for a tool that schedules meetings on a shared company calendar.",
+      expert: "Creates a calendar event on the company Google Calendar. Required inputs: 'title' (string), 'start_time' (ISO 8601 datetime with timezone, e.g., '2024-03-15T14:00:00-05:00'), 'duration_minutes' (integer, 15-480), 'attendees' (array of email strings). Optional: 'description' (string), 'location' (string or video link), 'recurring' (object: {frequency: 'daily'|'weekly'|'monthly', count: integer}). Checks attendee availability before booking -- returns conflicts if any attendee is busy. Cannot book more than 90 days in advance. Cannot modify or delete existing events -- use update_meeting or cancel_meeting. Returns: event_id, confirmed_attendees, and calendar link."
+    },
+    {
+      name: "Web Scraper Tool",
+      toolName: "scrape_webpage",
+      desc: "Write a tool description for a tool that fetches and extracts content from public web pages.",
+      expert: "Fetches a public webpage and extracts its content as clean text or structured data. Input: 'url' (string, must be HTTPS), 'mode' (string: 'text' for plain text extraction, 'structured' for headings/paragraphs/lists as JSON, 'links' for all hyperlinks). Returns: title, extracted content (based on mode), word_count, and language_detected. Maximum page size: 5MB. JavaScript-rendered content is NOT supported (static HTML only) -- for SPAs, use browser_automation tool instead. Respects robots.txt -- returns an error for disallowed pages. Rate limited to 30 requests per minute. Timeout: 10 seconds. Does not handle authentication -- only public pages."
+    }
+  ];
+
+  function renderWorkshop() {
+    var container = document.getElementById('workshopContainer');
+    var html = '<h3 style="margin-top:0; margin-bottom:20px;">Write Effective Tool Descriptions</h3>';
+
+    for (var i = 0; i < workshopScenarios.length; i++) {
+      var ws = workshopScenarios[i];
+      html += '<div class="workshop-scenario">';
+      html += '<div class="workshop-scenario-header">';
+      html += '<span class="workshop-scenario-number">' + (i + 1) + '</span>';
+      html += '<span class="workshop-scenario-title">' + escapeHtml(ws.name) + ' (<code>' + escapeHtml(ws.toolName) + '</code>)</span>';
+      html += '</div>';
+      html += '<p class="workshop-scenario-desc">' + escapeHtml(ws.desc) + '</p>';
+      html += '<textarea class="workshop-textarea" id="workshop-input-' + i + '" placeholder="Write your tool description here..."></textarea>';
+      html += '<button class="workshop-score-btn" onclick="scoreWorkshop(' + i + ')">Score My Description</button>';
+      html += '<div class="workshop-result" id="workshop-result-' + i + '">';
+      html += '<div class="workshop-result-scores" id="workshop-scores-' + i + '"></div>';
+      html += '<button class="gallery-why-toggle" onclick="toggleWorkshopExpert(' + i + ')">Show Expert Description &#9660;</button>';
+      html += '<div class="workshop-expert" id="workshop-expert-' + i + '">';
+      html += '<div class="workshop-expert-label">Expert Description</div>';
+      html += '<pre>' + escapeHtml(ws.expert) + '</pre>';
+      html += '</div>';
+      html += '</div>';
+      html += '</div>';
+    }
+
+    container.innerHTML = html;
+  }
+
+  window.scoreWorkshop = function(idx) {
+    var input = document.getElementById('workshop-input-' + idx).value.toLowerCase();
+    var scenario = workshopScenarios[idx];
+    var result = document.getElementById('workshop-result-' + idx);
+    var scoresEl = document.getElementById('workshop-scores-' + idx);
+
+    if (!input.trim()) {
+      return;
+    }
+
+    // Score on 5 criteria
+    var completeness = 0;
+    var specificity = 0;
+    var examplesScore = 0;
+    var edgeCases = 0;
+    var differentiation = 0;
+
+    // Completeness: does it explain what the tool does?
+    var completeWords = ['return', 'input', 'output', 'accept', 'provides', 'retrieves', 'sends', 'creates', 'fetches', 'executes', 'extracts', 'analyzes'];
+    for (var cw = 0; cw < completeWords.length; cw++) {
+      if (input.indexOf(completeWords[cw]) >= 0) completeness += 12;
+    }
+    if (input.length > 100) completeness += 10;
+    if (input.length > 200) completeness += 10;
+    completeness = Math.min(100, completeness);
+
+    // Specificity: types, formats, concrete details
+    var specificWords = ['string', 'integer', 'number', 'array', 'object', 'json', 'boolean', 'format', 'max', 'min', 'required', 'optional', 'default'];
+    for (var sw = 0; sw < specificWords.length; sw++) {
+      if (input.indexOf(specificWords[sw]) >= 0) specificity += 12;
+    }
+    if (input.length > 150) specificity += 10;
+    specificity = Math.min(100, specificity);
+
+    // Examples: includes input/output examples
+    var exampleWords = ['example', 'e.g.', 'such as', 'for instance', 'like', "'", '"'];
+    for (var ew = 0; ew < exampleWords.length; ew++) {
+      if (input.indexOf(exampleWords[ew]) >= 0) examplesScore += 18;
+    }
+    examplesScore = Math.min(100, examplesScore);
+
+    // Edge cases: limitations, errors, boundaries
+    var edgeWords = ['error', 'timeout', 'limit', 'maximum', 'minimum', 'cannot', 'not supported', 'only', 'restriction', 'fail', 'invalid', 'exceed', 'permission'];
+    for (var ecw = 0; ecw < edgeWords.length; ecw++) {
+      if (input.indexOf(edgeWords[ecw]) >= 0) edgeCases += 12;
+    }
+    edgeCases = Math.min(100, edgeCases);
+
+    // Differentiation: mentions when NOT to use, or alternative tools
+    var diffWords = ['instead', 'use .* tool', 'rather than', 'not for', 'alternative', 'for .* use', 'vs', 'compared to', 'unlike', 'different from'];
+    for (var dw = 0; dw < diffWords.length; dw++) {
+      if (input.indexOf(diffWords[dw]) >= 0 || input.match(new RegExp(diffWords[dw]))) differentiation += 25;
+    }
+    if (input.indexOf('instead') >= 0) differentiation += 20;
+    if (input.indexOf('for ') >= 0 && input.indexOf('use ') >= 0) differentiation += 15;
+    differentiation = Math.min(100, differentiation);
+
+    // Render scores
+    var criteria = [
+      { label: 'Completeness', score: completeness },
+      { label: 'Specificity', score: specificity },
+      { label: 'Examples', score: examplesScore },
+      { label: 'Edge Cases', score: edgeCases },
+      { label: 'Differentiation', score: differentiation }
+    ];
+
+    var scoresHtml = '';
+    for (var sc = 0; sc < criteria.length; sc++) {
+      var c = criteria[sc];
+      var scoreClass = 'low';
+      if (c.score >= 60) scoreClass = 'high';
+      else if (c.score >= 30) scoreClass = 'medium';
+
+      scoresHtml += '<div class="workshop-result-item">';
+      scoresHtml += '<div class="label">' + c.label + '</div>';
+      scoresHtml += '<div class="value ' + scoreClass + '">' + c.score + '</div>';
+      scoresHtml += '</div>';
+    }
+
+    scoresEl.innerHTML = scoresHtml;
+    result.classList.add('show');
+  };
+
+  window.toggleWorkshopExpert = function(idx) {
+    var el = document.getElementById('workshop-expert-' + idx);
+    el.classList.toggle('show');
+  };
+
+  renderWorkshop();
+
+  // ==========================================
+  // FINAL QUIZ
+  // ==========================================
+  var FINAL_QUIZ_KEY = 'claude-training-module-21';
+
+  var finalQuizData = [
+    {
+      question: "What is the most effective way to get Claude to produce consistently formatted JSON output?",
+      options: [
+        "Ask nicely for JSON in the prompt",
+        "Use tool_use with a JSON Schema definition",
+        "Set temperature to 0",
+        "Use the JSON mode flag"
+      ],
+      correct: 1
+    },
+    {
+      question: "When is Chain-of-Thought prompting LEAST helpful?",
+      options: [
+        "Complex math problems",
+        "Multi-step logical reasoning",
+        "Simple factual classification tasks",
+        "Architecture design decisions"
+      ],
+      correct: 2
+    },
+    {
+      question: "How many few-shot examples should you typically include?",
+      options: [
+        "As many as possible (10+)",
+        "2-3 high-quality examples covering common and edge cases",
+        "Exactly 1 example",
+        "None -- Claude works best without examples"
+      ],
+      correct: 1
+    },
+    {
+      question: "What makes a tool description effective for Claude's tool selection?",
+      options: [
+        "Keeping it short (under 10 words)",
+        "Explaining what the tool does, when to use it, input formats, and edge cases",
+        "Using technical jargon",
+        "Making all tool descriptions identical"
+      ],
+      correct: 1
+    },
+    {
+      question: "In a validation-retry loop, what should you include when asking Claude to fix invalid output?",
+      options: [
+        "Just say 'try again'",
+        "The original input, the failed output, AND the specific validation errors",
+        "Only the validation errors",
+        "A completely new prompt with no reference to the previous attempt"
+      ],
+      correct: 1
+    },
+    {
+      question: "Why is an independent Claude instance more effective at code review than self-review?",
+      options: [
+        "Independent instances use a different model",
+        "The reviewing instance does not retain reasoning context from generation, so it is less biased",
+        "Independent instances have access to more tools",
+        "Self-review is actually equally effective"
+      ],
+      correct: 1
+    },
+    {
+      question: "What does the Prompt Quality Scorer prioritize?",
+      options: [
+        "Prompt length",
+        "Clarity, structure, context, examples, and constraints",
+        "Use of technical vocabulary",
+        "Number of questions asked"
+      ],
+      correct: 1
+    },
+    {
+      question: "What is `tool_choice: 'any'` used for?",
+      options: [
+        "Selecting any model",
+        "Forcing Claude to call at least one tool (guaranteeing structured output)",
+        "Allowing Claude to use any available tool optionally",
+        "Making all tools optional"
+      ],
+      correct: 1
+    }
+  ];
+
+  var finalQuizSelections = [];
+  var finalQuizSubmitted = false;
+
+  for (var fi = 0; fi < finalQuizData.length; fi++) {
+    finalQuizSelections.push(null);
+  }
+
+  function renderFinalQuiz() {
+    var container = document.getElementById('finalQuizQuestions');
+    var html = '';
+
+    for (var qi = 0; qi < finalQuizData.length; qi++) {
+      var q = finalQuizData[qi];
+      html += '<div class="final-quiz-question" data-fq="' + qi + '">';
+      html += '<div class="fq-number">Question ' + (qi + 1) + ' of ' + finalQuizData.length + '</div>';
+      html += '<div class="fq-text">' + escapeHtml(q.question) + '</div>';
+      html += '<ul class="fq-options">';
+
+      for (var oi = 0; oi < q.options.length; oi++) {
+        html += '<li class="fq-option" data-fq-val="' + oi + '" onclick="selectFinalOption(' + qi + ', this)">';
+        html += '<input type="radio" name="fq-' + qi + '" value="' + oi + '">';
+        html += '<span>' + escapeHtml(q.options[oi]) + '</span>';
+        html += '</li>';
+      }
+
+      html += '</ul>';
+      html += '</div>';
+    }
+
+    container.innerHTML = html;
+  }
+
+  window.selectFinalOption = function(qIdx, el) {
+    if (finalQuizSubmitted) return;
+
+    var parentQ = el.closest('.final-quiz-question');
+    var opts = parentQ.querySelectorAll('.fq-option');
+    opts.forEach(function(opt) {
+      opt.querySelector('input').checked = false;
+      opt.style.background = '';
+    });
+
+    el.querySelector('input').checked = true;
+    finalQuizSelections[qIdx] = parseInt(el.getAttribute('data-fq-val'));
+
+    var allAnswered = finalQuizSelections.every(function(s) { return s !== null; });
+    document.getElementById('finalSubmitBtn').disabled = !allAnswered;
+  };
+
+  window.submitFinalQuiz = function() {
+    if (finalQuizSubmitted) return;
+    finalQuizSubmitted = true;
+
+    var score = 0;
+
+    for (var idx = 0; idx < finalQuizSelections.length; idx++) {
+      var sel = finalQuizSelections[idx];
+      var correctIdx = finalQuizData[idx].correct;
+      var questionEl = document.querySelector('.final-quiz-question[data-fq="' + idx + '"]');
+      var options = questionEl.querySelectorAll('.fq-option');
+
+      for (var oi = 0; oi < options.length; oi++) {
+        var opt = options[oi];
+        var val = parseInt(opt.getAttribute('data-fq-val'));
+        opt.style.pointerEvents = 'none';
+
+        if (val === correctIdx) {
+          if (sel === val) {
+            opt.classList.add('selected-correct');
+            score++;
+          } else {
+            opt.classList.add('reveal-correct');
+          }
+        } else if (val === sel) {
+          opt.classList.add('selected-wrong');
+        }
+      }
+    }
+
+    var result = document.getElementById('finalResult');
+    var title = document.getElementById('finalResultTitle');
+    var text = document.getElementById('finalResultText');
+
+    result.classList.add('show');
+
+    if (score >= 6) {
+      result.classList.add('pass');
+      result.classList.remove('fail');
+      title.textContent = 'Passed! ' + score + ' / 8 correct';
+      text.textContent = 'Excellent work! You have demonstrated a strong understanding of prompt engineering techniques -- explicit criteria, few-shot examples, structured output, tool descriptions, and multi-pass review. Your progress has been saved. Move on to Module 22 to continue your training.';
+    } else {
+      result.classList.add('fail');
+      result.classList.remove('pass');
+      title.textContent = score + ' / 8 correct -- Review needed';
+      text.textContent = 'You need at least 6 correct answers to pass. Review the sections above, paying close attention to the interactive exercises. The tool_use pattern for structured output, CoT applicability, and tool description best practices are key areas to revisit.';
+    }
+
+    var progressData = {
+      score: score,
+      total: 8,
+      completed: score >= 6,
+      timestamp: new Date().toISOString()
+    };
+    localStorage.setItem(FINAL_QUIZ_KEY, JSON.stringify(progressData));
+
+    document.getElementById('finalSubmitBtn').disabled = true;
+    document.getElementById('finalSubmitBtn').textContent = 'Submitted';
+  };
+
+  renderFinalQuiz();
+
+  // ==========================================
+  // LOAD EXISTING PROGRESS
+  // ==========================================
+  function loadExistingProgress() {
+    var saved = localStorage.getItem(FINAL_QUIZ_KEY);
+    if (saved) {
+      try {
+        var data = JSON.parse(saved);
+        if (data.completed) {
+          var fill = document.getElementById('sidebarProgressFill');
+          if (fill) {
+            fill.style.width = '100%';
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+  }
+  loadExistingProgress();
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,3376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 02: Claude in the Browser | Claude AI Training</title>
+<style>
+/* ============================================
+   CSS CUSTOM PROPERTIES & PREMIUM DESIGN SYSTEM
+   ============================================ */
+:root {
+  --primary: #7C3AED;
+  --primary-light: #A78BFA;
+  --primary-dark: #5B21B6;
+  --accent: #06B6D4;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  --bg: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --bg-code: #F1F5F9;
+  --text: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --border: #E2E8F0;
+
+  /* Premium 3-layer shadow system */
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.04);
+  --shadow-lg: 0 8px 30px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-glow: 0 0 20px rgba(124,58,237,0.15);
+
+  /* Premium rounded corners */
+  --radius: 16px;
+  --radius-sm: 10px;
+
+  /* Premium spring transition */
+  --transition: 0.2s ease;
+  --transition-spring: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --sidebar-width: 280px;
+  --content-max: 800px;
+}
+
+[data-theme="dark"] {
+  /* Premium dark mode with deeper contrast */
+  --bg: #0B0F1A;
+  --bg-card: #141926;
+  --bg-code: #1A2035;
+  --text: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --border: #1E293B;
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.12);
+  --shadow: 0 1px 3px rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.15);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.25), 0 1px 3px rgba(0,0,0,0.15);
+  --shadow-lg: 0 8px 30px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.15);
+  --shadow-glow: 0 0 20px rgba(124,58,237,0.25);
+}
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 24px;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  min-height: 100vh;
+  transition: background var(--transition), color var(--transition);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   REDUCED MOTION
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================
+   THEME TOGGLE
+   ============================================ */
+.theme-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: all var(--transition-spring);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+.theme-toggle:hover {
+  box-shadow: var(--shadow-lg);
+  transform: scale(1.08);
+}
+
+/* ============================================
+   SIDEBAR
+   ============================================ */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  z-index: 900;
+  transition: transform 0.3s ease, background var(--transition);
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow);
+}
+
+.sidebar-header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.sidebar-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+  margin-bottom: 12px;
+  transition: color var(--transition);
+}
+.sidebar-back:hover { color: var(--primary-dark); }
+
+.sidebar-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.sidebar-module-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.sidebar-nav {
+  padding: 12px 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.sidebar-section {
+  margin-bottom: 4px;
+}
+
+.sidebar-section-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 20px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  text-align: left;
+  transition: color var(--transition);
+  font-family: inherit;
+}
+.sidebar-section-toggle:hover { color: var(--text); }
+.sidebar-section-toggle .chevron {
+  transition: transform 0.2s ease;
+  font-size: 0.65rem;
+}
+.sidebar-section-toggle.collapsed .chevron {
+  transform: rotate(-90deg);
+}
+
+.sidebar-links {
+  list-style: none;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.sidebar-links.collapsed {
+  max-height: 0 !important;
+}
+
+.sidebar-link {
+  display: block;
+  padding: 7px 20px 7px 32px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: all var(--transition);
+  line-height: 1.4;
+}
+.sidebar-link:hover {
+  color: var(--text);
+  background: var(--bg);
+}
+.sidebar-link.active {
+  color: var(--primary);
+  border-left-color: var(--primary);
+  background: rgba(124, 58, 237, 0.05);
+  font-weight: 600;
+}
+[data-theme="dark"] .sidebar-link.active {
+  background: rgba(124, 58, 237, 0.12);
+}
+
+.sidebar-progress {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sidebar-progress-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.sidebar-progress-track {
+  height: 6px;
+  background: var(--bg-code);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.sidebar-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 3px;
+  transition: width 0.5s ease;
+  width: 0%;
+}
+
+/* Hamburger button (mobile) */
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1001;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+  transition: all var(--transition);
+}
+.hamburger span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--text);
+  margin: 4px auto;
+  transition: all 0.3s ease;
+  border-radius: 1px;
+}
+.hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(4px, 4px); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(4px, -4px); }
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 899;
+}
+
+/* ============================================
+   MAIN CONTENT
+   ============================================ */
+.main-content {
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+  transition: margin var(--transition);
+}
+
+.content-wrapper {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 40px 32px 80px;
+}
+
+/* Module Header */
+.module-header {
+  margin-bottom: 48px;
+}
+.module-header .breadcrumb {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+.module-header .breadcrumb a {
+  color: var(--primary);
+  text-decoration: none;
+}
+.module-header .breadcrumb a:hover { text-decoration: underline; }
+
+.module-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.module-badge .number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.module-badge .label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Premium gradient text on module h1 */
+.module-header h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, var(--text), var(--primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.module-header .description {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 640px;
+}
+
+.module-meta {
+  display: flex;
+  gap: 16px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.module-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  background: var(--bg-code);
+  padding: 6px 14px;
+  border-radius: 20px;
+}
+
+/* ============================================
+   SECTIONS
+   ============================================ */
+.section {
+  margin-bottom: 56px;
+  scroll-margin-top: 24px;
+}
+
+.section-heading {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+  line-height: 1.3;
+}
+
+.section h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-top: 32px;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.section h4 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-top: 24px;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.section p {
+  margin-bottom: 16px;
+  color: var(--text-secondary);
+}
+
+.section ul, .section ol {
+  margin-bottom: 16px;
+  padding-left: 24px;
+}
+.section li {
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+}
+.section li strong {
+  color: var(--text);
+}
+
+/* ============================================
+   CODE BLOCKS
+   ============================================ */
+.code-block {
+  background: #1E293B;
+  color: #E2E8F0;
+  border-radius: var(--radius-sm);
+  padding: 20px 24px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  overflow-x: auto;
+  position: relative;
+  margin: 16px 0 20px;
+  tab-size: 2;
+  box-shadow: var(--shadow-md);
+}
+.code-block .code-label {
+  position: absolute;
+  top: 8px;
+  left: 16px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #64748B;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+.code-block.has-label {
+  padding-top: 36px;
+}
+.code-block .copy-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: #94A3B8;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  transition: all var(--transition);
+}
+.code-block .copy-btn:hover { background: rgba(255,255,255,0.2); color: white; }
+.code-block .copy-btn.copied { background: var(--success); color: white; }
+
+/* Syntax highlighting classes */
+.kw { color: #C084FC; }
+.str { color: #6EE7B7; }
+.fn { color: #7DD3FC; }
+.cm { color: #64748B; }
+.num { color: #FDBA74; }
+.op { color: #FCA5A5; }
+.type { color: #67E8F9; }
+.param { color: #FDE68A; }
+.prop { color: #F0ABFC; }
+.punc { color: #94A3B8; }
+
+/* Inline code */
+code {
+  background: var(--bg-code);
+  color: var(--primary);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.88em;
+}
+[data-theme="dark"] code {
+  background: #1E293B;
+}
+.code-block code {
+  background: none;
+  color: inherit;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+  white-space: pre-wrap;
+  display: block;
+}
+
+/* ============================================
+   CALLOUT BOXES
+   ============================================ */
+.callout {
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  margin: 20px 0;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.callout-icon {
+  flex-shrink: 0;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+.callout-content { flex: 1; }
+.callout-content p { margin-bottom: 6px; color: inherit; }
+.callout-content p:last-child { margin-bottom: 0; }
+
+.callout.info {
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  color: #1E40AF;
+}
+.callout.tip {
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  color: #166534;
+}
+.callout.warning {
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  color: #92400E;
+}
+.callout.important {
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  color: #991B1B;
+}
+
+[data-theme="dark"] .callout.info {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: #93C5FD;
+}
+[data-theme="dark"] .callout.tip {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #6EE7B7;
+}
+[data-theme="dark"] .callout.warning {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #FCD34D;
+}
+[data-theme="dark"] .callout.important {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #FCA5A5;
+}
+
+/* ============================================
+   INFO BOXES WITH GRADIENT ACCENT
+   ============================================ */
+.info-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin: 24px 0;
+  position: relative;
+  overflow: hidden;
+  transition: border-color var(--transition), box-shadow var(--transition);
+  box-shadow: var(--shadow);
+}
+.info-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.info-box:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-md);
+}
+.info-box h4 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: var(--text);
+}
+.info-box p {
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+.info-box p:last-child {
+  margin-bottom: 0;
+}
+.info-box ul {
+  padding-left: 20px;
+  margin-bottom: 12px;
+}
+.info-box li {
+  margin-bottom: 6px;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+}
+
+/* ============================================
+   FEATURE CARDS GRID
+   ============================================ */
+.feature-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 24px 0;
+}
+.feature-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  transition: all var(--transition-spring);
+  box-shadow: var(--shadow-xs);
+  position: relative;
+  overflow: hidden;
+}
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.feature-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary-light);
+}
+.feature-card-icon {
+  font-size: 1.6rem;
+  margin-bottom: 10px;
+  display: block;
+}
+.feature-card h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-top: 0;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+.feature-card p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ============================================
+   INTERACTIVE: INTERFACE EXPLORER
+   ============================================ */
+.interface-explorer {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  box-shadow: var(--shadow);
+}
+.interface-explorer h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.mock-interface {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  margin-top: 16px;
+}
+
+/* Mock UI regions */
+.mock-region {
+  position: absolute;
+  border: 2px dashed var(--border);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  transition: all var(--transition);
+  background: var(--bg-card);
+}
+
+.mock-region-sidebar {
+  top: 0;
+  left: 0;
+  width: 18%;
+  height: 100%;
+  border-radius: 6px 0 0 6px;
+  background: var(--bg-code);
+  flex-direction: column;
+  gap: 4px;
+}
+.mock-region-topbar {
+  top: 0;
+  left: 18%;
+  right: 0;
+  height: 10%;
+  border-radius: 0 6px 0 0;
+  background: var(--bg-code);
+}
+.mock-region-conversation {
+  top: 10%;
+  left: 18%;
+  width: 55%;
+  bottom: 14%;
+}
+.mock-region-artifacts {
+  top: 10%;
+  right: 0;
+  width: 27%;
+  bottom: 14%;
+  background: var(--bg-code);
+}
+.mock-region-input {
+  bottom: 0;
+  left: 18%;
+  right: 0;
+  height: 14%;
+  background: var(--bg-code);
+  border-radius: 0 0 6px 0;
+}
+
+/* Hotspots */
+.hotspot {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  border: 2px solid white;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 0.7rem;
+  transition: all var(--transition-spring);
+  box-shadow: var(--shadow-md), var(--shadow-glow);
+  animation: hotspot-pulse 2s infinite;
+}
+.hotspot:hover {
+  transform: scale(1.2);
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+}
+.hotspot.active {
+  background: var(--accent);
+  animation: none;
+  transform: scale(1.15);
+}
+
+@keyframes hotspot-pulse {
+  0%, 100% { box-shadow: var(--shadow-md), 0 0 0 0 rgba(124,58,237,0.3); }
+  50% { box-shadow: var(--shadow-md), 0 0 0 8px rgba(124,58,237,0); }
+}
+
+/* Hotspot Tooltip */
+.hotspot-tooltip {
+  position: absolute;
+  width: 300px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  box-shadow: var(--shadow-lg);
+  z-index: 20;
+  display: none;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+.hotspot-tooltip.visible {
+  display: block;
+  animation: tooltipFadeIn 0.25s ease;
+}
+.hotspot-tooltip h5 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.hotspot-tooltip p {
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+}
+.hotspot-tooltip p:last-child {
+  margin-bottom: 0;
+}
+.hotspot-tooltip .tip-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--primary);
+  margin-bottom: 2px;
+}
+.hotspot-tooltip .shortcut {
+  display: inline-block;
+  background: var(--bg-code);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+@keyframes tooltipFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================
+   INTERACTIVE: SYSTEM PROMPT WORKSHOP
+   ============================================ */
+.prompt-workshop {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  box-shadow: var(--shadow);
+}
+.prompt-workshop h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.workshop-panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.workshop-panel {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+}
+.workshop-panel-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+.workshop-panel textarea {
+  width: 100%;
+  min-height: 160px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  resize: vertical;
+  background: var(--bg-card);
+  color: var(--text);
+  transition: border-color var(--transition);
+}
+.workshop-panel textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(124,58,237,0.1);
+}
+
+.workshop-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.88rem;
+  background: var(--bg-card);
+  color: var(--text);
+  cursor: pointer;
+  margin-bottom: 12px;
+  transition: border-color var(--transition);
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394A3B8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+}
+.workshop-select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.test-message {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+.test-message:last-child {
+  margin-bottom: 0;
+}
+.test-msg-role {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+.test-msg-role.user-role {
+  color: var(--accent);
+}
+.test-msg-role.claude-role {
+  color: var(--primary);
+}
+.test-msg-content {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+/* ============================================
+   INTERACTIVE: PROMPT COMPARISON LAB
+   ============================================ */
+.prompt-lab {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  box-shadow: var(--shadow);
+}
+.prompt-lab h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.lab-scenario {
+  margin-top: 20px;
+  padding: 20px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+}
+.lab-scenario:last-child {
+  margin-bottom: 0;
+}
+.lab-scenario-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.lab-scenario-header h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.lab-scenario-number {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: rgba(124,58,237,0.1);
+  padding: 3px 10px;
+  border-radius: 12px;
+}
+
+.lab-prompts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.lab-prompt-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  position: relative;
+  overflow: hidden;
+}
+.lab-prompt-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+}
+.lab-prompt-card.naive::before {
+  background: var(--error);
+}
+.lab-prompt-card.optimized::before {
+  background: var(--success);
+}
+.lab-prompt-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+}
+.lab-prompt-card.naive .lab-prompt-label {
+  color: var(--error);
+}
+.lab-prompt-card.optimized .lab-prompt-label {
+  color: var(--success);
+}
+.lab-prompt-text {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  font-style: italic;
+}
+
+.lab-show-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 20px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-spring);
+  font-family: inherit;
+}
+.lab-show-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.lab-show-btn:active {
+  transform: translateY(0);
+}
+.lab-show-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.lab-responses {
+  display: none;
+  margin-top: 12px;
+}
+.lab-responses.visible {
+  display: block;
+  animation: tooltipFadeIn 0.3s ease;
+}
+
+.lab-response-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.lab-response {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+}
+.lab-response-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+  color: var(--text-muted);
+}
+.lab-response-content {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+.lab-annotations {
+  background: rgba(124,58,237,0.05);
+  border: 1px solid rgba(124,58,237,0.15);
+  border-radius: 8px;
+  padding: 12px 16px;
+}
+[data-theme="dark"] .lab-annotations {
+  background: rgba(124,58,237,0.1);
+  border-color: rgba(124,58,237,0.25);
+}
+.lab-annotations-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+}
+.lab-annotations ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.lab-annotations li {
+  padding: 3px 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  padding-left: 16px;
+  position: relative;
+}
+.lab-annotations li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 11px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--primary);
+}
+
+/* ============================================
+   COMPARISON TABLE
+   ============================================ */
+.comparison-table-wrapper {
+  overflow-x: auto;
+  margin: 20px 0;
+}
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.comparison-table th {
+  background: var(--primary);
+  color: white;
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+.comparison-table th:first-child {
+  border-radius: var(--radius-sm) 0 0 0;
+}
+.comparison-table th:last-child {
+  border-radius: 0 var(--radius-sm) 0 0;
+}
+.comparison-table td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+.comparison-table tr:nth-child(even) td {
+  background: var(--bg);
+}
+.comparison-table tr:last-child td:first-child {
+  border-radius: 0 0 0 var(--radius-sm);
+}
+.comparison-table tr:last-child td:last-child {
+  border-radius: 0 0 var(--radius-sm) 0;
+}
+
+/* ============================================
+   STEP-BY-STEP
+   ============================================ */
+.step-list {
+  counter-reset: step-counter;
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+.step-item {
+  counter-increment: step-counter;
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: box-shadow var(--transition);
+  box-shadow: var(--shadow-xs);
+}
+.step-item:hover {
+  box-shadow: var(--shadow);
+}
+.step-item::before {
+  content: counter(step-counter);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+.step-content h4 {
+  margin-top: 0;
+  margin-bottom: 6px;
+}
+.step-content p {
+  margin-bottom: 8px;
+}
+
+/* ============================================
+   QUIZ STYLES (End-of-Module)
+   ============================================ */
+.final-quiz {
+  background: var(--bg-card);
+  border: 2px solid var(--primary-light);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  box-shadow: var(--shadow);
+}
+.final-quiz h3 {
+  margin-top: 0;
+}
+
+.final-quiz-question {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.final-quiz-question .fq-number {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+.final-quiz-question .fq-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+.fq-options { list-style: none; padding: 0; }
+.fq-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 12px;
+  margin-bottom: 4px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all var(--transition-spring);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+.fq-option:hover:not(.disabled-option) {
+  background: rgba(124, 58, 237, 0.05);
+  transform: translateY(-1px);
+}
+.fq-option input[type="radio"] {
+  accent-color: var(--primary);
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+.fq-option.selected-correct {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+.fq-option.selected-wrong {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+}
+.fq-option.reveal-correct {
+  background: rgba(16, 185, 129, 0.08);
+  color: #059669;
+  font-weight: 600;
+}
+[data-theme="dark"] .fq-option.selected-correct { color: #6EE7B7; }
+[data-theme="dark"] .fq-option.selected-wrong { color: #FCA5A5; }
+[data-theme="dark"] .fq-option.reveal-correct { color: #6EE7B7; }
+
+.final-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 32px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-spring);
+  margin-top: 8px;
+  font-family: inherit;
+}
+.final-submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.final-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.final-result {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: var(--radius-sm);
+  display: none;
+}
+.final-result.show { display: block; }
+.final-result.pass {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.final-result.fail {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.final-result h4 {
+  margin-top: 0;
+  margin-bottom: 6px;
+  font-size: 1.1rem;
+}
+.final-result p {
+  margin-bottom: 0;
+  font-size: 0.95rem;
+}
+.final-result.pass h4 { color: var(--success); }
+.final-result.fail h4 { color: var(--warning); }
+
+/* ============================================
+   NAVIGATION FOOTER
+   ============================================ */
+.module-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 16px;
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 2px solid var(--border);
+}
+.nav-link {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: all var(--transition-spring);
+  min-width: 0;
+  flex: 1;
+  max-width: 50%;
+  box-shadow: var(--shadow-xs);
+}
+.nav-link:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+.nav-link.next { align-items: flex-end; text-align: right; }
+.nav-link .nav-dir {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--primary);
+}
+.nav-link .nav-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================
+   KEY CONCEPT HIGHLIGHT
+   ============================================ */
+.key-concept {
+  display: inline-block;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(6, 182, 212, 0.1));
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  color: var(--primary);
+}
+[data-theme="dark"] .key-concept {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(6, 182, 212, 0.15));
+  border-color: rgba(124, 58, 237, 0.35);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 1024px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .hamburger {
+    display: flex;
+  }
+  .sidebar-overlay.show {
+    display: block;
+  }
+  .main-content {
+    margin-left: 0;
+  }
+  .theme-toggle {
+    right: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .workshop-panels {
+    grid-template-columns: 1fr;
+  }
+  .lab-prompts {
+    grid-template-columns: 1fr;
+  }
+  .lab-response-grid {
+    grid-template-columns: 1fr;
+  }
+  .feature-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .content-wrapper {
+    padding: 24px 16px 60px;
+  }
+  .module-header h1 {
+    font-size: 1.6rem;
+  }
+  .section-heading {
+    font-size: 1.3rem;
+  }
+  .module-nav {
+    flex-direction: column;
+  }
+  .nav-link {
+    max-width: 100%;
+  }
+  .nav-link.next {
+    align-items: flex-start;
+    text-align: left;
+  }
+  .mock-interface {
+    aspect-ratio: 4 / 3;
+  }
+}
+
+/* ============================================
+   SCROLLBAR STYLING
+   ============================================ */
+.sidebar::-webkit-scrollbar,
+.code-block::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.sidebar::-webkit-scrollbar-track,
+.code-block::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+.code-block::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.section {
+  animation: fadeInUp 0.4s ease both;
+}
+</style>
+</head>
+<body>
+<!-- ============================================
+     THEME TOGGLE
+     ============================================ -->
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+  <span id="themeIcon">&#9790;</span>
+</button>
+
+<!-- ============================================
+     HAMBURGER (mobile)
+     ============================================ -->
+<button class="hamburger" id="hamburger" aria-label="Toggle sidebar">
+  <span></span>
+  <span></span>
+  <span></span>
+</button>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ============================================
+     SIDEBAR
+     ============================================ -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="../index.html" class="sidebar-back">&larr; Back to Hub</a>
+    <div class="sidebar-title">Module 02</div>
+    <div class="sidebar-module-name">Claude in the Browser</div>
+  </div>
+
+  <div class="sidebar-nav">
+    <!-- Section: Getting Started -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="getting-started">
+        Getting Started <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-getting-started">
+        <li><a href="#welcome-claude-ai" class="sidebar-link" data-target="welcome-claude-ai">Welcome to Claude.ai</a></li>
+        <li><a href="#projects" class="sidebar-link" data-target="projects">Projects</a></li>
+        <li><a href="#artifacts" class="sidebar-link" data-target="artifacts">Artifacts</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Power Features -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="power-features">
+        Power Features <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-power-features">
+        <li><a href="#system-prompts" class="sidebar-link" data-target="system-prompts">System Prompts</a></li>
+        <li><a href="#document-analysis" class="sidebar-link" data-target="document-analysis">Document Analysis</a></li>
+        <li><a href="#power-patterns" class="sidebar-link" data-target="power-patterns">Power Patterns</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Exercises -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="exercises">
+        Exercises <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-exercises">
+        <li><a href="#interface-explorer" class="sidebar-link" data-target="interface-explorer">Interface Explorer</a></li>
+        <li><a href="#prompt-workshop" class="sidebar-link" data-target="prompt-workshop">System Prompt Workshop</a></li>
+        <li><a href="#prompt-lab" class="sidebar-link" data-target="prompt-lab">Prompt Comparison Lab</a></li>
+        <li><a href="#final-quiz" class="sidebar-link" data-target="final-quiz">End-of-Module Quiz</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sidebar-progress">
+    <div class="sidebar-progress-label">Module Progress</div>
+    <div class="sidebar-progress-track">
+      <div class="sidebar-progress-fill" id="sidebarProgressFill"></div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================
+     MAIN CONTENT
+     ============================================ -->
+<main class="main-content">
+  <div class="content-wrapper">
+
+    <!-- Module Header -->
+    <header class="module-header">
+      <div class="breadcrumb">
+        <a href="../index.html">Training Hub</a> &raquo; Module 02
+      </div>
+      <div class="module-badge">
+        <span class="number">2</span>
+        <span class="label">Browser</span>
+      </div>
+      <h1>Claude in the Browser &mdash; Your AI Workspace</h1>
+      <p class="description">
+        Master the Claude.ai web interface: Projects for organized context, Artifacts for creative output, system prompts for precision, and document analysis for real-world productivity.
+      </p>
+      <div class="module-meta">
+        <span class="module-meta-item">&#9201; ~60 min</span>
+        <span class="module-meta-item">&#128218; Beginner</span>
+        <span class="module-meta-item">&#127891; Everyone</span>
+        <span class="module-meta-item">&#127919; 3 Interactive Exercises</span>
+      </div>
+    </header>
+
+    <!-- ========================================
+         SECTION 1: WELCOME TO CLAUDE.AI
+         ======================================== -->
+    <section class="section" id="welcome-claude-ai">
+      <h2 class="section-heading">1. Welcome to Claude.ai</h2>
+
+      <p>
+        <strong>Claude.ai</strong> is the web-based interface for interacting with Claude. Available at
+        <code>claude.ai</code>, it provides a rich, conversational workspace where you can chat with Claude,
+        upload documents, generate artifacts, and manage persistent projects -- all from your browser.
+      </p>
+
+      <p>
+        Whether you are drafting a report, analyzing a contract, writing code, or brainstorming strategy,
+        Claude.ai is designed to be your <span class="key-concept">AI workspace</span> for daily work.
+      </p>
+
+      <h3>The Chat Interface</h3>
+
+      <p>
+        When you open Claude.ai, you are greeted with a clean conversation interface. The key elements are:
+      </p>
+
+      <ul>
+        <li><strong>Message input area</strong> -- at the bottom of the screen, where you type your messages. Supports rich text, file uploads, and multi-line input.</li>
+        <li><strong>Model selector</strong> -- at the top, letting you choose between Claude models (Sonnet for speed, Opus for depth, Haiku for lightweight tasks).</li>
+        <li><strong>Conversation panel</strong> -- the center area displaying the back-and-forth between you and Claude.</li>
+        <li><strong>Projects sidebar</strong> -- on the left, showing your organized projects and conversation history.</li>
+        <li><strong>Artifacts panel</strong> -- on the right, appearing when Claude generates standalone content like code, documents, or diagrams.</li>
+      </ul>
+
+      <h3>Creating Your First Conversation</h3>
+
+      <p>
+        Starting a conversation with Claude is as simple as typing in the message box and pressing Enter.
+        There is no setup, no configuration, and no ceremony required. Just describe what you need.
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Example First Message</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>I'm preparing for a quarterly business review next week. I need to create
+a one-page executive summary of our Q3 results. Here are the key metrics:
+- Revenue: $4.2M (up 12% YoY)
+- Customer count: 340 (up 8%)
+- Churn rate: 3.1% (down from 4.2%)
+- NPS: 72 (up from 65)
+
+Please draft a professional executive summary with these numbers.</code></div>
+
+      <p>
+        Claude will respond with a well-structured executive summary, formatted with markdown headings,
+        bullet points, and clear sections. This response appears in the conversation panel and, if it is
+        a substantial document, may also appear as an <strong>Artifact</strong> on the right side.
+      </p>
+
+      <h3>Understanding the Response</h3>
+
+      <p>
+        Claude's responses are rich and structured. Key formatting features include:
+      </p>
+
+      <ul>
+        <li><strong>Markdown formatting</strong> -- Claude uses headers, bold, italics, and bullet points to organize information clearly.</li>
+        <li><strong>Code blocks</strong> -- when Claude writes code, it appears in syntax-highlighted blocks with a copy button.</li>
+        <li><strong>Math rendering</strong> -- Claude can render mathematical equations when discussing formulas or calculations.</li>
+        <li><strong>Tables</strong> -- structured data is often presented in well-formatted tables.</li>
+      </ul>
+
+      <h3>The "Second Message" Technique</h3>
+
+      <p>
+        One of the most powerful patterns in working with Claude is the
+        <span class="key-concept">second message technique</span>. Your first message gets a solid initial
+        response, but the <em>real</em> magic happens in the follow-up.
+      </p>
+
+      <div class="info-box">
+        <h4>How It Works</h4>
+        <p>
+          After Claude's initial response, send a follow-up that refines, redirects, or deepens the output.
+          Claude retains the full context of the conversation, so your second message can be brief and specific.
+        </p>
+        <ul>
+          <li><strong>"Make it more concise"</strong> -- cuts the response down to essentials</li>
+          <li><strong>"Now rewrite it for a technical audience"</strong> -- shifts the tone and depth</li>
+          <li><strong>"Add a section about risks"</strong> -- extends the content in a specific direction</li>
+          <li><strong>"Actually, use a table format instead"</strong> -- restructures the entire output</li>
+          <li><strong>"That's close, but our CFO prefers seeing percentages. Can you convert all absolute numbers?"</strong> -- fine-tunes details</li>
+        </ul>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>Pro tip:</strong> Your first message should give Claude the context and raw material.
+          Your second message should direct the final shape. Think of it like sculpting: first you provide
+          the clay, then you shape it.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 1: INTERFACE EXPLORER
+         ======================================== -->
+    <section class="section" id="interface-explorer">
+      <h2 class="section-heading">Interactive: Interface Explorer</h2>
+
+      <p>
+        Click on the numbered hotspots below to learn about each part of the Claude.ai interface.
+        Each hotspot reveals what that element does, pro tips, and keyboard shortcuts.
+      </p>
+
+      <div class="interface-explorer" id="explorerContainer">
+        <h3>Claude.ai Interface Map</h3>
+        <p style="color: var(--text-secondary); font-size: 0.9rem;">
+          Click each numbered circle to explore. Dismiss a tooltip by clicking the same hotspot again or clicking a different one.
+        </p>
+
+        <div class="mock-interface" id="mockInterface">
+          <!-- Mock UI regions -->
+          <div class="mock-region mock-region-sidebar">
+            <span style="font-size:1rem">&#128193;</span>
+            Projects
+          </div>
+          <div class="mock-region mock-region-topbar">
+            Model Selector &amp; Settings
+          </div>
+          <div class="mock-region mock-region-conversation">
+            <span style="font-size:1rem">&#128172;</span>
+            &nbsp;Conversation
+          </div>
+          <div class="mock-region mock-region-artifacts">
+            <span style="font-size:1rem">&#128196;</span>
+            Artifacts
+          </div>
+          <div class="mock-region mock-region-input">
+            <span style="font-size:1rem">&#9997;</span>
+            &nbsp;Message Input
+          </div>
+
+          <!-- 7 Hotspots -->
+          <div class="hotspot" id="hs1" style="top:50%;left:9%;transform:translate(-50%,-50%)" data-hs="1" onclick="toggleHotspot(1)">1</div>
+          <div class="hotspot" id="hs2" style="top:5%;left:35%;transform:translate(-50%,-50%)" data-hs="2" onclick="toggleHotspot(2)">2</div>
+          <div class="hotspot" id="hs3" style="top:5%;left:70%;transform:translate(-50%,-50%)" data-hs="3" onclick="toggleHotspot(3)">3</div>
+          <div class="hotspot" id="hs4" style="top:50%;left:45%;transform:translate(-50%,-50%)" data-hs="4" onclick="toggleHotspot(4)">4</div>
+          <div class="hotspot" id="hs5" style="top:50%;left:85%;transform:translate(-50%,-50%)" data-hs="5" onclick="toggleHotspot(5)">5</div>
+          <div class="hotspot" id="hs6" style="top:93%;left:45%;transform:translate(-50%,-50%)" data-hs="6" onclick="toggleHotspot(6)">6</div>
+          <div class="hotspot" id="hs7" style="top:93%;left:70%;transform:translate(-50%,-50%)" data-hs="7" onclick="toggleHotspot(7)">7</div>
+        </div>
+
+        <!-- Tooltip container (positioned dynamically) -->
+        <div class="hotspot-tooltip" id="hotspotTooltip"></div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 2: PROJECTS
+         ======================================== -->
+    <section class="section" id="projects">
+      <h2 class="section-heading">2. Projects &mdash; Your Organized Workspace</h2>
+
+      <p>
+        <span class="key-concept">Projects</span> are Claude.ai's system for organizing your work into
+        persistent, context-rich containers. Think of a Project as a dedicated workspace that remembers
+        your files, your preferences, and your instructions across every conversation within it.
+      </p>
+
+      <h3>What Projects Are</h3>
+
+      <p>
+        A Project is more than a folder. It is a persistent context container that includes:
+      </p>
+
+      <ul>
+        <li><strong>Uploaded files</strong> -- PDFs, spreadsheets, code files, images, and documents that Claude can reference in every conversation</li>
+        <li><strong>Custom Instructions</strong> -- standing instructions that shape how Claude responds within this Project</li>
+        <li><strong>Conversation history</strong> -- all past conversations organized under this Project</li>
+        <li><strong>Shared context</strong> -- all conversations in the Project share the same uploaded files and instructions</li>
+      </ul>
+
+      <h3>Creating and Naming Projects Effectively</h3>
+
+      <p>
+        Good project organization is the difference between a chaotic AI experience and a streamlined
+        workflow. Follow these naming conventions:
+      </p>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <span class="feature-card-icon">&#9989;</span>
+          <h4>Good Names</h4>
+          <p>"Q3 Earnings Analysis", "Client Onboarding SOPs", "Product Launch - April 2025", "Legal Contract Reviews"</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-card-icon">&#10060;</span>
+          <h4>Avoid These</h4>
+          <p>"Stuff", "Work Things", "Misc", "Test" -- vague names make Projects impossible to navigate later</p>
+        </div>
+      </div>
+
+      <h3>Adding Files and Documents</h3>
+
+      <p>
+        One of the most powerful features of Projects is the ability to upload files as
+        <strong>persistent context</strong>. Once uploaded, Claude can reference these files in every
+        conversation within the Project.
+      </p>
+
+      <ul>
+        <li><strong>PDFs</strong> -- reports, contracts, research papers, manuals</li>
+        <li><strong>Spreadsheets</strong> -- CSV files, data exports, financial models</li>
+        <li><strong>Code files</strong> -- source code, configuration files, scripts</li>
+        <li><strong>Images</strong> -- charts, diagrams, screenshots, photos</li>
+        <li><strong>Text documents</strong> -- meeting notes, requirements, specifications</li>
+      </ul>
+
+      <div class="callout info">
+        <span class="callout-icon">&#9432;</span>
+        <div class="callout-content">
+          <p><strong>File limits:</strong> Each Project can hold multiple files, up to the context window
+          limit. Larger files consume more of the context budget, so be selective about what you upload.
+          Focus on the files Claude truly needs to reference.</p>
+        </div>
+      </div>
+
+      <h3>Custom Instructions per Project</h3>
+
+      <p>
+        Custom Instructions are standing directives that tell Claude how to behave within a specific Project.
+        They are applied to <em>every</em> conversation in the Project automatically.
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Example: Custom Instructions for a Finance Project</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>You are helping the FP&amp;A team at Acme Corp analyze financial data.
+
+Key conventions:
+- All dollar amounts should be in millions (e.g., $4.2M not $4,200,000)
+- Always show year-over-year comparisons when discussing metrics
+- Flag any metric that deviates more than 10% from the prior period
+- Use tables for comparing multiple periods or segments
+- When asked to "summarize," produce a 5-bullet executive summary
+
+Our fiscal year runs April-March. Current fiscal year is FY2025.</code></div>
+
+      <h3>Project Templates for Common Workflows</h3>
+
+      <p>
+        Once you find a Project setup that works well, you can replicate the pattern. Here are common
+        Project templates that organizations use:
+      </p>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <span class="feature-card-icon">&#128200;</span>
+          <h4>Weekly Report Generator</h4>
+          <p>Upload your data template, add instructions for formatting, and generate consistent reports each week.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-card-icon">&#128221;</span>
+          <h4>Contract Reviewer</h4>
+          <p>Upload your standard terms, add legal review instructions, then upload new contracts for analysis.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-card-icon">&#128187;</span>
+          <h4>Code Review Assistant</h4>
+          <p>Upload your style guide and coding standards, then paste code for consistent reviews.</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-card-icon">&#127891;</span>
+          <h4>Training Material Creator</h4>
+          <p>Upload source materials and style guides, then request training content in your format.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 3: ARTIFACTS
+         ======================================== -->
+    <section class="section" id="artifacts">
+      <h2 class="section-heading">3. Artifacts &mdash; Claude's Creative Output</h2>
+
+      <p>
+        <span class="key-concept">Artifacts</span> are standalone pieces of content that Claude creates
+        alongside the conversation. When Claude generates something substantial -- a document, code, a
+        diagram, or an interactive component -- it appears in the Artifacts panel on the right side of the
+        screen.
+      </p>
+
+      <p>
+        Think of Artifacts as Claude's "deliverables." While the conversation is the discussion, Artifacts
+        are the tangible outputs you can use, share, and iterate on.
+      </p>
+
+      <h3>Types of Artifacts</h3>
+
+      <div class="info-box">
+        <h4>Code Artifacts</h4>
+        <p>
+          Claude can produce code in virtually any programming language: Python, JavaScript, TypeScript, HTML/CSS,
+          SQL, Rust, Go, and many more. Code Artifacts appear with syntax highlighting, a copy button, and
+          a language label.
+        </p>
+      </div>
+
+      <div class="info-box">
+        <h4>Document Artifacts</h4>
+        <p>
+          Formatted text documents like executive summaries, proposals, emails, and reports. These render with
+          proper markdown formatting -- headings, bullet points, tables, and emphasis.
+        </p>
+      </div>
+
+      <div class="info-box">
+        <h4>SVG Graphics and Diagrams</h4>
+        <p>
+          Claude can generate vector graphics directly. Logos, icons, flowcharts, and simple illustrations
+          are rendered as SVG and displayed visually in the Artifacts panel.
+        </p>
+      </div>
+
+      <div class="info-box">
+        <h4>Mermaid Diagrams</h4>
+        <p>
+          For more complex diagrams -- flowcharts, sequence diagrams, entity-relationship diagrams, Gantt charts --
+          Claude uses Mermaid syntax, which renders as interactive, professional diagrams.
+        </p>
+      </div>
+
+      <div class="info-box">
+        <h4>React Components (Interactive HTML)</h4>
+        <p>
+          Claude can create fully interactive HTML components with embedded JavaScript. Calculators, dashboards,
+          interactive forms, and data visualizations come to life right in the Artifacts panel.
+        </p>
+      </div>
+
+      <h3>Iterating on Artifacts</h3>
+
+      <p>
+        One of the most powerful aspects of Artifacts is <strong>in-place editing</strong>. Instead of
+        regenerating an entire document, you can ask Claude to modify specific parts:
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Iterating on an Artifact</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm"># After Claude generates a dashboard artifact:</span>
+
+"Make the header background dark blue instead of gray"
+<span class="cm"># Claude modifies just the header styling</span>
+
+"Add a search filter above the data table"
+<span class="cm"># Claude adds the filter component, keeping everything else</span>
+
+"The chart should show the last 12 months, not 6"
+<span class="cm"># Claude adjusts the data range in the chart</span></code></div>
+
+      <p>
+        Each iteration builds on the previous version. Claude maintains the full Artifact state and makes
+        targeted modifications, just like a human editor working on a living document.
+      </p>
+
+      <h3>Downloading and Sharing Artifacts</h3>
+
+      <p>
+        Artifacts are not trapped in Claude.ai. You can:
+      </p>
+
+      <ul>
+        <li><strong>Copy to clipboard</strong> -- one click to copy the raw content (code, markdown, etc.)</li>
+        <li><strong>Download as a file</strong> -- save code files, documents, or SVGs to your computer</li>
+        <li><strong>Share via link</strong> -- generate a shareable link for interactive Artifacts that others can view</li>
+        <li><strong>Publish</strong> -- some Artifacts can be published as standalone web pages</li>
+      </ul>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>Pro tip:</strong> When you need a complex interactive tool (a calculator, a dashboard, a
+          form), ask Claude to create it as a React component Artifact. You will get a fully functional,
+          interactive tool that runs right in your browser -- no deployment needed.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 4: SYSTEM PROMPTS
+         ======================================== -->
+    <section class="section" id="system-prompts">
+      <h2 class="section-heading">4. System Prompts and Custom Instructions</h2>
+
+      <p>
+        <span class="key-concept">System prompts</span> are instructions that set Claude's behavior
+        <em>before</em> the conversation starts. They are the single most powerful tool for getting
+        consistent, high-quality responses tailored to your specific needs.
+      </p>
+
+      <h3>What System Prompts Do</h3>
+
+      <p>
+        A system prompt tells Claude who it is, how it should behave, what constraints to follow, and
+        how to format its responses. Think of it as a detailed job description for your AI assistant.
+        Without a system prompt, Claude defaults to being a helpful generalist. With one, Claude becomes
+        a specialist precisely tuned to your workflow.
+      </p>
+
+      <h3>The Three Types</h3>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Where It Lives</th>
+              <th>Scope</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Built-in</strong></td>
+              <td>Set by Anthropic (claude.ai defaults)</td>
+              <td>Applies to all conversations by default</td>
+            </tr>
+            <tr>
+              <td><strong>Project-level</strong></td>
+              <td>Project Custom Instructions</td>
+              <td>Applies to every conversation in that Project</td>
+            </tr>
+            <tr>
+              <td><strong>Conversation-level</strong></td>
+              <td>Your first message (or preamble)</td>
+              <td>Applies to just this conversation</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Patterns for Effective System Prompts</h3>
+
+      <h4>1. Persona Pattern</h4>
+      <p>
+        Define who Claude is and what expertise it brings. This shapes the vocabulary, depth, and
+        perspective of every response.
+      </p>
+      <div class="code-block has-label">
+        <span class="code-label">Persona Pattern</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>You are a senior financial analyst with 15 years of experience in SaaS
+metrics and enterprise valuation. You approach every question with the
+rigor of preparing for a board presentation. Use precise financial
+terminology and always consider the investor's perspective.</code></div>
+
+      <h4>2. Constraint Pattern</h4>
+      <p>
+        Set clear boundaries on what Claude should and should not do. Constraints prevent hallucination,
+        overreach, and inconsistency.
+      </p>
+      <div class="code-block has-label">
+        <span class="code-label">Constraint Pattern</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>Rules:
+- Always cite the specific document or data source for any claim
+- Never fabricate statistics or make up data points
+- If you are unsure about something, say so explicitly
+- Do not provide medical, legal, or financial advice -- frame as analysis
+- Flag when a question falls outside your area of expertise</code></div>
+
+      <h4>3. Format Pattern</h4>
+      <p>
+        Specify exactly how Claude should structure its responses. This ensures consistency across
+        every interaction.
+      </p>
+      <div class="code-block has-label">
+        <span class="code-label">Format Pattern</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>Response format:
+- Start with a one-sentence summary (the "bottom line up front")
+- Use bullet points for key findings (maximum 5)
+- Keep total response under 200 words
+- End with "Recommended next step:" followed by one action item
+- Use tables when comparing 3 or more items</code></div>
+
+      <h4>4. Audience Pattern</h4>
+      <p>
+        Tell Claude who the reader is. This dramatically changes vocabulary, depth, and what
+        background knowledge Claude assumes.
+      </p>
+      <div class="code-block has-label">
+        <span class="code-label">Audience Pattern</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>Your audience is non-technical C-suite executives. They are brilliant
+strategists but do not know what an API is. Explain technical concepts
+using business analogies. Replace jargon with plain language. Focus on
+business impact, not implementation details.</code></div>
+
+      <h3>Examples Across Industries</h3>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <span class="feature-card-icon">&#127973;</span>
+          <h4>Healthcare</h4>
+          <p>"You are a clinical research advisor. Always cite studies. Flag anything requiring physician consultation. Use accessible language."</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-card-icon">&#9878;</span>
+          <h4>Legal</h4>
+          <p>"You are a legal research assistant. Identify risks and liabilities. Note jurisdiction variations. Never provide legal advice directly."</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-card-icon">&#128176;</span>
+          <h4>Finance</h4>
+          <p>"You are an FP&A analyst. Support claims with data. Use financial terminology precisely. Present findings in structured tables."</p>
+        </div>
+        <div class="feature-card">
+          <span class="feature-card-icon">&#128736;</span>
+          <h4>Engineering</h4>
+          <p>"You are a senior software architect. Evaluate tradeoffs explicitly. Recommend proven patterns. Include code examples where helpful."</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 2: SYSTEM PROMPT WORKSHOP
+         ======================================== -->
+    <section class="section" id="prompt-workshop">
+      <h2 class="section-heading">Interactive: System Prompt Workshop</h2>
+
+      <p>
+        Write your own system prompt or select an industry example to see how different prompts produce
+        dramatically different response styles. The "Test Results" panel shows simulated Claude responses
+        based on your prompt.
+      </p>
+
+      <div class="prompt-workshop" id="workshopContainer">
+        <h3>System Prompt Workshop</h3>
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0;">
+          Select an industry preset or write your own. Watch how the simulated responses change in real time.
+        </p>
+
+        <div class="workshop-panels">
+          <!-- Left Panel: System Prompt Editor -->
+          <div class="workshop-panel">
+            <div class="workshop-panel-label">Your System Prompt</div>
+            <select class="workshop-select" id="industrySelect" onchange="selectIndustryPrompt()">
+              <option value="">-- Select an industry preset --</option>
+              <option value="finance">Finance</option>
+              <option value="healthcare">Healthcare</option>
+              <option value="legal">Legal</option>
+              <option value="retail">Retail</option>
+              <option value="tech">Tech</option>
+            </select>
+            <textarea id="systemPromptInput" placeholder="Write your system prompt here, or select an industry preset above..." oninput="updateWorkshopResponses()"></textarea>
+          </div>
+
+          <!-- Right Panel: Test Results -->
+          <div class="workshop-panel">
+            <div class="workshop-panel-label">Simulated Test Results</div>
+            <div id="workshopResponses">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 5: DOCUMENT ANALYSIS
+         ======================================== -->
+    <section class="section" id="document-analysis">
+      <h2 class="section-heading">5. Document Analysis Power</h2>
+
+      <p>
+        One of Claude's strongest capabilities in the browser is <strong>document analysis</strong>.
+        Upload PDFs, images, spreadsheets, and other files, then ask Claude to extract, summarize,
+        compare, and synthesize information from them.
+      </p>
+
+      <h3>Uploading Documents</h3>
+
+      <p>
+        You can upload documents in two ways:
+      </p>
+
+      <ul>
+        <li><strong>In a conversation</strong> -- click the attachment icon in the message input to upload files for a single conversation</li>
+        <li><strong>In a Project</strong> -- add files to the Project's knowledge base so they persist across all conversations</li>
+      </ul>
+
+      <p>
+        Claude supports a wide range of formats: PDF, images (PNG, JPG, WebP), CSV, plain text,
+        code files, and more. For best results, use text-based PDFs rather than scanned images when possible.
+      </p>
+
+      <h3>Asking Structured Questions</h3>
+
+      <p>
+        The key to effective document analysis is asking <em>structured</em> questions rather than vague ones.
+        Compare these approaches:
+      </p>
+
+      <div class="feature-grid">
+        <div class="feature-card" style="border-top: 3px solid var(--error);">
+          <h4>Vague Question</h4>
+          <p>"What does this document say?"</p>
+          <p style="font-size:0.82rem; color:var(--text-muted); margin-top:6px;">Gets a generic summary that may miss what you actually need.</p>
+        </div>
+        <div class="feature-card" style="border-top: 3px solid var(--success);">
+          <h4>Structured Question</h4>
+          <p>"Extract all payment terms, deadlines, and penalty clauses from this contract. Present them in a table."</p>
+          <p style="font-size:0.82rem; color:var(--text-muted); margin-top:6px;">Gets exactly the information you need in the format you want.</p>
+        </div>
+      </div>
+
+      <h3>Multi-Document Synthesis</h3>
+
+      <p>
+        Claude excels when asked to synthesize information across multiple documents. Upload several files
+        and ask cross-cutting questions:
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Multi-Document Synthesis Examples</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>"Compare these three vendor proposals on price, timeline, and support
+terms. Which one offers the best overall value?"
+
+"I've uploaded our last 4 quarterly reports. Identify the top 3 trends
+that have been consistent across all quarters."
+
+"Here are resumes from 5 candidates. Create a comparison matrix of their
+skills, experience levels, and cultural fit indicators."</code></div>
+
+      <h3>Data Extraction Patterns</h3>
+
+      <p>
+        Claude is exceptionally good at extracting structured data from unstructured documents:
+      </p>
+
+      <ul>
+        <li><strong>"Extract all dates and amounts from this invoice"</strong> -- turns messy invoices into clean data</li>
+        <li><strong>"List every person mentioned in this report with their title and role"</strong> -- builds a stakeholder map</li>
+        <li><strong>"Pull out all action items from these meeting notes"</strong> -- converts notes into a task list</li>
+        <li><strong>"Identify all regulatory requirements mentioned in this compliance document"</strong> -- creates a checklist</li>
+      </ul>
+
+      <h3>Vision Capabilities</h3>
+
+      <p>
+        Claude can analyze images, charts, screenshots, and photos. This makes it valuable for:
+      </p>
+
+      <ul>
+        <li><strong>Chart analysis</strong> -- upload a chart and ask Claude to describe trends, identify anomalies, or extract data points</li>
+        <li><strong>Screenshot review</strong> -- share a UI screenshot and ask for feedback on design, usability, or content</li>
+        <li><strong>Handwritten notes</strong> -- upload photos of whiteboard sessions or handwritten notes for transcription</li>
+        <li><strong>Infographic interpretation</strong> -- ask Claude to describe and explain complex visual information</li>
+      </ul>
+
+      <div class="callout warning">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Important:</strong> While Claude's vision is powerful, it is not perfect for fine-grained
+          text extraction from complex images. For best results with PDFs, use text-based (not scanned) PDFs.
+          For scanned documents, consider using OCR first, then uploading the text.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 6: POWER PATTERNS
+         ======================================== -->
+    <section class="section" id="power-patterns">
+      <h2 class="section-heading">6. Power Patterns for Daily Work</h2>
+
+      <p>
+        Beyond basic prompting, experienced Claude users employ a set of
+        <span class="key-concept">power patterns</span> that consistently produce higher-quality results.
+        These patterns work in any domain and scale from simple questions to complex multi-step workflows.
+      </p>
+
+      <h3>Chain-of-Thought</h3>
+
+      <p>
+        Asking Claude to "think step by step" before answering forces it to reason through complex
+        problems rather than jumping to a conclusion. This is especially valuable for math, logic,
+        analysis, and any task where the reasoning matters as much as the answer.
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Chain-of-Thought Pattern</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>Before answering, think step by step:
+
+1. What are the key factors to consider?
+2. What are the tradeoffs between each option?
+3. What does the data actually show?
+
+Then provide your recommendation with supporting reasoning.</code></div>
+
+      <h3>Role-Play</h3>
+
+      <p>
+        Ask Claude to adopt a specific perspective to stress-test your ideas and find blind spots.
+      </p>
+
+      <ul>
+        <li><strong>"Play devil's advocate on my proposal"</strong> -- finds weaknesses before your critics do</li>
+        <li><strong>"Respond as if you were a skeptical investor hearing this pitch"</strong> -- tests your business case</li>
+        <li><strong>"Review this as if you were a QA engineer looking for edge cases"</strong> -- finds bugs and gaps</li>
+        <li><strong>"What would a regulator's concerns be with this approach?"</strong> -- identifies compliance risks</li>
+      </ul>
+
+      <h3>Multi-Document Synthesis</h3>
+
+      <p>
+        When you upload 5 or more documents, Claude can answer cross-cutting questions that would take
+        hours to research manually:
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Cross-Cutting Analysis</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>I've uploaded our last 6 monthly sales reports. Please:
+
+1. Identify any trends that appear across 3+ months
+2. Flag any anomalies (metrics that deviate >15% from average)
+3. Correlate marketing spend with lead generation numbers
+4. Summarize in a table: Month | Revenue | Leads | Cost per Lead | Trend</code></div>
+
+      <h3>Template Generation</h3>
+
+      <p>
+        Create reusable prompt templates that you can fill in each time. This is especially powerful
+        for recurring tasks like weekly reports, client emails, or code reviews.
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Reusable Template</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm"># Weekly Status Report Template</span>
+
+Generate a weekly status report using this structure:
+
+Team: [TEAM_NAME]
+Week ending: [DATE]
+
+1. ACCOMPLISHMENTS (top 3 completed items)
+2. IN PROGRESS (items currently being worked on, with % complete)
+3. BLOCKERS (anything preventing progress)
+4. NEXT WEEK PRIORITIES (top 3 planned items)
+5. METRICS: [METRIC_1], [METRIC_2], [METRIC_3]
+
+Keep each section to 2-3 bullet points. Total length: under 1 page.</code></div>
+
+      <h3>Conversation Branching</h3>
+
+      <p>
+        Claude.ai allows you to start a new response from any previous message in the conversation.
+        This is called <strong>branching</strong>, and it lets you explore alternatives without losing
+        your original thread:
+      </p>
+
+      <ul>
+        <li><strong>Explore different approaches</strong> -- branch from a decision point to see two different solutions side by side</li>
+        <li><strong>Undo and redo</strong> -- if Claude goes in the wrong direction, branch from an earlier message and redirect</li>
+        <li><strong>A/B test prompts</strong> -- branch from the same point with two different instructions to compare outputs</li>
+      </ul>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>Power user move:</strong> Combine multiple patterns in one prompt. Start with a persona
+          ("You are a senior data analyst"), add constraints ("Use only the uploaded data, never fabricate numbers"),
+          specify the format ("Present as a 5-bullet executive summary"), and trigger chain-of-thought
+          ("Show your reasoning before the final summary"). This layered approach consistently produces
+          the best results.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 3: PROMPT COMPARISON LAB
+         ======================================== -->
+    <section class="section" id="prompt-lab">
+      <h2 class="section-heading">Interactive: Prompt Comparison Lab</h2>
+
+      <p>
+        See the dramatic difference between vague prompts and well-crafted ones. For each scenario,
+        click "Show Responses" to reveal simulated Claude responses for both approaches, along with
+        annotations explaining why the optimized version works better.
+      </p>
+
+      <div class="prompt-lab" id="promptLabContainer">
+        <h3>Prompt Comparison Lab</h3>
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0;">
+          5 real-world scenarios. Click "Show Responses" to compare naive vs. optimized prompting.
+        </p>
+
+        <div id="labScenarios">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         END-OF-MODULE QUIZ
+         ======================================== -->
+    <section class="section" id="final-quiz">
+      <h2 class="section-heading">End-of-Module Quiz</h2>
+
+      <p>
+        Complete this quiz to finish Module 02. Your score will be saved to track your progress
+        through the training program. You need at least 5 out of 7 to pass.
+      </p>
+
+      <div class="final-quiz" id="finalQuizContainer">
+        <h3>Module 02: Assessment</h3>
+
+        <!-- Question 1 -->
+        <div class="final-quiz-question" data-fq="0">
+          <div class="fq-number">Question 1 of 7</div>
+          <div class="fq-text">
+            What is the primary purpose of a Project in Claude.ai?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="0" data-fq-val="a" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="a"> To create a shareable link for team collaboration
+            </li>
+            <li class="fq-option" data-fq-idx="0" data-fq-val="b" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="b"> To provide persistent context and custom instructions for a set of related conversations
+            </li>
+            <li class="fq-option" data-fq-idx="0" data-fq-val="c" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="c"> To automatically save all conversations to the cloud
+            </li>
+            <li class="fq-option" data-fq-idx="0" data-fq-val="d" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="d"> To enable voice input for conversations
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="final-quiz-question" data-fq="1">
+          <div class="fq-number">Question 2 of 7</div>
+          <div class="fq-text">
+            Which of the following is NOT a type of Artifact that Claude can create?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="1" data-fq-val="a" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="a"> Python code
+            </li>
+            <li class="fq-option" data-fq-idx="1" data-fq-val="b" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="b"> Mermaid diagrams
+            </li>
+            <li class="fq-option" data-fq-idx="1" data-fq-val="c" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="c"> Video files
+            </li>
+            <li class="fq-option" data-fq-idx="1" data-fq-val="d" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="d"> SVG graphics
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="final-quiz-question" data-fq="2">
+          <div class="fq-number">Question 3 of 7</div>
+          <div class="fq-text">
+            What is the most effective pattern for a system prompt that should produce consistent, formatted output?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="2" data-fq-val="a" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="a"> Keep it vague so Claude has creative freedom
+            </li>
+            <li class="fq-option" data-fq-idx="2" data-fq-val="b" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="b"> Specify the exact format, audience, and constraints you want
+            </li>
+            <li class="fq-option" data-fq-idx="2" data-fq-val="c" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="c"> Just write "be professional" and Claude will figure it out
+            </li>
+            <li class="fq-option" data-fq-idx="2" data-fq-val="d" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="d"> Use as many words as possible to be thorough
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 4 -->
+        <div class="final-quiz-question" data-fq="3">
+          <div class="fq-number">Question 4 of 7</div>
+          <div class="fq-text">
+            When uploading a PDF to Claude for analysis, what approach is most effective?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="3" data-fq-val="a" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="a"> Upload it and ask "What does this say?"
+            </li>
+            <li class="fq-option" data-fq-idx="3" data-fq-val="b" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="b"> Upload it with specific questions about what you need extracted or analyzed
+            </li>
+            <li class="fq-option" data-fq-idx="3" data-fq-val="c" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="c"> Convert it to text first, then paste the text
+            </li>
+            <li class="fq-option" data-fq-idx="3" data-fq-val="d" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="d"> Upload only one page at a time
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 5 -->
+        <div class="final-quiz-question" data-fq="4">
+          <div class="fq-number">Question 5 of 7</div>
+          <div class="fq-text">
+            What is the "second message" technique?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="4" data-fq-val="a" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="a"> Sending the same message twice for a better response
+            </li>
+            <li class="fq-option" data-fq-idx="4" data-fq-val="b" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="b"> Using follow-up messages to refine and iterate on Claude's initial response
+            </li>
+            <li class="fq-option" data-fq-idx="4" data-fq-val="c" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="c"> Sending a message to two different conversations simultaneously
+            </li>
+            <li class="fq-option" data-fq-idx="4" data-fq-val="d" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="d"> A technique for bypassing Claude's safety guidelines
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 6 -->
+        <div class="final-quiz-question" data-fq="5">
+          <div class="fq-number">Question 6 of 7</div>
+          <div class="fq-text">
+            In the Prompt Comparison Lab, what consistently made "optimized" prompts more effective than "naive" ones?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="5" data-fq-val="a" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="a"> Using longer, more complex sentences
+            </li>
+            <li class="fq-option" data-fq-idx="5" data-fq-val="b" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="b"> Adding technical jargon that Claude recognizes
+            </li>
+            <li class="fq-option" data-fq-idx="5" data-fq-val="c" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="c"> Providing specific context, structure, and success criteria
+            </li>
+            <li class="fq-option" data-fq-idx="5" data-fq-val="d" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="d"> Starting with "Please" and "Thank you"
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 7 -->
+        <div class="final-quiz-question" data-fq="6">
+          <div class="fq-number">Question 7 of 7</div>
+          <div class="fq-text">
+            Which system prompt pattern is most appropriate for an AI assistant that helps non-technical executives understand technical reports?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="6" data-fq-val="a" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="a"> Persona pattern: "You are a senior engineer"
+            </li>
+            <li class="fq-option" data-fq-idx="6" data-fq-val="b" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="b"> Audience pattern: "Explain as if talking to a non-technical executive"
+            </li>
+            <li class="fq-option" data-fq-idx="6" data-fq-val="c" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="c"> Constraint pattern: "Always use code examples"
+            </li>
+            <li class="fq-option" data-fq-idx="6" data-fq-val="d" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="d"> Format pattern: "Respond in JSON"
+            </li>
+          </ul>
+        </div>
+
+        <button class="final-submit-btn" id="finalSubmitBtn" onclick="submitFinalQuiz()" disabled>
+          Submit Answers
+        </button>
+
+        <div class="final-result" id="finalResult">
+          <h4 id="finalResultTitle"></h4>
+          <p id="finalResultText"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         NAVIGATION FOOTER
+         ======================================== -->
+    <nav class="module-nav">
+      <a href="01-what-is-claude.html" class="nav-link prev">
+        <span class="nav-dir">&larr; Previous</span>
+        <span class="nav-title">Module 01: What Is Claude?</span>
+      </a>
+      <a href="03-claude-code-intro.html" class="nav-link next">
+        <span class="nav-dir">Next &rarr;</span>
+        <span class="nav-title">Module 03: Claude Code Introduction</span>
+      </a>
+    </nav>
+
+  </div>
+</main>
+
+<!-- ============================================
+     JAVASCRIPT
+     ============================================ -->
+<script>
+(function() {
+  'use strict';
+
+  // ==========================================
+  // THEME MANAGEMENT
+  // ==========================================
+  var THEME_KEY = 'claude-training-theme';
+
+  function getTheme() {
+    return localStorage.getItem(THEME_KEY) || 'light';
+  }
+
+  function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem(THEME_KEY, theme);
+    var icon = document.getElementById('themeIcon');
+    if (icon) {
+      icon.textContent = theme === 'dark' ? '\u2600' : '\u263E';
+    }
+  }
+
+  // Initialize theme
+  setTheme(getTheme());
+
+  document.getElementById('themeToggle').addEventListener('click', function() {
+    var current = getTheme();
+    setTheme(current === 'dark' ? 'light' : 'dark');
+  });
+
+  // ==========================================
+  // SIDEBAR MOBILE TOGGLE
+  // ==========================================
+  var hamburger = document.getElementById('hamburger');
+  var sidebar = document.getElementById('sidebar');
+  var overlay = document.getElementById('sidebarOverlay');
+
+  function toggleSidebar() {
+    var isOpen = sidebar.classList.contains('open');
+    sidebar.classList.toggle('open');
+    hamburger.classList.toggle('open');
+    if (isOpen) {
+      overlay.classList.remove('show');
+    } else {
+      overlay.classList.add('show');
+    }
+  }
+
+  hamburger.addEventListener('click', toggleSidebar);
+  overlay.addEventListener('click', toggleSidebar);
+
+  // ==========================================
+  // SIDEBAR SECTION COLLAPSING
+  // ==========================================
+  var sectionToggles = document.querySelectorAll('.sidebar-section-toggle');
+  for (var t = 0; t < sectionToggles.length; t++) {
+    (function(btn) {
+      btn.addEventListener('click', function() {
+        var sectionName = this.getAttribute('data-section');
+        var linksList = document.getElementById('nav-' + sectionName);
+        var isCollapsed = this.classList.contains('collapsed');
+
+        if (isCollapsed) {
+          this.classList.remove('collapsed');
+          linksList.classList.remove('collapsed');
+          linksList.style.maxHeight = linksList.scrollHeight + 'px';
+        } else {
+          this.classList.add('collapsed');
+          linksList.style.maxHeight = linksList.scrollHeight + 'px';
+          // Force reflow
+          linksList.offsetHeight;
+          linksList.classList.add('collapsed');
+        }
+      });
+
+      // Initialize: set max-height so transitions work
+      var sectionName = btn.getAttribute('data-section');
+      var linksList = document.getElementById('nav-' + sectionName);
+      if (linksList) {
+        linksList.style.maxHeight = linksList.scrollHeight + 'px';
+      }
+    })(sectionToggles[t]);
+  }
+
+  // ==========================================
+  // SCROLLSPY
+  // ==========================================
+  var sidebarLinks = document.querySelectorAll('.sidebar-link');
+  var sections = [];
+
+  for (var s = 0; s < sidebarLinks.length; s++) {
+    var targetId = sidebarLinks[s].getAttribute('data-target');
+    var sectionEl = document.getElementById(targetId);
+    if (sectionEl) {
+      sections.push({ el: sectionEl, link: sidebarLinks[s], id: targetId });
+    }
+  }
+
+  function updateScrollspy() {
+    var scrollPos = window.scrollY + 100;
+    var active = null;
+
+    for (var i = sections.length - 1; i >= 0; i--) {
+      if (sections[i].el.offsetTop <= scrollPos) {
+        active = sections[i];
+        break;
+      }
+    }
+
+    for (var j = 0; j < sidebarLinks.length; j++) {
+      sidebarLinks[j].classList.remove('active');
+    }
+    if (active) {
+      active.link.classList.add('active');
+    }
+
+    // Update progress based on scroll
+    updateSidebarProgress();
+  }
+
+  var scrollTimer = null;
+  window.addEventListener('scroll', function() {
+    if (scrollTimer) return;
+    scrollTimer = setTimeout(function() {
+      scrollTimer = null;
+      updateScrollspy();
+    }, 50);
+  });
+  updateScrollspy();
+
+  // Close mobile sidebar on link click
+  for (var sl = 0; sl < sidebarLinks.length; sl++) {
+    sidebarLinks[sl].addEventListener('click', function() {
+      if (window.innerWidth <= 1024) {
+        sidebar.classList.remove('open');
+        hamburger.classList.remove('open');
+        overlay.classList.remove('show');
+      }
+    });
+  }
+
+  // ==========================================
+  // SIDEBAR PROGRESS
+  // ==========================================
+  function updateSidebarProgress() {
+    var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    var scrolled = window.scrollY;
+    var pct = docHeight > 0 ? Math.min(100, (scrolled / docHeight) * 100) : 0;
+
+    var fill = document.getElementById('sidebarProgressFill');
+    if (fill) {
+      fill.style.width = pct + '%';
+    }
+  }
+
+  // ==========================================
+  // COPY TO CLIPBOARD
+  // ==========================================
+  window.copyCode = function(btn) {
+    var block = btn.closest('.code-block');
+    var codeEl = block.cloneNode(true);
+    var labelEl = codeEl.querySelector('.code-label');
+    var btnEl = codeEl.querySelector('.copy-btn');
+    if (labelEl) labelEl.remove();
+    if (btnEl) btnEl.remove();
+
+    var text = codeEl.textContent.trim();
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function() {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(function() {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      })['catch'](function() {
+        btn.textContent = 'Failed';
+        setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+      });
+    } else {
+      // Fallback for older browsers
+      var textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+      } catch (e) {
+        btn.textContent = 'Failed';
+      }
+      document.body.removeChild(textarea);
+      setTimeout(function() {
+        btn.textContent = 'Copy';
+        btn.classList.remove('copied');
+      }, 2000);
+    }
+  };
+
+  // ==========================================
+  // INTERACTIVE 1: INTERFACE EXPLORER
+  // ==========================================
+  var hotspotData = [
+    {
+      id: 1,
+      title: 'Projects Sidebar',
+      description: 'The left panel shows all your Projects and recent conversations. Each Project acts as a container with its own files, instructions, and conversation history.',
+      tip: 'Create a new Project for each major workstream (e.g., "Q3 Financial Analysis", "Product Launch Plan"). Keep conversations organized by topic.',
+      shortcut: null
+    },
+    {
+      id: 2,
+      title: 'Model Selector',
+      description: 'Choose which Claude model to use. Sonnet is faster and great for everyday tasks. Opus provides deeper reasoning for complex analysis. Haiku is lightweight and cost-effective.',
+      tip: 'Use Sonnet for drafting and brainstorming, switch to Opus when you need deep analysis or nuanced reasoning on critical documents.',
+      shortcut: null
+    },
+    {
+      id: 3,
+      title: 'Settings & Profile',
+      description: 'Access your account settings, manage API usage, configure preferences, and set global custom instructions that apply across all conversations.',
+      tip: 'Set global custom instructions for preferences that apply everywhere, like "Always use metric units" or "Prefer concise responses."',
+      shortcut: null
+    },
+    {
+      id: 4,
+      title: 'Conversation Panel',
+      description: 'The main area where your conversation with Claude unfolds. Messages are displayed in chronological order with rich formatting, code blocks, and embedded media.',
+      tip: 'Click on any previous Claude response to branch the conversation from that point. This lets you explore alternatives without losing your original thread.',
+      shortcut: null
+    },
+    {
+      id: 5,
+      title: 'Artifacts Panel',
+      description: 'When Claude generates standalone content (code, documents, diagrams, interactive components), it appears here. You can view, copy, download, and iterate on Artifacts.',
+      tip: 'Artifacts persist across the conversation. Ask Claude to modify an existing Artifact ("make the header blue") rather than regenerating from scratch.',
+      shortcut: null
+    },
+    {
+      id: 6,
+      title: 'Message Input',
+      description: 'Type your message here. Supports multi-line input (Shift+Enter for new lines), file uploads via the paperclip icon, and rich text. Press Enter to send.',
+      tip: 'Use Shift+Enter to write multi-line prompts. Longer, more detailed prompts generally produce better results than short, vague ones.',
+      shortcut: 'Enter to send, Shift+Enter for new line'
+    },
+    {
+      id: 7,
+      title: 'File Upload',
+      description: 'Click the attachment icon to upload files directly into the conversation. Supports PDFs, images, CSVs, code files, and more. Files uploaded here are available only in this conversation.',
+      tip: 'For files you need across multiple conversations, add them to the Project instead. For one-off analysis, upload directly in the conversation.',
+      shortcut: null
+    }
+  ];
+
+  var activeHotspot = null;
+
+  window.toggleHotspot = function(id) {
+    var tooltip = document.getElementById('hotspotTooltip');
+    var mockInterface = document.getElementById('mockInterface');
+
+    // If clicking the same hotspot, close it
+    if (activeHotspot === id) {
+      tooltip.classList.remove('visible');
+      document.getElementById('hs' + id).classList.remove('active');
+      activeHotspot = null;
+      return;
+    }
+
+    // Deactivate previous hotspot
+    if (activeHotspot !== null) {
+      var prevHs = document.getElementById('hs' + activeHotspot);
+      if (prevHs) prevHs.classList.remove('active');
+    }
+
+    // Find data for this hotspot
+    var data = null;
+    for (var h = 0; h < hotspotData.length; h++) {
+      if (hotspotData[h].id === id) {
+        data = hotspotData[h];
+        break;
+      }
+    }
+    if (!data) return;
+
+    // Activate new hotspot
+    var hsEl = document.getElementById('hs' + id);
+    hsEl.classList.add('active');
+    activeHotspot = id;
+
+    // Build tooltip HTML
+    var html = '<h5>' + data.title + '</h5>';
+    html += '<p>' + data.description + '</p>';
+    html += '<div class="tip-label">Pro Tip</div>';
+    html += '<p>' + data.tip + '</p>';
+    if (data.shortcut) {
+      html += '<div class="tip-label">Keyboard Shortcut</div>';
+      html += '<p><span class="shortcut">' + data.shortcut + '</span></p>';
+    }
+    tooltip.innerHTML = html;
+
+    // Position tooltip below the mock interface
+    tooltip.style.position = 'relative';
+    tooltip.style.width = '100%';
+    tooltip.style.marginTop = '12px';
+    tooltip.classList.add('visible');
+  };
+
+  // Close tooltip when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.hotspot') && !e.target.closest('.hotspot-tooltip')) {
+      var tooltip = document.getElementById('hotspotTooltip');
+      if (tooltip) tooltip.classList.remove('visible');
+      if (activeHotspot !== null) {
+        var prevHs = document.getElementById('hs' + activeHotspot);
+        if (prevHs) prevHs.classList.remove('active');
+        activeHotspot = null;
+      }
+    }
+  });
+
+  // ==========================================
+  // INTERACTIVE 2: SYSTEM PROMPT WORKSHOP
+  // ==========================================
+  var systemPromptExamples = {
+    finance: "You are a senior financial analyst at a Fortune 500 company. Always support claims with data. Use precise financial terminology. Present findings in bullet points with clear metrics.",
+    healthcare: "You are a clinical research advisor specializing in evidence-based medicine. Always cite relevant studies. Flag any information that requires physician consultation. Use accessible language for patients.",
+    legal: "You are a legal research assistant specializing in contract law. Identify potential risks and liabilities. Always note jurisdiction-specific variations. Never provide specific legal advice \u2014 frame as research findings.",
+    retail: "You are a retail strategy consultant. Focus on customer experience metrics, conversion rates, and competitive positioning. Use data-driven recommendations with clear ROI projections.",
+    tech: "You are a senior software architect. Evaluate tradeoffs explicitly. Recommend proven patterns over novel approaches unless innovation is specifically requested. Include code examples where helpful."
+  };
+
+  var testUserMessages = [
+    "What should we do about declining customer engagement?",
+    "Can you help me analyze our latest quarterly results?",
+    "Write a summary of the key risks in our current strategy."
+  ];
+
+  // Response templates keyed by style detection
+  var responseTemplates = {
+    bullet: [
+      "\u2022 Customer engagement decline likely driven by 3 factors: reduced feature adoption (-15%), increased competition, and seasonal patterns\n\u2022 Recommend A/B testing re-engagement campaigns targeting lapsed users\n\u2022 Priority: implement in-app nudges within 2 weeks",
+      "\u2022 Revenue: Strong performance at $4.2M (+12% YoY)\n\u2022 Margins: Operating margin compressed 120bps to 28.3%\n\u2022 Customer growth: Net new customers +8% vs. target of +10%\n\u2022 Action: Investigate margin compression drivers",
+      "\u2022 Risk 1: Single-vendor dependency for cloud infrastructure (High)\n\u2022 Risk 2: Regulatory changes in EU markets could impact Q2 (Medium)\n\u2022 Risk 3: Key talent attrition in engineering (+2 departures) (Medium)\n\u2022 Mitigation plans recommended for each"
+    ],
+    financial: [
+      "The decline in customer engagement represents a potential ARR risk of $1.2M-$1.8M based on current churn correlation models. Key leading indicators:\n\n- DAU/MAU ratio dropped from 0.42 to 0.36 (14% deterioration)\n- Feature adoption velocity decreased 22% QoQ\n- NPS detractor segment grew by 340bps\n\nRecommend allocating $200K to retention initiatives with a target 90-day payback period.",
+      "Q3 results reflect mixed execution against plan:\n\nTopline: $4.2M revenue (+12% YoY, +3% vs. consensus)\nGross Margin: 72.4% (vs. 73.1% prior year)\nEBITDA: $1.18M (28.1% margin, -150bps YoY)\nFCF: $890K (21.2% conversion)\n\nThe margin compression warrants investigation \u2014 likely driven by increased infrastructure costs and a richer sales mix.",
+      "Strategic Risk Assessment:\n\n1. Market Risk (High): TAM compression in core segment. Estimated impact: 8-12% revenue headwind in FY26.\n2. Operational Risk (Medium): Single-threaded on 2 key clients representing 34% of ARR. Concentration risk exceeds board-approved threshold of 25%.\n3. Competitive Risk (Medium): New entrant pricing 40% below our list. Win rate on competitive deals declined from 62% to 48%."
+    ],
+    constraint: [
+      "Based on the available data, I can identify several factors correlating with the engagement decline. However, I want to note that without access to your full analytics platform, these are directional observations rather than definitive causal claims.\n\nKey observations:\n- Engagement metrics suggest a pattern, but I cannot confirm root cause\n- I would recommend consulting your data science team for statistical validation\n- I am not including projections as they would require assumptions I cannot verify",
+      "I can provide analysis based on the figures shared, with the following caveats:\n- These observations are based solely on the data provided\n- Year-over-year comparisons assume consistent methodology\n- I have not independently verified these numbers\n\nThe quarterly results show positive topline growth. I would flag that further investigation is needed on the margin compression before drawing conclusions.",
+      "Risk Summary (based on information provided):\n\nNote: This analysis is based on the documents shared and should not be treated as comprehensive risk assessment. A qualified professional review is recommended.\n\n1. The strategy has exposure to regulatory changes \u2014 specific jurisdictional analysis would require legal consultation\n2. Competitive positioning data suggests vulnerability, though market research would be needed to confirm\n3. I cannot assess operational risks without access to internal process documentation"
+    ],
+    standard: [
+      "Customer engagement decline is a common challenge that can stem from several sources. Here are some areas to investigate:\n\nFirst, look at your product usage data to identify where users are dropping off. Are they not returning after onboarding, or are they using fewer features over time? This distinction matters because the interventions are different.\n\nSecond, consider surveying churned or disengaged customers directly. Quantitative data tells you what is happening, but qualitative feedback tells you why.\n\nThird, benchmark against industry standards. Some decline may be seasonal or market-wide rather than specific to your product.",
+      "Let me walk through the key aspects of your quarterly results.\n\nThe topline numbers look healthy with year-over-year growth. Revenue growth of 12% suggests strong demand and effective go-to-market execution. Customer count growth of 8% indicates the sales pipeline is converting well.\n\nHowever, it is worth examining whether the growth is sustainable. Are new customers coming from new segments, or are you saturating your existing market? The churn rate improvement from 4.2% to 3.1% is encouraging and suggests product-market fit is strengthening.\n\nOverall, the quarter shows positive momentum across most key metrics.",
+      "Here is a summary of the key risks in the current strategy:\n\nThe first risk area is market dependency. If your strategy relies heavily on a single market segment or geography, external shocks could have an outsized impact. Diversification is the typical mitigation.\n\nThe second risk is execution complexity. Ambitious strategies often require coordinating across multiple teams and timelines. The more moving parts, the higher the probability that something slips.\n\nThe third risk is competitive response. Any strategy that assumes competitors will remain static is vulnerable. Consider how competitors might react to your moves and build contingency plans."
+    ]
+  };
+
+  window.selectIndustryPrompt = function() {
+    var select = document.getElementById('industrySelect');
+    var textarea = document.getElementById('systemPromptInput');
+    var value = select.value;
+
+    if (value && systemPromptExamples[value]) {
+      textarea.value = systemPromptExamples[value];
+    }
+    updateWorkshopResponses();
+  };
+
+  window.updateWorkshopResponses = function() {
+    var prompt = document.getElementById('systemPromptInput').value.toLowerCase();
+    var container = document.getElementById('workshopResponses');
+
+    // Determine which response style to use based on keywords
+    var style = 'standard';
+    if (prompt.indexOf('bullet') !== -1 || prompt.indexOf('concise') !== -1 || prompt.indexOf('point') !== -1) {
+      style = 'bullet';
+    } else if (prompt.indexOf('analyst') !== -1 || prompt.indexOf('financial') !== -1 || prompt.indexOf('metric') !== -1 || prompt.indexOf('data') !== -1 || prompt.indexOf('revenue') !== -1) {
+      style = 'financial';
+    } else if (prompt.indexOf('never') !== -1 || prompt.indexOf("don't") !== -1 || prompt.indexOf('do not') !== -1 || prompt.indexOf('flag') !== -1 || prompt.indexOf('cite') !== -1 || prompt.indexOf('caveat') !== -1) {
+      style = 'constraint';
+    }
+
+    var responses = responseTemplates[style];
+    var html = '';
+
+    for (var i = 0; i < testUserMessages.length; i++) {
+      html += '<div class="test-message">';
+      html += '<div class="test-msg-role user-role">User</div>';
+      html += '<div class="test-msg-content">' + escapeHtml(testUserMessages[i]) + '</div>';
+      html += '</div>';
+
+      html += '<div class="test-message">';
+      html += '<div class="test-msg-role claude-role">Claude</div>';
+      html += '<div class="test-msg-content">' + escapeHtml(responses[i]) + '</div>';
+      html += '</div>';
+    }
+
+    container.innerHTML = html;
+  };
+
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.appendChild(document.createTextNode(str));
+    return div.innerHTML;
+  }
+
+  // Initialize workshop with default (empty) state
+  updateWorkshopResponses();
+
+  // ==========================================
+  // INTERACTIVE 3: PROMPT COMPARISON LAB
+  // ==========================================
+  var promptComparisons = [
+    {
+      task: "Summarize a financial report",
+      naive: {
+        prompt: "Summarize this report.",
+        response: "This report discusses Q3 earnings and shows that the company had a good quarter overall. Revenue was up and there were some areas of improvement. The company is doing well in most metrics and plans to continue its growth trajectory. There are some challenges but management is optimistic about the future."
+      },
+      optimized: {
+        prompt: "Summarize this Q3 earnings report in 5 bullet points. For each point, include the key metric and its year-over-year change. Highlight any metrics that missed analyst expectations.",
+        response: "\u2022 Revenue: $4.2B (+12% YoY) \u2014 exceeded consensus by $200M\n\u2022 Operating margin: 28.3% (-1.2pp YoY) \u2014 missed expectations of 29.5%\n\u2022 Free cash flow: $1.1B (+18% YoY) \u2014 strongest quarter in company history\n\u2022 Customer count: 12,400 (+22% YoY) \u2014 in line with estimates\n\u2022 Net retention: 118% (-3pp YoY) \u2014 below target of 120%, warrants monitoring"
+      },
+      annotations: ["Specific format requested (5 bullets)", "Defined structure (metric + YoY change)", "Success criteria provided (missed expectations)"]
+    },
+    {
+      task: "Write a client email",
+      naive: {
+        prompt: "Write an email to the client about the project delay.",
+        response: "Dear Client,\n\nI wanted to let you know that there has been a delay in the project. We are working on it and hope to have it resolved soon. We apologize for the inconvenience and will keep you updated.\n\nPlease let us know if you have any questions.\n\nBest regards"
+      },
+      optimized: {
+        prompt: "Write a professional email to our client (Sarah Chen, VP Engineering at TechCorp) about a 2-week delay in the API integration milestone. Tone: empathetic but confident. Include: reason (third-party API documentation was incomplete), mitigation plan (dedicated team, daily syncs), and revised timeline (March 15 \u2192 March 29).",
+        response: "Subject: API Integration Timeline Update \u2014 Revised to March 29\n\nDear Sarah,\n\nI'm writing to share an update on our API integration milestone. During implementation, we discovered that the third-party API documentation was incomplete, requiring additional reverse-engineering work that was not in our original scope.\n\nTo get us back on track, we have:\n\u2022 Assigned a dedicated 3-person team to the integration\n\u2022 Established daily sync calls with the vendor's technical team\n\u2022 Created a detailed day-by-day delivery plan through completion\n\nOur revised delivery date is March 29 (from March 15). This timeline includes a 2-day buffer for final testing.\n\nI take full ownership of this adjustment and am confident in the revised timeline. I would welcome a call this week to walk through our updated plan in detail.\n\nBest regards"
+      },
+      annotations: ["Named recipient adds personalization", "Specific details prevent vagueness", "Tone guidance shapes the communication style", "Structure (reason/plan/timeline) ensures completeness"]
+    },
+    {
+      task: "Analyze code for bugs",
+      naive: {
+        prompt: "Check this code for bugs.",
+        response: "I see a few potential issues in your code. There might be some edge cases that aren't handled properly. The logic looks mostly correct but could be improved. I would suggest adding some error handling and testing it more thoroughly."
+      },
+      optimized: {
+        prompt: "Review this Python function for: (1) logic errors that could cause incorrect results, (2) edge cases not handled (empty input, None values, negative numbers), (3) performance issues with large inputs. For each issue, show the problematic line and a fix.",
+        response: "Issue 1: Division by Zero (Line 12)\n  Bug: No check for empty list\n  avg = total / len(items)  # Crashes if items is []\n  Fix: avg = total / len(items) if items else 0\n\nIssue 2: None Value Handling (Line 8)\n  Bug: No type check before arithmetic\n  total += item  # TypeError if item is None\n  Fix: total += item if item is not None else 0\n\nIssue 3: O(n^2) Performance (Line 15)\n  Bug: Nested loop checks duplicates inefficiently\n  if item not in seen_list:  # O(n) lookup in list\n  Fix: Use a set: if item not in seen_set:  # O(1) lookup"
+      },
+      annotations: ["Specific categories of issues to look for", "Defined edge cases to consider", "Required output format (line + fix)"]
+    },
+    {
+      task: "Research a topic",
+      naive: {
+        prompt: "Tell me about AI in healthcare.",
+        response: "AI is transforming healthcare in many ways. It is being used for diagnosis, drug discovery, patient management, and administrative tasks. Machine learning algorithms can analyze medical images and predict patient outcomes. Many hospitals are beginning to adopt AI technologies. The field is growing rapidly and has a lot of potential."
+      },
+      optimized: {
+        prompt: "I'm preparing a 10-minute presentation for healthcare executives. Research the top 3 proven applications of AI in clinical settings (not administrative). For each, provide: a one-sentence description, one peer-reviewed study supporting it, the measured improvement, and one implementation challenge.",
+        response: "1. Medical Image Analysis (Radiology)\nAI systems analyze X-rays, CT scans, and MRIs to detect abnormalities with high accuracy.\nEvidence: Esteva et al. (Nature, 2017) showed CNN-based classification matched dermatologist accuracy at 94.5% sensitivity vs. 88.9% for dermatologists.\nChallenge: FDA regulatory pathway requires extensive validation per imaging modality.\n\n2. Sepsis Early Warning\nML models predict sepsis onset 4-12 hours before clinical recognition using EHR data.\nEvidence: Henry et al. (Science Translational Medicine, 2015) demonstrated 85% sensitivity with 4-hour advance warning.\nChallenge: High false-positive rates cause alert fatigue among nursing staff.\n\n3. Pathology Slide Analysis\nAI identifies cancerous cells in tissue samples, serving as a second reader for pathologists.\nEvidence: Bejnordi et al. (JAMA, 2017) showed AI detected breast cancer metastases with AUC of 0.994.\nChallenge: Integration with existing laboratory information systems requires significant IT investment."
+      },
+      annotations: ["Audience and context specified", "Scope narrowed (clinical, not administrative)", "Structure defined for each item", "Evidence standards set"]
+    },
+    {
+      task: "Create a project plan",
+      naive: {
+        prompt: "Make a project plan for launching our new product.",
+        response: "Here's a general project plan for your product launch:\n\nPhase 1: Planning (2-4 weeks)\n- Define requirements\n- Assemble team\n\nPhase 2: Development (4-8 weeks)\n- Build the product\n- Test it\n\nPhase 3: Launch (2-4 weeks)\n- Marketing\n- Release\n\nPhase 4: Post-Launch\n- Monitor and iterate"
+      },
+      optimized: {
+        prompt: "Create a 12-week project plan for launching our B2B SaaS product (CRM for real estate agents). Team: 3 engineers, 1 designer, 1 product manager. Key constraints: must have Salesforce integration at launch, beta program with 20 agents before public launch. Format: weekly milestones table with columns for Week, Milestone, Owner, Dependencies, Risk Level.",
+        response: "Week | Milestone | Owner | Dependencies | Risk\n1-2  | Core CRM schema + API design | Eng Lead | None | Low\n3-4  | Salesforce OAuth + sync engine | Eng 2 | API design | High\n5-6  | Agent dashboard UI + mobile responsive | Designer + Eng 3 | API endpoints | Medium\n7    | Internal QA + security audit | PM + All | UI complete | Medium\n8-9  | Beta onboarding (20 agents) | PM | QA sign-off | High\n10   | Beta feedback synthesis + priority fixes | Eng Lead | Beta data | Medium\n11   | Marketing site + documentation | PM + Designer | Product stable | Low\n12   | Public launch + monitoring | All | All milestones | Medium\n\nKey Risk: Salesforce integration (Weeks 3-4) is the critical path. Incomplete third-party documentation has caused delays in similar projects. Mitigation: Begin API exploration in Week 1."
+      },
+      annotations: ["Product context provided", "Team constraints specified", "Must-haves defined", "Output format with exact columns"]
+    }
+  ];
+
+  function renderPromptLab() {
+    var container = document.getElementById('labScenarios');
+    var html = '';
+
+    for (var i = 0; i < promptComparisons.length; i++) {
+      var scenario = promptComparisons[i];
+      html += '<div class="lab-scenario" id="lab-scenario-' + i + '">';
+
+      // Header
+      html += '<div class="lab-scenario-header">';
+      html += '<h4>' + escapeHtml(scenario.task) + '</h4>';
+      html += '<span class="lab-scenario-number">Scenario ' + (i + 1) + ' of 5</span>';
+      html += '</div>';
+
+      // Prompts side by side
+      html += '<div class="lab-prompts">';
+
+      // Naive
+      html += '<div class="lab-prompt-card naive">';
+      html += '<div class="lab-prompt-label">Naive Prompt</div>';
+      html += '<div class="lab-prompt-text">"' + escapeHtml(scenario.naive.prompt) + '"</div>';
+      html += '</div>';
+
+      // Optimized
+      html += '<div class="lab-prompt-card optimized">';
+      html += '<div class="lab-prompt-label">Optimized Prompt</div>';
+      html += '<div class="lab-prompt-text">"' + escapeHtml(scenario.optimized.prompt) + '"</div>';
+      html += '</div>';
+
+      html += '</div>';
+
+      // Show button
+      html += '<button class="lab-show-btn" id="lab-btn-' + i + '" onclick="showLabResponses(' + i + ')">Show Responses</button>';
+
+      // Responses (hidden initially)
+      html += '<div class="lab-responses" id="lab-responses-' + i + '">';
+
+      html += '<div class="lab-response-grid">';
+
+      // Naive response
+      html += '<div class="lab-response">';
+      html += '<div class="lab-response-label">Naive Response</div>';
+      html += '<div class="lab-response-content">' + escapeHtml(scenario.naive.response) + '</div>';
+      html += '</div>';
+
+      // Optimized response
+      html += '<div class="lab-response">';
+      html += '<div class="lab-response-label">Optimized Response</div>';
+      html += '<div class="lab-response-content">' + escapeHtml(scenario.optimized.response) + '</div>';
+      html += '</div>';
+
+      html += '</div>';
+
+      // Annotations
+      html += '<div class="lab-annotations">';
+      html += '<div class="lab-annotations-title">Why the optimized version works better</div>';
+      html += '<ul>';
+      for (var a = 0; a < scenario.annotations.length; a++) {
+        html += '<li>' + escapeHtml(scenario.annotations[a]) + '</li>';
+      }
+      html += '</ul>';
+      html += '</div>';
+
+      html += '</div>'; // .lab-responses
+
+      html += '</div>'; // .lab-scenario
+    }
+
+    container.innerHTML = html;
+  }
+
+  window.showLabResponses = function(idx) {
+    var responsesEl = document.getElementById('lab-responses-' + idx);
+    var btnEl = document.getElementById('lab-btn-' + idx);
+
+    if (responsesEl.classList.contains('visible')) {
+      responsesEl.classList.remove('visible');
+      btnEl.textContent = 'Show Responses';
+    } else {
+      responsesEl.classList.add('visible');
+      btnEl.textContent = 'Hide Responses';
+    }
+  };
+
+  renderPromptLab();
+
+  // ==========================================
+  // FINAL QUIZ
+  // ==========================================
+  var FINAL_QUIZ_KEY = 'claude-training-module-02';
+  var TOTAL_QUESTIONS = 7;
+  var PASS_THRESHOLD = 5;
+
+  var finalQuizAnswers = ['b', 'c', 'b', 'b', 'b', 'c', 'b'];
+  var finalQuizSelections = [];
+  for (var q = 0; q < TOTAL_QUESTIONS; q++) {
+    finalQuizSelections.push(null);
+  }
+  var finalQuizSubmitted = false;
+
+  window.selectFinalOption = function(qIdx, el) {
+    if (finalQuizSubmitted) return;
+
+    // Deselect siblings
+    var parentQ = el.closest('.final-quiz-question');
+    var options = parentQ.querySelectorAll('.fq-option');
+    for (var o = 0; o < options.length; o++) {
+      options[o].querySelector('input').checked = false;
+      options[o].style.background = '';
+    }
+
+    // Select this one
+    el.querySelector('input').checked = true;
+    finalQuizSelections[qIdx] = el.getAttribute('data-fq-val');
+
+    // Enable submit if all answered
+    var allAnswered = true;
+    for (var a = 0; a < finalQuizSelections.length; a++) {
+      if (finalQuizSelections[a] === null) {
+        allAnswered = false;
+        break;
+      }
+    }
+    document.getElementById('finalSubmitBtn').disabled = !allAnswered;
+  };
+
+  window.submitFinalQuiz = function() {
+    if (finalQuizSubmitted) return;
+    finalQuizSubmitted = true;
+
+    var score = 0;
+
+    for (var idx = 0; idx < finalQuizSelections.length; idx++) {
+      var sel = finalQuizSelections[idx];
+      var questionEl = document.querySelector('.final-quiz-question[data-fq="' + idx + '"]');
+      var options = questionEl.querySelectorAll('.fq-option');
+
+      for (var o = 0; o < options.length; o++) {
+        var opt = options[o];
+        var val = opt.getAttribute('data-fq-val');
+        opt.style.pointerEvents = 'none';
+        opt.classList.add('disabled-option');
+
+        if (val === finalQuizAnswers[idx]) {
+          if (sel === val) {
+            opt.classList.add('selected-correct');
+            score++;
+          } else {
+            opt.classList.add('reveal-correct');
+          }
+        } else if (val === sel) {
+          opt.classList.add('selected-wrong');
+        }
+      }
+    }
+
+    // Show result
+    var result = document.getElementById('finalResult');
+    var title = document.getElementById('finalResultTitle');
+    var text = document.getElementById('finalResultText');
+
+    result.classList.add('show');
+
+    if (score >= PASS_THRESHOLD) {
+      result.classList.add('pass');
+      result.classList.remove('fail');
+      title.textContent = 'Passed! ' + score + ' / ' + TOTAL_QUESTIONS + ' correct';
+      text.textContent = 'Excellent work! You have a strong understanding of Claude in the browser. ' +
+        'Your progress has been saved. Move on to Module 03: Claude Code Introduction to continue your training.';
+    } else {
+      result.classList.add('fail');
+      result.classList.remove('pass');
+      title.textContent = score + ' / ' + TOTAL_QUESTIONS + ' correct -- Review needed';
+      text.textContent = 'You need at least ' + PASS_THRESHOLD + ' correct answers to pass. Review the material above and try again. ' +
+        'Pay special attention to Projects, Artifacts, and system prompt patterns.';
+    }
+
+    // Save progress
+    var progressData = {
+      score: score,
+      total: TOTAL_QUESTIONS,
+      completed: score >= PASS_THRESHOLD,
+      timestamp: new Date().toISOString()
+    };
+    try {
+      localStorage.setItem(FINAL_QUIZ_KEY, JSON.stringify(progressData));
+    } catch (e) {
+      // localStorage may be unavailable
+    }
+
+    // Disable submit button
+    document.getElementById('finalSubmitBtn').disabled = true;
+    document.getElementById('finalSubmitBtn').textContent = 'Submitted';
+  };
+
+  // Check for existing progress
+  function loadExistingProgress() {
+    try {
+      var saved = localStorage.getItem(FINAL_QUIZ_KEY);
+      if (saved) {
+        var data = JSON.parse(saved);
+        if (data.completed) {
+          var fill = document.getElementById('sidebarProgressFill');
+          if (fill) {
+            fill.style.width = '100%';
+          }
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+  }
+  loadExistingProgress();
+
+})();
+</script>
+</body>
+</html>

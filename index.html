@@ -1,0 +1,2057 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCA-F — Apostila Interativa</title>
+<style>
+:root {
+  --bg: #0C0E18;
+  --surface: #141726;
+  --elevated: #1C2035;
+  --border: #252A40;
+  --primary: #CC785C;
+  --secondary: #7C6AF7;
+  --accent: #38BDF8;
+  --success: #34D399;
+  --warning: #FBBF24;
+  --error: #F87171;
+  --text: #E2E8F0;
+  --text2: #94A3B8;
+  --text3: #64748B;
+  --sidebar: 260px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, sans-serif; display: flex; min-height: 100vh; font-size: 15px; line-height: 1.6; }
+
+/* SIDEBAR */
+.sidebar { width: var(--sidebar); background: var(--surface); border-right: 1px solid var(--border); position: fixed; top: 0; left: 0; height: 100vh; overflow-y: auto; z-index: 100; display: flex; flex-direction: column; }
+.sidebar-logo { padding: 20px 16px 12px; border-bottom: 1px solid var(--border); }
+.sidebar-logo h2 { font-size: 13px; font-weight: 700; color: var(--primary); letter-spacing: .05em; text-transform: uppercase; }
+.sidebar-logo p { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.nav-section { padding: 12px 8px 0; }
+.nav-label { font-size: 10px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .08em; padding: 0 8px 6px; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; cursor: pointer; font-size: 13px; color: var(--text2); transition: all .15s; margin-bottom: 2px; }
+.nav-item:hover { background: var(--elevated); color: var(--text); }
+.nav-item.active { background: rgba(204,120,92,.15); color: var(--primary); font-weight: 600; }
+.nav-item .icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+.nav-badge { margin-left: auto; font-size: 10px; font-weight: 700; background: var(--elevated); color: var(--text3); padding: 1px 6px; border-radius: 10px; }
+.nav-item.active .nav-badge { background: rgba(204,120,92,.2); color: var(--primary); }
+.sidebar-footer { margin-top: auto; padding: 12px 16px; border-top: 1px solid var(--border); font-size: 11px; color: var(--text3); }
+
+/* MAIN */
+.main { margin-left: var(--sidebar); flex: 1; padding: 32px 40px; max-width: calc(100vw - var(--sidebar)); }
+.section { display: none; animation: fadeIn .2s ease; }
+.section.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+h1 { font-size: 26px; font-weight: 700; margin-bottom: 6px; }
+h2 { font-size: 19px; font-weight: 600; margin: 28px 0 12px; }
+h3 { font-size: 15px; font-weight: 600; margin: 20px 0 8px; color: var(--text); }
+p { color: var(--text2); margin-bottom: 12px; }
+.page-header { margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+.subtitle { color: var(--text2); font-size: 14px; }
+
+/* CARDS */
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+.card.clickable { cursor: pointer; transition: all .15s; }
+.card.clickable:hover { border-color: var(--primary); transform: translateY(-2px); }
+.card-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+.card-value { font-size: 26px; font-weight: 700; }
+.card-sub { font-size: 12px; color: var(--text2); margin-top: 4px; }
+
+/* DOMAIN CARDS */
+.domain-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 28px; }
+.domain-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; cursor: pointer; transition: all .15s; }
+.domain-card:hover { transform: translateY(-2px); }
+.domain-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.domain-name { font-size: 14px; font-weight: 600; }
+.domain-weight { font-size: 20px; font-weight: 700; }
+.domain-bar { height: 4px; background: var(--elevated); border-radius: 2px; overflow: hidden; margin-top: 12px; }
+.domain-fill { height: 100%; border-radius: 2px; }
+.domain-sub { font-size: 12px; color: var(--text3); margin-top: 8px; }
+
+/* CONTENT BLOCKS */
+.content-block { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+.task-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+.task-id { font-size: 11px; font-weight: 700; color: var(--primary); background: rgba(204,120,92,.1); padding: 3px 8px; border-radius: 6px; }
+.task-title { font-size: 16px; font-weight: 600; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.col-header { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
+.know-col .col-header { color: var(--accent); }
+.skills-col .col-header { color: var(--success); }
+ul.bullets { list-style: none; padding: 0; }
+ul.bullets li { font-size: 13px; color: var(--text2); padding: 4px 0 4px 16px; position: relative; line-height: 1.5; }
+ul.bullets li::before { content: "▸"; position: absolute; left: 0; color: var(--text3); font-size: 10px; top: 6px; }
+.trap-box { background: rgba(248,113,113,.07); border: 1px solid rgba(248,113,113,.2); border-radius: 8px; padding: 12px 16px; margin-top: 14px; }
+.trap-box-header { font-size: 11px; font-weight: 700; color: var(--error); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+.trap-box p { font-size: 13px; color: var(--text2); margin: 0; }
+code { background: rgba(56,189,248,.1); color: var(--accent); padding: 1px 6px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 12px; }
+.tip-box { background: rgba(124,106,247,.08); border: 1px solid rgba(124,106,247,.2); border-radius: 8px; padding: 12px 16px; margin-top: 14px; }
+.tip-box-header { font-size: 11px; font-weight: 700; color: var(--secondary); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+
+/* SCENARIO CARDS */
+.scenario-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+.scenario-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 22px; }
+.scenario-num { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+.scenario-name { font-size: 16px; font-weight: 600; margin-bottom: 10px; }
+.scenario-desc { font-size: 13px; color: var(--text2); margin-bottom: 14px; }
+.domain-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.domain-tag { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+
+/* QUIZ */
+.quiz-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: gap; }
+.quiz-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+.filter-btn { font-size: 12px; font-weight: 600; padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface); color: var(--text2); cursor: pointer; transition: all .15s; }
+.filter-btn:hover { border-color: var(--primary); color: var(--text); }
+.filter-btn.active { background: rgba(204,120,92,.15); border-color: var(--primary); color: var(--primary); }
+.quiz-progress { background: var(--elevated); border-radius: 4px; height: 6px; margin-bottom: 24px; overflow: hidden; }
+.quiz-progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); border-radius: 4px; transition: width .3s; }
+.question-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px; margin-bottom: 20px; }
+.question-meta { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+.q-badge { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; background: var(--elevated); color: var(--text2); }
+.question-text { font-size: 16px; font-weight: 500; color: var(--text); margin-bottom: 20px; line-height: 1.6; }
+.option { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; cursor: pointer; transition: all .15s; }
+.option:hover { border-color: var(--secondary); background: rgba(124,106,247,.05); }
+.option.selected { border-color: var(--secondary); background: rgba(124,106,247,.1); }
+.option.correct { border-color: var(--success); background: rgba(52,211,153,.08); }
+.option.wrong { border-color: var(--error); background: rgba(248,113,113,.08); }
+.option-letter { width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+.option.selected .option-letter { border-color: var(--secondary); color: var(--secondary); }
+.option.correct .option-letter { border-color: var(--success); background: rgba(52,211,153,.15); color: var(--success); }
+.option.wrong .option-letter { border-color: var(--error); background: rgba(248,113,113,.15); color: var(--error); }
+.option-text { font-size: 14px; color: var(--text2); line-height: 1.5; }
+.quiz-actions { display: flex; gap: 12px; }
+.btn { padding: 10px 22px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: all .15s; }
+.btn-primary { background: var(--primary); color: white; }
+.btn-primary:hover { opacity: .9; }
+.btn-primary:disabled { opacity: .4; cursor: not-allowed; }
+.btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text2); }
+.btn-outline:hover { border-color: var(--text2); color: var(--text); }
+.explanation-box { background: rgba(52,211,153,.06); border: 1px solid rgba(52,211,153,.2); border-radius: 10px; padding: 16px 20px; margin-top: 16px; }
+.explanation-header { font-size: 12px; font-weight: 700; color: var(--success); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
+.explanation-text { font-size: 13px; color: var(--text2); line-height: 1.6; }
+.score-screen { text-align: center; padding: 40px 20px; }
+.score-big { font-size: 64px; font-weight: 700; }
+.score-label { font-size: 16px; color: var(--text2); margin: 8px 0 24px; }
+.score-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin: 24px 0; }
+.score-item { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; text-align: center; }
+.score-item-val { font-size: 22px; font-weight: 700; }
+.score-item-label { font-size: 12px; color: var(--text3); margin-top: 2px; }
+
+/* REFERENCE */
+.ref-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+.ref-table th { text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text3); padding: 8px 12px; border-bottom: 1px solid var(--border); }
+.ref-table td { padding: 10px 12px; font-size: 13px; border-bottom: 1px solid rgba(37,42,64,.5); vertical-align: top; }
+.ref-table tr:hover td { background: rgba(255,255,255,.02); }
+.ref-table td:first-child { color: var(--accent); font-family: monospace; font-size: 12px; white-space: nowrap; }
+.tag-correct { color: var(--success); font-weight: 600; }
+.tag-wrong { color: var(--error); }
+
+/* PROGRESS BAR IN DOMAIN SECTION */
+.domain-progress-bar { height: 3px; background: var(--elevated); border-radius: 2px; margin-top: 6px; }
+.domain-progress-fill { height: 100%; border-radius: 2px; background: var(--success); transition: width .3s; }
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .main { margin-left: 0; padding: 20px; }
+  .sidebar { transform: translateX(-100%); transition: transform .25s; }
+  .sidebar.open { transform: translateX(0); }
+  .two-col { grid-template-columns: 1fr; }
+  .menu-toggle { display: block !important; }
+}
+.menu-toggle { display: none; position: fixed; top: 16px; left: 16px; z-index: 200; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; cursor: pointer; font-size: 18px; }
+
+/* DIAGRAMS & CODE EXAMPLES */
+.diagram-box { background: var(--elevated); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; margin-top: 14px; }
+.diagram-box pre { font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.9; color: var(--text2); margin: 0; white-space: pre; }
+.diagram-label,.code-title { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px; font-family: system-ui; }
+.code-ex { background: #0a0d14; border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; margin-top: 14px; overflow-x: auto; }
+.code-ex pre { font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.8; color: var(--text2); margin: 0; white-space: pre; }
+.hl-key { color: var(--secondary); } .hl-str { color: var(--success); } .hl-cmt { color: var(--text3); font-style: italic; } .hl-val { color: var(--accent); } .hl-ok { color: var(--success); font-weight:700; } .hl-err { color: var(--error); font-weight:700; }
+
+/* COLLAPSIBLE NAV GROUPS */
+.nav-group { margin-bottom: 2px; }
+.nav-group-header { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; cursor: pointer; font-size: 13px; color: var(--text2); transition: all .15s; user-select: none; }
+.nav-group-header:hover { background: var(--elevated); color: var(--text); }
+.nav-group.active-group .nav-group-header { background: rgba(204,120,92,.15); color: var(--primary); font-weight: 600; }
+.nav-group-header .icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+.nav-group-title { flex: 1; }
+.nav-chevron { font-size: 10px; color: var(--text3); transition: transform .2s; }
+.nav-group.active-group .nav-chevron { color: var(--primary); }
+.nav-group.collapsed .nav-sublist { display: none; }
+.nav-group.collapsed .nav-chevron { transform: rotate(-90deg); }
+.nav-sublist { padding: 2px 0 6px 0; }
+.nav-subitem { font-size: 12px; color: var(--text3); padding: 5px 10px 5px 40px; border-radius: 7px; cursor: pointer; transition: all .12s; line-height: 1.35; }
+.nav-subitem:hover { background: var(--elevated); color: var(--text); }
+.nav-subitem.active { color: var(--primary); background: rgba(204,120,92,.1); font-weight: 600; }
+
+/* "ONDE VIVE" BADGES */
+.where-badges { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 14px; }
+.wb { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; display: inline-flex; gap: 5px; align-items: center; border: 1px solid transparent; }
+.wb-cli { background: rgba(56,189,248,.12); color: #38BDF8; border-color: rgba(56,189,248,.3); }
+.wb-sdk { background: rgba(204,120,92,.12); color: #CC785C; border-color: rgba(204,120,92,.3); }
+.wb-api { background: rgba(124,106,247,.12); color: #7C6AF7; border-color: rgba(124,106,247,.3); }
+.wb-mcp { background: rgba(251,191,36,.12); color: #FBBF24; border-color: rgba(251,191,36,.3); }
+.wb-off { opacity: .35; filter: grayscale(1); }
+
+/* FUNCTIONAL TEMPLATE HELPERS */
+.concept-line { font-size: 14px; color: var(--text); margin: 0 0 12px; padding: 10px 14px; background: var(--elevated); border-left: 3px solid var(--primary); border-radius: 6px; line-height: 1.55; }
+.concept-line strong { color: var(--primary); }
+.block-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; margin: 18px 0 8px; color: var(--text3); }
+.scenario-framing { font-size: 13px; color: var(--text2); background: rgba(124,106,247,.05); border: 1px solid rgba(124,106,247,.15); border-radius: 8px; padding: 12px 16px; margin-bottom: 8px; line-height: 1.55; }
+.scenario-framing em { color: var(--secondary); font-style: normal; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<button class="menu-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <h2>CCA-F Study Portal</h2>
+    <p>Claude Certified Architect – Foundations</p>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Visão Geral</div>
+    <div class="nav-item active" onclick="show('dashboard')"><span class="icon">🏠</span>Dashboard</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">5 Domínios</div>
+
+    <div class="nav-group collapsed" id="navg-d1">
+      <div class="nav-group-header" onclick="toggleGroup('d1')"><span class="icon">🤖</span><span class="nav-group-title">Arquitetura Agêntica</span><span class="nav-badge">27%</span><span class="nav-chevron">▾</span></div>
+      <div class="nav-sublist" id="sub-d1">
+        <div class="nav-subitem" onclick="show('d1','d1-1.1')">1.1 Loop agêntico</div>
+        <div class="nav-subitem" onclick="show('d1','d1-1.2')">1.2 Coordenador-subagente</div>
+        <div class="nav-subitem" onclick="show('d1','d1-1.3')">1.3 Invocação & paralelismo</div>
+        <div class="nav-subitem" onclick="show('d1','d1-1.4')">1.4 Workflows & enforcement</div>
+        <div class="nav-subitem" onclick="show('d1','d1-1.5')">1.5 Hooks (Agent SDK)</div>
+        <div class="nav-subitem" onclick="show('d1','d1-1.6')">1.6 Decomposição de tarefas</div>
+        <div class="nav-subitem" onclick="show('d1','d1-1.7')">1.7 Sessões: resume & fork</div>
+      </div>
+    </div>
+
+    <div class="nav-group collapsed" id="navg-d2">
+      <div class="nav-group-header" onclick="toggleGroup('d2')"><span class="icon">🔧</span><span class="nav-group-title">Tool Design & MCP</span><span class="nav-badge">18%</span><span class="nav-chevron">▾</span></div>
+      <div class="nav-sublist" id="sub-d2">
+        <div class="nav-subitem" onclick="show('d2','d2-2.1')">2.1 Descrições de tools</div>
+        <div class="nav-subitem" onclick="show('d2','d2-2.2')">2.2 Erros estruturados MCP</div>
+        <div class="nav-subitem" onclick="show('d2','d2-2.3')">2.3 Distribuição & tool_choice</div>
+        <div class="nav-subitem" onclick="show('d2','d2-2.4')">2.4 Servidores MCP</div>
+        <div class="nav-subitem" onclick="show('d2','d2-2.5')">2.5 Ferramentas nativas</div>
+      </div>
+    </div>
+
+    <div class="nav-group collapsed" id="navg-d3">
+      <div class="nav-group-header" onclick="toggleGroup('d3')"><span class="icon">⚙️</span><span class="nav-group-title">Claude Code Config</span><span class="nav-badge">20%</span><span class="nav-chevron">▾</span></div>
+      <div class="nav-sublist" id="sub-d3">
+        <div class="nav-subitem" onclick="show('d3','d3-3.1')">3.1 CLAUDE.md hierarquia</div>
+        <div class="nav-subitem" onclick="show('d3','d3-3.2')">3.2 Commands & Skills</div>
+        <div class="nav-subitem" onclick="show('d3','d3-3.3')">3.3 Regras por path</div>
+        <div class="nav-subitem" onclick="show('d3','d3-3.4')">3.4 Plan mode</div>
+        <div class="nav-subitem" onclick="show('d3','d3-3.5')">3.5 Refinamento iterativo</div>
+        <div class="nav-subitem" onclick="show('d3','d3-3.6')">3.6 CI/CD</div>
+      </div>
+    </div>
+
+    <div class="nav-group collapsed" id="navg-d4">
+      <div class="nav-group-header" onclick="toggleGroup('d4')"><span class="icon">💬</span><span class="nav-group-title">Prompt Engineering</span><span class="nav-badge">20%</span><span class="nav-chevron">▾</span></div>
+      <div class="nav-sublist" id="sub-d4">
+        <div class="nav-subitem" onclick="show('d4','d4-4.1')">4.1 Critérios explícitos</div>
+        <div class="nav-subitem" onclick="show('d4','d4-4.2')">4.2 Few-shot prompting</div>
+        <div class="nav-subitem" onclick="show('d4','d4-4.3')">4.3 Output estruturado</div>
+        <div class="nav-subitem" onclick="show('d4','d4-4.4')">4.4 Validação & retry</div>
+        <div class="nav-subitem" onclick="show('d4','d4-4.5')">4.5 Batch processing</div>
+        <div class="nav-subitem" onclick="show('d4','d4-4.6')">4.6 Multi-pass review</div>
+      </div>
+    </div>
+
+    <div class="nav-group collapsed" id="navg-d5">
+      <div class="nav-group-header" onclick="toggleGroup('d5')"><span class="icon">🧠</span><span class="nav-group-title">Context & Reliability</span><span class="nav-badge">15%</span><span class="nav-chevron">▾</span></div>
+      <div class="nav-sublist" id="sub-d5">
+        <div class="nav-subitem" onclick="show('d5','d5-5.1')">5.1 Contexto longo</div>
+        <div class="nav-subitem" onclick="show('d5','d5-5.2')">5.2 Escalação</div>
+        <div class="nav-subitem" onclick="show('d5','d5-5.3')">5.3 Propagação de erros</div>
+        <div class="nav-subitem" onclick="show('d5','d5-5.4')">5.4 Codebase grande</div>
+        <div class="nav-subitem" onclick="show('d5','d5-5.5')">5.5 Revisão humana</div>
+        <div class="nav-subitem" onclick="show('d5','d5-5.6')">5.6 Proveniência</div>
+      </div>
+    </div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Prática</div>
+    <div class="nav-item" onclick="show('scenarios')"><span class="icon">🎬</span>Cenários do Exame</div>
+    <div class="nav-item" onclick="show('quiz')"><span class="icon">🎯</span>Simulado Interativo</div>
+    <div class="nav-item" onclick="show('reference')"><span class="icon">📋</span>Referência Rápida</div>
+    <div class="nav-item" onclick="show('examtopics')"><span class="icon">📜</span>Exam Topics (oficial)</div>
+  </div>
+  <div class="sidebar-footer">Exame: 60 questões · 120 min · 720/1000</div>
+</nav>
+
+<main class="main">
+
+<!-- DASHBOARD -->
+<div class="section active" id="dashboard">
+  <div class="page-header">
+    <h1>Claude Certified Architect – Foundations</h1>
+    <p class="subtitle">Seu portal de estudo interativo para o exame CCA-F</p>
+  </div>
+  <div class="card-grid">
+    <div class="card"><div class="card-label">Questões</div><div class="card-value" style="color:var(--primary)">60</div><div class="card-sub">Múltipla escolha, 4 opções</div></div>
+    <div class="card"><div class="card-label">Duração</div><div class="card-value" style="color:var(--accent)">120</div><div class="card-sub">minutos</div></div>
+    <div class="card"><div class="card-label">Pontuação Mínima</div><div class="card-value" style="color:var(--success)">720</div><div class="card-sub">de 1000 pontos</div></div>
+    <div class="card"><div class="card-label">Cenários</div><div class="card-value" style="color:var(--secondary)">4 de 6</div><div class="card-sub">apresentados aleatoriamente</div></div>
+  </div>
+  <h2>Domínios do Exame</h2>
+  <div class="domain-cards">
+    <div class="domain-card" onclick="show('d1')" style="border-color:rgba(204,120,92,.3)">
+      <div class="domain-header"><span class="domain-name">🤖 Arquitetura Agêntica</span><span class="domain-weight" style="color:#CC785C">27%</span></div>
+      <div style="font-size:12px;color:var(--text3)">~16 questões · Maior peso do exame</div>
+      <div class="domain-bar"><div class="domain-fill" style="width:27%;background:#CC785C"></div></div>
+      <div class="domain-sub">Loops agênticos, multi-agent, hooks, decomposição de tarefas</div>
+    </div>
+    <div class="domain-card" onclick="show('d3')" style="border-color:rgba(56,189,248,.3)">
+      <div class="domain-header"><span class="domain-name">⚙️ Claude Code Config</span><span class="domain-weight" style="color:#38BDF8">20%</span></div>
+      <div style="font-size:12px;color:var(--text3)">~12 questões</div>
+      <div class="domain-bar"><div class="domain-fill" style="width:20%;background:#38BDF8"></div></div>
+      <div class="domain-sub">CLAUDE.md, slash commands, skills, plan mode, CI/CD</div>
+    </div>
+    <div class="domain-card" onclick="show('d4')" style="border-color:rgba(124,106,247,.3)">
+      <div class="domain-header"><span class="domain-name">💬 Prompt Engineering</span><span class="domain-weight" style="color:#7C6AF7">20%</span></div>
+      <div style="font-size:12px;color:var(--text3)">~12 questões</div>
+      <div class="domain-bar"><div class="domain-fill" style="width:20%;background:#7C6AF7"></div></div>
+      <div class="domain-sub">Critérios explícitos, few-shot, structured output, batch</div>
+    </div>
+    <div class="domain-card" onclick="show('d2')" style="border-color:rgba(251,191,36,.3)">
+      <div class="domain-header"><span class="domain-name">🔧 Tool Design & MCP</span><span class="domain-weight" style="color:#FBBF24">18%</span></div>
+      <div style="font-size:12px;color:var(--text3)">~11 questões</div>
+      <div class="domain-bar"><div class="domain-fill" style="width:18%;background:#FBBF24"></div></div>
+      <div class="domain-sub">Descrições de ferramentas, MCP config, isError, tool_choice</div>
+    </div>
+    <div class="domain-card" onclick="show('d5')" style="border-color:rgba(52,211,153,.3)">
+      <div class="domain-header"><span class="domain-name">🧠 Context & Reliability</span><span class="domain-weight" style="color:#34D399">15%</span></div>
+      <div style="font-size:12px;color:var(--text3)">~9 questões</div>
+      <div class="domain-bar"><div class="domain-fill" style="width:15%;background:#34D399"></div></div>
+      <div class="domain-sub">Janela de contexto, escalação, proveniência, amostragem</div>
+    </div>
+  </div>
+  <h2>Dicas Essenciais de Estudo</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px">
+    <div class="tip-box"><div class="tip-box-header">🎯 Julgamento Prático</div><p style="font-size:13px;margin:0">O exame testa se você sabe escolher a solução CERTA no contexto CERTO — não memorização de definições.</p></div>
+    <div class="tip-box"><div class="tip-box-header">⚖️ Trade-offs São a Chave</div><p style="font-size:13px;margin:0">Hooks vs prompts, batch vs sync, plan mode vs execução direta — entenda quando cada um é melhor.</p></div>
+    <div class="tip-box"><div class="tip-box-header">🎬 Use os Cenários</div><p style="font-size:13px;margin:0">Todas as questões são contextualizadas em um dos 6 cenários. Conheça bem cada cenário.</p></div>
+    <div class="tip-box"><div class="tip-box-header">🔍 Elimine Opções</div><p style="font-size:13px;margin:0">Aprenda por que as respostas ERRADAS são erradas — isso é tão importante quanto saber a certa.</p></div>
+  </div>
+
+  <h2>🗺️ Onde cada coisa vive (mapa mental)</h2>
+  <p class="subtitle" style="margin-bottom:14px">Antes de mergulhar nos domínios, fixe este modelo: o exame cobre <strong>4 superfícies</strong>. Quase toda questão se resolve sabendo <em>em qual superfície</em> o problema vive. Cada tópico do material traz selos indicando onde aquele conceito é implementado.</p>
+  <div class="content-block">
+    <table class="ref-table">
+      <tr><th>Superfície</th><th>O que é</th><th>O que você configura/escreve aqui</th><th>Conceitos &amp; arquivos</th></tr>
+      <tr>
+        <td><span class="wb wb-cli">🖥️ Claude Code</span></td>
+        <td>A CLI/IDE que você usa no terminal. O próprio Claude já é um agente pronto.</td>
+        <td>Comportamento do agente pronto via arquivos de config no repo. Você não escreve o loop — ele já existe.</td>
+        <td><code>CLAUDE.md</code>, <code>.claude/rules/</code>, <code>.claude/commands/</code>, <code>.claude/skills/</code>, <code>.mcp.json</code>, plan mode, <code>/memory</code>, <code>/compact</code>, <code>--resume</code>, <code>-p</code></td>
+      </tr>
+      <tr>
+        <td><span class="wb wb-sdk">🧩 Agent SDK</span></td>
+        <td>A biblioteca para você <strong>construir seu próprio agente</strong> em código (a app do Customer Support, do Multi-Agent Research...).</td>
+        <td>O loop agêntico, os hooks, a orquestração coordenador-subagente, a definição de subagentes. Você escreve a lógica.</td>
+        <td>Loop com <code>stop_reason</code>, <code>PostToolUse</code> hooks, <code>Task</code> tool, <code>allowedTools</code>, <code>AgentDefinition</code>, <code>fork_session</code></td>
+      </tr>
+      <tr>
+        <td><span class="wb wb-api">🔌 Claude API</span></td>
+        <td>A camada HTTP por baixo de tudo. SDK e Claude Code falam com ela.</td>
+        <td>Parâmetros de cada chamada ao modelo: ferramentas, formato de saída, processamento em lote.</td>
+        <td><code>tool_use</code> + JSON schema, <code>tool_choice</code> (auto/any/forçado), <code>stop_reason</code>, Message Batches API, <code>system</code> prompt</td>
+      </tr>
+      <tr>
+        <td><span class="wb wb-mcp">🌐 MCP</span></td>
+        <td>O protocolo que conecta o Claude aos seus sistemas de backend (CRM, banco, GitHub...).</td>
+        <td>As ferramentas e os recursos que seu backend expõe, e como erros voltam para o agente.</td>
+        <td>MCP <strong>tools</strong> (ações) vs <strong>resources</strong> (leitura), flag <code>isError</code>, descrições de tools, <code>.mcp.json</code></td>
+      </tr>
+    </table>
+    <div class="tip-box" style="margin-top:14px">
+      <div class="tip-box-header">💡 A pergunta que destrava 80% das questões</div>
+      <p style="font-size:13px;margin:0">"Esse problema precisa de <strong>garantia determinística</strong>?" Se sim → código (hook no SDK, regra programática). Se é só <strong>orientação</strong> → texto (CLAUDE.md, system prompt, few-shot). Confundir essas duas superfícies é a armadilha nº 1 do exame.</p>
+    </div>
+  </div>
+</div>
+
+<!-- DOMAIN 1 -->
+<div class="section" id="d1">
+  <div class="page-header">
+    <h1>🤖 Domínio 1: Arquitetura Agêntica & Orquestração</h1>
+    <p class="subtitle">27% do exame · ~16 questões · o maior peso</p>
+  </div>
+  <p style="margin-bottom:20px">Este domínio é sobre <strong>como um agente decide o que fazer sozinho</strong> e como vários agentes se coordenam. Quase tudo aqui vive no <span class="wb wb-sdk" style="padding:1px 8px">🧩 Agent SDK</span> (você constrói a lógica em código) — com paralelos no <span class="wb wb-cli" style="padding:1px 8px">🖥️ Claude Code</span>, onde o agente já vem pronto.</p>
+
+  <!-- 1.1 -->
+  <div class="content-block" id="d1-1.1">
+    <div class="task-header"><span class="task-id">1.1</span><span class="task-title">O loop agêntico</span></div>
+    <div class="where-badges">
+      <span class="wb wb-sdk">🧩 Agent SDK</span>
+      <span class="wb wb-api">🔌 Claude API</span>
+      <span class="wb wb-cli wb-off">🖥️ Claude Code</span>
+      <span class="wb wb-mcp wb-off">🌐 MCP</span>
+    </div>
+    <div class="concept-line"><strong>Em uma frase:</strong> o loop agêntico é o ciclo "mando pro Claude → ele pede uma ferramenta → eu executo → devolvo o resultado → ele decide o próximo passo", repetindo até ele terminar. Quem controla esse ciclo é o campo <code>stop_reason</code>.</div>
+
+    <div class="block-label">📦 O cenário</div>
+    <div class="scenario-framing">Você está construindo o <em>Customer Support Resolution Agent</em> (Cenário 1) com o Agent SDK. O cliente escreve "meu pedido veio errado". Você não sabe de antemão quantas ferramentas o agente vai precisar chamar — ele decide na hora: buscar o cliente, depois o pedido, depois avaliar reembolso. O loop é o que permite essa autonomia.</div>
+
+    <div class="block-label">⚙️ Como funciona</div>
+    <p>A cada resposta da API você inspeciona <code>stop_reason</code>. Se for <code>"tool_use"</code>, o Claude quer usar uma ferramenta — você executa, anexa o resultado ao histórico e chama de novo. Se for <code>"end_turn"</code>, ele terminou — você mostra a resposta. <strong>É a API que decide, não uma árvore de decisão sua.</strong></p>
+    <div class="code-ex">
+      <div class="code-title">🐍 Loop agêntico mínimo (Agent SDK / API)</div>
+      <pre><span class="hl-key">while</span> <span class="hl-val">True</span>:
+    resp = client.messages.create(
+        model=<span class="hl-str">"claude-sonnet-4-6"</span>, max_tokens=<span class="hl-val">2048</span>,
+        tools=tools, messages=messages,
+    )
+    <span class="hl-key">if</span> resp.stop_reason == <span class="hl-str">"tool_use"</span>:          <span class="hl-cmt"># Claude quer uma ferramenta</span>
+        messages.append({<span class="hl-key">"role"</span>: <span class="hl-str">"assistant"</span>, <span class="hl-key">"content"</span>: resp.content})
+        results = [executar(b) <span class="hl-key">for</span> b <span class="hl-key">in</span> resp.content <span class="hl-key">if</span> b.type == <span class="hl-str">"tool_use"</span>]
+        messages.append({<span class="hl-key">"role"</span>: <span class="hl-str">"user"</span>, <span class="hl-key">"content"</span>: results})  <span class="hl-cmt"># devolve p/ o modelo</span>
+    <span class="hl-key">elif</span> resp.stop_reason == <span class="hl-str">"end_turn"</span>:         <span class="hl-cmt"># terminou</span>
+        <span class="hl-key">break</span></pre>
+    </div>
+    <div class="diagram-box">
+      <div class="diagram-label">🔄 Fluxo</div>
+      <pre>
+  enviar request ──▶ stop_reason?
+                       │
+        ┌──────────────┴──────────────┐
+     "tool_use"                    "end_turn"
+        │                              │
+   executa ferramenta            mostra resposta
+   anexa resultado ao histórico       (FIM)
+        └────────▶ (volta ao topo)</pre>
+    </div>
+    <p style="margin-top:12px"><strong>No Claude Code esse loop já está pronto</strong> — quando você pede "refatora e roda os testes", ele roda esse ciclo internamente. No SDK, você escreve o <code>while</code>.</p>
+
+    <div class="block-label">🎯 Quando usar / quando não</div>
+    <div class="two-col">
+      <div><div class="col-header" style="color:var(--success)">✅ Faça</div><ul class="bullets">
+        <li>Terminar o loop SÓ por <code>stop_reason == "end_turn"</code></li>
+        <li>Anexar todo <code>tool_result</code> ao histórico antes da próxima chamada</li>
+      </ul></div>
+      <div><div class="col-header" style="color:var(--error)">⚠️ Evite (anti-padrões)</div><ul class="bullets">
+        <li>Procurar texto tipo "tarefa concluída" para parar — o modelo pode dizer isso e ainda querer chamar ferramentas</li>
+        <li>Usar um limite fixo de iterações como mecanismo <em>primário</em> de parada</li>
+      </ul></div>
+    </div>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>Se a questão diz "o loop para cedo / resposta incompleta", a resposta é <strong>usar <code>stop_reason</code></strong>, não parsear o texto da resposta. Analisar linguagem natural para decidir parada e caps arbitrários de iteração são as distratoras clássicas.</p></div>
+  </div>
+
+  <!-- 1.2 -->
+  <div class="content-block" id="d1-1.2">
+    <div class="task-header"><span class="task-id">1.2</span><span class="task-title">Orquestração coordenador-subagente</span></div>
+    <div class="where-badges">
+      <span class="wb wb-sdk">🧩 Agent SDK</span>
+      <span class="wb wb-cli">🖥️ Claude Code</span>
+      <span class="wb wb-api wb-off">🔌 Claude API</span>
+      <span class="wb wb-mcp wb-off">🌐 MCP</span>
+    </div>
+    <div class="concept-line"><strong>Em uma frase:</strong> um agente <em>coordenador</em> decompõe a tarefa e delega pedaços a <em>subagentes</em> especializados (hub-and-spoke). Toda comunicação passa pelo coordenador — subagentes não conversam entre si.</div>
+
+    <div class="block-label">📦 O cenário</div>
+    <div class="scenario-framing">Você está construindo o <em>Multi-Agent Research System</em> (Cenário 3): um coordenador delega para um subagente que busca na web, um que analisa documentos, um que sintetiza e um que gera o relatório. O coordenador decide quais subagentes acionar conforme a complexidade da pergunta.</div>
+
+    <div class="block-label">⚙️ Como funciona — e onde isso vive</div>
+    <div class="two-col">
+      <div><div class="col-header" style="color:var(--accent)">🖥️ No Claude Code — automático</div><ul class="bullets">
+        <li>O próprio Claude já é o coordenador</li>
+        <li>Ele spawna subagentes via ferramenta <code>Task</code> quando a tarefa pede</li>
+        <li>Você não escreve a orquestração — só influencia via <code>CLAUDE.md</code></li>
+      </ul></div>
+      <div><div class="col-header" style="color:var(--primary)">🧩 No Agent SDK — você constrói</div><ul class="bullets">
+        <li>Você define o coordenador e cada subagente (<code>AgentDefinition</code>)</li>
+        <li>O coordenador precisa de <code>"Task"</code> em <code>allowedTools</code> para delegar</li>
+        <li>Você decide a decomposição e a agregação dos resultados</li>
+      </ul></div>
+    </div>
+    <div class="diagram-box">
+      <div class="diagram-label">🛰️ Hub-and-spoke</div>
+      <pre>
+              ┌─────────────┐
+       ┌──────│ COORDENADOR │──────┐      ⚠ subagentes NÃO
+       ▼      └─────────────┘      ▼        falam entre si:
+   [busca web]   [análise doc]   [síntese]  tudo passa pelo hub</pre>
+    </div>
+
+    <div class="block-label">🎯 Quando usar / quando não</div>
+    <div class="two-col">
+      <div><div class="col-header" style="color:var(--success)">✅ Use multi-agente</div><ul class="bullets">
+        <li>Subtarefas independentes que cabem ser paralelizadas</li>
+        <li>Especializações distintas (buscar ≠ sintetizar)</li>
+      </ul></div>
+      <div><div class="col-header" style="color:var(--warning)">⚠️ Cuidado</div><ul class="bullets">
+        <li>Decomposição estreita demais = cobertura incompleta do tópico</li>
+        <li>Tarefa simples e linear não precisa de coordenador</li>
+      </ul></div>
+    </div>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>Questão clássica: "todos os subagentes tiveram sucesso, mas o relatório cobriu só parte do tópico". A causa é <strong>decomposição estreita do coordenador</strong> — não culpe os subagentes (que fizeram bem o que foi pedido). Olhe o log do coordenador.</p></div>
+  </div>
+
+  <!-- 1.3 -->
+  <div class="content-block" id="d1-1.3">
+    <div class="task-header"><span class="task-id">1.3</span><span class="task-title">Invocação de subagentes, passagem de contexto & paralelismo</span></div>
+    <div class="where-badges">
+      <span class="wb wb-sdk">🧩 Agent SDK</span>
+      <span class="wb wb-cli">🖥️ Claude Code</span>
+      <span class="wb wb-api wb-off">🔌 Claude API</span>
+      <span class="wb wb-mcp wb-off">🌐 MCP</span>
+    </div>
+    <div class="concept-line"><strong>Em uma frase:</strong> subagentes têm <strong>contexto isolado</strong> — não herdam o histórico do coordenador. Tudo que precisam tem que ir explícito no prompt da <code>Task</code>. E para rodar em paralelo, o coordenador emite várias <code>Task</code> numa única resposta.</div>
+
+    <div class="block-label">📦 O cenário</div>
+    <div class="scenario-framing">No <em>Multi-Agent Research System</em>, o subagente de síntese precisa dos resultados da busca e da análise. Se você só disser "sintetize as descobertas", ele responde "que descobertas?" — porque começou do zero. Você precisa passar os resultados <em>dentro</em> do prompt dele.</div>
+
+    <div class="block-label">⚙️ Como funciona</div>
+    <div class="code-ex">
+      <div class="code-title">Passagem de contexto — errado vs certo</div>
+      <pre><span class="hl-err">❌ ERRADO</span> — subagente não herdou nada:
+Task(prompt=<span class="hl-str">"Investigue o problema de cobrança do cliente"</span>)
+
+<span class="hl-ok">✅ CERTO</span> — contexto completo no prompt:
+Task(prompt=<span class="hl-str">"""Investigue cobrança dupla.
+Cliente: CUS-4829 | Pedido: ORD-789
+Cobrado 2x em 15/03 | Valor: R$249,90
+Ferramentas: get_order_details, process_refund"""</span>)</pre>
+    </div>
+    <p><strong>Paralelo vs sequencial:</strong> para paralelismo real, o coordenador emite <strong>múltiplas chamadas <code>Task</code> na MESMA resposta</strong>. Uma <code>Task</code> por turno = execução sequencial.</p>
+    <div class="two-col">
+      <div><div class="col-header" style="color:var(--success)">✅ Paralelo (tarefas independentes)</div><ul class="bullets">
+        <li>3 <code>Task</code> numa única resposta: pesquisar UE, EUA e China</li>
+        <li>Tempo total ≈ o da subtarefa mais longa</li>
+      </ul></div>
+      <div><div class="col-header" style="color:var(--warning)">⏭️ Sequencial (há dependência)</div><ul class="bullets">
+        <li>Turnos separados quando B precisa do resultado de A</li>
+        <li>Ex.: coletar dados → depois analisar o que foi coletado</li>
+      </ul></div>
+    </div>
+    <p style="margin-top:8px">Boa prática: passe metadados estruturados (URL da fonte, nome do doc, página) junto do conteúdo, para preservar a atribuição na síntese. E escreva prompts de coordenador com <strong>objetivos e critérios de qualidade</strong>, não um passo-a-passo rígido — isso deixa o subagente se adaptar.</p>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>"Subagente responde: não tenho informações" → passar contexto explícito no prompt da Task. "Como paralelizar?" → múltiplas <code>Task</code> em UMA resposta (não turnos consecutivos, não threads). E lembre: <code>allowedTools</code> precisa incluir <code>"Task"</code> para o coordenador poder spawnar.</p></div>
+  </div>
+
+  <!-- 1.4 -->
+  <div class="content-block" id="d1-1.4">
+    <div class="task-header"><span class="task-id">1.4</span><span class="task-title">Workflows multi-etapa com enforcement & handoff</span></div>
+    <div class="where-badges">
+      <span class="wb wb-sdk">🧩 Agent SDK</span>
+      <span class="wb wb-api wb-off">🔌 Claude API</span>
+      <span class="wb wb-cli wb-off">🖥️ Claude Code</span>
+      <span class="wb wb-mcp wb-off">🌐 MCP</span>
+    </div>
+    <div class="concept-line"><strong>Em uma frase:</strong> quando uma ordem de passos é <strong>obrigatória</strong> (ex.: verificar identidade antes de reembolsar), prompt não basta — ele tem taxa de falha não-zero. Use <strong>enforcement programático</strong> (hooks / gates de pré-requisito).</div>
+
+    <div class="block-label">📦 O cenário</div>
+    <div class="scenario-framing">No <em>Customer Support Agent</em>, a política diz: nunca processar reembolso sem verificar o cliente primeiro. Em 12% dos casos o agente pula <code>get_customer</code> e chama <code>process_refund</code> direto — risco financeiro real.</div>
+
+    <div class="block-label">⚙️ Como funciona</div>
+    <p>Um <strong>gate programático</strong> bloqueia <code>process_refund</code> e <code>lookup_order</code> até que <code>get_customer</code> tenha retornado um ID verificado. Isso é código — uma garantia determinística — não uma instrução no prompt que o modelo "deveria" seguir.</p>
+    <div class="code-ex">
+      <div class="code-title">Gate de pré-requisito (Agent SDK)</div>
+      <pre><span class="hl-key">def</span> antes_da_ferramenta(tool, state):
+    <span class="hl-key">if</span> tool.name == <span class="hl-str">"process_refund"</span> <span class="hl-key">and</span> <span class="hl-key">not</span> state.customer_verified:
+        <span class="hl-key">return</span> bloquear(<span class="hl-str">"Verifique o cliente com get_customer primeiro"</span>)
+    <span class="hl-key">return</span> permitir()</pre>
+    </div>
+    <p><strong>Handoff estruturado:</strong> ao escalar no meio do processo para um humano (que não vê o histórico da conversa), compile um resumo: ID do cliente, causa-raiz, valor, ação recomendada.</p>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>"Em X% dos casos o agente pula a verificação apesar do system prompt" → <strong>pré-requisito programático / hook</strong>. As distratoras "reforçar o system prompt" e "adicionar few-shot" dependem de conformidade probabilística — insuficiente quando o erro tem consequência financeira.</p></div>
+  </div>
+
+  <!-- 1.5 -->
+  <div class="content-block" id="d1-1.5">
+    <div class="task-header"><span class="task-id">1.5</span><span class="task-title">Hooks do Agent SDK (interceptação & normalização)</span></div>
+    <div class="where-badges">
+      <span class="wb wb-sdk">🧩 Agent SDK</span>
+      <span class="wb wb-cli">🖥️ Claude Code</span>
+      <span class="wb wb-api wb-off">🔌 Claude API</span>
+      <span class="wb wb-mcp wb-off">🌐 MCP</span>
+    </div>
+    <div class="concept-line"><strong>Em uma frase:</strong> hooks são pontos de interceptação determinísticos. <code>PostToolUse</code> transforma o <em>resultado</em> de uma ferramenta antes do modelo ver; hooks de interceptação de chamada bloqueiam <em>ações</em> que violam regras de negócio.</div>
+
+    <div class="block-label">📦 O cenário</div>
+    <div class="scenario-framing">No <em>Customer Support Agent</em>, suas ferramentas MCP retornam datas em formatos diferentes (Unix timestamp, ISO 8601, código numérico). Um <code>PostToolUse</code> normaliza tudo para um formato só antes do agente raciocinar — e outro hook bloqueia reembolsos acima de R$500, redirecionando para escalação humana.</div>
+
+    <div class="block-label">⚙️ Como funciona</div>
+    <div class="code-ex">
+      <div class="code-title">PostToolUse — normalizar datas heterogêneas</div>
+      <pre><span class="hl-key">def</span> post_tool_use(tool_name, result):
+    <span class="hl-key">if</span> <span class="hl-str">"date"</span> <span class="hl-key">in</span> result:
+        result[<span class="hl-str">"date"</span>] = para_iso8601(result[<span class="hl-str">"date"</span>])  <span class="hl-cmt"># formato único</span>
+    <span class="hl-key">return</span> result</pre>
+    </div>
+    <p>O ponto-chave do exame: hook = <strong>garantia determinística</strong>; prompt = <strong>conformidade probabilística</strong>. Quando a regra de negócio exige compliance garantido, escolha hook.</p>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>"Bloquear reembolsos acima de um limite" ou "garantir que uma regra seja sempre aplicada" → hook de interceptação. Hooks também são ótimos para <strong>aparar tool results verbosos</strong> (ligação com o Domínio 5).</p></div>
+  </div>
+
+  <!-- 1.6 -->
+  <div class="content-block" id="d1-1.6">
+    <div class="task-header"><span class="task-id">1.6</span><span class="task-title">Estratégias de decomposição de tarefas</span></div>
+    <div class="where-badges">
+      <span class="wb wb-sdk">🧩 Agent SDK</span>
+      <span class="wb wb-cli">🖥️ Claude Code</span>
+      <span class="wb wb-api wb-off">🔌 Claude API</span>
+      <span class="wb wb-mcp wb-off">🌐 MCP</span>
+    </div>
+    <div class="concept-line"><strong>Em uma frase:</strong> escolha entre <em>pipeline fixo</em> (prompt chaining — passos previsíveis) e <em>decomposição dinâmica</em> (subtarefas geradas conforme as descobertas) com base em quão aberto é o problema.</div>
+
+    <div class="block-label">📦 O cenário</div>
+    <div class="scenario-framing">No <em>Developer Productivity</em> (Cenário 4): "adicione testes abrangentes a um codebase legado" é aberto — você mapeia a estrutura, identifica áreas de alto impacto e cria um plano que se adapta. Já uma revisão de PR multi-arquivo é previsível — analise cada arquivo, depois faça uma passagem de integração entre arquivos.</div>
+
+    <div class="block-label">🎯 Quando usar / quando não</div>
+    <div class="two-col">
+      <div><div class="col-header" style="color:var(--success)">🔗 Prompt chaining (fixo)</div><ul class="bullets">
+        <li>Revisões multi-aspecto previsíveis</li>
+        <li>Dividir revisão grande em: por-arquivo + integração</li>
+      </ul></div>
+      <div><div class="col-header" style="color:var(--accent)">🌱 Decomposição dinâmica</div><ul class="bullets">
+        <li>Investigação aberta (explorar legado)</li>
+        <li>Gera subtarefas conforme dependências aparecem</li>
+      </ul></div>
+    </div>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>Revisão de muitos arquivos numa passagem só → resultado inconsistente por <strong>diluição de atenção</strong>. A resposta é dividir em passagens (por-arquivo + integração), não "usar uma janela de contexto maior" (ver 4.6).</p></div>
+  </div>
+
+  <!-- 1.7 -->
+  <div class="content-block" id="d1-1.7">
+    <div class="task-header"><span class="task-id">1.7</span><span class="task-title">Estado de sessão: resume & fork</span></div>
+    <div class="where-badges">
+      <span class="wb wb-cli">🖥️ Claude Code</span>
+      <span class="wb wb-sdk">🧩 Agent SDK</span>
+      <span class="wb wb-api wb-off">🔌 Claude API</span>
+      <span class="wb wb-mcp wb-off">🌐 MCP</span>
+    </div>
+    <div class="concept-line"><strong>Em uma frase:</strong> <code>--resume &lt;nome&gt;</code> continua uma sessão nomeada; <code>fork_session</code> cria ramos paralelos a partir de uma base comum. Mas quando os tool results estão obsoletos, <strong>começar uma sessão nova com um resumo estruturado é mais confiável</strong> que retomar.</div>
+
+    <div class="block-label">📦 O cenário</div>
+    <div class="scenario-framing">No <em>Developer Productivity</em>, você analisou um codebase ontem. Hoje os arquivos mudaram. Retomar a sessão antiga traz resultados de ferramentas obsoletos (o conteúdo já não bate). Forkar é útil para comparar duas abordagens de refatoração a partir da mesma análise base.</div>
+
+    <div class="block-label">🎯 Quando usar / quando não</div>
+    <div class="two-col">
+      <div><div class="col-header" style="color:var(--success)">✅ Resume / fork</div><ul class="bullets">
+        <li><code>--resume</code>: contexto anterior ainda majoritariamente válido</li>
+        <li><code>fork_session</code>: explorar caminhos divergentes da mesma base</li>
+      </ul></div>
+      <div><div class="col-header" style="color:var(--warning)">🆕 Sessão nova + resumo</div><ul class="bullets">
+        <li>Quando tool results estão obsoletos/contaminados</li>
+        <li>Injeta um resumo estruturado em vez de arrastar lixo</li>
+      </ul></div>
+    </div>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>"O contexto degradou / o Claude cita 'padrões típicos' em vez das classes específicas" → <strong>nova sessão com resumo estruturado</strong>, NÃO <code>--resume</code>. Ao retomar após mudanças, informe explicitamente quais arquivos mudaram para re-análise direcionada.</p></div>
+  </div>
+</div>
+
+<!-- DOMAIN 2 -->
+<div class="section" id="d2">
+  <div class="page-header">
+    <h1>🔧 Domínio 2: Tool Design & MCP Integration</h1>
+    <p class="subtitle">18% do exame · ~11 questões</p>
+  </div>
+  <p style="margin-bottom:20px">Aqui o tema é <strong>as ferramentas que o Claude pode chamar</strong>: como descrevê-las para ele escolher certo, como expor seu backend via <span class="wb wb-mcp" style="padding:1px 8px">🌐 MCP</span>, como erros voltam, e quais são as ferramentas nativas do <span class="wb wb-cli" style="padding:1px 8px">🖥️ Claude Code</span>.</p>
+
+  <!-- 2.1 -->
+  <div class="content-block" id="d2-2.1">
+    <div class="task-header"><span class="task-id">2.1</span><span class="task-title">Descrições de ferramentas claras</span></div>
+    <div class="where-badges">
+      <span class="wb wb-mcp">🌐 MCP</span>
+      <span class="wb wb-api">🔌 Claude API</span>
+      <span class="wb wb-sdk">🧩 Agent SDK</span>
+      <span class="wb wb-cli wb-off">🖥️ Claude Code</span>
+    </div>
+    <div class="concept-line"><strong>Em uma frase:</strong> a <strong>descrição</strong> é o mecanismo PRIMÁRIO que o modelo usa para escolher a ferramenta — não o nome, não o código. Descrição fraca = seleção errada em produção.</div>
+
+    <div class="block-label">📦 O cenário</div>
+    <div class="scenario-framing">No <em>Customer Support Agent</em>, <code>get_customer</code> ("Retrieves customer information") e <code>lookup_order</code> ("Retrieves order details") têm descrições mínimas e aceitam IDs parecidos. Quando o usuário diz "check my order #12345", o agente às vezes chama <code>get_customer</code> — bug.</div>
+
+    <div class="block-label">⚙️ Como funciona</div>
+    <div class="code-ex">
+      <div class="code-title">Descrição com fronteiras explícitas</div>
+      <pre><span class="hl-ok">lookup_order:</span> <span class="hl-str">"Retorna DETALHES DE PEDIDO por order ID (#12345 ou ORD-XXXXX).
+  Use para: status, rastreio, itens, entrega, elegibilidade de reembolso.
+  NÃO use para: dados de perfil do cliente — use get_customer.
+  Ex.: 'onde está meu pedido', 'status do pedido #12345'"</span></pre>
+    </div>
+    <p>Regra de ouro: se dois devs discordariam sobre qual ferramenta usar para um input, a descrição está ruim. Adicione formatos de entrada, exemplos, casos extremos e um "NÃO use para → use X". Cuidado também com o <strong>system prompt</strong>: instruções sensíveis a palavra-chave podem sobrescrever descrições boas.</p>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>Misrouting entre ferramentas similares → <strong>expandir as descrições</strong> (primeiro passo, baixo esforço, alta alavancagem). As distratoras "adicionar few-shot", "camada de roteamento por keywords" e "consolidar numa tool só" são overhead ou over-engineering que não atacam a causa raiz.</p></div>
+  </div>
+
+  <!-- 2.2 -->
+  <div class="content-block" id="d2-2.2">
+    <div class="task-header"><span class="task-id">2.2</span><span class="task-title">Respostas de erro estruturadas (MCP)</span></div>
+    <div class="where-badges">
+      <span class="wb wb-mcp">🌐 MCP</span>
+      <span class="wb wb-sdk">🧩 Agent SDK</span>
+      <span class="wb wb-api wb-off">🔌 Claude API</span>
+      <span class="wb wb-cli wb-off">🖥️ Claude Code</span>
+    </div>
+    <div class="concept-line"><strong>Em uma frase:</strong> a flag <code>isError</code> comunica falha ao agente — mas um erro genérico ("Operation failed") impede recuperação inteligente. Retorne <strong>metadados estruturados</strong>: categoria, se é retryável, e descrição legível.</div>
+
+    <div class="block-label">📦 O cenário</div>
+    <div class="scenario-framing">Sua ferramenta <code>process_refund</code> pode falhar por motivos muito diferentes: timeout (transitório), input inválido (validação), valor acima da política (negócio), sem permissão. O agente precisa saber qual é para decidir: tentar de novo? explicar ao cliente? escalar?</div>
+
+    <div class="block-label">⚙️ Como funciona</div>
+    <div class="code-ex">
+      <div class="code-title">Erro estruturado</div>
+      <pre>{
+  <span class="hl-key">"isError"</span>: <span class="hl-val">true</span>,
+  <span class="hl-key">"errorCategory"</span>: <span class="hl-str">"business"</span>,   <span class="hl-cmt"># transient | validation | business | permission</span>
+  <span class="hl-key">"isRetryable"</span>: <span class="hl-val">false</span>,
+  <span class="hl-key">"message"</span>: <span class="hl-str">"Reembolso acima de R$500 exige aprovação humana"</span>
+}</pre>
+    </div>
+    <p>Distinga também <strong>falha de acesso</strong> (timeout — precisa decisão de retry) de <strong>resultado vazio válido</strong> (consulta funcionou, não achou nada). Em multi-agente: subagentes resolvem falhas transitórias localmente e só propagam ao coordenador o que não conseguem resolver, junto com resultados parciais e o que foi tentado.</p>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>"Erro genérico impede o agente de decidir" → metadados estruturados (<code>errorCategory</code> + <code>isRetryable</code>). <code>isRetryable: false</code> + mensagem amigável para violações de regra de negócio evita tentativas inúteis.</p></div>
+  </div>
+
+  <!-- 2.3 -->
+  <div class="content-block" id="d2-2.3">
+    <div class="task-header"><span class="task-id">2.3</span><span class="task-title">Distribuição de ferramentas & tool_choice</span></div>
+    <div class="where-badges">
+      <span class="wb wb-api">🔌 Claude API</span>
+      <span class="wb wb-sdk">🧩 Agent SDK</span>
+      <span class="wb wb-mcp wb-off">🌐 MCP</span>
+      <span class="wb wb-cli wb-off">🖥️ Claude Code</span>
+    </div>
+    <div class="concept-line"><strong>Em uma frase:</strong> dar ferramentas demais a um agente (18 em vez de 4-5) degrada a seleção. Dê a cada agente só o que o seu papel exige. E use <code>tool_choice</code> para controlar SE/QUAL ferramenta é chamada.</div>
+
+    <div class="block-label">📦 O cenário</div>
+    <div class="scenario-framing">No <em>Multi-Agent Research</em>, o agente de síntese tentava fazer buscas na web (fora da especialização dele) e errava. Você restringe o set de ferramentas dele — e dá só uma <code>verify_fact</code> com escopo para os fact-checks simples (85% dos casos), deixando o resto via coordenador.</div>
+
+    <div class="block-label">⚙️ Como funciona — tool_choice</div>
+    <table class="ref-table">
+      <tr><th>Valor</th><th>Comportamento</th><th>Quando</th></tr>
+      <tr><td><code>"auto"</code></td><td>Pode chamar ferramenta OU responder texto</td><td>Padrão conversacional</td></tr>
+      <tr><td><code>"any"</code></td><td>DEVE chamar alguma ferramenta (qualquer)</td><td>Garantir saída estruturada</td></tr>
+      <tr><td><code>{"type":"tool","name":"X"}</code></td><td>DEVE chamar a ferramenta X</td><td>Forçar uma etapa primeiro (ex.: <code>extract_metadata</code>)</td></tr>
+    </table>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>"85% das verificações são simples, 15% complexas" → ferramenta com escopo (<code>verify_fact</code>) para o caso comum, mantendo o caminho do coordenador para o resto = princípio do <strong>menor privilégio</strong>. Dar todas as ferramentas (over-provisioning) ou batch de verificações (cria bloqueio) são distratoras.</p></div>
+  </div>
+
+  <!-- 2.4 -->
+  <div class="content-block" id="d2-2.4">
+    <div class="task-header"><span class="task-id">2.4</span><span class="task-title">Integração de servidores MCP</span></div>
+    <div class="where-badges">
+      <span class="wb wb-mcp">🌐 MCP</span>
+      <span class="wb wb-cli">🖥️ Claude Code</span>
+      <span class="wb wb-sdk">🧩 Agent SDK</span>
+      <span class="wb wb-api wb-off">🔌 Claude API</span>
+    </div>
+    <div class="concept-line"><strong>Em uma frase:</strong> MCP conecta o Claude ao seu backend. Config do <strong>time</strong> vai em <code>.mcp.json</code> (raiz do projeto, versionado); config <strong>pessoal/experimental</strong> em <code>~/.claude.json</code>. Tokens vêm de variáveis de ambiente, nunca hardcoded.</div>
+
+    <div class="block-label">📦 O cenário</div>
+    <div class="scenario-framing">No <em>Developer Productivity</em>, o time integra o servidor MCP do GitHub. Todo dev que clonar o repo deve receber a config automaticamente — por isso ela vai versionada no <code>.mcp.json</code>, com o token vindo do ambiente de cada um.</div>
+
+    <div class="block-label">⚙️ Como funciona</div>
+    <div class="code-ex">
+      <div class="code-title">.mcp.json (raiz do projeto, versionado)</div>
+      <pre>{
+  <span class="hl-key">"mcpServers"</span>: {
+    <span class="hl-key">"github"</span>: {
+      <span class="hl-key">"command"</span>: <span class="hl-str">"npx"</span>,
+      <span class="hl-key">"args"</span>: [<span class="hl-str">"-y"</span>, <span class="hl-str">"@modelcontextprotocol/server-github"</span>],
+      <span class="hl-key">"env"</span>: { <span class="hl-key">"GITHUB_TOKEN"</span>: <span class="hl-str">"${GITHUB_TOKEN}"</span> }  <span class="hl-cmt"># do ambiente</span>
+    }
+  }
+}</pre>
+    </div>
+    <p><strong>Resources vs Tools</strong> (sempre cai): <em>resource</em> = leitura passiva de catálogo (listar schemas de banco, hierarquia de docs); <em>tool</em> = ação com efeito colateral (rodar query, criar registro). Expor catálogos como resources reduz chamadas exploratórias. Ferramentas de todos os servidores configurados ficam disponíveis simultaneamente. Prefira servidores MCP da comunidade (ex.: Jira) a reimplementar.</p>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>Config do time em <code>~/.claude.json</code> = colegas não recebem (erro clássico). Deve ser <code>.mcp.json</code> na raiz. "Ler catálogo para decidir" = resource; "mudar o estado do sistema" = tool. Se o agente prefere Grep nativo a uma tool MCP melhor, <strong>melhore a descrição da tool MCP</strong>.</p></div>
+  </div>
+
+  <!-- 2.5 -->
+  <div class="content-block" id="d2-2.5">
+    <div class="task-header"><span class="task-id">2.5</span><span class="task-title">Ferramentas nativas: Grep, Glob, Read, Edit, Write, Bash</span></div>
+    <div class="where-badges">
+      <span class="wb wb-cli">🖥️ Claude Code</span>
+      <span class="wb wb-sdk">🧩 Agent SDK</span>
+      <span class="wb wb-mcp wb-off">🌐 MCP</span>
+      <span class="wb wb-api wb-off">🔌 Claude API</span>
+    </div>
+    <div class="concept-line"><strong>Em uma frase:</strong> <code>Grep</code> busca por <em>conteúdo</em>; <code>Glob</code> busca por <em>nome/caminho</em>; <code>Read/Write</code> são arquivo inteiro; <code>Edit</code> é alteração pontual; <code>Bash</code> é o único que executa comandos.</div>
+
+    <div class="block-label">📦 O cenário</div>
+    <div class="scenario-framing">No <em>Developer Productivity</em>, você precisa achar todos os arquivos que importam <code>legacy_auth</code>. Isso é busca por conteúdo → <code>Grep</code>. Já achar todos os <code>*.test.tsx</code> é por nome → <code>Glob</code>.</div>
+
+    <div class="block-label">⚙️ Tabela de decisão</div>
+    <table class="ref-table">
+      <tr><th>Necessidade</th><th class="tag-correct">Correto</th><th class="tag-wrong">Errado</th></tr>
+      <tr><td>Achar arquivos que importam um módulo</td><td>Grep (conteúdo)</td><td>Glob</td></tr>
+      <tr><td>Achar todos os <code>**/*.test.tsx</code></td><td>Glob (nome)</td><td>Grep</td></tr>
+      <tr><td>Alterar um trecho único</td><td>Edit</td><td>Write (reescreve tudo)</td></tr>
+      <tr><td>Edit falha (texto não é único)</td><td>Read + Write</td><td>Bash com sed</td></tr>
+      <tr><td>Rodar os testes</td><td>Bash</td><td>Read</td></tr>
+    </table>
+    <p style="margin-top:8px">Fluxo de exploração incremental: <strong>Grep</strong> acha o entry point → <strong>Read</strong> segue imports e traça o fluxo → <strong>Edit</strong> faz a mudança com contexto completo. Não leia todos os arquivos de cara.</p>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>Grep × Glob é a confusão mais cobrada. Conteúdo → Grep; nome/extensão → Glob. Quando <code>Edit</code> não acha âncora única, o fallback é <code>Read + Write</code>.</p></div>
+  </div>
+</div>
+
+<!-- DOMAIN 3 -->
+<div class="section" id="d3">
+  <div class="page-header">
+    <h1>⚙️ Domínio 3: Claude Code Configuration & Workflows</h1>
+    <p class="subtitle">20% do exame · ~12 questões</p>
+  </div>
+  <p style="margin-bottom:20px">Tudo aqui vive no <span class="wb wb-cli" style="padding:1px 8px">🖥️ Claude Code</span>: os arquivos que você coloca no repo para configurar o agente pronto, os comandos e skills do time, e como rodar o Claude no CI/CD. A regra-mãe: <strong>config do time é versionada; config pessoal não</strong>.</p>
+
+  <!-- 3.1 -->
+  <div class="content-block" id="d3-3.1">
+    <div class="task-header"><span class="task-id">3.1</span><span class="task-title">CLAUDE.md — hierarquia, escopo & organização modular</span></div>
+    <div class="where-badges">
+      <span class="wb wb-cli">🖥️ Claude Code</span>
+      <span class="wb wb-sdk wb-off">🧩 Agent SDK</span>
+      <span class="wb wb-api wb-off">🔌 Claude API</span>
+      <span class="wb wb-mcp wb-off">🌐 MCP</span>
+    </div>
+    <div class="concept-line"><strong>Em uma frase:</strong> o <code>CLAUDE.md</code> dá contexto/instruções ao Claude Code, em 3 níveis: usuário (<code>~/.claude/CLAUDE.md</code>, só seu), projeto (<code>CLAUDE.md</code> na raiz ou <code>.claude/CLAUDE.md</code>, do time) e diretório (subpastas). Sempre carregado.</div>
+
+    <div class="block-label">📦 O cenário</div>
+    <div class="scenario-framing">No <em>Code Generation</em> (Cenário 2), um novo dev não recebe as convenções do time. Causa: alguém colocou as instruções em <code>~/.claude/CLAUDE.md</code> (escopo pessoal, não versionado). Instruções do time têm que estar no nível de projeto.</div>
+
+    <div class="block-label">⚙️ Como funciona</div>
+    <div class="diagram-box">
+      <div class="diagram-label">📁 Onde cada coisa vai</div>
+      <pre>
+  ~/.claude/CLAUDE.md          ← PESSOAL (não versionado, só você)
+  CLAUDE.md  (raiz)            ← TIME (versionado ✓)
+  .claude/CLAUDE.md            ← TIME (versionado ✓)
+  backend/CLAUDE.md            ← específico do diretório
+       └─ @import ../docs/standards.md   ← reusa padrão compartilhado</pre>
+    </div>
+    <p><code>@import</code> mantém o arquivo modular (uma fonte de verdade compartilhada). Para arquivos enormes, prefira dividir em <code>.claude/rules/</code> (ver 3.3). Use <code>/memory</code> para ver quais arquivos de memória estão carregados e diagnosticar comportamento inconsistente.</p>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>"Membro novo do time não recebe as instruções" → estão no <strong>nível de usuário</strong>, deviam estar no <strong>nível de projeto</strong> (versionado). Esse é o diagnóstico de hierarquia mais cobrado.</p></div>
+  </div>
+
+  <!-- 3.2 -->
+  <div class="content-block" id="d3-3.2">
+    <div class="task-header"><span class="task-id">3.2</span><span class="task-title">Slash commands & Skills</span></div>
+    <div class="where-badges">
+      <span class="wb wb-cli">🖥️ Claude Code</span>
+      <span class="wb wb-sdk wb-off">🧩 Agent SDK</span>
+      <span class="wb wb-api wb-off">🔌 Claude API</span>
+      <span class="wb wb-mcp wb-off">🌐 MCP</span>
+    </div>
+    <div class="concept-line"><strong>Em uma frase:</strong> <em>commands</em> (<code>.claude/commands/</code>) são atalhos de prompt; <em>skills</em> (<code>.claude/skills/</code> com <code>SKILL.md</code>) são workflows com frontmatter (<code>context: fork</code>, <code>allowed-tools</code>, <code>argument-hint</code>). Projeto = versionado; <code>~/.claude/</code> = pessoal.</div>
+
+    <div class="block-label">📦 O cenário</div>
+    <div class="scenario-framing">No <em>Code Generation</em>, você cria um <code>/review</code> com o checklist de code review do time. Colocando em <code>.claude/commands/review.md</code>, todo dev que clonar o repo já tem o comando.</div>
+
+    <div class="block-label">⚙️ Como funciona</div>
+    <div class="code-ex">
+      <div class="code-title">SKILL.md com frontmatter</div>
+      <pre><span class="hl-cmt">---</span>
+<span class="hl-key">name</span>: analyze-codebase
+<span class="hl-key">context</span>: fork          <span class="hl-cmt"># roda isolado, não polui a conversa principal</span>
+<span class="hl-key">allowed-tools</span>: [Read, Grep, Glob]   <span class="hl-cmt"># restringe ferramentas</span>
+<span class="hl-key">argument-hint</span>: "&lt;módulo a analisar&gt;"
+<span class="hl-cmt">---</span>
+Analise o módulo indicado e retorne só um resumo estruturado.</pre>
+    </div>
+    <p><code>context: fork</code> é o ponto-chave: a skill roda num sub-contexto isolado, então output verboso (análise, brainstorm) não contamina a sessão principal. <strong>Skill</strong> = invocação sob demanda para um workflow; <strong>CLAUDE.md</strong> = padrões universais sempre carregados.</p>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>"Comando disponível a todos ao clonar" → <code>.claude/commands/</code> (versionado), não <code>~/.claude/commands/</code> nem <code>CLAUDE.md</code> nem um <code>config.json</code> inexistente. "Isolar output verboso" → <code>context: fork</code>.</p></div>
+  </div>
+
+  <!-- 3.3 -->
+  <div class="content-block" id="d3-3.3">
+    <div class="task-header"><span class="task-id">3.3</span><span class="task-title">Regras com escopo de caminho (.claude/rules/)</span></div>
+    <div class="where-badges">
+      <span class="wb wb-cli">🖥️ Claude Code</span>
+      <span class="wb wb-sdk wb-off">🧩 Agent SDK</span>
+      <span class="wb wb-api wb-off">🔌 Claude API</span>
+      <span class="wb wb-mcp wb-off">🌐 MCP</span>
+    </div>
+    <div class="concept-line"><strong>Em uma frase:</strong> arquivos em <code>.claude/rules/</code> com <code>paths:</code> (glob) no frontmatter carregam <strong>só quando você edita arquivos que batem com o padrão</strong> — economizando contexto e aplicando convenções por tipo de arquivo, independente da pasta.</div>
+
+    <div class="block-label">📦 O cenário</div>
+    <div class="scenario-framing">No <em>Code Generation</em>, arquivos de teste ficam ao lado do código (<code>Button.test.tsx</code> junto de <code>Button.tsx</code>), espalhados por toda parte. Você quer que TODOS sigam a mesma convenção, não importa onde estejam.</div>
+
+    <div class="block-label">⚙️ Como funciona</div>
+    <div class="code-ex">
+      <div class="code-title">.claude/rules/testing.md</div>
+      <pre><span class="hl-cmt">---</span>
+<span class="hl-key">description</span>: Convenções de teste
+<span class="hl-key">paths</span>:
+  - <span class="hl-str">"**/*.test.tsx"</span>
+  - <span class="hl-str">"**/*.spec.tsx"</span>
+<span class="hl-cmt">---</span>
+Use describe/it. Mocke só dependências externas. Cubra os casos-limite.</pre>
+    </div>
+    <p>Vantagem sobre <code>CLAUDE.md</code> por subdiretório: o glob alcança arquivos do mesmo tipo <strong>espalhados pelo codebase</strong> — um <code>CLAUDE.md</code> de pasta só vale para aquela pasta.</p>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>"Aplicar convenções a arquivos de teste espalhados, automaticamente" → <code>.claude/rules/</code> com glob. As distratoras: <code>CLAUDE.md</code> raiz (depende de inferência), skills (exigem invocação manual), <code>CLAUDE.md</code> por subpasta (não pega arquivos espalhados).</p></div>
+  </div>
+
+  <!-- 3.4 -->
+  <div class="content-block" id="d3-3.4">
+    <div class="task-header"><span class="task-id">3.4</span><span class="task-title">Plan mode vs execução direta</span></div>
+    <div class="where-badges">
+      <span class="wb wb-cli">🖥️ Claude Code</span>
+      <span class="wb wb-sdk wb-off">🧩 Agent SDK</span>
+      <span class="wb wb-api wb-off">🔌 Claude API</span>
+      <span class="wb wb-mcp wb-off">🌐 MCP</span>
+    </div>
+    <div class="concept-line"><strong>Em uma frase:</strong> plan mode explora e projeta <strong>antes</strong> de mexer no código — para tarefas grandes/arquiteturais com múltiplos caminhos válidos. Execução direta é para mudanças simples e bem-definidas.</div>
+
+    <div class="block-label">📦 O cenário</div>
+    <div class="scenario-framing">No <em>Code Generation</em>, reestruturar um monolito em microsserviços toca dezenas de arquivos e exige decidir limites de serviço. Plan mode deixa o Claude entender dependências e propor uma abordagem antes de mudar nada — evitando retrabalho caro.</div>
+
+    <div class="block-label">🎯 Quando usar / quando não</div>
+    <table class="ref-table">
+      <tr><th>Tarefa</th><th class="tag-correct">Plan mode</th><th class="tag-correct">Execução direta</th></tr>
+      <tr><td>Monolito → microsserviços</td><td>✅ arquitetural, multi-arquivo</td><td></td></tr>
+      <tr><td>Migrar 45+ arquivos para nova API</td><td>✅ explorar deps antes</td><td></td></tr>
+      <tr><td>Adicionar validação numa função</td><td></td><td>✅ escopo claro</td></tr>
+      <tr><td>Corrigir bug com stack trace claro</td><td></td><td>✅ sem surpresas</td></tr>
+    </table>
+    <p style="margin-top:8px">Combine: plan mode para investigar, execução direta para implementar o plano. Use o <strong>subagente Explore</strong> para isolar a descoberta verbosa e devolver só resumos (preserva o contexto principal).</p>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>Tarefa com implicação arquitetural / múltiplas abordagens → plan mode. A distratora "começar direto e mudar para plan mode se aparecer complexidade" ignora que a complexidade <strong>já está no enunciado</strong>.</p></div>
+  </div>
+
+  <!-- 3.5 -->
+  <div class="content-block" id="d3-3.5">
+    <div class="task-header"><span class="task-id">3.5</span><span class="task-title">Refinamento iterativo</span></div>
+    <div class="where-badges">
+      <span class="wb wb-cli">🖥️ Claude Code</span>
+      <span class="wb wb-sdk wb-off">🧩 Agent SDK</span>
+      <span class="wb wb-api wb-off">🔌 Claude API</span>
+      <span class="wb wb-mcp wb-off">🌐 MCP</span>
+    </div>
+    <div class="concept-line"><strong>Em uma frase:</strong> quando a prosa não comunica bem, use <strong>exemplos input/output concretos</strong>; itere por <strong>testes</strong> (escreva o teste, compartilhe a falha); use o <strong>padrão entrevista</strong> (peça ao Claude perguntar antes de implementar).</div>
+
+    <div class="block-label">📦 O cenário</div>
+    <div class="scenario-framing">No <em>Code Generation</em>, você descreve uma transformação em prosa e o Claude interpreta de formas diferentes a cada vez. Dar 2-3 exemplos de entrada→saída fixa o comportamento. Para um domínio que você não domina, peça que ele te entreviste (estratégias de cache, modos de falha) antes de codar.</div>
+
+    <div class="block-label">🎯 Quando usar / quando não</div>
+    <div class="two-col">
+      <div><div class="col-header" style="color:var(--success)">📥 Tudo numa mensagem</div><ul class="bullets">
+        <li>Quando os problemas <strong>interagem</strong> entre si</li>
+      </ul></div>
+      <div><div class="col-header" style="color:var(--accent)">🔁 Sequencial</div><ul class="bullets">
+        <li>Quando os problemas são <strong>independentes</strong></li>
+      </ul></div>
+    </div>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>Prosa gera resultado inconsistente → 2-3 exemplos input/output (não "explicar melhor em texto"). Bug em caso-limite → forneça um caso de teste específico com entrada e saída esperada.</p></div>
+  </div>
+
+  <!-- 3.6 -->
+  <div class="content-block" id="d3-3.6">
+    <div class="task-header"><span class="task-id">3.6</span><span class="task-title">Claude Code em CI/CD</span></div>
+    <div class="where-badges">
+      <span class="wb wb-cli">🖥️ Claude Code</span>
+      <span class="wb wb-api">🔌 Claude API</span>
+      <span class="wb wb-sdk wb-off">🧩 Agent SDK</span>
+      <span class="wb wb-mcp wb-off">🌐 MCP</span>
+    </div>
+    <div class="concept-line"><strong>Em uma frase:</strong> no pipeline, rode com <code>-p</code> (não-interativo, senão trava esperando input), use <code>--output-format json</code> + <code>--json-schema</code> para saída parseável, e dê contexto via <code>CLAUDE.md</code>.</div>
+
+    <div class="block-label">📦 O cenário</div>
+    <div class="scenario-framing">No <em>CI/CD</em> (Cenário 5), seu script roda <code>claude "Analyze this PR"</code> e o job trava — está esperando input interativo. A correção é a flag <code>-p</code>.</div>
+
+    <div class="block-label">⚙️ Como funciona</div>
+    <div class="code-ex">
+      <div class="code-title">CI não-interativo</div>
+      <pre><span class="hl-err"># ❌ trava aguardando input</span>
+claude <span class="hl-str">"Analyze this PR for security issues"</span>
+
+<span class="hl-ok"># ✅ modo print + saída estruturada</span>
+claude -p <span class="hl-str">"Analyze this PR"</span> --output-format json --json-schema schema.json</pre>
+    </div>
+    <p><strong>Isolamento de sessão</strong>: a mesma sessão que <em>gerou</em> o código é pior para <em>revisá-lo</em> (carrega o raciocínio da geração). Use uma instância independente para revisar (liga com 4.6). Ao re-rodar revisões após novos commits, inclua os achados anteriores no contexto e peça para reportar só o que é novo/não resolvido — evita comentários duplicados.</p>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>Job trava no CI → flag <code>-p</code>. As distratoras (<code>CLAUDE_HEADLESS=true</code>, <code>--batch</code>) são features <strong>inexistentes</strong>; redirecionar <code>/dev/null</code> é gambiarra que não resolve a sintaxe do Claude Code.</p></div>
+  </div>
+</div>
+
+<!-- DOMAIN 4 -->
+<div class="section" id="d4">
+  <div class="page-header">
+    <h1>💬 Domínio 4: Prompt Engineering & Structured Output</h1>
+    <p class="subtitle">20% do exame · ~12 questões</p>
+  </div>
+  <p style="margin-bottom:20px">Como escrever prompts que produzem comportamento confiável e saída estruturada. Os critérios e few-shot vivem no <span class="wb wb-api" style="padding:1px 8px">🔌 system prompt</span> da sua app (ou no <span class="wb wb-cli" style="padding:1px 8px">🖥️ CLAUDE.md</span>); a garantia de schema vem do <code>tool_use</code> na <span class="wb wb-api" style="padding:1px 8px">🔌 API</span>.</p>
+
+  <!-- 4.1 -->
+  <div class="content-block" id="d4-4.1">
+    <div class="task-header"><span class="task-id">4.1</span><span class="task-title">Critérios explícitos (reduzir falsos positivos)</span></div>
+    <div class="where-badges">
+      <span class="wb wb-api">🔌 Claude API</span>
+      <span class="wb wb-cli">🖥️ Claude Code</span>
+      <span class="wb wb-sdk">🧩 Agent SDK</span>
+      <span class="wb wb-mcp wb-off">🌐 MCP</span>
+    </div>
+    <div class="concept-line"><strong>Em uma frase:</strong> "seja conservador" não melhora precisão — critérios <strong>categóricos explícitos</strong> sim. Diga exatamente o que reportar e o que ignorar.</div>
+
+    <div class="block-label">📦 O cenário</div>
+    <div class="scenario-framing">No <em>CI/CD</em>, a revisão automática de comentários gera muitos falsos positivos. Instrução vaga ("verifique se os comentários são precisos, seja conservador") não diz ao modelo o que é alta confiança no SEU código.</div>
+
+    <div class="block-label">⚙️ Como funciona</div>
+    <div class="code-ex">
+      <div class="code-title">Vago → explícito</div>
+      <pre><span class="hl-err">❌ "Seja conservador ao reportar."</span>
+
+<span class="hl-ok">✅ Reporte SOMENTE quando:
+   - o comentário contradiz o comportamento do código
+   - um parâmetro documentado não existe na assinatura
+   NÃO reporte:
+   - estilo informal mas semanticamente correto
+   - ausência de documentação (ausência ≠ erro)</span></pre>
+    </div>
+    <p>Categorias com alto falso positivo derrubam a confiança nas categorias boas — vale desativar temporariamente a categoria ruim enquanto melhora o prompt dela. Defina severidade com exemplos de código concretos para cada nível.</p>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>Falsos positivos altos → critérios categóricos explícitos. "Peça ao modelo só reportar alta confiança" / "seja conservador" são as distratoras — instruções vagas não calibram precisão.</p></div>
+  </div>
+
+  <!-- 4.2 -->
+  <div class="content-block" id="d4-4.2">
+    <div class="task-header"><span class="task-id">4.2</span><span class="task-title">Few-shot prompting</span></div>
+    <div class="where-badges">
+      <span class="wb wb-api">🔌 Claude API</span>
+      <span class="wb wb-cli">🖥️ Claude Code</span>
+      <span class="wb wb-sdk">🧩 Agent SDK</span>
+      <span class="wb wb-mcp wb-off">🌐 MCP</span>
+    </div>
+    <div class="concept-line"><strong>Em uma frase:</strong> few-shot é a técnica mais eficaz quando <strong>instruções detalhadas ainda dão saída inconsistente</strong>. Mostre 2-4 exemplos input→output (com o raciocínio) e o modelo generaliza para casos novos.</div>
+
+    <div class="block-label">📦 O cenário</div>
+    <div class="scenario-framing">No <em>Structured Data Extraction</em> (Cenário 6), documentos vêm em formatos variados (citações inline vs bibliografia; medidas informais como "uns 90kg"). Exemplos mostrando como tratar cada caso ambíguo reduzem alucinação e fixam o formato de saída.</div>
+
+    <div class="block-label">🎯 Quando usar / quando NÃO</div>
+    <table class="ref-table">
+      <tr><th class="tag-correct">Few-shot resolve</th><th class="tag-wrong">Few-shot NÃO é a resposta</th></tr>
+      <tr><td>Saída inconsistente após instruções detalhadas</td><td>Misrouting entre tools similares → tool descriptions (2.1)</td></tr>
+      <tr><td>Casos ambíguos que regras não cobrem</td><td>Campo ausente no documento → nullable (4.3)</td></tr>
+      <tr><td>Formato que a prosa não descreve bem</td><td>Sequência crítica de ferramentas → hooks (1.4)</td></tr>
+    </table>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>Few-shot é forte para <strong>ambiguidade e formato</strong>, e também para calibrar escalação (1.5/5.2). Mas NÃO use few-shot para misrouting de tools (use descrições) nem para campos ausentes (use nullable).</p></div>
+  </div>
+
+  <!-- 4.3 -->
+  <div class="content-block" id="d4-4.3">
+    <div class="task-header"><span class="task-id">4.3</span><span class="task-title">Output estruturado via tool_use & JSON schema</span></div>
+    <div class="where-badges">
+      <span class="wb wb-api">🔌 Claude API</span>
+      <span class="wb wb-sdk">🧩 Agent SDK</span>
+      <span class="wb wb-cli wb-off">🖥️ Claude Code</span>
+      <span class="wb wb-mcp wb-off">🌐 MCP</span>
+    </div>
+    <div class="concept-line"><strong>Em uma frase:</strong> <code>tool_use</code> com JSON schema é a forma mais confiável de garantir saída estruturada — elimina erros de <em>sintaxe</em>. Mas NÃO previne erros <em>semânticos</em> (line items que não somam ao total, valor no campo errado).</div>
+
+    <div class="block-label">📦 O cenário</div>
+    <div class="scenario-framing">No <em>Structured Data Extraction</em>, você define uma ferramenta de extração cujo input é o schema desejado, e lê os dados do bloco <code>tool_use</code> da resposta. Campos que podem não existir no documento devem ser <strong>nullable</strong> — senão o modelo inventa valor para satisfazer o "required".</div>
+
+    <div class="block-label">⚙️ Como funciona</div>
+    <div class="code-ex">
+      <div class="code-title">Schema com nullable + enum extensível</div>
+      <pre>{
+  <span class="hl-key">"invoice_total"</span>: { <span class="hl-key">"type"</span>: <span class="hl-str">"number"</span> },
+  <span class="hl-key">"po_number"</span>:    { <span class="hl-key">"type"</span>: [<span class="hl-str">"string"</span>, <span class="hl-str">"null"</span>] },   <span class="hl-cmt"># null se ausente</span>
+  <span class="hl-key">"category"</span>:     { <span class="hl-key">"enum"</span>: [<span class="hl-str">"goods"</span>, <span class="hl-str">"service"</span>, <span class="hl-str">"other"</span>] },
+  <span class="hl-key">"category_detail"</span>: { <span class="hl-key">"type"</span>: [<span class="hl-str">"string"</span>, <span class="hl-str">"null"</span>] }  <span class="hl-cmt"># para "other"</span>
+}</pre>
+    </div>
+    <p><code>tool_choice</code> aqui: <code>"any"</code> garante saída estruturada quando há vários schemas e o tipo do doc é desconhecido; forçar <code>{"type":"tool","name":"..."}</code> garante que uma extração rode antes de etapas de enriquecimento.</p>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>Campo que pode faltar no documento → <strong>nullable</strong> (não required, senão fabrica). Schema rígido elimina erro de sintaxe mas não semântico — para semântica, valide (4.4). Enum com <code>"other"</code> + detalhe para categorias extensíveis; <code>"unclear"</code> para ambíguos.</p></div>
+  </div>
+
+  <!-- 4.4 -->
+  <div class="content-block" id="d4-4.4">
+    <div class="task-header"><span class="task-id">4.4</span><span class="task-title">Validação, retry & feedback</span></div>
+    <div class="where-badges">
+      <span class="wb wb-api">🔌 Claude API</span>
+      <span class="wb wb-sdk">🧩 Agent SDK</span>
+      <span class="wb wb-cli wb-off">🖥️ Claude Code</span>
+      <span class="wb wb-mcp wb-off">🌐 MCP</span>
+    </div>
+    <div class="concept-line"><strong>Em uma frase:</strong> retry-com-feedback (reenviar com o erro de validação específico) corrige erros de <strong>formato/estrutura</strong> — mas é inútil quando a informação simplesmente <strong>não está</strong> no documento fonte.</div>
+
+    <div class="block-label">📦 O cenário</div>
+    <div class="scenario-framing">No <em>Structured Data Extraction</em>, a validação Pydantic falha porque os <code>line_items</code> não somam ao <code>total</code>. Você reenvia incluindo o documento, a extração que falhou e o erro exato — o modelo se corrige. Mas se o campo que falta não existe no doc, nenhum retry resolve.</div>
+
+    <div class="block-label">🎯 Quando retry funciona / não funciona</div>
+    <div class="two-col">
+      <div><div class="col-header" style="color:var(--success)">✅ Retry resolve</div><ul class="bullets">
+        <li>Formato errado (DD/MM vs MM/DD)</li>
+        <li>Itens em ordem errada, valor somado errado</li>
+      </ul></div>
+      <div><div class="col-header" style="color:var(--error)">❌ Retry NÃO resolve</div><ul class="bullets">
+        <li>Informação ausente da fonte → use nullable</li>
+        <li>Dado só existe em outro doc não fornecido</li>
+      </ul></div>
+    </div>
+    <p>Padrões úteis: extrair <code>calculated_total</code> junto de <code>stated_total</code> para flagar divergência; <code>conflict_detected</code> para fonte inconsistente; <code>detected_pattern</code> para analisar falsos positivos depois.</p>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>Distinga erro de <strong>estrutura</strong> (retry resolve) de <strong>informação ausente</strong> (retry não resolve — use nullable). Esse é o par mais cobrado do 4.4.</p></div>
+  </div>
+
+  <!-- 4.5 -->
+  <div class="content-block" id="d4-4.5">
+    <div class="task-header"><span class="task-id">4.5</span><span class="task-title">Batch processing (Message Batches API)</span></div>
+    <div class="where-badges">
+      <span class="wb wb-api">🔌 Claude API</span>
+      <span class="wb wb-sdk wb-off">🧩 Agent SDK</span>
+      <span class="wb wb-cli wb-off">🖥️ Claude Code</span>
+      <span class="wb wb-mcp wb-off">🌐 MCP</span>
+    </div>
+    <div class="concept-line"><strong>Em uma frase:</strong> a Message Batches API dá <strong>50% de desconto</strong>, janela de até <strong>24h</strong> e <strong>sem SLA de latência</strong>. Ótima para cargas tolerantes a atraso; péssima para fluxos bloqueantes.</div>
+
+    <div class="block-label">📦 O cenário</div>
+    <div class="scenario-framing">No <em>CI/CD</em>, há dois fluxos: (1) check pré-merge bloqueante (dev espera) e (2) relatório de dívida técnica gerado overnight. O gestor quer migrar os dois para batch pelo desconto. Só o (2) deve ir para batch.</div>
+
+    <div class="block-label">🎯 Quando usar / quando não</div>
+    <div class="two-col">
+      <div><div class="col-header" style="color:var(--success)">✅ Batch</div><ul class="bullets">
+        <li>Relatórios overnight, auditorias semanais, geração de testes noturna</li>
+        <li>Correlacione request/response por <code>custom_id</code></li>
+      </ul></div>
+      <div><div class="col-header" style="color:var(--error)">❌ Síncrono (não batch)</div><ul class="bullets">
+        <li>Checks pré-merge bloqueantes</li>
+        <li>Qualquer coisa onde alguém espera o resultado</li>
+      </ul></div>
+    </div>
+    <p>Batch não suporta tool calling multi-turno num mesmo request. Em falhas, reenvie só os <code>custom_id</code> que falharam (ex.: dividindo docs que estouraram o contexto). Refine o prompt num set de amostra antes de processar o volume todo.</p>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>Migrar fluxo bloqueante para batch = errado (sem SLA). "Polling porque geralmente é rápido" não vale para bloqueante. Reprocessar falhas = só os <code>custom_id</code> que falharam, não o lote inteiro.</p></div>
+  </div>
+
+  <!-- 4.6 -->
+  <div class="content-block" id="d4-4.6">
+    <div class="task-header"><span class="task-id">4.6</span><span class="task-title">Arquiteturas de revisão multi-instância & multi-passagem</span></div>
+    <div class="where-badges">
+      <span class="wb wb-api">🔌 Claude API</span>
+      <span class="wb wb-sdk">🧩 Agent SDK</span>
+      <span class="wb wb-cli">🖥️ Claude Code</span>
+      <span class="wb wb-mcp wb-off">🌐 MCP</span>
+    </div>
+    <div class="concept-line"><strong>Em uma frase:</strong> um modelo é ruim em revisar o próprio código (carrega o raciocínio da geração). Use uma <strong>instância independente</strong> para revisar; e divida revisões grandes em passagens (por-arquivo + integração) para evitar diluição de atenção.</div>
+
+    <div class="block-label">📦 O cenário</div>
+    <div class="scenario-framing">No <em>CI/CD</em>, um PR de 14 arquivos revisado numa passagem só dá resultado inconsistente: detalhado em uns, superficial em outros, bugs óbvios passam, e feedback contraditório (reprova um padrão num arquivo, aprova idêntico em outro).</div>
+
+    <div class="block-label">🎯 Como reestruturar</div>
+    <div class="two-col">
+      <div><div class="col-header" style="color:var(--success)">✅ Faça</div><ul class="bullets">
+        <li>Passagem por-arquivo (issues locais) + passagem de integração (fluxo entre arquivos)</li>
+        <li>Revisor independente, sem o contexto de raciocínio do gerador</li>
+      </ul></div>
+      <div><div class="col-header" style="color:var(--error)">❌ Não</div><ul class="bullets">
+        <li>"Janela de contexto maior" — não resolve qualidade de atenção</li>
+        <li>Consenso de 3 runs — suprime bugs detectados intermitentemente</li>
+      </ul></div>
+    </div>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>Revisão inconsistente em muitos arquivos → dividir em passagens focadas. "Modelo com janela maior" é a distratora favorita — o problema é diluição de atenção, não tamanho de janela.</p></div>
+  </div>
+</div>
+
+<!-- DOMAIN 5 -->
+<div class="section" id="d5">
+  <div class="page-header">
+    <h1>🧠 Domínio 5: Context Management & Reliability</h1>
+    <p class="subtitle">15% do exame · ~9 questões</p>
+  </div>
+  <p style="margin-bottom:20px">Como manter <strong>qualidade e confiabilidade</strong> quando as conversas ficam longas, erros acontecem em cadeia e dados precisos precisam sobreviver. Vive na sua app <span class="wb wb-sdk" style="padding:1px 8px">🧩 SDK</span> (o que entra no contexto a cada chamada) e no <span class="wb wb-cli" style="padding:1px 8px">🖥️ Claude Code</span> (<code>/compact</code>, sessões).</p>
+
+  <!-- 5.1 -->
+  <div class="content-block" id="d5-5.1">
+    <div class="task-header"><span class="task-id">5.1</span><span class="task-title">Preservar informação crítica em conversas longas</span></div>
+    <div class="where-badges">
+      <span class="wb wb-sdk">🧩 Agent SDK</span>
+      <span class="wb wb-cli">🖥️ Claude Code</span>
+      <span class="wb wb-api">🔌 Claude API</span>
+      <span class="wb wb-mcp wb-off">🌐 MCP</span>
+    </div>
+    <div class="concept-line"><strong>Em uma frase:</strong> resumir progressivamente apaga números, datas e valores exatos. Extraia os fatos transacionais para um bloco "case facts" que vai em todo prompt, fora do histórico resumido — e cuide do efeito "lost in the middle".</div>
+
+    <div class="block-label">📦 O cenário</div>
+    <div class="scenario-framing">No <em>Customer Support Agent</em>, numa sessão longa, "cobrado R$249,90 em 15/03, pedido ORD-789" vira "o cliente teve problemas recentes". Você perde o que importa para resolver o caso.</div>
+
+    <div class="block-label">⚙️ Como funciona</div>
+    <div class="code-ex">
+      <div class="code-title">Bloco CASE FACTS (nunca sumarizado)</div>
+      <pre><span class="hl-ok">---CASE FACTS---</span>
+Cliente: CUS-4829 | ORD-789 cobrado 2x em 15/03 | R$249,90
+Pontos: 450 | Reclamação: cobrança dupla
+<span class="hl-ok">---FIM---</span>   <span class="hl-cmt"># atualizado a cada tool call, incluído em todo prompt</span></pre>
+    </div>
+    <p><strong>Lost in the middle:</strong> o modelo lê bem o início e o fim de inputs longos, mas pode ignorar o meio. Coloque achados críticos no <strong>início</strong>, com headers explícitos. E apare tool results verbosos (40+ campos quando só 5 importam) com um hook <code>PostToolUse</code> antes que acumulem.</p>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>Perda de precisão em sessão longa → bloco de fatos persistente fora do resumo. Achados importantes "no meio" sendo ignorados → reposicionar no início com headers. Tool result gigante → aparar para os campos relevantes.</p></div>
+  </div>
+
+  <!-- 5.2 -->
+  <div class="content-block" id="d5-5.2">
+    <div class="task-header"><span class="task-id">5.2</span><span class="task-title">Escalação & resolução de ambiguidade</span></div>
+    <div class="where-badges">
+      <span class="wb wb-sdk">🧩 Agent SDK</span>
+      <span class="wb wb-api">🔌 Claude API</span>
+      <span class="wb wb-cli wb-off">🖥️ Claude Code</span>
+      <span class="wb wb-mcp wb-off">🌐 MCP</span>
+    </div>
+    <div class="concept-line"><strong>Em uma frase:</strong> escale quando o cliente pede humano, quando a política é omissa/ambígua, ou quando não há progresso possível. Score de confiança e análise de sentimento NÃO são bons proxies de complexidade.</div>
+
+    <div class="block-label">📦 O cenário</div>
+    <div class="scenario-framing">No <em>Customer Support Agent</em>, o agente atinge só 55% de resolução (meta 80%): escala casos simples (troca com foto) e tenta resolver sozinho casos que exigem exceção de política. O limite de decisão está mal definido.</div>
+
+    <div class="block-label">⚙️ Como funciona</div>
+    <p>A correção é adicionar <strong>critérios explícitos de escalação com few-shot</strong> ao system prompt, mostrando quando escalar vs resolver. Honre pedido explícito de humano <em>imediatamente</em> (sem investigar antes). Quando a busca retorna múltiplos clientes, peça um identificador adicional em vez de chutar por heurística.</p>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>Calibrar escalação → critérios explícitos + few-shot. As distratoras: <strong>score de confiança</strong> (o LLM já está confiante errado nos casos difíceis), <strong>classificador treinado</strong> (over-engineering antes de tentar prompt) e <strong>sentimento</strong> (não correlaciona com complexidade).</p></div>
+  </div>
+
+  <!-- 5.3 -->
+  <div class="content-block" id="d5-5.3">
+    <div class="task-header"><span class="task-id">5.3</span><span class="task-title">Propagação de erros em multi-agente</span></div>
+    <div class="where-badges">
+      <span class="wb wb-sdk">🧩 Agent SDK</span>
+      <span class="wb wb-mcp">🌐 MCP</span>
+      <span class="wb wb-api wb-off">🔌 Claude API</span>
+      <span class="wb wb-cli wb-off">🖥️ Claude Code</span>
+    </div>
+    <div class="concept-line"><strong>Em uma frase:</strong> ao subir um erro ao coordenador, mande <strong>contexto estruturado</strong> (tipo de falha, query tentada, resultados parciais, alternativas). Status genérico esconde informação; suprimir o erro ou matar o workflow inteiro são anti-padrões.</div>
+
+    <div class="block-label">📦 O cenário</div>
+    <div class="scenario-framing">No <em>Multi-Agent Research</em>, o subagente de busca dá timeout. Se ele só retornar "search unavailable", o coordenador não sabe se vale tentar outra query, seguir com parciais ou trocar de abordagem.</div>
+
+    <div class="block-label">🎯 Como fazer / não fazer</div>
+    <div class="two-col">
+      <div><div class="col-header" style="color:var(--success)">✅ Faça</div><ul class="bullets">
+        <li>Erro estruturado: falha + tentativa + parciais + alternativas</li>
+        <li>Subagente resolve transitório localmente; só propaga o que não resolve</li>
+        <li>Anote cobertura na síntese (o que está bem suportado vs lacunas)</li>
+      </ul></div>
+      <div><div class="col-header" style="color:var(--error)">❌ Não</div><ul class="bullets">
+        <li>Status genérico ("search unavailable")</li>
+        <li>Marcar falha como sucesso (vazio = ok)</li>
+        <li>Terminar todo o workflow por uma falha</li>
+      </ul></div>
+    </div>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>Timeout de subagente → contexto de erro estruturado ao coordenador. Distinga <strong>falha de acesso</strong> (timeout, precisa decisão) de <strong>resultado vazio válido</strong> (consulta ok, sem matches).</p></div>
+  </div>
+
+  <!-- 5.4 -->
+  <div class="content-block" id="d5-5.4">
+    <div class="task-header"><span class="task-id">5.4</span><span class="task-title">Contexto em exploração de codebase grande</span></div>
+    <div class="where-badges">
+      <span class="wb wb-cli">🖥️ Claude Code</span>
+      <span class="wb wb-sdk">🧩 Agent SDK</span>
+      <span class="wb wb-api wb-off">🔌 Claude API</span>
+      <span class="wb wb-mcp wb-off">🌐 MCP</span>
+    </div>
+    <div class="concept-line"><strong>Em uma frase:</strong> em sessões longas o contexto degrada (o modelo passa a citar "padrões típicos" em vez das classes específicas). Use <strong>scratchpad files</strong>, delegue exploração verbosa a subagentes, e persista estado para recuperação de crash.</div>
+
+    <div class="block-label">📦 O cenário</div>
+    <div class="scenario-framing">No <em>Developer Productivity</em>, explorando um sistema legado por horas, o Claude começa a dar respostas genéricas. Você faz ele gravar achados num scratchpad e delega "ache todos os testes" / "trace o fluxo de reembolso" a subagentes, mantendo o agente principal na coordenação de alto nível.</div>
+
+    <div class="block-label">⚙️ Ferramentas</div>
+    <ul class="bullets">
+      <li><strong>Scratchpad</strong>: arquivo que persiste achados-chave entre fronteiras de contexto</li>
+      <li><strong>Subagentes</strong>: isolam output verboso; resumo volta ao principal</li>
+      <li><strong>Manifesto de estado</strong>: cada agente exporta estado para um local conhecido; o coordenador recarrega no resume (recuperação de crash)</li>
+      <li><strong><code>/compact</code></strong>: comprime o contexto quando enche de descoberta verbosa</li>
+    </ul>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>"Sistema crasha após 8 de 20 arquivos convertidos" → manifesto JSON de progresso (cada agente escreve estado após cada item). Degradação em sessão longa → scratchpad + delegação a subagentes + <code>/compact</code>.</p></div>
+  </div>
+
+  <!-- 5.5 -->
+  <div class="content-block" id="d5-5.5">
+    <div class="task-header"><span class="task-id">5.5</span><span class="task-title">Revisão humana & calibração de confiança</span></div>
+    <div class="where-badges">
+      <span class="wb wb-api">🔌 Claude API</span>
+      <span class="wb wb-sdk">🧩 Agent SDK</span>
+      <span class="wb wb-cli wb-off">🖥️ Claude Code</span>
+      <span class="wb wb-mcp wb-off">🌐 MCP</span>
+    </div>
+    <div class="concept-line"><strong>Em uma frase:</strong> precisão agregada (97%) pode esconder desempenho ruim num tipo de documento ou campo específico. Valide por <strong>tipo de documento E por campo</strong> antes de automatizar; use amostragem estratificada.</div>
+
+    <div class="block-label">📦 O cenário</div>
+    <div class="scenario-framing">No <em>Structured Data Extraction</em>, a extração tem 97% de precisão global — mas em faturas manuscritas o campo <code>invoice_total</code> erra 40%. Remover a revisão humana confiando no número agregado seria um desastre nesse segmento.</div>
+
+    <div class="block-label">⚙️ Como funciona</div>
+    <ul class="bullets">
+      <li><strong>Amostragem estratificada</strong> de extrações de alta confiança (amostra puramente aleatória sub-representa categorias raras de alto erro)</li>
+      <li>Analisar precisão <strong>por tipo de doc e por campo</strong> antes de reduzir revisão</li>
+      <li>Modelo emite <strong>confiança por campo</strong>; calibre os limiares com um set rotulado</li>
+      <li>Roteie baixa confiança / fonte contraditória para revisão humana</li>
+    </ul>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>Ver 97% agregado e automatizar = a armadilha. Sempre segmente por tipo de documento e por campo. Score de confiança aqui é útil <em>se calibrado com dados rotulados</em> (diferente da escalação em 5.2, onde confiança auto-reportada não serve).</p></div>
+  </div>
+
+  <!-- 5.6 -->
+  <div class="content-block" id="d5-5.6">
+    <div class="task-header"><span class="task-id">5.6</span><span class="task-title">Proveniência & incerteza em síntese multi-fonte</span></div>
+    <div class="where-badges">
+      <span class="wb wb-sdk">🧩 Agent SDK</span>
+      <span class="wb wb-api">🔌 Claude API</span>
+      <span class="wb wb-cli wb-off">🖥️ Claude Code</span>
+      <span class="wb wb-mcp wb-off">🌐 MCP</span>
+    </div>
+    <div class="concept-line"><strong>Em uma frase:</strong> a atribuição da fonte se perde quando os achados são comprimidos sem manter o mapeamento claim→fonte. Exija <strong>mapeamentos estruturados</strong> que a síntese preserva; anote conflitos com a fonte em vez de escolher um valor arbitrário.</div>
+
+    <div class="block-label">📦 O cenário</div>
+    <div class="scenario-framing">No <em>Multi-Agent Research</em>, duas fontes credíveis dão estatísticas diferentes. A síntese não deve escolher uma — deve manter ambas com atribuição. E datas: censo de 2018 vs estimativa de 2023 não é contradição, é evolução temporal.</div>
+
+    <div class="block-label">⚙️ Como funciona</div>
+    <ul class="bullets">
+      <li>Subagentes emitem claim + trecho de evidência + URL/nome do doc + <strong>data de publicação</strong></li>
+      <li>Estruture o relatório separando achados bem estabelecidos dos contestados</li>
+      <li>Análise entrega valores conflitantes <strong>anotados</strong>; o coordenador decide como reconciliar</li>
+      <li>Renderize cada tipo de conteúdo no formato certo (financeiro = tabela, notícia = prosa)</li>
+    </ul>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>Estatísticas conflitantes de fontes credíveis → preservar ambas com atribuição (não escolher uma). Exigir datas nos outputs evita que diferença temporal seja lida como contradição.</p></div>
+  </div>
+</div>
+<!-- SCENARIOS -->
+<div class="section" id="scenarios">
+  <div class="page-header">
+    <h1>🎬 Cenários do Exame</h1>
+    <p class="subtitle">6 cenários disponíveis — 4 apresentados aleatoriamente no exame</p>
+  </div>
+  <div class="scenario-grid">
+    <div class="scenario-card">
+      <div class="scenario-num">Cenário 1</div>
+      <div class="scenario-name">Customer Support Resolution Agent</div>
+      <div class="scenario-desc">Agente de suporte ao cliente usando Claude Agent SDK. Lida com devoluções, disputas de cobrança e problemas de conta via ferramentas MCP: <code>get_customer</code>, <code>lookup_order</code>, <code>process_refund</code>, <code>escalate_to_human</code>. Meta: 80%+ de resolução no primeiro contato.</div>
+      <div class="domain-tags">
+        <span class="domain-tag" style="background:rgba(204,120,92,.15);color:#CC785C">D1 Agêntico</span>
+        <span class="domain-tag" style="background:rgba(251,191,36,.15);color:#FBBF24">D2 Tools/MCP</span>
+        <span class="domain-tag" style="background:rgba(52,211,153,.15);color:#34D399">D5 Contexto</span>
+      </div>
+    </div>
+    <div class="scenario-card">
+      <div class="scenario-num">Cenário 2</div>
+      <div class="scenario-name">Code Generation with Claude Code</div>
+      <div class="scenario-desc">Time usa Claude Code para geração de código, refatoração, debugging e docs. Inclui comandos slash personalizados, configuração CLAUDE.md, escolha entre plan mode e execução direta.</div>
+      <div class="domain-tags">
+        <span class="domain-tag" style="background:rgba(56,189,248,.15);color:#38BDF8">D3 Claude Code</span>
+        <span class="domain-tag" style="background:rgba(52,211,153,.15);color:#34D399">D5 Contexto</span>
+      </div>
+    </div>
+    <div class="scenario-card">
+      <div class="scenario-num">Cenário 3</div>
+      <div class="scenario-name">Multi-Agent Research System</div>
+      <div class="scenario-desc">Sistema coordenador + subagentes (busca web, análise de documentos, síntese, relatório). Produz relatórios citados sobre tópicos complexos com coordenação, paralelismo e síntese.</div>
+      <div class="domain-tags">
+        <span class="domain-tag" style="background:rgba(204,120,92,.15);color:#CC785C">D1 Agêntico</span>
+        <span class="domain-tag" style="background:rgba(251,191,36,.15);color:#FBBF24">D2 Tools/MCP</span>
+        <span class="domain-tag" style="background:rgba(52,211,153,.15);color:#34D399">D5 Contexto</span>
+      </div>
+    </div>
+    <div class="scenario-card">
+      <div class="scenario-num">Cenário 4</div>
+      <div class="scenario-name">Developer Productivity with Claude</div>
+      <div class="scenario-desc">Agent SDK para exploração de codebases desconhecidos e sistemas legados. Geração de boilerplate, ferramentas nativas (Read/Write/Bash/Grep/Glob) e servidores MCP.</div>
+      <div class="domain-tags">
+        <span class="domain-tag" style="background:rgba(251,191,36,.15);color:#FBBF24">D2 Tools/MCP</span>
+        <span class="domain-tag" style="background:rgba(56,189,248,.15);color:#38BDF8">D3 Claude Code</span>
+        <span class="domain-tag" style="background:rgba(204,120,92,.15);color:#CC785C">D1 Agêntico</span>
+      </div>
+    </div>
+    <div class="scenario-card">
+      <div class="scenario-num">Cenário 5</div>
+      <div class="scenario-name">Claude Code for CI/CD</div>
+      <div class="scenario-desc">Pipeline CI/CD com revisões de código automatizadas, geração de testes e feedback em pull requests. Minimizar falsos positivos, maximizar confiabilidade de achados.</div>
+      <div class="domain-tags">
+        <span class="domain-tag" style="background:rgba(56,189,248,.15);color:#38BDF8">D3 Claude Code</span>
+        <span class="domain-tag" style="background:rgba(124,106,247,.15);color:#7C6AF7">D4 Prompts</span>
+      </div>
+    </div>
+    <div class="scenario-card">
+      <div class="scenario-num">Cenário 6</div>
+      <div class="scenario-name">Structured Data Extraction</div>
+      <div class="scenario-desc">Extração de dados de documentos não estruturados, validação com JSON schemas, tratamento de casos extremos e integração com sistemas downstream.</div>
+      <div class="domain-tags">
+        <span class="domain-tag" style="background:rgba(124,106,247,.15);color:#7C6AF7">D4 Prompts</span>
+        <span class="domain-tag" style="background:rgba(52,211,153,.15);color:#34D399">D5 Contexto</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div class="section" id="quiz">
+  <div class="page-header">
+    <h1>🎯 Simulado Interativo</h1>
+    <p class="subtitle">Questões oficiais do exam guide + questões dos simulados</p>
+  </div>
+  <div class="quiz-filters">
+    <button class="filter-btn active" onclick="setFilter('all',this)">Todos</button>
+    <button class="filter-btn" onclick="setFilter(1,this)">D1 Agêntico</button>
+    <button class="filter-btn" onclick="setFilter(2,this)">D2 Tools/MCP</button>
+    <button class="filter-btn" onclick="setFilter(3,this)">D3 Claude Code</button>
+    <button class="filter-btn" onclick="setFilter(4,this)">D4 Prompts</button>
+    <button class="filter-btn" onclick="setFilter(5,this)">D5 Contexto</button>
+  </div>
+  <div id="quiz-start-screen">
+    <div class="content-block" style="text-align:center;padding:40px">
+      <div style="font-size:48px;margin-bottom:16px">🎯</div>
+      <h2 style="margin-top:0">Pronto para praticar?</h2>
+      <p id="quiz-count-text" style="margin-bottom:24px">18 questões disponíveis (todos os domínios)</p>
+      <button class="btn btn-primary" onclick="startQuiz()">Iniciar Simulado</button>
+    </div>
+  </div>
+  <div id="quiz-active" style="display:none">
+    <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill" style="width:0%"></div></div>
+    <div id="question-area"></div>
+    <div class="quiz-actions">
+      <button class="btn btn-primary" id="confirm-btn" onclick="confirmAnswer()" disabled>Confirmar Resposta</button>
+      <button class="btn btn-outline" id="next-btn" onclick="nextQuestion()" style="display:none">Próxima →</button>
+    </div>
+  </div>
+  <div id="quiz-score" style="display:none">
+    <div class="score-screen">
+      <div class="score-big" id="score-pct"></div>
+      <div class="score-label" id="score-label"></div>
+      <div class="score-grid" id="score-grid"></div>
+      <button class="btn btn-primary" onclick="restartQuiz()">Refazer Simulado</button>
+    </div>
+  </div>
+</div>
+
+<!-- REFERENCE -->
+<div class="section" id="reference">
+  <div class="page-header">
+    <h1>📋 Referência Rápida</h1>
+    <p class="subtitle">Cheat sheet dos conceitos essenciais para o exame</p>
+  </div>
+
+  <h2>Pesos dos Domínios</h2>
+  <div class="content-block">
+    <table class="ref-table">
+      <tr><th>Domínio</th><th>Peso</th><th>~Questões</th></tr>
+      <tr><td style="color:var(--text)">🤖 Agentic Architecture & Orchestration</td><td style="color:#CC785C;font-weight:700">27%</td><td>~16</td></tr>
+      <tr><td style="color:var(--text)">⚙️ Claude Code Configuration & Workflows</td><td style="color:#38BDF8;font-weight:700">20%</td><td>~12</td></tr>
+      <tr><td style="color:var(--text)">💬 Prompt Engineering & Structured Output</td><td style="color:#7C6AF7;font-weight:700">20%</td><td>~12</td></tr>
+      <tr><td style="color:var(--text)">🔧 Tool Design & MCP Integration</td><td style="color:#FBBF24;font-weight:700">18%</td><td>~11</td></tr>
+      <tr><td style="color:var(--text)">🧠 Context Management & Reliability</td><td style="color:#34D399;font-weight:700">15%</td><td>~9</td></tr>
+    </table>
+  </div>
+
+  <h2>Termos-Chave Rápidos</h2>
+  <div class="content-block">
+    <table class="ref-table">
+      <tr><th>Conceito</th><th>Valor</th></tr>
+      <tr><td>stop_reason → continuar loop</td><td><code>"tool_use"</code></td></tr>
+      <tr><td>stop_reason → apresentar resposta</td><td><code>"end_turn"</code></td></tr>
+      <tr><td>Spawnar subagentes — deve ter em allowedTools</td><td><code>"Task"</code></td></tr>
+      <tr><td>Skill isolada em contexto próprio</td><td><code>context: fork</code></td></tr>
+      <tr><td>MCP do time (compartilhado)</td><td><code>.mcp.json</code> (raiz do projeto)</td></tr>
+      <tr><td>MCP pessoal/experimental</td><td><code>~/.claude.json</code></td></tr>
+      <tr><td>Claude Code em modo não-interativo CI</td><td><code>-p</code> / <code>--print</code></td></tr>
+      <tr><td>tool_choice — pode chamar ou retornar texto</td><td><code>"auto"</code></td></tr>
+      <tr><td>tool_choice — DEVE chamar alguma ferramenta</td><td><code>"any"</code></td></tr>
+      <tr><td>tool_choice — DEVE chamar ferramenta específica</td><td><code>{"type":"tool","name":"X"}</code></td></tr>
+      <tr><td>Interceptar resultados de ferramentas</td><td><code>PostToolUse</code> hook</td></tr>
+      <tr><td>Batch API — economia de custo</td><td>50%</td></tr>
+      <tr><td>Batch API — janela de processamento</td><td>até 24 horas</td></tr>
+      <tr><td>Batch API — SLA de latência</td><td>Não garantido</td></tr>
+    </table>
+  </div>
+
+  <h2>Distinções Críticas (pegadinhas comuns)</h2>
+  <div class="content-block">
+    <table class="ref-table">
+      <tr><th>Situação</th><th class="tag-wrong">Resposta Errada</th><th class="tag-correct">Resposta Correta</th></tr>
+      <tr><td>Enforçar sequência de ferramentas crítica</td><td class="tag-wrong">System prompt</td><td class="tag-correct">Hook programático</td></tr>
+      <tr><td>Melhorar seleção de ferramentas similares</td><td class="tag-wrong">Few-shot examples</td><td class="tag-correct">Expandir tool descriptions</td></tr>
+      <tr><td>Calibrar escalation do agente</td><td class="tag-wrong">Score de confiança</td><td class="tag-correct">Few-shot com critérios explícitos</td></tr>
+      <tr><td>Processar verificação pré-merge</td><td class="tag-wrong">Message Batches API</td><td class="tag-correct">Synchronous API</td></tr>
+      <tr><td>Revisar 14 arquivos em um PR</td><td class="tag-wrong">Uma passagem com contexto grande</td><td class="tag-correct">Múltiplas passagens (per-file + integration)</td></tr>
+      <tr><td>Config MCP do time</td><td class="tag-wrong">~/.claude.json</td><td class="tag-correct">.mcp.json (raiz do projeto)</td></tr>
+      <tr><td>Contexto de sessão degradou</td><td class="tag-wrong">--resume para continuar</td><td class="tag-correct">Sessão nova com resumo estruturado</td></tr>
+      <tr><td>Subagentes em paralelo</td><td class="tag-wrong">Múltiplos turnos do coordenador</td><td class="tag-correct">Múltiplas chamadas Task em UMA resposta</td></tr>
+      <tr><td>Instruções do time no Claude</td><td class="tag-wrong">~/.claude/CLAUDE.md</td><td class="tag-correct">.claude/CLAUDE.md (versionado)</td></tr>
+      <tr><td>Automatizar lint após edição de arquivo</td><td class="tag-wrong">Instrução no CLAUDE.md</td><td class="tag-correct">Hook PostToolUse em settings.json</td></tr>
+      <tr><td>Campo que pode não existir no documento</td><td class="tag-wrong">Campo required no schema</td><td class="tag-correct">Campo nullable: ["string", "null"]</td></tr>
+      <tr><td>Buscar todos os arquivos que importam um módulo</td><td class="tag-wrong">Glob (busca por nome)</td><td class="tag-correct">Grep (busca por conteúdo)</td></tr>
+      <tr><td>Múltiplas etapas com dependência sequencial</td><td class="tag-wrong">Subagentes em paralelo</td><td class="tag-correct">Um agente com ferramentas em sequência</td></tr>
+      <tr><td>Reprocessar itens com falha num batch</td><td class="tag-wrong">Reenviar o lote inteiro</td><td class="tag-correct">Reenviar apenas os custom_ids que falharam</td></tr>
+    </table>
+  </div>
+
+  <h2>CLI do Claude Code — Flags e Comandos Relevantes</h2>
+  <div class="content-block">
+    <table class="ref-table">
+      <tr><th>Comando / Flag</th><th>Para que serve</th><th>Quando usar</th></tr>
+      <tr><td>claude -p "query"</td><td>Modo não-interativo (one-shot, sem sessão)</td><td>Pipelines de CI/CD — evita travamento aguardando input</td></tr>
+      <tr><td>--output-format json</td><td>Retorna saída em JSON estruturado</td><td>Integração com scripts e sistemas downstream</td></tr>
+      <tr><td>--json-schema schema.json</td><td>Enforça schema JSON na saída</td><td>Extração estruturada em CI</td></tr>
+      <tr><td>--max-turns 5</td><td>Limita número de turnos do agente</td><td>Controle de custo em automações</td></tr>
+      <tr><td>claude -c</td><td>Retoma a última conversa</td><td>Continuar trabalho do dia anterior</td></tr>
+      <tr><td>claude --resume &lt;nome&gt;</td><td>Retoma sessão nomeada específica</td><td>Investigações longas com ponto de retorno definido</td></tr>
+      <tr><td>/plan</td><td>Entra em plan mode (só lê, não edita)</td><td>Antes de tarefas complexas multi-arquivo</td></tr>
+      <tr><td>/compact</td><td>Comprime histórico para economizar tokens</td><td>Sessões longas com degradação de contexto</td></tr>
+      <tr><td>/memory</td><td>Mostra quais arquivos de memória estão carregados</td><td>Diagnosticar por que instruções não estão sendo aplicadas</td></tr>
+      <tr><td>claude --think</td><td>Ativa extended thinking</td><td>Problemas que exigem raciocínio mais profundo</td></tr>
+      <tr><td>claude --permission-mode auto</td><td>Aceita edições sem pedir confirmação</td><td>Automações onde aprovação manual não é viável</td></tr>
+    </table>
+  </div>
+
+  <h2>Fora do Escopo do Exame</h2>
+  <div class="content-block">
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px">
+      <div style="font-size:13px;color:var(--text3);padding:6px 0;border-bottom:1px solid var(--border)">❌ Fine-tuning / treinamento de modelos</div>
+      <div style="font-size:13px;color:var(--text3);padding:6px 0;border-bottom:1px solid var(--border)">❌ Deploy/hospedagem de servidores MCP</div>
+      <div style="font-size:13px;color:var(--text3);padding:6px 0;border-bottom:1px solid var(--border)">❌ Constitutional AI, RLHF</div>
+      <div style="font-size:13px;color:var(--text3);padding:6px 0;border-bottom:1px solid var(--border)">❌ Modelos de embedding / vector DBs</div>
+      <div style="font-size:13px;color:var(--text3);padding:6px 0;border-bottom:1px solid var(--border)">❌ Computer use (browser/desktop automation)</div>
+      <div style="font-size:13px;color:var(--text3);padding:6px 0;border-bottom:1px solid var(--border)">❌ Streaming API / SSE</div>
+      <div style="font-size:13px;color:var(--text3);padding:6px 0;border-bottom:1px solid var(--border)">❌ OAuth, rotação de API keys</div>
+      <div style="font-size:13px;color:var(--text3);padding:6px 0;border-bottom:1px solid var(--border)">❌ Cloud providers (AWS, GCP, Azure)</div>
+      <div style="font-size:13px;color:var(--text3);padding:6px 0;border-bottom:1px solid var(--border)">❌ Arquitetura interna do Claude</div>
+      <div style="font-size:13px;color:var(--text3);padding:6px 0;border-bottom:1px solid var(--border)">❌ Autenticação / billing da conta Anthropic</div>
+    </div>
+  </div>
+</div>
+
+<!-- EXAM TOPICS (OFICIAL) -->
+<div class="section" id="examtopics">
+  <div class="page-header">
+    <h1>📜 Exam Topics — Conteúdo Oficial</h1>
+    <p class="subtitle">O blueprint oficial do exame CCA-F, reescrito em português (termos técnicos mantidos em inglês). 60 questões · 120 min · aprovação 720/1000 · 4 dos 6 cenários sorteados por prova.</p>
+  </div>
+
+  <div class="tip-box" style="margin-bottom:20px">
+    <div class="tip-box-header">🎯 Perfil do candidato</div>
+    <p style="font-size:13px;margin:0">Um solution architect que constrói aplicações em produção com Claude, com 6+ meses de prática em Claude API, Agent SDK, Claude Code e MCP. O exame cobra <strong>julgamento prático sobre trade-offs</strong>, não decoreba. Cada distrator é uma escolha que alguém com conhecimento incompleto faria. Sem penalidade por chute.</p>
+  </div>
+
+  <h2>Os 5 domínios e seus pesos</h2>
+  <div class="content-block">
+    <table class="ref-table">
+      <tr><th>Domínio</th><th>Peso</th><th>Task statements</th></tr>
+      <tr><td style="color:var(--text)">1 · Agentic Architecture &amp; Orchestration</td><td style="color:#CC785C;font-weight:700">27%</td><td>1.1 – 1.7</td></tr>
+      <tr><td style="color:var(--text)">3 · Claude Code Configuration &amp; Workflows</td><td style="color:#38BDF8;font-weight:700">20%</td><td>3.1 – 3.6</td></tr>
+      <tr><td style="color:var(--text)">4 · Prompt Engineering &amp; Structured Output</td><td style="color:#7C6AF7;font-weight:700">20%</td><td>4.1 – 4.6</td></tr>
+      <tr><td style="color:var(--text)">2 · Tool Design &amp; MCP Integration</td><td style="color:#FBBF24;font-weight:700">18%</td><td>2.1 – 2.5</td></tr>
+      <tr><td style="color:var(--text)">5 · Context Management &amp; Reliability</td><td style="color:#34D399;font-weight:700">15%</td><td>5.1 – 5.6</td></tr>
+    </table>
+  </div>
+
+  <h2>Domínio 1 — Agentic Architecture &amp; Orchestration <span style="color:#CC785C">(27%)</span></h2>
+  <div class="content-block">
+    <div class="task-header"><span class="task-id">1.1</span><span class="task-title">Projetar e implementar agentic loops para execução autônoma de tarefas</span></div>
+    <ul class="bullets">
+      <li>O ciclo de vida do loop: enviar request → inspecionar <code>stop_reason</code> (<code>"tool_use"</code> vs <code>"end_turn"</code>) → executar a ferramenta pedida → devolver o resultado para a próxima iteração.</li>
+      <li>Resultados de ferramentas são anexados ao histórico da conversa para o modelo raciocinar sobre a próxima ação; a decisão é <strong>model-driven</strong>, não uma árvore de decisão pré-configurada.</li>
+      <li>Anti-padrões: parsear linguagem natural para decidir a parada, usar cap de iterações como mecanismo primário, ou checar o texto do assistant como indicador de conclusão.</li>
+    </ul>
+    <div class="task-header" style="margin-top:16px"><span class="task-id">1.2</span><span class="task-title">Orquestrar sistemas multi-agente com o padrão coordinator-subagent</span></div>
+    <ul class="bullets">
+      <li>Arquitetura hub-and-spoke: o coordinator gerencia toda a comunicação entre subagents, o tratamento de erros e o roteamento de informação.</li>
+      <li>Subagents têm contexto isolado — não herdam o histórico do coordinator automaticamente.</li>
+      <li>Papel do coordinator: decomposição de tarefas, delegação, agregação de resultados e escolha de quais subagents invocar. Risco: decomposição estreita demais → cobertura incompleta.</li>
+    </ul>
+    <div class="task-header" style="margin-top:16px"><span class="task-id">1.3</span><span class="task-title">Configurar invocação de subagents, passagem de contexto e spawning</span></div>
+    <ul class="bullets">
+      <li>A <code>Task</code> tool é o mecanismo para spawnar subagents; <code>allowedTools</code> precisa incluir <code>"Task"</code> para o coordinator conseguir delegar.</li>
+      <li>Contexto do subagent tem que vir explícito no prompt — nada é herdado nem compartilhado entre invocações. Use formatos estruturados para separar conteúdo de metadados (URLs de fonte, nomes de documento, páginas).</li>
+      <li>Paralelismo: emita várias <code>Task</code> calls numa <strong>única resposta</strong> do coordinator (não em turnos separados). <code>AgentDefinition</code> define descrição, system prompt e restrição de tools por subagent.</li>
+    </ul>
+    <div class="task-header" style="margin-top:16px"><span class="task-id">1.4</span><span class="task-title">Implementar workflows multi-etapa com enforcement e handoff</span></div>
+    <ul class="bullets">
+      <li>Diferença entre enforcement programático (hooks, prerequisite gates) e orientação por prompt para ordenar o workflow.</li>
+      <li>Quando é preciso compliance determinístico (ex: verificar identidade antes de operação financeira), instruções de prompt têm taxa de falha diferente de zero — use um gate que bloqueia <code>process_refund</code> até <code>get_customer</code> retornar um ID verificado.</li>
+      <li>Protocolos de handoff estruturado para escalação no meio do processo: incluir dados do cliente, root cause e ação recomendada.</li>
+    </ul>
+    <div class="task-header" style="margin-top:16px"><span class="task-id">1.5</span><span class="task-title">Aplicar Agent SDK hooks para interceptar tool calls e normalizar dados</span></div>
+    <ul class="bullets">
+      <li><code>PostToolUse</code> hooks interceptam resultados de ferramentas para transformá-los antes do modelo processar (ex: normalizar Unix timestamp, ISO 8601 e códigos numéricos vindos de MCP tools diferentes).</li>
+      <li>Hooks que interceptam tool calls de saída para impor regras de negócio (ex: bloquear refund acima de $500 e redirecionar para escalação).</li>
+      <li>Escolha hooks quando a regra exige garantia determinística; prompt serve para compliance apenas probabilístico.</li>
+    </ul>
+    <div class="task-header" style="margin-top:16px"><span class="task-id">1.6</span><span class="task-title">Projetar estratégias de decomposição de tarefas para workflows complexos</span></div>
+    <ul class="bullets">
+      <li>Quando usar pipeline sequencial fixo (prompt chaining) vs decomposição dinâmica e adaptativa baseada nos achados intermediários.</li>
+      <li>Prompt chaining para revisões previsíveis (analisar cada arquivo, depois um passe de integração cross-file).</li>
+      <li>Planos de investigação adaptativos que geram subtarefas conforme as dependências vão sendo descobertas (ex: "adicionar testes a um codebase legado").</li>
+    </ul>
+    <div class="task-header" style="margin-top:16px"><span class="task-id">1.7</span><span class="task-title">Gerenciar estado de sessão, retomada e forking</span></div>
+    <ul class="bullets">
+      <li><code>--resume &lt;session-name&gt;</code> retoma uma conversa específica; <code>fork_session</code> cria branches independentes a partir de uma baseline compartilhada para explorar abordagens divergentes.</li>
+      <li>Ao retomar após mudanças em arquivos, avise o agente sobre o que mudou para re-análise direcionada.</li>
+      <li>Começar uma sessão nova com um resumo estruturado é mais confiável do que dar <code>--resume</code> arrastando tool results desatualizados.</li>
+    </ul>
+  </div>
+
+  <h2>Domínio 2 — Tool Design &amp; MCP Integration <span style="color:#FBBF24">(18%)</span></h2>
+  <div class="content-block">
+    <div class="task-header"><span class="task-id">2.1</span><span class="task-title">Projetar interfaces de tools com descrições e limites claros</span></div>
+    <ul class="bullets">
+      <li>A description da tool é o mecanismo primário que o LLM usa para escolher qual chamar; descrição mínima = seleção não confiável entre tools parecidas.</li>
+      <li>Inclua na description: formatos de input, exemplos de query, edge cases e limites (quando usar esta vs a alternativa). Descrições sobrepostas causam misrouting.</li>
+      <li>Renomeie tools para eliminar sobreposição e divida uma tool genérica em específicas (ex: <code>analyze_document</code> → <code>extract_data_points</code>, <code>summarize_content</code>, <code>verify_claim_against_source</code>).</li>
+    </ul>
+    <div class="task-header" style="margin-top:16px"><span class="task-id">2.2</span><span class="task-title">Implementar respostas de erro estruturadas para MCP tools</span></div>
+    <ul class="bullets">
+      <li>O flag <code>isError</code> comunica falhas ao agente. Distinga erros transient (timeout, indisponibilidade), de validation (input inválido), de business (violação de política) e de permission.</li>
+      <li>Retorne metadados: <code>errorCategory</code>, <code>isRetryable</code> boolean e descrição legível. Erro genérico ("Operation failed") impede o agente de decidir a recuperação.</li>
+      <li>Subagents fazem recuperação local para falhas transitórias e só propagam ao coordinator o que não conseguem resolver. Distinga access failure (precisa decidir retry) de resultado vazio válido (query com zero matches).</li>
+    </ul>
+    <div class="task-header" style="margin-top:16px"><span class="task-id">2.3</span><span class="task-title">Distribuir tools entre agents e configurar tool choice</span></div>
+    <ul class="bullets">
+      <li>Dar tools demais a um agent (ex: 18 em vez de 4-5) degrada a confiabilidade da seleção. Dê a cada agent só as tools do seu papel (scoped access).</li>
+      <li>Substitua tools genéricas por versões restritas (ex: <code>fetch_url</code> → <code>load_document</code> que valida URLs).</li>
+      <li><code>tool_choice</code>: <code>"auto"</code> (pode responder texto), <code>"any"</code> (obrigado a chamar alguma tool), e forçado (<code>{"type":"tool","name":"..."}</code>) para garantir uma tool específica primeiro.</li>
+    </ul>
+    <div class="task-header" style="margin-top:16px"><span class="task-id">2.4</span><span class="task-title">Integrar MCP servers no Claude Code e nos workflows de agentes</span></div>
+    <ul class="bullets">
+      <li>Escopo: <code>.mcp.json</code> (projeto, compartilhado com o time via version control) vs <code>~/.claude.json</code> (pessoal/experimental).</li>
+      <li>Expansão de variável de ambiente em <code>.mcp.json</code> (ex: <code>${GITHUB_TOKEN}</code>) para não commitar segredos. Tools de todos os servers configurados ficam disponíveis simultaneamente.</li>
+      <li>MCP resources expõem catálogos de conteúdo (issues, hierarquia de docs, schema de banco) para reduzir tool calls exploratórias. Prefira MCP servers da comunidade a implementações custom para integrações padrão (ex: Jira).</li>
+    </ul>
+    <div class="task-header" style="margin-top:16px"><span class="task-id">2.5</span><span class="task-title">Selecionar e usar built-in tools (Read, Write, Edit, Bash, Grep, Glob)</span></div>
+    <ul class="bullets">
+      <li><code>Grep</code> = busca por <strong>conteúdo</strong> (nomes de função, mensagens de erro, imports). <code>Glob</code> = busca por <strong>nome/caminho</strong> (ex: <code>**/*.test.tsx</code>).</li>
+      <li><code>Read</code>/<code>Write</code> para arquivo inteiro; <code>Edit</code> para mudança pontual com texto único. Se <code>Edit</code> falha por texto não-único, use <code>Read</code> + <code>Write</code>.</li>
+      <li>Entenda o codebase incrementalmente: <code>Grep</code> para achar entry points, <code>Read</code> para seguir imports e rastrear fluxos — em vez de ler tudo de uma vez.</li>
+    </ul>
+  </div>
+
+  <h2>Domínio 3 — Claude Code Configuration &amp; Workflows <span style="color:#38BDF8">(20%)</span></h2>
+  <div class="content-block">
+    <div class="task-header"><span class="task-id">3.1</span><span class="task-title">Configurar CLAUDE.md com hierarquia, escopo e organização modular</span></div>
+    <ul class="bullets">
+      <li>Hierarquia: user-level (<code>~/.claude/CLAUDE.md</code>), project-level (<code>.claude/CLAUDE.md</code> ou <code>CLAUDE.md</code> na raiz) e directory-level (subpastas). O user-level NÃO é compartilhado com o time via version control.</li>
+      <li><code>@import</code> referencia arquivos externos para manter o CLAUDE.md modular. <code>.claude/rules/</code> organiza regras por tópico em vez de um CLAUDE.md monolítico.</li>
+      <li>Use <code>/memory</code> para ver quais arquivos de memória estão carregados e diagnosticar comportamento inconsistente.</li>
+    </ul>
+    <div class="task-header" style="margin-top:16px"><span class="task-id">3.2</span><span class="task-title">Criar e configurar slash commands e skills customizados</span></div>
+    <ul class="bullets">
+      <li>Commands em <code>.claude/commands/</code> (projeto, versionado) vs <code>~/.claude/commands/</code> (pessoal). Skills em <code>.claude/skills/</code> com <code>SKILL.md</code>.</li>
+      <li>Frontmatter da skill: <code>context: fork</code> (roda em sub-agente isolado, sem poluir a conversa principal), <code>allowed-tools</code> (restringe tools na execução) e <code>argument-hint</code>.</li>
+      <li>Escolha entre skill (invocação sob demanda para workflow específico) e CLAUDE.md (padrões universais sempre carregados).</li>
+    </ul>
+    <div class="task-header" style="margin-top:16px"><span class="task-id">3.3</span><span class="task-title">Aplicar path-specific rules para carregamento condicional de convenções</span></div>
+    <ul class="bullets">
+      <li>Arquivos em <code>.claude/rules/</code> com frontmatter YAML <code>paths</code> (glob) carregam só quando você edita arquivos que casam com o padrão — reduz contexto irrelevante e tokens.</li>
+      <li>Vantagem do glob sobre CLAUDE.md por subdiretório: aplica convenções a arquivos por tipo, espalhados pelo codebase (ex: <code>**/*.test.tsx</code> para todos os testes).</li>
+    </ul>
+    <div class="task-header" style="margin-top:16px"><span class="task-id">3.4</span><span class="task-title">Decidir entre plan mode e execução direta</span></div>
+    <ul class="bullets">
+      <li>Plan mode: tarefas complexas com mudanças em larga escala, múltiplas abordagens válidas, decisões arquiteturais e edição multi-arquivo (ex: migração de 45+ arquivos, monolito → microsserviços).</li>
+      <li>Execução direta: mudanças simples e bem-escopadas (ex: um bug fix de um arquivo, adicionar uma validação).</li>
+      <li>O subagent <code>Explore</code> isola output verboso de descoberta e devolve resumos, preservando o contexto da conversa principal.</li>
+    </ul>
+    <div class="task-header" style="margin-top:16px"><span class="task-id">3.5</span><span class="task-title">Aplicar técnicas de refinamento iterativo</span></div>
+    <ul class="bullets">
+      <li>Exemplos concretos de input/output são a forma mais eficaz de comunicar transformações quando a prosa é interpretada de forma inconsistente.</li>
+      <li>Iteração test-driven: escrever a suíte de testes primeiro e iterar compartilhando as falhas. Interview pattern: fazer o Claude perguntar antes de implementar.</li>
+      <li>Vários problemas que interagem entre si → tudo numa mensagem só; problemas independentes → correção sequencial.</li>
+    </ul>
+    <div class="task-header" style="margin-top:16px"><span class="task-id">3.6</span><span class="task-title">Integrar Claude Code em pipelines de CI/CD</span></div>
+    <ul class="bullets">
+      <li><code>-p</code> (<code>--print</code>) roda em modo não-interativo (evita travar aguardando input). <code>--output-format json</code> + <code>--json-schema</code> para saída estruturada e parseável.</li>
+      <li>CLAUDE.md fornece o contexto do projeto (padrões de teste, fixtures, critérios de review) ao Claude Code invocado no CI.</li>
+      <li>Isolamento de sessão: a mesma sessão que gerou o código é pior para revisá-lo — use uma instância de review independente. Ao re-rodar review, passe os achados anteriores e peça só issues novos.</li>
+    </ul>
+  </div>
+
+  <h2>Domínio 4 — Prompt Engineering &amp; Structured Output <span style="color:#7C6AF7">(20%)</span></h2>
+  <div class="content-block">
+    <div class="task-header"><span class="task-id">4.1</span><span class="task-title">Projetar prompts com critérios explícitos para reduzir falsos positivos</span></div>
+    <ul class="bullets">
+      <li>Critérios explícitos batem instruções vagas (ex: "flag um comentário só quando o comportamento descrito contradiz o código real" &gt; "verifique se os comentários estão corretos").</li>
+      <li>"Seja conservador" ou "só reporte alta confiança" não melhoram precisão — critérios categóricos específicos, sim.</li>
+      <li>Categorias com muito falso positivo minam a confiança do dev nas categorias corretas; defina severidade com exemplos de código concretos.</li>
+    </ul>
+    <div class="task-header" style="margin-top:16px"><span class="task-id">4.2</span><span class="task-title">Aplicar few-shot prompting para consistência e qualidade</span></div>
+    <ul class="bullets">
+      <li>Few-shot é a técnica mais eficaz quando instruções detalhadas ainda produzem output inconsistente; use 2-4 exemplos alvo mostrando o raciocínio da escolha.</li>
+      <li>Demonstre o handling de casos ambíguos e o formato de saída desejado (location, issue, severity, suggested fix).</li>
+      <li>Reduz alucinação em extração (medidas informais, estruturas de documento variadas) e permite generalizar para padrões novos, não só casar os pré-especificados.</li>
+    </ul>
+    <div class="task-header" style="margin-top:16px"><span class="task-id">4.3</span><span class="task-title">Forçar output estruturado com tool use e JSON schemas</span></div>
+    <ul class="bullets">
+      <li><code>tool_use</code> com JSON schema é a forma mais confiável de garantir output válido — elimina erro de sintaxe JSON, mas NÃO evita erro semântico (ex: line items que não somam ao total).</li>
+      <li><code>tool_choice</code>: <code>"auto"</code> / <code>"any"</code> / forçado. Campos que podem não existir no documento devem ser <strong>nullable</strong> — senão o modelo fabrica valor.</li>
+      <li>Use enum com <code>"unclear"</code> e <code>"other"</code> + campo de detalhe para categorias extensíveis; inclua regras de normalização de formato no prompt.</li>
+    </ul>
+    <div class="task-header" style="margin-top:16px"><span class="task-id">4.4</span><span class="task-title">Implementar validação, retry e feedback loops</span></div>
+    <ul class="bullets">
+      <li>Retry-with-error-feedback: no retry, anexe o documento, a extração falha e o erro de validação específico para guiar a correção.</li>
+      <li>Retry é inútil quando a informação simplesmente não existe na fonte (≠ erro de formato/estrutura, esses o retry resolve).</li>
+      <li>Fluxos de auto-correção: extrair <code>calculated_total</code> junto de <code>stated_total</code> para flagar divergência; campo <code>detected_pattern</code> para analisar falsos positivos.</li>
+    </ul>
+    <div class="task-header" style="margin-top:16px"><span class="task-id">4.5</span><span class="task-title">Projetar estratégias eficientes de batch processing</span></div>
+    <ul class="bullets">
+      <li>Message Batches API: 50% de economia, janela de até 24h, <strong>sem SLA de latência garantido</strong>. Boa para workloads tolerantes a latência (relatórios noturnos), ruim para bloqueantes (pre-merge check).</li>
+      <li>Não suporta multi-turn tool calling num único request. Use <code>custom_id</code> para correlacionar request/response.</li>
+      <li>Ao falhar, reenvie só os documentos que falharam (por <code>custom_id</code>) com ajustes (ex: chunking dos que estouraram o contexto).</li>
+    </ul>
+    <div class="task-header" style="margin-top:16px"><span class="task-id">4.6</span><span class="task-title">Projetar arquiteturas de review multi-instância e multi-pass</span></div>
+    <ul class="bullets">
+      <li>Auto-review é limitado: a mesma instância retém o raciocínio da geração e questiona menos as próprias decisões. Uma instância independente pega mais issues sutis.</li>
+      <li>Multi-pass: divida reviews grandes em passes por arquivo (issues locais) + um passe de integração cross-file, evitando diluição de atenção e feedback contraditório.</li>
+    </ul>
+  </div>
+
+  <h2>Domínio 5 — Context Management &amp; Reliability <span style="color:#34D399">(15%)</span></h2>
+  <div class="content-block">
+    <div class="task-header"><span class="task-id">5.1</span><span class="task-title">Gerenciar contexto para preservar informação crítica em interações longas</span></div>
+    <ul class="bullets">
+      <li>Risco da sumarização progressiva: condensar valores, percentuais, datas e expectativas do cliente em resumos vagos. Extraia isso para um bloco "case facts" persistente, fora do histórico sumarizado.</li>
+      <li>Efeito "lost in the middle": o modelo processa bem o início e o fim de inputs longos, mas pode omitir achados do meio — coloque o crítico no começo, com headers explícitos.</li>
+      <li>Tool results acumulam e consomem tokens desproporcionalmente (40+ campos quando só 5 importam) — apare para os campos relevantes antes de acumular.</li>
+    </ul>
+    <div class="task-header" style="margin-top:16px"><span class="task-id">5.2</span><span class="task-title">Projetar padrões de escalação e resolução de ambiguidade</span></div>
+    <ul class="bullets">
+      <li>Gatilhos legítimos de escalação: o cliente pede um humano, a política é omissa/ambígua (não só "caso complexo"), ou o agente não consegue progredir.</li>
+      <li>Sentimento e self-reported confidence score são proxies ruins de complexidade real — o agente já erra "confiante" nos casos difíceis. Use critérios explícitos + few-shot.</li>
+      <li>Múltiplos matches de cliente → peça identificador adicional em vez de escolher por heurística.</li>
+    </ul>
+    <div class="task-header" style="margin-top:16px"><span class="task-id">5.3</span><span class="task-title">Implementar propagação de erros em sistemas multi-agente</span></div>
+    <ul class="bullets">
+      <li>Contexto de erro estruturado (tipo de falha, query tentada, resultados parciais, alternativas) permite ao coordinator decidir a recuperação de forma inteligente.</li>
+      <li>Status genérico ("search unavailable") esconde contexto valioso. Distinga access failure de resultado vazio válido.</li>
+      <li>Anti-padrões: suprimir o erro silenciosamente (retornar vazio como sucesso) e derrubar o workflow inteiro numa única falha.</li>
+    </ul>
+    <div class="task-header" style="margin-top:16px"><span class="task-id">5.4</span><span class="task-title">Gerenciar contexto na exploração de codebases grandes</span></div>
+    <ul class="bullets">
+      <li>Degradação em sessões longas: o modelo passa a dar respostas inconsistentes e a citar "padrões típicos" em vez das classes específicas descobertas antes.</li>
+      <li>Use scratchpad files para persistir achados-chave; delegue a subagents a exploração verbosa enquanto o agente principal coordena.</li>
+      <li>State persistence estruturado (manifest) para crash recovery; <code>/compact</code> para reduzir contexto em sessões longas.</li>
+    </ul>
+    <div class="task-header" style="margin-top:16px"><span class="task-id">5.5</span><span class="task-title">Projetar workflows de revisão humana e calibração de confiança</span></div>
+    <ul class="bullets">
+      <li>Precisão agregada (ex: 97%) pode esconder desempenho ruim em tipos de documento ou campos específicos — valide por tipo E por campo antes de automatizar.</li>
+      <li>Amostragem aleatória estratificada para medir erro em extrações de alta confiança e detectar padrões novos.</li>
+      <li>Confidence score por campo calibrado com validation set rotulado; roteie baixa confiança / fontes ambíguas para revisão humana.</li>
+    </ul>
+    <div class="task-header" style="margin-top:16px"><span class="task-id">5.6</span><span class="task-title">Preservar provenance e lidar com incerteza na síntese multi-fonte</span></div>
+    <ul class="bullets">
+      <li>A atribuição de fonte se perde na sumarização quando os achados são comprimidos sem preservar o mapeamento claim→source. Exija claim-source mappings estruturados que a síntese preserva.</li>
+      <li>Estatísticas conflitantes de fontes confiáveis: anote o conflito com atribuição em vez de escolher um valor arbitrariamente.</li>
+      <li>Exija datas de publicação/coleta nos outputs — diferença temporal (censo 2018 vs estimativa 2023) não é contradição. Renderize cada tipo de conteúdo no formato certo (tabela, prosa, lista).</li>
+    </ul>
+  </div>
+
+  <h2>Os 6 cenários oficiais</h2>
+  <div class="content-block">
+    <table class="ref-table">
+      <tr><th>Cenário</th><th>Sobre</th><th>Domínios primários</th></tr>
+      <tr><td style="color:var(--text)">1 · Customer Support Resolution Agent</td><td>Agent SDK + MCP tools (<code>get_customer</code>, <code>lookup_order</code>, <code>process_refund</code>, <code>escalate_to_human</code>); meta de 80%+ de resolução no 1º contato.</td><td>D1, D2, D5</td></tr>
+      <tr><td style="color:var(--text)">2 · Code Generation with Claude Code</td><td>Geração/refatoração/debug com slash commands, CLAUDE.md e plan mode vs execução direta.</td><td>D3, D5</td></tr>
+      <tr><td style="color:var(--text)">3 · Multi-Agent Research System</td><td>Coordinator delega a subagents (web search, análise de documento, síntese, relatório) com citações.</td><td>D1, D2, D5</td></tr>
+      <tr><td style="color:var(--text)">4 · Developer Productivity with Claude</td><td>Explorar codebases desconhecidos/legados com built-in tools (Read, Write, Bash, Grep, Glob) e MCP servers.</td><td>D2, D3, D1</td></tr>
+      <tr><td style="color:var(--text)">5 · Claude Code for CI/CD</td><td>Code review automatizado, geração de testes e feedback em PRs; minimizar falsos positivos.</td><td>D3, D4</td></tr>
+      <tr><td style="color:var(--text)">6 · Structured Data Extraction</td><td>Extrair de documentos não-estruturados, validar com JSON schema, tratar edge cases.</td><td>D4, D5</td></tr>
+    </table>
+    <div class="tip-box" style="margin-top:14px"><div class="tip-box-header">🎲 Na prova</div><p style="font-size:13px;margin:0">Apenas <strong>4 dos 6</strong> cenários aparecem, sorteados. Conheça todos — cada um "enquadra" um conjunto de questões dentro de um contexto de produção realista.</p></div>
+  </div>
+
+  <h2>Fora de escopo (NÃO cai na prova)</h2>
+  <div class="content-block">
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px">
+      <div style="font-size:13px;color:var(--text3);padding:6px 0;border-bottom:1px solid var(--border)">❌ Fine-tuning / treinar modelos custom</div>
+      <div style="font-size:13px;color:var(--text3);padding:6px 0;border-bottom:1px solid var(--border)">❌ Auth, billing ou gestão de conta da API</div>
+      <div style="font-size:13px;color:var(--text3);padding:6px 0;border-bottom:1px solid var(--border)">❌ Deploy/hosting de MCP servers (infra, rede, containers)</div>
+      <div style="font-size:13px;color:var(--text3);padding:6px 0;border-bottom:1px solid var(--border)">❌ Arquitetura interna do Claude, treino, weights</div>
+      <div style="font-size:13px;color:var(--text3);padding:6px 0;border-bottom:1px solid var(--border)">❌ Constitutional AI, RLHF, métodos de safety training</div>
+      <div style="font-size:13px;color:var(--text3);padding:6px 0;border-bottom:1px solid var(--border)">❌ Embedding models / detalhes de vector DB</div>
+      <div style="font-size:13px;color:var(--text3);padding:6px 0;border-bottom:1px solid var(--border)">❌ Computer use (browser/desktop automation)</div>
+      <div style="font-size:13px;color:var(--text3);padding:6px 0;border-bottom:1px solid var(--border)">❌ Vision / análise de imagem</div>
+      <div style="font-size:13px;color:var(--text3);padding:6px 0;border-bottom:1px solid var(--border)">❌ Streaming API / server-sent events</div>
+      <div style="font-size:13px;color:var(--text3);padding:6px 0;border-bottom:1px solid var(--border)">❌ Rate limiting, quotas, cálculo de preço</div>
+      <div style="font-size:13px;color:var(--text3);padding:6px 0;border-bottom:1px solid var(--border)">❌ Detalhes de prompt caching (além de saber que existe)</div>
+      <div style="font-size:13px;color:var(--text3);padding:6px 0;border-bottom:1px solid var(--border)">❌ Tokenização / algoritmos de contagem de token</div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script>
+const QUESTIONS = [
+  {id:"O1",domain:1,scenario:"Cenário 1: Customer Support",
+   question:"Dados de produção mostram que em 12% dos casos, seu agente pula get_customer e chama lookup_order usando apenas o nome do cliente, levando a contas incorretas e reembolsos errados. Qual mudança abordaria mais efetivamente esse problema?",
+   options:["Adicionar pré-requisito programático que bloqueia lookup_order e process_refund até get_customer retornar um customer ID verificado.","Melhorar o system prompt declarando que verificação via get_customer é obrigatória antes de qualquer operação de pedido.","Adicionar exemplos few-shot mostrando o agente sempre chamando get_customer primeiro.","Implementar um classificador de roteamento que habilita apenas ferramentas apropriadas para cada tipo de request."],
+   answer:0,explanation:"Enforcement programático fornece garantias determinísticas. Opções B e C dependem de conformidade probabilística do LLM — insuficiente para operações financeiras. Opção D aborda disponibilidade de ferramentas, não ordenação."},
+  {id:"O2",domain:2,scenario:"Cenário 1: Customer Support",
+   question:"Logs mostram que o agente frequentemente chama get_customer quando usuários perguntam sobre pedidos, em vez de lookup_order. Ambas têm descrições mínimas e aceitam formatos de identificador similares. Qual é o primeiro passo mais eficaz?",
+   options:["Adicionar exemplos few-shot ao system prompt demonstrando padrões corretos de seleção de ferramentas.","Expandir a descrição de cada ferramenta com formatos de entrada, consultas de exemplo, casos extremos e quando usar vs a alternativa.","Implementar uma camada de roteamento que analisa a entrada antes de cada turno e pré-seleciona a ferramenta.","Consolidar ambas em uma única lookup_entity que determina internamente qual backend consultar."],
+   answer:1,explanation:"Descrições de ferramentas são o mecanismo primário que LLMs usam para seleção. Expandir descrições corrije a causa raiz com baixo esforço. Few-shot (A) adiciona overhead sem corrigir o problema subjacente."},
+  {id:"O3",domain:5,scenario:"Cenário 1: Customer Support",
+   question:"Seu agente alcança 55% de resolução no primeiro contato (meta: 80%). Logs mostram que ele escalona casos simples (substituições com foto) enquanto tenta resolver autonomamente situações complexas que requerem exceções de política. Qual é a forma mais eficaz de melhorar a calibração?",
+   options:["Adicionar critérios explícitos de escalação ao system prompt com exemplos few-shot demonstrando quando escalonar vs resolver.","Fazer o agente reportar score de confiança (1-10) e rotear automaticamente para humanos quando abaixo de um limiar.","Deploy de classificador separado treinado em tickets históricos para prever quais solicitações precisam de escalação.","Implementar análise de sentimento para detectar frustração e escalonar quando sentimento negativo excede limiar."],
+   answer:0,explanation:"Critérios explícitos de escalação com few-shot aborda diretamente a causa raiz: limites de decisão pouco claros. Score de confiança (B) é mal calibrado pelo LLM. Classificador (C) é over-engineered. Sentimento (D) não correlaciona com complexidade."},
+  {id:"O4",domain:3,scenario:"Cenário 2: Code Generation",
+   question:"Você quer criar um comando slash /review que executa o checklist de revisão do time. Deve estar disponível para todos os devs ao clonar o repositório. Onde criar o arquivo?",
+   options:["No diretório .claude/commands/ no repositório do projeto.","Em ~/.claude/commands/ no diretório home de cada desenvolvedor.","No arquivo CLAUDE.md na raiz do projeto.","Em um arquivo .claude/config.json com um array commands."],
+   answer:0,explanation:"Comandos de escopo de projeto devem ficar em .claude/commands/ dentro do repositório — são versionados e automaticamente disponíveis ao clonar. ~/.claude/commands/ é para comandos pessoais não compartilhados via version control."},
+  {id:"O5",domain:3,scenario:"Cenário 2: Code Generation",
+   question:"Você foi designado para reestruturar uma aplicação monolítica em microsserviços — mudanças em dezenas de arquivos com decisões sobre limites de serviço. Qual abordagem seguir?",
+   options:["Entrar no plan mode para explorar o codebase, entender dependências e projetar uma abordagem antes de fazer mudanças.","Começar com execução direta e fazer mudanças incrementalmente, deixando a implementação revelar os limites naturais.","Usar execução direta com instruções abrangentes detalhando como cada serviço deve ser estruturado.","Começar no modo de execução direta e só mudar para plan mode se encontrar complexidade inesperada."],
+   answer:0,explanation:"Plan mode é projetado para tarefas complexas com mudanças em larga escala, múltiplas abordagens válidas e decisões arquiteturais. Opção B arrisca retrabalho custoso quando dependências são descobertas tarde."},
+  {id:"O6",domain:3,scenario:"Cenário 2: Code Generation",
+   question:"Seu codebase tem convenções distintas: React usa hooks, APIs usam async/await, modelos seguem repository pattern. Arquivos de teste ficam ao lado dos componentes (Button.test.tsx). Como garantir que Claude aplique automaticamente as convenções corretas?",
+   options:["Criar arquivos .claude/rules/ com frontmatter YAML especificando padrões glob para aplicar condicionalmente convenções baseadas em caminhos.","Consolidar todas as convenções no CLAUDE.md raiz sob headers, confiando no Claude para inferir qual seção se aplica.","Criar skills em .claude/skills/ para cada tipo de código com as convenções nos arquivos SKILL.md.","Colocar CLAUDE.md separado em cada subdiretório com as convenções específicas."],
+   answer:0,explanation:".claude/rules/ com padrões glob (**/*.test.tsx) permite que convenções sejam aplicadas automaticamente baseadas em caminhos, independente de localização de diretório — essencial para arquivos de teste espalhados. Opção B depende de inferência não confiável."},
+  {id:"O7",domain:1,scenario:"Cenário 3: Multi-Agent Research",
+   question:"Após executar o sistema sobre 'impacto da IA em indústrias criativas', os relatórios cobrem apenas artes visuais, omitindo música, escrita e cinema. O log do coordenador mostra decomposição em: 'IA em arte digital', 'IA em design gráfico', 'IA em fotografia'. Qual é a causa raiz?",
+   options:["O agente de síntese não tem instruções para identificar lacunas de cobertura nos resultados.","A decomposição de tarefas do coordenador é muito estreita — atribuições não cobrem todos os domínios relevantes.","As consultas do agente de busca não são abrangentes o suficiente.","O agente de análise está filtrando fontes relacionadas a indústrias criativas não-visuais."],
+   answer:1,explanation:"O log do coordenador revela diretamente a causa raiz: decomposição estreita. Os subagentes executaram suas tarefas corretamente — eles só não foram atribuídos as tarefas certas. Opções A, C e D culpam incorretamente agentes downstream."},
+  {id:"O8",domain:5,scenario:"Cenário 3: Multi-Agent Research",
+   question:"O subagente de busca atinge timeout enquanto pesquisa um tópico complexo. Como projetar o fluxo de informação de falha para o coordenador?",
+   options:["Retornar contexto de erro estruturado ao coordenador: tipo de falha, query tentada, resultados parciais e abordagens alternativas potenciais.","Implementar retry automático com backoff dentro do subagente, retornando 'search unavailable' após todas as tentativas.","Capturar o timeout e retornar conjunto de resultados vazio marcado como bem-sucedido.","Propagar exceção diretamente para handler que termina todo o workflow de pesquisa."],
+   answer:0,explanation:"Contexto de erro estruturado permite ao coordenador tomar decisões de recuperação inteligentes. Status genérico (B) esconde contexto valioso. Opção C suprime o erro marcando falha como sucesso. Opção D termina desnecessariamente."},
+  {id:"O9",domain:2,scenario:"Cenário 3: Multi-Agent Research",
+   question:"O agente de síntese precisa verificar claims com frequência, causando 2-3 round trips ao coordenador e 40% de latência extra. 85% são fact-checks simples, 15% requerem investigação profunda. Como reduzir overhead?",
+   options:["Dar ao agente de síntese ferramenta verify_fact com escopo para lookups simples; verificações complexas continuam via coordenador.","Fazer o agente de síntese acumular todas as necessidades de verificação e retorná-las em lote ao final.","Dar ao agente de síntese acesso a todas as ferramentas de busca para lidar com qualquer verificação diretamente.","Fazer o agente de busca cachear contexto extra ao redor de cada fonte durante pesquisa inicial."],
+   answer:0,explanation:"Opção A aplica o princípio do menor privilégio: resolve 85% dos casos comuns (verificação simples) enquanto preserva o padrão existente para casos complexos. Opção B cria dependências de bloqueio. Opção C superprovê o agente."},
+  {id:"O10",domain:3,scenario:"Cenário 5: CI/CD",
+   question:"Seu script de pipeline executa 'claude Analyze this pull request' mas o job fica suspenso aguardando input interativo. Qual é a abordagem correta?",
+   options:["Adicionar a flag -p: claude -p 'Analyze this pull request'","Definir CLAUDE_HEADLESS=true antes de executar o comando","Redirecionar stdin de /dev/null: claude 'Analyze...' < /dev/null","Adicionar a flag --batch: claude --batch 'Analyze...'"],
+   answer:0,explanation:"A flag -p (--print) é a forma documentada de executar Claude Code em modo não-interativo: processa o prompt, envia ao stdout e sai sem aguardar input. As outras opções referenciam recursos inexistentes ou workarounds inadequados."},
+  {id:"O11",domain:4,scenario:"Cenário 5: CI/CD",
+   question:"Dois workflows: (1) verificação pré-merge bloqueante que deve completar antes do merge, (2) relatório de dívida técnica gerado overnight. Seu gestor propõe migrar ambos para Message Batches API pela economia de 50%. Como avaliar?",
+   options:["Usar batch apenas para relatórios de dívida técnica; manter chamadas em tempo real para verificações pré-merge.","Migrar ambos para batch com status polling para verificar conclusão.","Manter em tempo real para ambos para evitar problemas de ordenação.","Migrar ambos com fallback de timeout para tempo real se os batches demorarem muito."],
+   answer:0,explanation:"Message Batches API tem processamento de até 24h sem SLA garantido — inadequada para verificações pré-merge onde devs aguardam. Ideal para jobs noturnos como relatórios de dívida técnica. Opção B é errada: 'geralmente mais rápido' não é aceitável para workflows bloqueantes."},
+  {id:"O12",domain:4,scenario:"Cenário 5: CI/CD",
+   question:"Um PR com 14 arquivos do módulo de estoque produz revisão inconsistente: feedback detalhado em alguns arquivos, superficial em outros, bugs óbvios não detectados, feedback contraditório sobre código idêntico. Como reestruturar?",
+   options:["Dividir em passagens focadas: análise individual de cada arquivo para issues locais, depois passagem separada de integração entre arquivos.","Exigir que devs dividam PRs grandes em submissões menores antes da revisão automatizada.","Mudar para modelo com janela de contexto maior para dar a todos os 14 arquivos atenção adequada em uma passagem.","Executar três revisões independentes no PR completo e sinalizar apenas issues em pelo menos dois dos três runs."],
+   answer:0,explanation:"Passagens focadas resolve diretamente a diluição de atenção ao processar muitos arquivos de uma vez. Análise por arquivo garante profundidade consistente; passagem de integração captura issues entre arquivos. Opção C assume incorretamente que janelas maiores resolvem qualidade de atenção."},
+  {id:"S1",domain:1,scenario:"Arquitetura Agêntica",
+   question:"O que é 'blast radius' no contexto de ações agênticas?",
+   options:["O número de tokens consumidos por uma chamada de ferramenta.","O escopo de impacto e reversibilidade de uma ação tomada pelo agente.","A latência máxima tolerável em pipelines de agentes encadeados.","O limite de chamadas de API por sessão de um agente autônomo."],
+   answer:1,explanation:"Blast radius = escopo de impacto potencial e reversibilidade da ação. Agentes devem preferir ações de baixo blast radius (reversíveis, escopo limitado) e pausar para confirmação quando o blast radius for alto."},
+  {id:"S2",domain:1,scenario:"Arquitetura Agêntica",
+   question:"Para spawnar subagentes em paralelo, o coordenador deve:",
+   options:["Emitir chamadas de ferramenta Task separadas em turnos consecutivos.","Emitir múltiplas chamadas de ferramenta Task em UMA ÚNICA resposta do coordenador.","Usar threads Python separadas para invocar subagentes concorrentemente.","Configurar allowedTools com múltiplas instâncias do Task tool."],
+   answer:1,explanation:"Para paralelismo real, emita múltiplas Task calls em UMA resposta. Turnos consecutivos = execução sequencial. A paralelização acontece quando o runtime recebe múltiplas tool calls na mesma resposta."},
+  {id:"S3",domain:3,scenario:"Claude Code Config",
+   question:"Qual é a principal diferença entre skills com 'context: fork' e commandos normais?",
+   options:["Skills com context: fork executam mais rápido por usar cache.","Skills com context: fork rodam em contexto de sub-agente isolado, prevenindo poluição da conversa principal.","Skills com context: fork podem acessar ferramentas externas que comandos normais não podem.","Skills com context: fork são automaticamente incluídas no CLAUDE.md."],
+   answer:1,explanation:"context: fork executa a skill em contexto isolado — output verboso não contamina a conversa principal. Ideal para skills de análise ou exploração que produzem muito output intermediário."},
+  {id:"S4",domain:4,scenario:"Prompt Engineering",
+   question:"Por que schemas JSON rígidos via tool_use eliminam erros de sintaxe mas não erros semânticos?",
+   options:["Porque schemas JSON não validam tipos de dados numéricos.","Porque o schema garante estrutura correta mas não verifica se valores são semanticamente válidos (ex: line items que não somam ao total).","Porque o modelo ignora restrições de schema para campos opcionais.","Porque erros semânticos só podem ser detectados por modelos de raciocínio."],
+   answer:1,explanation:"Schemas garantem estrutura correta (campos certos, tipos certos). Mas não conseguem verificar validade semântica — que line_items somam ao total, datas são cronologicamente consistentes, valores estão nos campos corretos."},
+  {id:"S5",domain:5,scenario:"Context & Reliability",
+   question:"O que é o efeito 'lost in the middle'?",
+   options:["Quando o agente perde conexão com serviços externos no meio de uma operação.","Modelos processam informações no início e fim de inputs longos confiavelmente, mas podem omitir findings de seções do meio.","Quando o contexto é dividido desigualmente entre subagentes, causando sobreposição.","Um comportamento onde o agente esquece instruções anteriores após muitas tool calls."],
+   answer:1,explanation:"'Lost in the middle' é comportamento documentado de LLMs onde informações no meio de inputs longos recebem menos atenção. Mitigação: coloque informações críticas no início ou fim, use headers explícitos."},
+  {id:"S6",domain:2,scenario:"Tool Design & MCP",
+   question:"Qual é a diferença entre um MCP resource e um MCP tool?",
+   options:["Resources são mais rápidos; tools são mais precisos.","Resources expõem dados/conteúdo para leitura; tools executam ações com efeitos colaterais.","Resources são síncronos; tools são assíncronos.","Resources são definidos no projeto; tools são globais."],
+   answer:1,explanation:"MCP Resources expõem DADOS para leitura passiva (catálogos de templates, esquemas de banco, hierarquias de documentação). MCP Tools executam AÇÕES com efeitos colaterais (criar projeto, enviar mensagem, modificar arquivo). A distinção semântica importa para o exame: usar tool para operação de listagem é tecnicamente correto, mas vai contra o modelo conceitual do MCP."},
+  {id:"S7",domain:3,scenario:"Claude Code Config",
+   question:"Seu time quer configurar o Claude Code para que, ao editar qualquer arquivo TypeScript, ele execute automaticamente o linter. Onde e como configurar isso?",
+   options:["No CLAUDE.md do projeto, com a instrução 'sempre execute o linter após editar arquivos .ts'.","Configurando um hook PostToolUse em .claude/settings.json que executa o lint quando o arquivo editado termina em .ts.","Criando um slash command /lint que o desenvolvedor invoca manualmente após cada edição.","Adicionando ao system prompt a instrução de sempre verificar a qualidade do código TypeScript."],
+   answer:1,explanation:"Hooks em settings.json são executáveis de forma determinística — um PostToolUse que observa edições em arquivos .ts e dispara o linter é a única abordagem que garante execução automática. CLAUDE.md e system prompt são texto orientativo, não automação. O slash command requer ação manual do desenvolvedor."},
+  {id:"S8",domain:1,scenario:"Arquitetura Agêntica",
+   question:"Um usuário pede ao agente de suporte para 'limpar todos os contatos inativos do CRM'. Isso afetaria 3.000 registros. Qual é a resposta mais adequada do agente?",
+   options:["Executar a limpeza imediatamente, pois o usuário deu a instrução explicitamente.","Listar os contatos afetados e exigir confirmação humana explícita antes de executar a deleção em massa.","Recusar completamente a operação por ser muito arriscada.","Executar a limpeza em lotes menores de 100 por vez para reduzir o risco."],
+   answer:1,explanation:"Deleção de 3.000 registros é uma ação de alto blast radius e irreversível. O agente deve listar os itens afetados e exigir confirmação explícita antes de prosseguir — independente da instrução ter sido dada. Lotes menores (opção D) não reduzem o blast radius total, apenas distribuem o risco."},
+  {id:"S9",domain:3,scenario:"CI/CD",
+   question:"Você precisa que o mesmo código de pipeline funcione de forma diferente em dev e em produção: em dev deve logar tudo e não executar ações reais; em prod executa normalmente. Qual abordagem é mais adequada?",
+   options:["Manter codebases separados para dev e prod.","Usar variáveis de ambiente (DRY_RUN=true, LOG_LEVEL=debug) para controlar o comportamento do pipeline.","Usar modelos diferentes do Claude: Haiku em dev, Sonnet em prod.","Criar um arquivo de configuração separado para cada ambiente."],
+   answer:1,explanation:"Variáveis de ambiente são o padrão para controle de comportamento por ambiente — permitem o mesmo código funcionar de formas diferentes sem duplicação. DRY_RUN=true desabilita ações reais; LOG_LEVEL=debug aumenta a verbosidade. Codebases separados criam drift inevitável. A escolha de modelo não deveria ser o diferenciador primário de comportamento entre ambientes."},
+  {id:"S10",domain:4,scenario:"Structured Data Extraction",
+   question:"Seu pipeline de extração falha consistentemente em um campo específico: número de pedido de compra (PO number). Análise dos documentos revela que faturas de pessoa física nunca incluem esse campo, mas faturas corporativas sempre incluem. O schema atual define PO number como campo obrigatório. O que fazer?",
+   options:["Adicionar mais exemplos few-shot de faturas sem PO number.","Tornar o campo nullable: definir como type ['string', 'null'] com instrução 'null se não presente no documento'.","Criar dois schemas separados: um para pessoa física, outro para pessoa jurídica.","Implementar retry com feedback de erro para forçar o modelo a encontrar o PO number."],
+   answer:1,explanation:"Campo obrigatório ausente no documento fonte = o modelo vai fabricar um valor. A solução é tornar o campo nullable com instrução explícita ('null se não presente'). Isso diz ao modelo que a ausência é um estado válido, não um erro a corrigir. Dois schemas (opção C) resolve o problema mas introduz complexidade desnecessária. Retry (opção D) é ineficaz quando a informação simplesmente não existe."},
+  {id:"S11",domain:1,scenario:"Multi-Agent Research",
+   question:"Uma tarefa consiste em: (1) buscar dados da API de cotações, (2) processar os dados com Python, (3) gerar um relatório PDF. Cada etapa depende do resultado da anterior. Como estruturar?",
+   options:["Um único agente com ferramentas em sequência — busca, processa, gera o PDF.","Três subagentes em paralelo, cada um com sua ferramenta especializada.","Coordenador que spawna os três subagentes em uma única resposta para maximizar paralelismo.","Dois agentes: um para busca e processamento, outro para geração do PDF."],
+   answer:0,explanation:"Quando as etapas têm dependências sequenciais (cada etapa precisa do resultado da anterior), paralelismo não faz sentido e adiciona overhead desnecessário. Um único agente executando as ferramentas em sequência é a solução mais simples e eficiente. Paralelismo só se aplica quando as subtarefas são independentes entre si."},
+  {id:"S12",domain:5,scenario:"Context & Reliability",
+   question:"Uma ferramenta de busca retorna: {\"status\": \"success\", \"data\": null, \"rows_affected\": 0}. Como o agente deve interpretar esse resultado?",
+   options:["Como sucesso confirmado — status é 'success'.","Como possível falha silenciosa — inspecionar semanticamente, não apenas o campo status.","Como resultado vazio válido — consulta funcionou, só não encontrou dados.","Como erro que deve ser reportado ao coordenador com isError: true."],
+   answer:1,explanation:"data: null + rows_affected: 0 com status: success é uma resposta ambígua — pode ser resultado vazio válido ou falha silenciosa. O agente não deve confiar apenas no campo 'status'; precisa inspecionar semanticamente o conteúdo. Essa distinção entre 'sucesso real' e 'sucesso nominal com falha implícita' é exatamente o que o exame testa."}
+];
+
+let currentFilter = 'all';
+let filteredQuestions = [];
+let currentIndex = 0;
+let selected = null;
+let answered = false;
+let scores = {};
+
+function show(id, anchor) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.nav-subitem').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.nav-group').forEach(g => g.classList.remove('active-group'));
+  const sec = document.getElementById(id);
+  if (sec) sec.classList.add('active');
+
+  // simple nav-items (dashboard / scenarios / quiz / reference)
+  document.querySelectorAll('.nav-item').forEach(item => {
+    const oc = item.getAttribute('onclick');
+    if (oc && oc.includes("'" + id + "'")) item.classList.add('active');
+  });
+
+  // domain groups: mark active + expand the open one, collapse the rest
+  const grp = document.getElementById('navg-' + id);
+  if (grp) {
+    document.querySelectorAll('.nav-group').forEach(g => g.classList.add('collapsed'));
+    grp.classList.remove('collapsed');
+    grp.classList.add('active-group');
+  }
+
+  if (anchor) {
+    const sub = document.querySelector('.nav-subitem[onclick*="' + anchor + '"]');
+    if (sub) sub.classList.add('active');
+    setTimeout(() => {
+      const el = document.getElementById(anchor);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 60);
+  } else {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }
+  // close mobile sidebar after navigation
+  const sb = document.querySelector('.sidebar');
+  if (sb && window.innerWidth <= 768) sb.classList.remove('open');
+}
+
+function toggleGroup(d) {
+  const grp = document.getElementById('navg-' + d);
+  if (!grp) return;
+  // if the section isn't open yet, open it (and expand); otherwise just toggle the sublist
+  const sec = document.getElementById(d);
+  const isActive = sec && sec.classList.contains('active');
+  if (!isActive) {
+    show(d);
+  } else {
+    grp.classList.toggle('collapsed');
+  }
+}
+
+function setFilter(domain, btn) {
+  currentFilter = domain;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const count = domain === 'all' ? QUESTIONS.length : QUESTIONS.filter(q => q.domain === domain).length;
+  const domainLabel = domain === 'all' ? 'todos os domínios' : 'Domínio ' + domain;
+  document.getElementById('quiz-count-text').textContent = count + ' questões disponíveis (' + domainLabel + ')';
+  document.getElementById('quiz-start-screen').style.display = 'block';
+  document.getElementById('quiz-active').style.display = 'none';
+  document.getElementById('quiz-score').style.display = 'none';
+}
+
+function startQuiz() {
+  filteredQuestions = currentFilter === 'all' ? [...QUESTIONS] : QUESTIONS.filter(q => q.domain === currentFilter);
+  filteredQuestions = shuffle(filteredQuestions);
+  currentIndex = 0;
+  scores = {};
+  document.getElementById('quiz-start-screen').style.display = 'none';
+  document.getElementById('quiz-active').style.display = 'block';
+  document.getElementById('quiz-score').style.display = 'none';
+  showQuestion();
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function showQuestion() {
+  selected = null;
+  answered = false;
+  const q = filteredQuestions[currentIndex];
+  const pct = (currentIndex / filteredQuestions.length) * 100;
+  document.getElementById('quiz-progress-fill').style.width = pct + '%';
+  const letters = ['A', 'B', 'C', 'D'];
+  const domainNames = {1:'D1 Agêntico', 2:'D2 Tools/MCP', 3:'D3 Claude Code', 4:'D4 Prompts', 5:'D5 Contexto'};
+  let html = `<div class="question-card">
+    <div class="question-meta">
+      <span class="q-badge">${currentIndex + 1} / ${filteredQuestions.length}</span>
+      <span class="q-badge">${domainNames[q.domain]}</span>
+      <span class="q-badge">${q.scenario}</span>
+    </div>
+    <div class="question-text">${q.question}</div>`;
+  q.options.forEach((opt, i) => {
+    html += `<div class="option" id="opt-${i}" onclick="selectOption(${i})">
+      <div class="option-letter">${letters[i]}</div>
+      <div class="option-text">${opt}</div>
+    </div>`;
+  });
+  html += '</div>';
+  document.getElementById('question-area').innerHTML = html;
+  const confirmBtn = document.getElementById('confirm-btn');
+  const nextBtn = document.getElementById('next-btn');
+  confirmBtn.disabled = true;
+  confirmBtn.style.display = 'inline-block';
+  nextBtn.style.display = 'none';
+}
+
+function selectOption(i) {
+  if (answered) return;
+  selected = i;
+  document.querySelectorAll('.option').forEach((el, idx) => {
+    el.classList.toggle('selected', idx === i);
+  });
+  document.getElementById('confirm-btn').disabled = false;
+}
+
+function confirmAnswer() {
+  if (selected === null || answered) return;
+  answered = true;
+  const q = filteredQuestions[currentIndex];
+  const correct = q.answer;
+  const isCorrect = selected === correct;
+  scores[currentIndex] = isCorrect;
+  document.querySelectorAll('.option').forEach((el, idx) => {
+    if (idx === correct) el.classList.add('correct');
+    else if (idx === selected) el.classList.add('wrong');
+    el.style.cursor = 'default';
+  });
+  const letters = ['A', 'B', 'C', 'D'];
+  const qArea = document.getElementById('question-area');
+  const expHtml = `<div class="explanation-box">
+    <div class="explanation-header">${isCorrect ? '✅ Correto!' : '❌ Incorreto — Resposta: ' + letters[correct]}</div>
+    <div class="explanation-text">${q.explanation}</div>
+  </div>`;
+  const card = qArea.querySelector('.question-card');
+  card.insertAdjacentHTML('beforeend', expHtml);
+  document.getElementById('confirm-btn').style.display = 'none';
+  document.getElementById('next-btn').style.display = 'inline-block';
+  document.getElementById('next-btn').textContent = currentIndex + 1 < filteredQuestions.length ? 'Próxima →' : 'Ver Resultado';
+}
+
+function nextQuestion() {
+  currentIndex++;
+  if (currentIndex >= filteredQuestions.length) {
+    showScore();
+  } else {
+    showQuestion();
+  }
+}
+
+function showScore() {
+  document.getElementById('quiz-active').style.display = 'none';
+  document.getElementById('quiz-score').style.display = 'block';
+  const total = filteredQuestions.length;
+  const correct = Object.values(scores).filter(Boolean).length;
+  const pct = Math.round((correct / total) * 100);
+  const scaledScore = Math.round(100 + (pct / 100) * 900);
+  document.getElementById('score-pct').textContent = pct + '%';
+  document.getElementById('score-pct').style.color = pct >= 72 ? 'var(--success)' : 'var(--error)';
+  document.getElementById('score-label').innerHTML = `${correct} de ${total} questões corretas<br><span style="font-size:14px">Equivalente aproximado: <strong>${scaledScore}/1000</strong> — ${scaledScore >= 720 ? '✅ APROVADO' : '❌ Necessita revisão (mínimo: 720)'}</span>`;
+  // Domain breakdown
+  const domainNames = {1:'Agêntico',2:'Tools/MCP',3:'Claude Code',4:'Prompts',5:'Contexto'};
+  const domainColors = {1:'#CC785C',2:'#FBBF24',3:'#38BDF8',4:'#7C6AF7',5:'#34D399'};
+  const byDomain = {};
+  filteredQuestions.forEach((q, i) => {
+    if (!byDomain[q.domain]) byDomain[q.domain] = {correct:0,total:0};
+    byDomain[q.domain].total++;
+    if (scores[i]) byDomain[q.domain].correct++;
+  });
+  let gridHtml = '';
+  for (const [d, s] of Object.entries(byDomain)) {
+    const dpct = Math.round((s.correct / s.total) * 100);
+    gridHtml += `<div class="score-item"><div class="score-item-val" style="color:${domainColors[d]}">${dpct}%</div><div class="score-item-label">D${d}: ${domainNames[d]}<br><span style="font-size:11px">${s.correct}/${s.total}</span></div></div>`;
+  }
+  document.getElementById('score-grid').innerHTML = gridHtml;
+}
+
+function restartQuiz() {
+  document.getElementById('quiz-score').style.display = 'none';
+  document.getElementById('quiz-start-screen').style.display = 'block';
+}
+</script>
+</body>
+</html>

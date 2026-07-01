@@ -1,0 +1,4028 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 20: Claude API Fundamentals | Claude AI Training</title>
+<style>
+/* ============================================
+   CSS CUSTOM PROPERTIES & DESIGN SYSTEM
+   Premium Upgrades Applied:
+   1. 3-layer shadows with --shadow-glow
+   2. radius 16/10px
+   3. spring transitions cubic-bezier(0.34,1.56,0.64,1)
+   4. gradient h1 background-clip:text
+   5. Inter font antialiased
+   6. deep dark mode #0B0F1A/#141926
+   7. prefers-reduced-motion
+   8. accent cards ::before gradient
+   9. depth hover on buttons
+   ============================================ */
+:root {
+  --primary: #7C3AED;
+  --primary-light: #A78BFA;
+  --primary-dark: #5B21B6;
+  --accent: #06B6D4;
+  --accent-light: #22D3EE;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  --bg: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --bg-code: #F1F5F9;
+  --text: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --border: #E2E8F0;
+  /* 3-layer shadows with glow */
+  --shadow: 0 1px 2px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+  --shadow-lg: 0 4px 6px rgba(0,0,0,0.05), 0 10px 20px rgba(0,0,0,0.08), 0 20px 40px rgba(0,0,0,0.04);
+  --shadow-xl: 0 8px 12px rgba(0,0,0,0.06), 0 20px 40px rgba(0,0,0,0.1), 0 40px 80px rgba(0,0,0,0.06);
+  --shadow-glow: 0 0 20px rgba(124,58,237,0.15), 0 4px 16px rgba(0,0,0,0.06);
+  /* radius 16/10px */
+  --radius: 16px;
+  --radius-sm: 10px;
+  --radius-xs: 6px;
+  /* spring transitions */
+  --transition: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --transition-smooth: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --sidebar-width: 280px;
+  --content-max: 820px;
+}
+
+/* deep dark mode #0B0F1A/#141926 */
+[data-theme="dark"] {
+  --bg: #0B0F1A;
+  --bg-card: #141926;
+  --bg-code: #141926;
+  --text: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --border: #1E293B;
+  --shadow: 0 1px 2px rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.2);
+  --shadow-lg: 0 4px 6px rgba(0,0,0,0.3), 0 10px 20px rgba(0,0,0,0.35), 0 20px 40px rgba(0,0,0,0.2);
+  --shadow-xl: 0 8px 12px rgba(0,0,0,0.3), 0 20px 40px rgba(0,0,0,0.4), 0 40px 80px rgba(0,0,0,0.3);
+  --shadow-glow: 0 0 20px rgba(124,58,237,0.25), 0 4px 16px rgba(0,0,0,0.3);
+}
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 24px;
+}
+
+/* Inter font + antialiased */
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  min-height: 100vh;
+  transition: background var(--transition-smooth), color var(--transition-smooth);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================
+   THEME TOGGLE
+   ============================================ */
+.theme-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: all var(--transition);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+.theme-toggle:hover {
+  box-shadow: var(--shadow-glow);
+  transform: scale(1.08);
+}
+
+/* ============================================
+   SIDEBAR
+   ============================================ */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  z-index: 900;
+  transition: transform 0.3s ease, background var(--transition-smooth);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.sidebar-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+  margin-bottom: 12px;
+  transition: color var(--transition);
+}
+.sidebar-back:hover { color: var(--primary-dark); }
+
+.sidebar-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.sidebar-module-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.sidebar-nav {
+  padding: 12px 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.sidebar-section {
+  margin-bottom: 4px;
+}
+
+.sidebar-section-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 20px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  text-align: left;
+  transition: color var(--transition-smooth);
+}
+.sidebar-section-toggle:hover { color: var(--text); }
+.sidebar-section-toggle .chevron {
+  transition: transform 0.2s ease;
+  font-size: 0.65rem;
+}
+.sidebar-section-toggle.collapsed .chevron {
+  transform: rotate(-90deg);
+}
+
+.sidebar-links {
+  list-style: none;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.sidebar-links.collapsed {
+  max-height: 0 !important;
+}
+
+.sidebar-link {
+  display: block;
+  padding: 7px 20px 7px 32px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: all var(--transition-smooth);
+  line-height: 1.4;
+}
+.sidebar-link:hover {
+  color: var(--text);
+  background: var(--bg);
+}
+.sidebar-link.active {
+  color: var(--primary);
+  border-left-color: var(--primary);
+  background: rgba(124, 58, 237, 0.05);
+  font-weight: 600;
+}
+[data-theme="dark"] .sidebar-link.active {
+  background: rgba(124, 58, 237, 0.12);
+}
+
+.sidebar-progress {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sidebar-progress-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.sidebar-progress-track {
+  height: 6px;
+  background: var(--bg-code);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.sidebar-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 3px;
+  transition: width 0.5s ease;
+  width: 0%;
+}
+
+/* Hamburger button (mobile) */
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1001;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+  transition: all var(--transition-smooth);
+}
+.hamburger span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--text);
+  margin: 4px auto;
+  transition: all 0.3s ease;
+  border-radius: 1px;
+}
+.hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(4px, 4px); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(4px, -4px); }
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 899;
+}
+
+/* ============================================
+   MAIN CONTENT
+   ============================================ */
+.main-content {
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+  transition: margin var(--transition-smooth);
+}
+
+.content-wrapper {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 40px 32px 80px;
+}
+
+/* Module Header */
+.module-header {
+  margin-bottom: 48px;
+}
+.module-header .breadcrumb {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+.module-header .breadcrumb a {
+  color: var(--primary);
+  text-decoration: none;
+}
+.module-header .breadcrumb a:hover { text-decoration: underline; }
+
+.module-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.module-badge .number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.module-badge .label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* gradient h1 background-clip:text */
+.module-header h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.module-header .description {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 640px;
+}
+
+.module-meta {
+  display: flex;
+  gap: 16px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.module-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  background: var(--bg-code);
+  padding: 6px 14px;
+  border-radius: 20px;
+}
+
+/* ============================================
+   SECTIONS
+   ============================================ */
+.section {
+  margin-bottom: 56px;
+  scroll-margin-top: 24px;
+}
+
+.section-heading {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+  line-height: 1.3;
+}
+
+.section h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-top: 32px;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.section h4 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-top: 24px;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.section p {
+  margin-bottom: 16px;
+  color: var(--text-secondary);
+}
+
+.section ul, .section ol {
+  margin-bottom: 16px;
+  padding-left: 24px;
+}
+.section li {
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+}
+.section li strong {
+  color: var(--text);
+}
+
+/* ============================================
+   CODE BLOCKS
+   ============================================ */
+.code-block {
+  background: #1E293B;
+  color: #E2E8F0;
+  border-radius: var(--radius-sm);
+  padding: 20px 24px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  overflow-x: auto;
+  position: relative;
+  margin: 16px 0 20px;
+  tab-size: 2;
+}
+.code-block .code-label {
+  position: absolute;
+  top: 8px;
+  left: 16px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #64748B;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+.code-block.has-label {
+  padding-top: 36px;
+}
+.code-block .copy-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: #94A3B8;
+  padding: 6px 12px;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  transition: all var(--transition-smooth);
+}
+.code-block .copy-btn:hover { background: rgba(255,255,255,0.2); color: white; }
+.code-block .copy-btn.copied { background: var(--success); color: white; }
+
+/* Syntax highlighting classes */
+.kw { color: #C084FC; }
+.str { color: #6EE7B7; }
+.fn { color: #7DD3FC; }
+.cm { color: #64748B; }
+.num { color: #FDBA74; }
+.op { color: #FCA5A5; }
+.type { color: #67E8F9; }
+.param { color: #FDE68A; }
+.prop { color: #F0ABFC; }
+.punc { color: #94A3B8; }
+
+/* Inline code */
+code {
+  background: var(--bg-code);
+  color: var(--primary);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.88em;
+}
+[data-theme="dark"] code {
+  background: #1E293B;
+}
+.code-block code {
+  background: none;
+  color: inherit;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+  white-space: pre-wrap;
+  display: block;
+}
+
+/* ============================================
+   CALLOUT BOXES
+   ============================================ */
+.callout {
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  margin: 20px 0;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.callout-icon {
+  flex-shrink: 0;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+.callout-content { flex: 1; }
+.callout-content p { margin-bottom: 6px; color: inherit; }
+.callout-content p:last-child { margin-bottom: 0; }
+
+.callout.info {
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  color: #1E40AF;
+}
+.callout.tip {
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  color: #166534;
+}
+.callout.warning {
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  color: #92400E;
+}
+.callout.important {
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  color: #991B1B;
+}
+
+[data-theme="dark"] .callout.info {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: #93C5FD;
+}
+[data-theme="dark"] .callout.tip {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #6EE7B7;
+}
+[data-theme="dark"] .callout.warning {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #FCD34D;
+}
+[data-theme="dark"] .callout.important {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #FCA5A5;
+}
+
+/* ============================================
+   ACCENT CARDS (::before gradient)
+   ============================================ */
+.accent-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin: 24px 0;
+  position: relative;
+  overflow: hidden;
+  transition: border-color var(--transition-smooth), box-shadow var(--transition);
+}
+.accent-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+}
+.accent-card:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-glow);
+}
+.accent-card h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+/* ============================================
+   COMPARISON TABLE
+   ============================================ */
+.comparison-table-wrapper {
+  overflow-x: auto;
+  margin: 20px 0;
+  border-radius: var(--radius-sm);
+}
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.comparison-table th {
+  background: var(--primary);
+  color: white;
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+.comparison-table th:first-child {
+  border-radius: var(--radius-sm) 0 0 0;
+}
+.comparison-table th:last-child {
+  border-radius: 0 var(--radius-sm) 0 0;
+}
+.comparison-table td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+.comparison-table tr:nth-child(even) td {
+  background: var(--bg);
+}
+.comparison-table tr:last-child td:first-child {
+  border-radius: 0 0 0 var(--radius-sm);
+}
+.comparison-table tr:last-child td:last-child {
+  border-radius: 0 0 var(--radius-sm) 0;
+}
+
+/* ============================================
+   STEP-BY-STEP TIMELINE
+   ============================================ */
+.step-list {
+  counter-reset: step-counter;
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+.step-item {
+  counter-increment: step-counter;
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: border-color var(--transition-smooth);
+}
+.step-item:hover {
+  border-color: var(--primary-light);
+}
+.step-item::before {
+  content: counter(step-counter);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+.step-content h4 {
+  margin-top: 0;
+  margin-bottom: 6px;
+}
+.step-content p {
+  margin-bottom: 8px;
+}
+
+/* ============================================
+   KEY CONCEPT
+   ============================================ */
+.key-concept {
+  display: inline-block;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(6, 182, 212, 0.1));
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  color: var(--primary);
+}
+[data-theme="dark"] .key-concept {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(6, 182, 212, 0.15));
+  border-color: rgba(124, 58, 237, 0.35);
+}
+
+/* ============================================
+   INTERACTIVE: API REQUEST BUILDER
+   ============================================ */
+.api-builder {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0;
+  margin: 32px 0;
+  overflow: hidden;
+}
+.api-builder-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(135deg, rgba(124,58,237,0.05), rgba(6,182,212,0.05));
+}
+.api-builder-header h3 {
+  margin: 0 0 4px;
+  font-size: 1.15rem;
+}
+.api-builder-header p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+.api-builder-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 400px;
+}
+.api-builder-form {
+  padding: 24px;
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  max-height: 600px;
+}
+.api-builder-preview {
+  padding: 0;
+  background: #1E293B;
+  position: relative;
+  overflow: auto;
+  max-height: 600px;
+}
+.api-builder-preview pre {
+  padding: 20px;
+  margin: 0;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.82rem;
+  color: #E2E8F0;
+  line-height: 1.6;
+  white-space: pre;
+}
+.api-builder-preview .preview-label {
+  position: sticky;
+  top: 0;
+  padding: 8px 20px;
+  background: #0F172A;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #64748B;
+  font-family: 'Inter', -apple-system, sans-serif;
+  border-bottom: 1px solid #334155;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+.form-group label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.form-group select,
+.form-group textarea,
+.form-group input[type="text"],
+.form-group input[type="number"] {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  background: var(--bg);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.88rem;
+  transition: border-color var(--transition-smooth);
+}
+.form-group select:focus,
+.form-group textarea:focus,
+.form-group input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+.form-group textarea {
+  resize: vertical;
+  min-height: 60px;
+  font-family: 'SF Mono', monospace;
+  font-size: 0.82rem;
+}
+
+.range-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.range-group input[type="range"] {
+  flex: 1;
+  accent-color: var(--primary);
+}
+.range-group .range-value {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary);
+  min-width: 30px;
+  text-align: center;
+}
+
+.msg-entry {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  padding: 10px;
+  margin-bottom: 8px;
+  position: relative;
+}
+.msg-entry select {
+  width: auto;
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  margin-bottom: 6px;
+}
+.msg-entry textarea {
+  min-height: 40px;
+}
+.msg-entry .msg-remove {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 2px;
+}
+.msg-entry .msg-remove:hover { color: var(--error); }
+
+.btn-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+/* Depth hover on buttons */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  box-shadow: 0 2px 8px rgba(124,58,237,0.3);
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(124,58,237,0.4);
+}
+.btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(124,58,237,0.2);
+}
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.btn-secondary:hover {
+  border-color: var(--primary-light);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
+.btn-secondary:active {
+  transform: translateY(0);
+}
+
+.btn-small {
+  padding: 6px 14px;
+  font-size: 0.8rem;
+}
+
+.preset-buttons {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.preset-btn {
+  padding: 5px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition-smooth);
+}
+.preset-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: rgba(124,58,237,0.05);
+}
+.preset-btn.active {
+  border-color: var(--primary);
+  background: rgba(124,58,237,0.1);
+  color: var(--primary);
+}
+
+/* Simulated Response */
+.sim-response {
+  margin-top: 16px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  display: none;
+}
+.sim-response.show { display: block; }
+.sim-response-header {
+  padding: 10px 16px;
+  background: rgba(16,185,129,0.1);
+  border-bottom: 1px solid var(--border);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--success);
+}
+.sim-response pre {
+  padding: 16px;
+  margin: 0;
+  font-family: 'SF Mono', monospace;
+  font-size: 0.82rem;
+  color: var(--text);
+  overflow-x: auto;
+  line-height: 1.6;
+}
+
+/* ============================================
+   INTERACTIVE: STREAMING VISUALIZER
+   ============================================ */
+.stream-viz {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin: 32px 0;
+  overflow: hidden;
+}
+.stream-viz-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: linear-gradient(135deg, rgba(124,58,237,0.05), rgba(6,182,212,0.05));
+}
+.stream-viz-header h3 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+.stream-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.stream-controls label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.stream-controls select {
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.82rem;
+}
+.toggle-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+.toggle-wrap input[type="checkbox"] {
+  accent-color: var(--primary);
+}
+
+.stream-panels {
+  display: grid;
+  grid-template-rows: 1fr auto;
+}
+
+.event-stream-panel {
+  background: #0F172A;
+  padding: 16px 20px;
+  font-family: 'SF Mono', monospace;
+  font-size: 0.8rem;
+  color: #94A3B8;
+  height: 220px;
+  overflow-y: auto;
+  border-bottom: 1px solid #1E293B;
+  position: relative;
+}
+.event-stream-panel .panel-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #475569;
+  margin-bottom: 10px;
+}
+.event-line {
+  padding: 3px 0;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.event-line.visible {
+  opacity: 1;
+}
+.event-line.flash {
+  background: rgba(124,58,237,0.15);
+  border-radius: 3px;
+  padding: 3px 4px;
+}
+.event-type-start { color: #7DD3FC; }
+.event-type-delta { color: #6EE7B7; }
+.event-type-stop { color: #FDBA74; }
+.event-type-meta { color: #C084FC; }
+
+.response-panel {
+  background: var(--bg-card);
+  padding: 24px;
+  min-height: 120px;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--text);
+}
+.response-panel .panel-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+.response-text {
+  min-height: 60px;
+}
+.cursor-blink {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: var(--primary);
+  animation: blink 1s step-end infinite;
+  vertical-align: text-bottom;
+  margin-left: 1px;
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* ============================================
+   INTERACTIVE: TOOL USE LOOP ANIMATOR
+   ============================================ */
+.tool-loop {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin: 32px 0;
+  overflow: hidden;
+}
+.tool-loop-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: linear-gradient(135deg, rgba(124,58,237,0.05), rgba(6,182,212,0.05));
+}
+.tool-loop-header h3 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.loop-variant-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 0;
+}
+.loop-tab {
+  padding: 6px 16px;
+  border: 1px solid var(--border);
+  border-bottom: none;
+  border-radius: var(--radius-xs) var(--radius-xs) 0 0;
+  background: var(--bg);
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-smooth);
+}
+.loop-tab.active {
+  background: var(--bg-card);
+  color: var(--primary);
+  border-color: var(--border);
+  border-bottom-color: var(--bg-card);
+  position: relative;
+  z-index: 1;
+}
+
+.tool-loop-body {
+  padding: 24px;
+}
+
+.timeline-step {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 0;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  opacity: 0.4;
+  transition: all 0.4s ease;
+  position: relative;
+}
+.timeline-step + .timeline-step {
+  margin-top: 12px;
+}
+.timeline-step.active {
+  opacity: 1;
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-glow);
+}
+.timeline-step.completed {
+  opacity: 0.85;
+  border-color: var(--success);
+}
+.timeline-step.completed .step-indicator {
+  background: var(--success);
+}
+
+.step-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--border);
+  color: white;
+  font-weight: 700;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+  transition: background 0.3s ease;
+}
+.timeline-step.active .step-indicator {
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+}
+
+.step-body { flex: 1; min-width: 0; }
+.step-direction {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+.step-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.step-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0;
+}
+
+.step-json-toggle {
+  padding: 4px 10px;
+  background: rgba(124,58,237,0.1);
+  border: 1px solid rgba(124,58,237,0.2);
+  border-radius: var(--radius-xs);
+  color: var(--primary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-smooth);
+  white-space: nowrap;
+  align-self: flex-start;
+  margin-top: 4px;
+}
+.step-json-toggle:hover {
+  background: rgba(124,58,237,0.2);
+}
+
+.step-json {
+  display: none;
+  margin-top: 10px;
+}
+.step-json.show { display: block; }
+.step-json pre {
+  background: #1E293B;
+  color: #E2E8F0;
+  padding: 14px 18px;
+  border-radius: var(--radius-xs);
+  font-family: 'SF Mono', monospace;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  overflow-x: auto;
+  margin: 0;
+}
+
+/* connector line between steps */
+.timeline-connector {
+  width: 2px;
+  height: 12px;
+  background: var(--border);
+  margin-left: 31px;
+  transition: background 0.3s ease;
+}
+.timeline-connector.active {
+  background: var(--primary);
+}
+
+/* ============================================
+   INTERACTIVE: COST CALCULATOR
+   ============================================ */
+.cost-calc {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin: 32px 0;
+  overflow: hidden;
+}
+.cost-calc-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(135deg, rgba(124,58,237,0.05), rgba(6,182,212,0.05));
+}
+.cost-calc-header h3 {
+  margin: 0 0 4px;
+  font-size: 1.15rem;
+}
+.cost-calc-header p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.cost-calc-body {
+  padding: 24px;
+}
+
+.cost-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.cost-input-group label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.cost-input-group input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'SF Mono', monospace;
+  font-size: 0.88rem;
+}
+.cost-input-group input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.model-radio-group {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+.model-radio {
+  flex: 1;
+  padding: 12px 16px;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-smooth);
+  text-align: center;
+}
+.model-radio:hover {
+  border-color: var(--primary-light);
+}
+.model-radio.selected {
+  border-color: var(--primary);
+  background: rgba(124,58,237,0.08);
+}
+.model-radio input { display: none; }
+.model-radio .model-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+  display: block;
+  margin-bottom: 2px;
+}
+.model-radio .model-tier {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.cost-results {
+  margin-top: 20px;
+}
+.cost-summary-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.cost-summary-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  text-align: center;
+}
+.cost-summary-card .cost-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+.cost-summary-card .cost-value {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.cost-summary-card .cost-value.highlight {
+  color: var(--primary);
+}
+
+/* Cost bar chart */
+.cost-chart {
+  margin: 20px 0;
+}
+.cost-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.cost-bar-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  min-width: 80px;
+}
+.cost-bar-track {
+  flex: 1;
+  height: 28px;
+  background: var(--bg);
+  border-radius: var(--radius-xs);
+  overflow: hidden;
+  position: relative;
+}
+.cost-bar-fill {
+  height: 100%;
+  border-radius: var(--radius-xs);
+  transition: width 0.5s ease;
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: white;
+  white-space: nowrap;
+}
+.cost-bar-fill.haiku { background: linear-gradient(90deg, #10B981, #34D399); }
+.cost-bar-fill.sonnet { background: linear-gradient(90deg, #3B82F6, #60A5FA); }
+.cost-bar-fill.opus { background: linear-gradient(90deg, #7C3AED, #A78BFA); }
+
+.cost-bar-amount {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  min-width: 80px;
+  text-align: right;
+}
+
+/* Savings recommendation */
+.savings-box {
+  background: rgba(16,185,129,0.08);
+  border: 1px solid rgba(16,185,129,0.2);
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  margin-top: 16px;
+}
+.savings-box h4 {
+  margin: 0 0 6px;
+  font-size: 0.95rem;
+  color: var(--success);
+}
+.savings-box p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+[data-theme="dark"] .savings-box {
+  background: rgba(16,185,129,0.12);
+}
+
+/* ============================================
+   INTERACTIVE: QUIZ (FINAL)
+   ============================================ */
+.final-quiz {
+  background: var(--bg-card);
+  border: 2px solid var(--primary-light);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+}
+.final-quiz h3 {
+  margin-top: 0;
+}
+
+.final-quiz-question {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.final-quiz-question .fq-number {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+.final-quiz-question .fq-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+.fq-options { list-style: none; padding: 0; }
+.fq-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 12px;
+  margin-bottom: 4px;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+.fq-option:hover { background: rgba(124, 58, 237, 0.05); }
+.fq-option input[type="radio"] {
+  accent-color: var(--primary);
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+.fq-option.selected-correct {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+.fq-option.selected-wrong {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+}
+.fq-option.reveal-correct {
+  background: rgba(16, 185, 129, 0.08);
+  color: #059669;
+  font-weight: 600;
+}
+[data-theme="dark"] .fq-option.selected-correct { color: #6EE7B7; }
+[data-theme="dark"] .fq-option.selected-wrong { color: #FCA5A5; }
+[data-theme="dark"] .fq-option.reveal-correct { color: #6EE7B7; }
+
+.final-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 32px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  margin-top: 8px;
+  box-shadow: 0 2px 8px rgba(124,58,237,0.3);
+}
+.final-submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(124,58,237,0.4);
+}
+.final-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.final-result {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: var(--radius-sm);
+  display: none;
+}
+.final-result.show { display: block; }
+.final-result.pass {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.final-result.fail {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.final-result h4 {
+  margin-top: 0;
+  margin-bottom: 6px;
+  font-size: 1.1rem;
+}
+.final-result p {
+  margin-bottom: 0;
+  font-size: 0.95rem;
+}
+.final-result.pass h4 { color: var(--success); }
+.final-result.fail h4 { color: var(--warning); }
+
+/* ============================================
+   NAVIGATION FOOTER
+   ============================================ */
+.module-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 16px;
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 2px solid var(--border);
+}
+.nav-link {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: all var(--transition);
+  min-width: 0;
+  flex: 1;
+  max-width: 50%;
+}
+.nav-link:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow);
+  transform: translateY(-1px);
+}
+.nav-link.next { align-items: flex-end; text-align: right; }
+.nav-link .nav-dir {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--primary);
+}
+.nav-link .nav-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 1024px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .hamburger {
+    display: flex;
+  }
+  .sidebar-overlay.show {
+    display: block;
+  }
+  .main-content {
+    margin-left: 0;
+  }
+  .theme-toggle {
+    right: 16px;
+  }
+  .api-builder-body {
+    grid-template-columns: 1fr;
+  }
+  .api-builder-form {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+}
+
+@media (max-width: 640px) {
+  .content-wrapper {
+    padding: 24px 16px 60px;
+  }
+  .module-header h1 {
+    font-size: 1.6rem;
+  }
+  .section-heading {
+    font-size: 1.3rem;
+  }
+  .module-nav {
+    flex-direction: column;
+  }
+  .nav-link {
+    max-width: 100%;
+  }
+  .nav-link.next {
+    align-items: flex-start;
+    text-align: left;
+  }
+  .cost-inputs {
+    grid-template-columns: 1fr;
+  }
+  .cost-summary-cards {
+    grid-template-columns: 1fr 1fr;
+  }
+  .model-radio-group {
+    flex-direction: column;
+  }
+}
+
+/* ============================================
+   SCROLLBAR STYLING
+   ============================================ */
+.sidebar::-webkit-scrollbar,
+.code-block::-webkit-scrollbar,
+.event-stream-panel::-webkit-scrollbar,
+.api-builder-form::-webkit-scrollbar,
+.api-builder-preview::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.sidebar::-webkit-scrollbar-track,
+.code-block::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+.code-block::-webkit-scrollbar-thumb,
+.event-stream-panel::-webkit-scrollbar-thumb,
+.api-builder-preview::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.section {
+  animation: fadeInUp 0.4s ease both;
+}
+</style>
+</head>
+<body>
+<!-- ============================================
+     THEME TOGGLE
+     ============================================ -->
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+  <span id="themeIcon">&#9790;</span>
+</button>
+
+<!-- ============================================
+     HAMBURGER (mobile)
+     ============================================ -->
+<button class="hamburger" id="hamburger" aria-label="Toggle sidebar">
+  <span></span>
+  <span></span>
+  <span></span>
+</button>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ============================================
+     SIDEBAR
+     ============================================ -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="../index.html" class="sidebar-back">&larr; Back to Hub</a>
+    <div class="sidebar-title">Module 20</div>
+    <div class="sidebar-module-name">Claude API Fundamentals</div>
+  </div>
+
+  <div class="sidebar-nav">
+    <!-- Section: Core Concepts -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="concepts">
+        Core Concepts <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-concepts">
+        <li><a href="#messages-api" class="sidebar-link" data-target="messages-api">The Messages API</a></li>
+        <li><a href="#using-sdks" class="sidebar-link" data-target="using-sdks">Using the SDKs</a></li>
+        <li><a href="#streaming" class="sidebar-link" data-target="streaming">Streaming</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Advanced -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="advanced">
+        Advanced <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-advanced">
+        <li><a href="#tool-use" class="sidebar-link" data-target="tool-use">Tool Use (Function Calling)</a></li>
+        <li><a href="#error-handling" class="sidebar-link" data-target="error-handling">Error Handling &amp; Retries</a></li>
+        <li><a href="#cost-optimization" class="sidebar-link" data-target="cost-optimization">Cost Optimization</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Exercises -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="exercises">
+        Exercises <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-exercises">
+        <li><a href="#api-builder" class="sidebar-link" data-target="api-builder">API Request Builder</a></li>
+        <li><a href="#stream-visualizer" class="sidebar-link" data-target="stream-visualizer">Streaming Visualizer</a></li>
+        <li><a href="#tool-loop-animator" class="sidebar-link" data-target="tool-loop-animator">Tool Use Loop Animator</a></li>
+        <li><a href="#cost-calculator" class="sidebar-link" data-target="cost-calculator">Cost Calculator</a></li>
+        <li><a href="#final-quiz" class="sidebar-link" data-target="final-quiz">End-of-Module Quiz</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sidebar-progress">
+    <div class="sidebar-progress-label">Module Progress</div>
+    <div class="sidebar-progress-track">
+      <div class="sidebar-progress-fill" id="sidebarProgressFill"></div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================
+     MAIN CONTENT
+     ============================================ -->
+<main class="main-content">
+  <div class="content-wrapper">
+
+    <!-- Module Header -->
+    <header class="module-header">
+      <div class="breadcrumb">
+        <a href="../index.html">Training Hub</a> &raquo; Module 20
+      </div>
+      <div class="module-badge">
+        <span class="number">20</span>
+        <span class="label">API</span>
+      </div>
+      <h1>Claude API Fundamentals</h1>
+      <p class="description">
+        Master the Claude Messages API from first principles. Learn authentication, request/response anatomy,
+        streaming, tool use (function calling), error handling, and cost optimization strategies for production workloads.
+      </p>
+      <div class="module-meta">
+        <span class="module-meta-item">&#9201; ~90 min</span>
+        <span class="module-meta-item">&#128218; Intermediate</span>
+        <span class="module-meta-item">&#127891; Developers, Architects</span>
+        <span class="module-meta-item">&#127919; 4 Interactive Exercises</span>
+      </div>
+    </header>
+
+    <!-- ========================================
+         SECTION 1: THE MESSAGES API
+         ======================================== -->
+    <section class="section" id="messages-api">
+      <h2 class="section-heading">1. The Messages API</h2>
+
+      <p>
+        All interactions with Claude happen through a single endpoint: the <span class="key-concept">Messages API</span>.
+        Whether you are building a chatbot, a data pipeline, or an autonomous agent, every request goes to the same place.
+      </p>
+
+      <h3>The Endpoint</h3>
+
+      <div class="code-block has-label">
+        <span class="code-label">HTTP</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="kw">POST</span> <span class="str">https://api.anthropic.com/v1/messages</span></code></div>
+
+      <h3>Authentication</h3>
+
+      <p>
+        Every request requires an API key. Pass it in the <code>x-api-key</code> header (or the equivalent
+        <code>anthropic-api-key</code> header). You also need to specify the API version with the
+        <code>anthropic-version</code> header.
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Headers</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="prop">x-api-key</span>: <span class="str">sk-ant-api03-...</span>
+<span class="prop">anthropic-version</span>: <span class="str">2023-06-01</span>
+<span class="prop">content-type</span>: <span class="str">application/json</span></code></div>
+
+      <div class="callout warning">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Never commit your API key to source control.</strong> Use environment variables
+          (<code>ANTHROPIC_API_KEY</code>) or a secrets manager. If a key is leaked, rotate it immediately
+          in the Anthropic Console.</p>
+        </div>
+      </div>
+
+      <h3>Request Body Anatomy</h3>
+
+      <p>
+        The request body is JSON with a handful of required and optional fields. Here is the minimum viable request:
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">JSON Request</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>{
+  <span class="prop">"model"</span>: <span class="str">"claude-sonnet-4-6-20250514"</span>,
+  <span class="prop">"max_tokens"</span>: <span class="num">1024</span>,
+  <span class="prop">"system"</span>: <span class="str">"You are a helpful assistant."</span>,
+  <span class="prop">"messages"</span>: [
+    {<span class="prop">"role"</span>: <span class="str">"user"</span>, <span class="prop">"content"</span>: <span class="str">"What is the capital of France?"</span>}
+  ]
+}</code></div>
+
+      <h3>Response Structure</h3>
+
+      <p>
+        The API returns a structured JSON response that includes the model's output, metadata, and token usage:
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">JSON Response</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>{
+  <span class="prop">"id"</span>: <span class="str">"msg_01XFDUDYJgAACzvnptvVoYEL"</span>,
+  <span class="prop">"type"</span>: <span class="str">"message"</span>,
+  <span class="prop">"role"</span>: <span class="str">"assistant"</span>,
+  <span class="prop">"content"</span>: [
+    {<span class="prop">"type"</span>: <span class="str">"text"</span>, <span class="prop">"text"</span>: <span class="str">"The capital of France is Paris."</span>}
+  ],
+  <span class="prop">"model"</span>: <span class="str">"claude-sonnet-4-6-20250514"</span>,
+  <span class="prop">"stop_reason"</span>: <span class="str">"end_turn"</span>,
+  <span class="prop">"usage"</span>: {
+    <span class="prop">"input_tokens"</span>: <span class="num">25</span>,
+    <span class="prop">"output_tokens"</span>: <span class="num">15</span>
+  }
+}</code></div>
+
+      <h3>Key Parameters</h3>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Parameter</th>
+              <th>Required</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>model</code></td>
+              <td>Yes</td>
+              <td>Model identifier (e.g. <code>claude-sonnet-4-6-20250514</code>)</td>
+            </tr>
+            <tr>
+              <td><code>max_tokens</code></td>
+              <td>Yes</td>
+              <td>Maximum tokens in the response. Set this intentionally.</td>
+            </tr>
+            <tr>
+              <td><code>messages</code></td>
+              <td>Yes</td>
+              <td>Array of message objects with <code>role</code> and <code>content</code></td>
+            </tr>
+            <tr>
+              <td><code>system</code></td>
+              <td>No</td>
+              <td>System prompt that guides Claude's behavior</td>
+            </tr>
+            <tr>
+              <td><code>temperature</code></td>
+              <td>No</td>
+              <td>Randomness (0.0 = deterministic, 1.0 = creative). Default: 1.0</td>
+            </tr>
+            <tr>
+              <td><code>top_p</code></td>
+              <td>No</td>
+              <td>Nucleus sampling. Use temperature <em>or</em> top_p, not both.</td>
+            </tr>
+            <tr>
+              <td><code>tools</code></td>
+              <td>No</td>
+              <td>Array of tool definitions for function calling</td>
+            </tr>
+            <tr>
+              <td><code>stream</code></td>
+              <td>No</td>
+              <td>Set to <code>true</code> for streaming responses via SSE</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Multi-Turn Conversations</h3>
+
+      <p>
+        Claude is stateless -- it does not remember previous requests. To have a multi-turn conversation, you
+        send <strong>all previous messages</strong> (both user and assistant) in each request. Messages must
+        alternate between <code>user</code> and <code>assistant</code> roles.
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Multi-Turn Example</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>{
+  <span class="prop">"model"</span>: <span class="str">"claude-sonnet-4-6-20250514"</span>,
+  <span class="prop">"max_tokens"</span>: <span class="num">1024</span>,
+  <span class="prop">"messages"</span>: [
+    {<span class="prop">"role"</span>: <span class="str">"user"</span>, <span class="prop">"content"</span>: <span class="str">"What is the capital of France?"</span>},
+    {<span class="prop">"role"</span>: <span class="str">"assistant"</span>, <span class="prop">"content"</span>: <span class="str">"The capital of France is Paris."</span>},
+    {<span class="prop">"role"</span>: <span class="str">"user"</span>, <span class="prop">"content"</span>: <span class="str">"What is its population?"</span>}
+  ]
+}</code></div>
+
+      <h3>The <code>stop_reason</code> Field</h3>
+
+      <p>
+        The <code>stop_reason</code> field tells you <em>why</em> Claude stopped generating. This is critical
+        for building reliable applications:
+      </p>
+
+      <ul>
+        <li><strong><code>"end_turn"</code></strong> -- Claude finished its response naturally.</li>
+        <li><strong><code>"max_tokens"</code></strong> -- Claude hit the <code>max_tokens</code> limit. The response is likely truncated.</li>
+        <li><strong><code>"tool_use"</code></strong> -- Claude wants to call a tool. You must execute the tool and send the result back.</li>
+      </ul>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>Always check <code>stop_reason</code>.</strong> If it is <code>"max_tokens"</code>,
+          your response was cut off. If it is <code>"tool_use"</code>, Claude is waiting for you to
+          execute the tool and return results. Ignoring these signals leads to broken applications.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 2: USING THE SDKs
+         ======================================== -->
+    <section class="section" id="using-sdks">
+      <h2 class="section-heading">2. Using the SDKs</h2>
+
+      <p>
+        While you can call the Messages API with raw HTTP, the official SDKs provide typed interfaces,
+        automatic retries, and streaming helpers that make development much smoother.
+      </p>
+
+      <h3>Python SDK</h3>
+
+      <div class="code-block has-label">
+        <span class="code-label">Install</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="fn">pip</span> <span class="param">install</span> anthropic</code></div>
+
+      <div class="code-block has-label">
+        <span class="code-label">Python</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="kw">import</span> anthropic
+
+<span class="cm"># The SDK reads ANTHROPIC_API_KEY from your environment</span>
+client = anthropic.<span class="fn">Anthropic</span>()
+
+message = client.messages.<span class="fn">create</span>(
+    model=<span class="str">"claude-sonnet-4-6-20250514"</span>,
+    max_tokens=<span class="num">1024</span>,
+    messages=[
+        {<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="str">"Hello, Claude!"</span>}
+    ]
+)
+
+<span class="fn">print</span>(message.content[<span class="num">0</span>].text)</code></div>
+
+      <h3>TypeScript / Node.js SDK</h3>
+
+      <div class="code-block has-label">
+        <span class="code-label">Install</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="fn">npm</span> <span class="param">install</span> @anthropic-ai/sdk</code></div>
+
+      <div class="code-block has-label">
+        <span class="code-label">TypeScript</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="kw">import</span> Anthropic <span class="kw">from</span> <span class="str">'@anthropic-ai/sdk'</span>;
+
+<span class="cm">// The SDK reads ANTHROPIC_API_KEY from your environment</span>
+<span class="kw">const</span> client = <span class="kw">new</span> <span class="fn">Anthropic</span>();
+
+<span class="kw">const</span> message = <span class="kw">await</span> client.messages.<span class="fn">create</span>({
+  model: <span class="str">"claude-sonnet-4-6-20250514"</span>,
+  max_tokens: <span class="num">1024</span>,
+  messages: [
+    { role: <span class="str">"user"</span>, content: <span class="str">"Hello, Claude!"</span> }
+  ]
+});
+
+console.<span class="fn">log</span>(message.content[<span class="num">0</span>].text);</code></div>
+
+      <h3>Error Handling</h3>
+
+      <p>
+        The SDKs throw typed exceptions that make error handling straightforward:
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Python</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="kw">import</span> anthropic
+
+client = anthropic.<span class="fn">Anthropic</span>()
+
+<span class="kw">try</span>:
+    message = client.messages.<span class="fn">create</span>(
+        model=<span class="str">"claude-sonnet-4-6-20250514"</span>,
+        max_tokens=<span class="num">1024</span>,
+        messages=[{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="str">"Hello!"</span>}]
+    )
+<span class="kw">except</span> anthropic.<span class="type">AuthenticationError</span>:
+    <span class="fn">print</span>(<span class="str">"Invalid API key"</span>)
+<span class="kw">except</span> anthropic.<span class="type">RateLimitError</span>:
+    <span class="fn">print</span>(<span class="str">"Rate limited -- back off and retry"</span>)
+<span class="kw">except</span> anthropic.<span class="type">APIError</span> <span class="kw">as</span> e:
+    <span class="fn">print</span>(<span class="str">f"API error: </span>{e.status_code}<span class="str">"</span>)</code></div>
+
+      <div class="callout info">
+        <span class="callout-icon">&#9432;</span>
+        <div class="callout-content">
+          <p><strong>Environment variable:</strong> Both SDKs look for <code>ANTHROPIC_API_KEY</code>
+          automatically. You can also pass the key explicitly:
+          <code>anthropic.Anthropic(api_key="sk-...")</code> in Python or
+          <code>new Anthropic({ apiKey: "sk-..." })</code> in TypeScript.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 3: STREAMING
+         ======================================== -->
+    <section class="section" id="streaming">
+      <h2 class="section-heading">3. Streaming</h2>
+
+      <p>
+        Without streaming, your application waits for the <em>entire</em> response before showing anything to the user.
+        With streaming, tokens appear in real-time as Claude generates them, creating a dramatically better user experience.
+      </p>
+
+      <h3>Why Streaming Matters</h3>
+
+      <p>
+        A 500-token response from Claude Sonnet might take 3-5 seconds to generate. Without streaming, the user
+        stares at a blank screen for that entire duration. With streaming, they see the first word within
+        ~200 milliseconds.
+      </p>
+
+      <h3>Server-Sent Events (SSE)</h3>
+
+      <p>
+        Streaming uses the <span class="key-concept">SSE protocol</span>. When you set <code>"stream": true</code>
+        in your request, the API sends back a stream of events rather than a single JSON response.
+      </p>
+
+      <h3>Event Types</h3>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Event</th>
+              <th>When</th>
+              <th>Contains</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>message_start</code></td>
+              <td>First event</td>
+              <td>Message ID, model, role</td>
+            </tr>
+            <tr>
+              <td><code>content_block_start</code></td>
+              <td>New content block begins</td>
+              <td>Block type (text or tool_use)</td>
+            </tr>
+            <tr>
+              <td><code>content_block_delta</code></td>
+              <td>Each chunk of text</td>
+              <td>Incremental text addition (1-3 words)</td>
+            </tr>
+            <tr>
+              <td><code>content_block_stop</code></td>
+              <td>Content block finishes</td>
+              <td>Block index</td>
+            </tr>
+            <tr>
+              <td><code>message_delta</code></td>
+              <td>Near end</td>
+              <td>Stop reason, final usage stats</td>
+            </tr>
+            <tr>
+              <td><code>message_stop</code></td>
+              <td>Last event</td>
+              <td>Stream complete signal</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Python Streaming</h3>
+
+      <div class="code-block has-label">
+        <span class="code-label">Python</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="kw">with</span> client.messages.<span class="fn">stream</span>(
+    model=<span class="str">"claude-sonnet-4-6-20250514"</span>,
+    max_tokens=<span class="num">1024</span>,
+    messages=[{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="str">"Write a poem about APIs."</span>}]
+) <span class="kw">as</span> stream:
+    <span class="kw">for</span> text <span class="kw">in</span> stream.text_stream:
+        <span class="fn">print</span>(text, end=<span class="str">""</span>, flush=<span class="kw">True</span>)</code></div>
+
+      <h3>TypeScript Streaming</h3>
+
+      <div class="code-block has-label">
+        <span class="code-label">TypeScript</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="kw">const</span> stream = client.messages.<span class="fn">stream</span>({
+  model: <span class="str">"claude-sonnet-4-6-20250514"</span>,
+  max_tokens: <span class="num">1024</span>,
+  messages: [{ role: <span class="str">"user"</span>, content: <span class="str">"Write a poem about APIs."</span> }]
+});
+
+<span class="kw">for await</span> (<span class="kw">const</span> event <span class="kw">of</span> stream) {
+  <span class="kw">if</span> (event.type === <span class="str">"content_block_delta"</span>) {
+    process.stdout.<span class="fn">write</span>(event.delta.text);
+  }
+}</code></div>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>Always stream in user-facing applications.</strong> The perceived latency improvement
+          is dramatic. Even when processing the stream programmatically, streaming lets you start work
+          on partial results sooner.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 1: API REQUEST BUILDER
+         ======================================== -->
+    <section class="section" id="api-builder">
+      <h2 class="section-heading">Interactive: API Request Builder</h2>
+
+      <p>
+        Build a Messages API request interactively. Adjust the form on the left and watch the JSON request body
+        update in real-time on the right. Use the presets to quickly see common patterns.
+      </p>
+
+      <div class="api-builder">
+        <div class="api-builder-header">
+          <h3>Messages API Request Builder</h3>
+          <p>Configure your request and see the JSON body update live</p>
+        </div>
+
+        <div style="padding: 12px 24px 0; border-bottom: 1px solid var(--border);">
+          <div class="preset-buttons">
+            <button class="preset-btn active" onclick="loadPreset('simple')">Simple Chat</button>
+            <button class="preset-btn" onclick="loadPreset('system')">With System Prompt</button>
+            <button class="preset-btn" onclick="loadPreset('tools')">With Tool Use</button>
+          </div>
+        </div>
+
+        <div class="api-builder-body">
+          <div class="api-builder-form" id="builderForm">
+            <div class="form-group">
+              <label>Model</label>
+              <select id="builderModel" onchange="updatePreview()">
+                <option value="claude-haiku-4-5-20250514">claude-haiku-4-5-20250514</option>
+                <option value="claude-sonnet-4-6-20250514" selected>claude-sonnet-4-6-20250514</option>
+                <option value="claude-opus-4-6-20250514">claude-opus-4-6-20250514</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>System Prompt (optional)</label>
+              <textarea id="builderSystem" rows="2" placeholder="e.g. You are a helpful assistant." oninput="updatePreview()"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Messages</label>
+              <div id="builderMessages">
+                <!-- Messages injected by JS -->
+              </div>
+              <button class="btn-secondary btn-small" onclick="addMessage()" style="margin-top: 8px;">+ Add Message</button>
+            </div>
+
+            <div class="form-group">
+              <label>Temperature: <span id="tempValue">1.0</span></label>
+              <div class="range-group">
+                <input type="range" id="builderTemp" min="0" max="10" value="10" step="1" oninput="updateTempLabel(); updatePreview();">
+                <span class="range-value" id="tempDisplay">1.0</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Max Tokens: <span id="maxTokValue">1024</span></label>
+              <div class="range-group">
+                <input type="range" id="builderMaxTokens" min="1" max="4096" value="1024" step="1" oninput="updateMaxTokLabel(); updatePreview();">
+                <span class="range-value" id="maxTokDisplay">1024</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Tools (optional)</label>
+              <div id="builderTools">
+                <!-- Tools injected by JS -->
+              </div>
+              <button class="btn-secondary btn-small" onclick="addTool()" style="margin-top: 8px;">+ Add Tool</button>
+            </div>
+
+            <div class="btn-row">
+              <button class="btn-primary" onclick="simulateResponse()">Simulate Response</button>
+            </div>
+          </div>
+
+          <div class="api-builder-preview">
+            <div class="preview-label">Live JSON Request Body</div>
+            <pre id="builderPreviewJSON"></pre>
+          </div>
+        </div>
+
+        <div class="sim-response" id="simResponse">
+          <div class="sim-response-header">Simulated Response (200 OK)</div>
+          <pre id="simResponseJSON"></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 4: TOOL USE (FUNCTION CALLING)
+         ======================================== -->
+    <section class="section" id="tool-use">
+      <h2 class="section-heading">4. Tool Use (Function Calling)</h2>
+
+      <p>
+        <span class="key-concept">Tool use</span> is the most powerful capability of the Claude API.
+        It allows Claude to call functions that <em>you</em> define and control. This is the foundation
+        of agentic applications -- Claude can search databases, call external APIs, run calculations,
+        and take real-world actions through your code.
+      </p>
+
+      <h3>How It Works</h3>
+
+      <p>
+        You define tools as JSON Schema descriptions in your API request. When Claude determines it
+        needs to use a tool, it responds with a structured <code>tool_use</code> content block instead
+        of plain text. Your code then executes the function and sends the result back.
+      </p>
+
+      <h3>Defining Tools</h3>
+
+      <p>
+        Each tool needs a <code>name</code>, a <code>description</code> (which Claude reads to decide
+        when to use it), and an <code>input_schema</code> that defines the parameters:
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Tool Definition</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>{
+  <span class="prop">"name"</span>: <span class="str">"get_weather"</span>,
+  <span class="prop">"description"</span>: <span class="str">"Get current weather for a location. Returns temperature, conditions, and humidity."</span>,
+  <span class="prop">"input_schema"</span>: {
+    <span class="prop">"type"</span>: <span class="str">"object"</span>,
+    <span class="prop">"properties"</span>: {
+      <span class="prop">"location"</span>: {
+        <span class="prop">"type"</span>: <span class="str">"string"</span>,
+        <span class="prop">"description"</span>: <span class="str">"City and country, e.g. 'Paris, France'"</span>
+      },
+      <span class="prop">"units"</span>: {
+        <span class="prop">"type"</span>: <span class="str">"string"</span>,
+        <span class="prop">"enum"</span>: [<span class="str">"celsius"</span>, <span class="str">"fahrenheit"</span>],
+        <span class="prop">"description"</span>: <span class="str">"Temperature units"</span>
+      }
+    },
+    <span class="prop">"required"</span>: [<span class="str">"location"</span>]
+  }
+}</code></div>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>Write great descriptions.</strong> Claude uses the tool description to decide
+          <em>when</em> to call it. A vague description like "Gets data" will lead to poor tool selection.
+          Be specific about what the tool does and what it returns.</p>
+        </div>
+      </div>
+
+      <h3>The Tool Use Loop (The Agentic Pattern)</h3>
+
+      <p>
+        This is the core agentic loop that powers sophisticated AI applications. Understand this pattern
+        deeply:
+      </p>
+
+      <div class="step-list">
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Send message with tool definitions</h4>
+            <p>Include the <code>tools</code> array in your API request along with the user message.
+            Claude now knows what tools are available.</p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Claude responds with <code>tool_use</code></h4>
+            <p>If Claude decides a tool is needed, it responds with <code>stop_reason: "tool_use"</code>
+            and includes a <code>tool_use</code> content block with the tool name and input arguments.</p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Your code executes the function</h4>
+            <p>You extract the tool name and input from Claude's response, call the actual function in your
+            code, and get the result.</p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Send <code>tool_result</code> back</h4>
+            <p>You add Claude's response to the messages array, then add a <code>user</code> message
+            containing a <code>tool_result</code> content block with the function output.</p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Claude responds with final text</h4>
+            <p>Claude reads the tool result and responds with natural language. It might also call
+            <em>another</em> tool -- in which case you repeat steps 2-4.</p>
+          </div>
+        </div>
+      </div>
+
+      <h3><code>tool_choice</code> Parameter</h3>
+
+      <ul>
+        <li><strong><code>"auto"</code></strong> (default) -- Claude decides whether to use a tool or respond with text.</li>
+        <li><strong><code>"any"</code></strong> -- Forces Claude to call at least one tool. It will not respond with text only.</li>
+        <li><strong><code>{"type": "tool", "name": "get_weather"}</code></strong> -- Forces Claude to call a specific tool.</li>
+      </ul>
+
+      <h3>Multiple Tool Calls</h3>
+
+      <p>
+        Claude can call multiple tools in a single response. For example, if a user asks "What's the weather
+        in Paris and London?", Claude might respond with two <code>tool_use</code> blocks. You need to execute
+        both and send both results back.
+      </p>
+
+      <h3>Error Handling in Tool Results</h3>
+
+      <p>
+        If a tool execution fails, send the error back as a <code>tool_result</code> with
+        <code>"is_error": true</code>. Claude will gracefully handle the error and either retry
+        or explain the issue to the user.
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Error Result</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>{
+  <span class="prop">"role"</span>: <span class="str">"user"</span>,
+  <span class="prop">"content"</span>: [
+    {
+      <span class="prop">"type"</span>: <span class="str">"tool_result"</span>,
+      <span class="prop">"tool_use_id"</span>: <span class="str">"toolu_01A..."</span>,
+      <span class="prop">"is_error"</span>: <span class="kw">true</span>,
+      <span class="prop">"content"</span>: <span class="str">"Error: Location 'Narnia' not found in weather database."</span>
+    }
+  ]
+}</code></div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 2: STREAMING VISUALIZER
+         ======================================== -->
+    <section class="section" id="stream-visualizer">
+      <h2 class="section-heading">Interactive: Streaming Visualizer</h2>
+
+      <p>
+        Watch how SSE events arrive over time and build up a complete response. The top panel shows
+        raw events; the bottom panel shows the response as a user would see it.
+      </p>
+
+      <div class="stream-viz">
+        <div class="stream-viz-header">
+          <h3>SSE Streaming Visualizer</h3>
+          <div class="stream-controls">
+            <label>Speed:</label>
+            <select id="streamSpeed" onchange="updateStreamSpeed()">
+              <option value="2">0.5x</option>
+              <option value="1" selected>1x</option>
+              <option value="0.5">2x</option>
+              <option value="0.2">5x</option>
+            </select>
+            <div class="toggle-wrap">
+              <input type="checkbox" id="showRawEvents" checked onchange="toggleRawEvents()">
+              <label for="showRawEvents">Show Raw Events</label>
+            </div>
+            <button class="btn-primary btn-small" id="streamPlayBtn" onclick="toggleStreamPlay()">Play</button>
+            <button class="btn-secondary btn-small" onclick="resetStream()">Reset</button>
+          </div>
+        </div>
+
+        <div class="stream-panels">
+          <div class="event-stream-panel" id="eventStreamPanel">
+            <div class="panel-label">Event Stream</div>
+            <div id="eventLines"></div>
+          </div>
+          <div class="response-panel">
+            <div class="panel-label">Response</div>
+            <div class="response-text" id="streamResponseText"><span class="cursor-blink" id="streamCursor" style="display:none;"></span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 3: TOOL USE LOOP ANIMATOR
+         ======================================== -->
+    <section class="section" id="tool-loop-animator">
+      <h2 class="section-heading">Interactive: Tool Use Loop Animator</h2>
+
+      <p>
+        Step through the complete tool use cycle. Click "Animate" to watch each step light up in sequence,
+        or click individual "Show JSON" buttons to inspect the payloads.
+      </p>
+
+      <div class="tool-loop">
+        <div class="tool-loop-header">
+          <h3>Tool Use Loop</h3>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn-primary btn-small" onclick="animateToolLoop()">Animate</button>
+            <button class="btn-secondary btn-small" onclick="resetToolLoop()">Reset</button>
+          </div>
+        </div>
+
+        <div style="padding: 0 24px;">
+          <div class="loop-variant-tabs">
+            <button class="loop-tab active" onclick="switchLoopVariant('single', this)">Single Tool Call</button>
+            <button class="loop-tab" onclick="switchLoopVariant('multi', this)">Multiple Tool Calls</button>
+          </div>
+        </div>
+
+        <div class="tool-loop-body" id="toolLoopSingle">
+          <!-- Single tool call timeline - injected by JS -->
+        </div>
+
+        <div class="tool-loop-body" id="toolLoopMulti" style="display: none;">
+          <!-- Multi tool call timeline - injected by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 5: ERROR HANDLING & RETRIES
+         ======================================== -->
+    <section class="section" id="error-handling">
+      <h2 class="section-heading">5. Error Handling &amp; Retries</h2>
+
+      <p>
+        Production applications must handle API errors gracefully. The Claude API uses standard HTTP
+        status codes, and the SDKs provide typed exceptions for each error category.
+      </p>
+
+      <h3>Error Types</h3>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Meaning</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>400</code></td>
+              <td>Invalid request (bad parameters)</td>
+              <td>Fix the request. Do not retry.</td>
+            </tr>
+            <tr>
+              <td><code>401</code></td>
+              <td>Authentication failed</td>
+              <td>Check your API key. Do not retry.</td>
+            </tr>
+            <tr>
+              <td><code>429</code></td>
+              <td>Rate limited</td>
+              <td>Exponential backoff and retry.</td>
+            </tr>
+            <tr>
+              <td><code>500</code></td>
+              <td>Internal server error</td>
+              <td>Retry with backoff. Usually transient.</td>
+            </tr>
+            <tr>
+              <td><code>529</code></td>
+              <td>API overloaded</td>
+              <td>Retry with longer backoff. The system is under heavy load.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Retry Strategy with Exponential Backoff</h3>
+
+      <div class="code-block has-label">
+        <span class="code-label">Python</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="kw">import</span> time
+<span class="kw">import</span> anthropic
+
+client = anthropic.<span class="fn">Anthropic</span>()
+
+<span class="kw">def</span> <span class="fn">call_with_retry</span>(messages, max_retries=<span class="num">3</span>):
+    <span class="kw">for</span> attempt <span class="kw">in</span> <span class="fn">range</span>(max_retries):
+        <span class="kw">try</span>:
+            <span class="kw">return</span> client.messages.<span class="fn">create</span>(
+                model=<span class="str">"claude-sonnet-4-6-20250514"</span>,
+                max_tokens=<span class="num">1024</span>,
+                messages=messages
+            )
+        <span class="kw">except</span> anthropic.<span class="type">RateLimitError</span>:
+            wait = <span class="num">2</span> ** attempt  <span class="cm"># 1s, 2s, 4s</span>
+            <span class="fn">print</span>(<span class="str">f"Rate limited. Retrying in </span>{wait}<span class="str">s..."</span>)
+            time.<span class="fn">sleep</span>(wait)
+        <span class="kw">except</span> anthropic.<span class="type">APIStatusError</span> <span class="kw">as</span> e:
+            <span class="kw">if</span> e.status_code == <span class="num">529</span>:
+                wait = <span class="num">2</span> ** (attempt + <span class="num">1</span>)  <span class="cm"># Longer backoff for overload</span>
+                time.<span class="fn">sleep</span>(wait)
+            <span class="kw">else</span>:
+                <span class="kw">raise</span>
+    <span class="kw">raise</span> <span class="type">Exception</span>(<span class="str">"Max retries exceeded"</span>)</code></div>
+
+      <h3>Rate Limits</h3>
+
+      <ul>
+        <li><strong>Requests per minute (RPM)</strong> -- How many API calls you can make per minute.</li>
+        <li><strong>Tokens per minute (TPM)</strong> -- Combined input and output tokens per minute.</li>
+        <li><strong>Tokens per day (TPD)</strong> -- Total tokens across a 24-hour window.</li>
+      </ul>
+
+      <p>
+        Rate limits vary by model and usage tier. Check the <code>x-ratelimit-*</code> response headers
+        to see your current limits and remaining quota.
+      </p>
+
+      <div class="callout info">
+        <span class="callout-icon">&#9432;</span>
+        <div class="callout-content">
+          <p><strong>SDK built-in retries:</strong> The official SDKs include automatic retry logic
+          for 429 and 5xx errors. You can configure the retry count:
+          <code>anthropic.Anthropic(max_retries=5)</code>. For most applications, the built-in retries
+          are sufficient.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 6: COST OPTIMIZATION
+         ======================================== -->
+    <section class="section" id="cost-optimization">
+      <h2 class="section-heading">6. Cost Optimization</h2>
+
+      <p>
+        API costs are directly proportional to token usage. Understanding the pricing model and applying
+        the right optimization strategies can reduce your costs by 80% or more without sacrificing quality.
+      </p>
+
+      <h3>Model Selection by Task</h3>
+
+      <p>
+        Not every task requires the most powerful model. Match the model to the task complexity:
+      </p>
+
+      <ul>
+        <li><strong>Haiku 4.5</strong> -- Classification, extraction, formatting, simple Q&amp;A. Fast and cheap.</li>
+        <li><strong>Sonnet 4.6</strong> -- Most development tasks, code generation, analysis, writing. Best balance.</li>
+        <li><strong>Opus 4.6</strong> -- Complex reasoning, novel problem-solving, research. Use when quality is paramount.</li>
+      </ul>
+
+      <h3>Pricing Comparison</h3>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Input (per 1M tokens)</th>
+              <th>Output (per 1M tokens)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Haiku 4.5</strong></td>
+              <td>$0.80</td>
+              <td>$4.00</td>
+            </tr>
+            <tr>
+              <td><strong>Sonnet 4.6</strong></td>
+              <td>$3.00</td>
+              <td>$15.00</td>
+            </tr>
+            <tr>
+              <td><strong>Opus 4.6</strong></td>
+              <td>$15.00</td>
+              <td>$75.00</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Prompt Caching</h3>
+
+      <p>
+        If you send the same system prompt or tool definitions across many requests, enable
+        <span class="key-concept">prompt caching</span>. Cached input tokens are billed at 90% less
+        than regular input tokens. The first request pays full price; subsequent requests within the
+        cache TTL get the discount.
+      </p>
+
+      <h3>Message Batches API</h3>
+
+      <p>
+        For non-urgent workloads -- bulk classification, report generation, data processing -- use the
+        <span class="key-concept">Message Batches API</span>. You submit up to 100,000 requests in a batch,
+        and the API processes them within 24 hours at a <strong>50% discount</strong>.
+      </p>
+
+      <h3>Token Budgeting Best Practices</h3>
+
+      <ul>
+        <li><strong>Set <code>max_tokens</code> appropriately.</strong> If you expect a 200-token response, don't set it to 4096. While you only pay for tokens actually generated, lower limits prevent runaway costs from unexpectedly long outputs.</li>
+        <li><strong>Keep system prompts concise.</strong> Every token in the system prompt is billed on every request.</li>
+        <li><strong>Trim conversation history.</strong> In multi-turn chats, summarize or truncate old messages rather than sending the entire history.</li>
+        <li><strong>Monitor usage by feature.</strong> Tag requests with metadata and track costs per feature, per user, or per model.</li>
+      </ul>
+
+      <div class="callout important">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Output tokens cost 5x more than input tokens.</strong> This is true across all models.
+          Techniques that reduce output length (structured JSON responses, concise formatting instructions)
+          have outsized cost impact.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 4: COST CALCULATOR
+         ======================================== -->
+    <section class="section" id="cost-calculator">
+      <h2 class="section-heading">Interactive: Cost Calculator</h2>
+
+      <p>
+        Estimate your monthly API costs. Enter your expected usage patterns and see the cost breakdown
+        across all three models.
+      </p>
+
+      <div class="cost-calc">
+        <div class="cost-calc-header">
+          <h3>Monthly Cost Estimator</h3>
+          <p>Adjust your usage parameters and model selection to estimate costs</p>
+        </div>
+
+        <div class="cost-calc-body">
+          <div class="cost-inputs">
+            <div class="cost-input-group">
+              <label>Monthly API Calls</label>
+              <input type="number" id="costCalls" value="10000" min="1" oninput="updateCostCalc()">
+            </div>
+            <div class="cost-input-group">
+              <label>Avg Input Tokens per Call</label>
+              <input type="number" id="costInputTokens" value="500" min="1" oninput="updateCostCalc()">
+            </div>
+            <div class="cost-input-group">
+              <label>Avg Output Tokens per Call</label>
+              <input type="number" id="costOutputTokens" value="200" min="1" oninput="updateCostCalc()">
+            </div>
+          </div>
+
+          <label style="font-size: 0.85rem; font-weight: 600; color: var(--text); display: block; margin-bottom: 10px;">Select Primary Model</label>
+          <div class="model-radio-group" id="modelRadioGroup">
+            <div class="model-radio" onclick="selectModel('haiku', this)">
+              <input type="radio" name="model" value="haiku">
+              <span class="model-name">Haiku 4.5</span>
+              <span class="model-tier">Fast &amp; Affordable</span>
+            </div>
+            <div class="model-radio selected" onclick="selectModel('sonnet', this)">
+              <input type="radio" name="model" value="sonnet" checked>
+              <span class="model-name">Sonnet 4.6</span>
+              <span class="model-tier">Balanced</span>
+            </div>
+            <div class="model-radio" onclick="selectModel('opus', this)">
+              <input type="radio" name="model" value="opus">
+              <span class="model-name">Opus 4.6</span>
+              <span class="model-tier">Most Capable</span>
+            </div>
+          </div>
+
+          <div class="cost-results" id="costResults">
+            <div class="cost-summary-cards" id="costSummaryCards">
+              <!-- Injected by JS -->
+            </div>
+
+            <h4 style="margin-top: 20px; margin-bottom: 12px;">Cost Comparison (All Models)</h4>
+            <div class="cost-chart" id="costChart">
+              <!-- Injected by JS -->
+            </div>
+
+            <div class="savings-box" id="savingsBox">
+              <!-- Injected by JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         END-OF-MODULE QUIZ
+         ======================================== -->
+    <section class="section" id="final-quiz">
+      <h2 class="section-heading">End-of-Module Quiz</h2>
+
+      <p>
+        Test your understanding of Claude API fundamentals. Answer all 8 questions and score at least 6
+        correct to pass. Your progress will be saved locally.
+      </p>
+
+      <div class="final-quiz">
+        <h3>Knowledge Check</h3>
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 24px;">8 questions &middot; 6 correct to pass</p>
+
+        <div id="finalQuizQuestions">
+          <!-- Injected by JS -->
+        </div>
+
+        <button class="final-submit-btn" id="finalSubmitBtn" disabled onclick="submitFinalQuiz()">
+          Submit Answers
+        </button>
+
+        <div class="final-result" id="finalResult">
+          <h4 id="finalResultTitle"></h4>
+          <p id="finalResultText"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         NAVIGATION FOOTER
+         ======================================== -->
+    <nav class="module-nav">
+      <a href="13-cowork-mastery.html" class="nav-link prev">
+        <span class="nav-dir">&larr; Previous</span>
+        <span class="nav-title">Module 13: Cowork Mastery</span>
+      </a>
+      <a href="21-prompt-engineering.html" class="nav-link next">
+        <span class="nav-dir">Next &rarr;</span>
+        <span class="nav-title">Module 21: Prompt Engineering Lab</span>
+      </a>
+    </nav>
+
+  </div>
+</main>
+
+<!-- ============================================
+     JAVASCRIPT (ES5 compatible)
+     ============================================ -->
+<script>
+(function() {
+  'use strict';
+
+  // ==========================================
+  // THEME MANAGEMENT
+  // ==========================================
+  var THEME_KEY = 'claude-training-theme';
+
+  function getTheme() {
+    return localStorage.getItem(THEME_KEY) || 'light';
+  }
+
+  function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem(THEME_KEY, theme);
+    var icon = document.getElementById('themeIcon');
+    if (icon) {
+      icon.textContent = theme === 'dark' ? '\u2600' : '\u263E';
+    }
+  }
+
+  setTheme(getTheme());
+
+  document.getElementById('themeToggle').addEventListener('click', function() {
+    var current = getTheme();
+    setTheme(current === 'dark' ? 'light' : 'dark');
+  });
+
+  // ==========================================
+  // SIDEBAR MOBILE TOGGLE
+  // ==========================================
+  var hamburger = document.getElementById('hamburger');
+  var sidebar = document.getElementById('sidebar');
+  var overlay = document.getElementById('sidebarOverlay');
+
+  function toggleSidebar() {
+    var isOpen = sidebar.classList.contains('open');
+    sidebar.classList.toggle('open');
+    hamburger.classList.toggle('open');
+    if (isOpen) {
+      overlay.classList.remove('show');
+    } else {
+      overlay.classList.add('show');
+    }
+  }
+
+  hamburger.addEventListener('click', toggleSidebar);
+  overlay.addEventListener('click', toggleSidebar);
+
+  // ==========================================
+  // SIDEBAR SECTION COLLAPSING
+  // ==========================================
+  var sectionToggles = document.querySelectorAll('.sidebar-section-toggle');
+  for (var i = 0; i < sectionToggles.length; i++) {
+    (function(btn) {
+      btn.addEventListener('click', function() {
+        var sectionName = this.getAttribute('data-section');
+        var linksList = document.getElementById('nav-' + sectionName);
+        var isCollapsed = this.classList.contains('collapsed');
+
+        if (isCollapsed) {
+          this.classList.remove('collapsed');
+          linksList.classList.remove('collapsed');
+          linksList.style.maxHeight = linksList.scrollHeight + 'px';
+        } else {
+          this.classList.add('collapsed');
+          linksList.style.maxHeight = linksList.scrollHeight + 'px';
+          linksList.offsetHeight; // Force reflow
+          linksList.classList.add('collapsed');
+        }
+      });
+
+      var sectionName = btn.getAttribute('data-section');
+      var linksList = document.getElementById('nav-' + sectionName);
+      if (linksList) {
+        linksList.style.maxHeight = linksList.scrollHeight + 'px';
+      }
+    })(sectionToggles[i]);
+  }
+
+  // ==========================================
+  // SCROLLSPY
+  // ==========================================
+  var sidebarLinks = document.querySelectorAll('.sidebar-link');
+  var sections = [];
+
+  for (var i = 0; i < sidebarLinks.length; i++) {
+    var targetId = sidebarLinks[i].getAttribute('data-target');
+    var sectionEl = document.getElementById(targetId);
+    if (sectionEl) {
+      sections.push({ el: sectionEl, link: sidebarLinks[i], id: targetId });
+    }
+  }
+
+  function updateScrollspy() {
+    var scrollPos = window.scrollY + 100;
+    var active = null;
+
+    for (var i = sections.length - 1; i >= 0; i--) {
+      if (sections[i].el.offsetTop <= scrollPos) {
+        active = sections[i];
+        break;
+      }
+    }
+
+    for (var j = 0; j < sidebarLinks.length; j++) {
+      sidebarLinks[j].classList.remove('active');
+    }
+    if (active) {
+      active.link.classList.add('active');
+    }
+
+    updateSidebarProgress();
+  }
+
+  var scrollTimer = null;
+  window.addEventListener('scroll', function() {
+    if (scrollTimer) return;
+    scrollTimer = setTimeout(function() {
+      scrollTimer = null;
+      updateScrollspy();
+    }, 50);
+  });
+  updateScrollspy();
+
+  // Close mobile sidebar on link click
+  for (var i = 0; i < sidebarLinks.length; i++) {
+    sidebarLinks[i].addEventListener('click', function() {
+      if (window.innerWidth <= 1024) {
+        sidebar.classList.remove('open');
+        hamburger.classList.remove('open');
+        overlay.classList.remove('show');
+      }
+    });
+  }
+
+  // ==========================================
+  // SIDEBAR PROGRESS
+  // ==========================================
+  function updateSidebarProgress() {
+    var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    var scrolled = window.scrollY;
+    var pct = docHeight > 0 ? Math.min(100, (scrolled / docHeight) * 100) : 0;
+
+    var fill = document.getElementById('sidebarProgressFill');
+    if (fill) {
+      fill.style.width = pct + '%';
+    }
+  }
+
+  // ==========================================
+  // COPY TO CLIPBOARD
+  // ==========================================
+  window.copyCode = function(btn) {
+    var block = btn.closest('.code-block');
+    var codeEl = block.cloneNode(true);
+    var labelEl = codeEl.querySelector('.code-label');
+    var btnEl = codeEl.querySelector('.copy-btn');
+    if (labelEl) labelEl.remove();
+    if (btnEl) btnEl.remove();
+
+    var text = codeEl.textContent.trim();
+
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(function() {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(function() {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      }).catch(function() {
+        btn.textContent = 'Failed';
+        setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+      });
+    }
+  };
+
+  // ==========================================
+  // INTERACTIVE 1: API REQUEST BUILDER
+  // ==========================================
+  var builderState = {
+    model: 'claude-sonnet-4-6-20250514',
+    system: '',
+    messages: [{ role: 'user', content: 'What is the capital of France?' }],
+    temperature: 1.0,
+    maxTokens: 1024,
+    tools: []
+  };
+
+  var presets = {
+    simple: {
+      model: 'claude-sonnet-4-6-20250514',
+      system: '',
+      messages: [{ role: 'user', content: 'What is the capital of France?' }],
+      temperature: 1.0,
+      maxTokens: 1024,
+      tools: []
+    },
+    system: {
+      model: 'claude-sonnet-4-6-20250514',
+      system: 'You are a concise geography expert. Answer in one sentence.',
+      messages: [{ role: 'user', content: 'What are the three largest countries by area?' }],
+      temperature: 0.5,
+      maxTokens: 256,
+      tools: []
+    },
+    tools: {
+      model: 'claude-sonnet-4-6-20250514',
+      system: 'You are a helpful assistant with access to weather data.',
+      messages: [{ role: 'user', content: 'What\'s the weather like in Paris today?' }],
+      temperature: 0.0,
+      maxTokens: 1024,
+      tools: [{
+        name: 'get_weather',
+        description: 'Get current weather for a location. Returns temperature, conditions, and humidity.',
+        properties: '{\n  "location": {"type": "string", "description": "City and country"},\n  "units": {"type": "string", "enum": ["celsius", "fahrenheit"]}\n}',
+        required: '["location"]'
+      }]
+    }
+  };
+
+  window.loadPreset = function(name) {
+    var preset = presets[name];
+    if (!preset) return;
+
+    // Update active preset button
+    var btns = document.querySelectorAll('.preset-btn');
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].classList.remove('active');
+    }
+    event.target.classList.add('active');
+
+    builderState.model = preset.model;
+    builderState.system = preset.system;
+    builderState.messages = JSON.parse(JSON.stringify(preset.messages));
+    builderState.temperature = preset.temperature;
+    builderState.maxTokens = preset.maxTokens;
+    builderState.tools = JSON.parse(JSON.stringify(preset.tools));
+
+    // Sync form
+    document.getElementById('builderModel').value = preset.model;
+    document.getElementById('builderSystem').value = preset.system;
+    document.getElementById('builderTemp').value = Math.round(preset.temperature * 10);
+    document.getElementById('tempDisplay').textContent = preset.temperature.toFixed(1);
+    document.getElementById('tempValue').textContent = preset.temperature.toFixed(1);
+    document.getElementById('builderMaxTokens').value = preset.maxTokens;
+    document.getElementById('maxTokDisplay').textContent = preset.maxTokens;
+    document.getElementById('maxTokValue').textContent = preset.maxTokens;
+
+    renderMessages();
+    renderTools();
+    updatePreview();
+
+    // Hide simulated response on preset change
+    document.getElementById('simResponse').classList.remove('show');
+  };
+
+  function renderMessages() {
+    var container = document.getElementById('builderMessages');
+    var html = '';
+    for (var i = 0; i < builderState.messages.length; i++) {
+      var msg = builderState.messages[i];
+      html += '<div class="msg-entry">';
+      html += '<select onchange="updateMsgRole(' + i + ', this.value)">';
+      html += '<option value="user"' + (msg.role === 'user' ? ' selected' : '') + '>user</option>';
+      html += '<option value="assistant"' + (msg.role === 'assistant' ? ' selected' : '') + '>assistant</option>';
+      html += '</select>';
+      if (builderState.messages.length > 1) {
+        html += '<button class="msg-remove" onclick="removeMessage(' + i + ')" title="Remove">&times;</button>';
+      }
+      html += '<textarea rows="2" oninput="updateMsgContent(' + i + ', this.value)">' + escapeHtml(msg.content) + '</textarea>';
+      html += '</div>';
+    }
+    container.innerHTML = html;
+  }
+
+  function renderTools() {
+    var container = document.getElementById('builderTools');
+    var html = '';
+    for (var i = 0; i < builderState.tools.length; i++) {
+      var tool = builderState.tools[i];
+      html += '<div class="msg-entry" style="margin-bottom: 12px;">';
+      html += '<button class="msg-remove" onclick="removeTool(' + i + ')" title="Remove">&times;</button>';
+      html += '<div class="form-group" style="margin-bottom:8px;">';
+      html += '<label style="font-size:0.78rem;">Tool Name</label>';
+      html += '<input type="text" value="' + escapeHtml(tool.name) + '" oninput="updateToolField(' + i + ', \'name\', this.value)" style="font-size:0.82rem;">';
+      html += '</div>';
+      html += '<div class="form-group" style="margin-bottom:8px;">';
+      html += '<label style="font-size:0.78rem;">Description</label>';
+      html += '<textarea rows="2" oninput="updateToolField(' + i + ', \'description\', this.value)" style="font-size:0.82rem;">' + escapeHtml(tool.description) + '</textarea>';
+      html += '</div>';
+      html += '<div class="form-group" style="margin-bottom:8px;">';
+      html += '<label style="font-size:0.78rem;">Properties (JSON)</label>';
+      html += '<textarea rows="3" oninput="updateToolField(' + i + ', \'properties\', this.value)" style="font-size:0.78rem;">' + escapeHtml(tool.properties) + '</textarea>';
+      html += '</div>';
+      html += '<div class="form-group" style="margin-bottom:0;">';
+      html += '<label style="font-size:0.78rem;">Required (JSON array)</label>';
+      html += '<input type="text" value="' + escapeHtml(tool.required) + '" oninput="updateToolField(' + i + ', \'required\', this.value)" style="font-size:0.82rem;">';
+      html += '</div>';
+      html += '</div>';
+    }
+    container.innerHTML = html;
+  }
+
+  window.addMessage = function() {
+    var lastRole = builderState.messages.length > 0 ? builderState.messages[builderState.messages.length - 1].role : 'assistant';
+    var newRole = lastRole === 'user' ? 'assistant' : 'user';
+    builderState.messages.push({ role: newRole, content: '' });
+    renderMessages();
+    updatePreview();
+  };
+
+  window.removeMessage = function(idx) {
+    if (builderState.messages.length <= 1) return;
+    builderState.messages.splice(idx, 1);
+    renderMessages();
+    updatePreview();
+  };
+
+  window.updateMsgRole = function(idx, role) {
+    builderState.messages[idx].role = role;
+    updatePreview();
+  };
+
+  window.updateMsgContent = function(idx, content) {
+    builderState.messages[idx].content = content;
+    updatePreview();
+  };
+
+  window.addTool = function() {
+    builderState.tools.push({
+      name: 'my_tool',
+      description: 'Describe what this tool does',
+      properties: '{\n  "param1": {"type": "string", "description": "A parameter"}\n}',
+      required: '["param1"]'
+    });
+    renderTools();
+    updatePreview();
+  };
+
+  window.removeTool = function(idx) {
+    builderState.tools.splice(idx, 1);
+    renderTools();
+    updatePreview();
+  };
+
+  window.updateToolField = function(idx, field, value) {
+    builderState.tools[idx][field] = value;
+    updatePreview();
+  };
+
+  window.updateTempLabel = function() {
+    var val = parseInt(document.getElementById('builderTemp').value) / 10;
+    document.getElementById('tempDisplay').textContent = val.toFixed(1);
+    document.getElementById('tempValue').textContent = val.toFixed(1);
+    builderState.temperature = val;
+  };
+
+  window.updateMaxTokLabel = function() {
+    var val = parseInt(document.getElementById('builderMaxTokens').value);
+    document.getElementById('maxTokDisplay').textContent = val;
+    document.getElementById('maxTokValue').textContent = val;
+    builderState.maxTokens = val;
+  };
+
+  window.updatePreview = function() {
+    builderState.model = document.getElementById('builderModel').value;
+    builderState.system = document.getElementById('builderSystem').value;
+
+    var req = {};
+    req.model = builderState.model;
+    req.max_tokens = builderState.maxTokens;
+
+    if (builderState.system.trim()) {
+      req.system = builderState.system;
+    }
+
+    req.messages = [];
+    for (var i = 0; i < builderState.messages.length; i++) {
+      req.messages.push({
+        role: builderState.messages[i].role,
+        content: builderState.messages[i].content
+      });
+    }
+
+    if (builderState.temperature !== 1.0) {
+      req.temperature = builderState.temperature;
+    }
+
+    if (builderState.tools.length > 0) {
+      req.tools = [];
+      for (var j = 0; j < builderState.tools.length; j++) {
+        var t = builderState.tools[j];
+        var toolDef = {
+          name: t.name,
+          description: t.description,
+          input_schema: {
+            type: 'object',
+            properties: {},
+            required: []
+          }
+        };
+
+        try { toolDef.input_schema.properties = JSON.parse(t.properties); } catch(e) { /* keep empty */ }
+        try { toolDef.input_schema.required = JSON.parse(t.required); } catch(e) { /* keep empty */ }
+
+        req.tools.push(toolDef);
+      }
+    }
+
+    var jsonStr = JSON.stringify(req, null, 2);
+    document.getElementById('builderPreviewJSON').textContent = jsonStr;
+  };
+
+  window.simulateResponse = function() {
+    var hasTools = builderState.tools.length > 0;
+    var modelShort = builderState.model.indexOf('haiku') > -1 ? 'haiku' : (builderState.model.indexOf('opus') > -1 ? 'opus' : 'sonnet');
+
+    var response;
+    if (hasTools) {
+      response = {
+        id: 'msg_01Xk9P7' + Math.random().toString(36).substring(2, 8),
+        type: 'message',
+        role: 'assistant',
+        content: [
+          {
+            type: 'tool_use',
+            id: 'toolu_01A' + Math.random().toString(36).substring(2, 10),
+            name: builderState.tools[0].name,
+            input: { location: 'Paris, France', units: 'celsius' }
+          }
+        ],
+        model: builderState.model,
+        stop_reason: 'tool_use',
+        usage: {
+          input_tokens: 180 + Math.floor(Math.random() * 40),
+          output_tokens: 45 + Math.floor(Math.random() * 20)
+        }
+      };
+    } else {
+      var responses = {
+        haiku: 'The capital of France is Paris.',
+        sonnet: 'The capital of France is Paris, a city renowned for its art, culture, and history along the Seine river.',
+        opus: 'The capital of France is Paris. Founded over 2,000 years ago as a Roman city called Lutetia, it has grown into one of the world\'s most influential cities, serving as the political, economic, and cultural heart of France.'
+      };
+      response = {
+        id: 'msg_01Xk9P7' + Math.random().toString(36).substring(2, 8),
+        type: 'message',
+        role: 'assistant',
+        content: [
+          { type: 'text', text: responses[modelShort] || responses.sonnet }
+        ],
+        model: builderState.model,
+        stop_reason: 'end_turn',
+        usage: {
+          input_tokens: 25 + Math.floor(Math.random() * 20),
+          output_tokens: modelShort === 'haiku' ? 12 : (modelShort === 'opus' ? 58 : 28)
+        }
+      };
+    }
+
+    document.getElementById('simResponseJSON').textContent = JSON.stringify(response, null, 2);
+    document.getElementById('simResponse').classList.add('show');
+  };
+
+  // Initialize the builder
+  renderMessages();
+  renderTools();
+  updatePreview();
+
+  // ==========================================
+  // INTERACTIVE 2: STREAMING VISUALIZER
+  // ==========================================
+  var streamTokens = [
+    'The ', 'art ', 'of ', 'building ', 'great ', 'APIs ', 'lies ', 'in ', 'simplicity. ',
+    'A ', 'well-designed ', 'API ', 'should ', 'feel ', 'intuitive ', 'to ', 'the ', 'developer, ',
+    'hiding ', 'complexity ', 'behind ', 'clean ', 'abstractions. ',
+    'When ', 'you ', 'call ', 'Claude\'s ', 'Messages ', 'API, ', 'the ', 'response ', 'is ',
+    'structured ', 'and ', 'predictable. ', 'Each ', 'field ', 'has ', 'a ', 'clear ', 'purpose, ',
+    'from ', 'the ', 'model ', 'identifier ', 'to ', 'the ', 'usage ', 'statistics. ',
+    'This ', 'consistency ', 'makes ', 'it ', 'easy ', 'to ', 'build ', 'reliable ',
+    'applications ', 'on ', 'top ', 'of ', 'Claude, ', 'whether ', 'you\'re ', 'creating ',
+    'a ', 'chatbot, ', 'a ', 'data ', 'pipeline, ', 'or ', 'an ', 'autonomous ', 'agent.'
+  ];
+
+  var streamEvents = [];
+  var streamIdx = 0;
+  var streamPlaying = false;
+  var streamTimerId = null;
+  var speedMultiplier = 1;
+
+  function buildStreamEvents() {
+    streamEvents = [];
+    var msgId = 'msg_01' + Math.random().toString(36).substring(2, 10);
+
+    // message_start
+    streamEvents.push({
+      type: 'meta',
+      label: 'message_start',
+      raw: 'event: message_start\ndata: {"type":"message_start","message":{"id":"' + msgId + '","type":"message","role":"assistant","model":"claude-sonnet-4-6-20250514","content":[]}}',
+      text: ''
+    });
+
+    // content_block_start
+    streamEvents.push({
+      type: 'start',
+      label: 'content_block_start',
+      raw: 'event: content_block_start\ndata: {"type":"content_block_start","index":0,"content_block":{"type":"text","text":""}}',
+      text: ''
+    });
+
+    // content_block_deltas (each adds 1-3 tokens)
+    var tokenIdx = 0;
+    while (tokenIdx < streamTokens.length) {
+      var chunkSize = 1 + Math.floor(Math.random() * 2); // 1-2 tokens per delta
+      var chunk = '';
+      for (var c = 0; c < chunkSize && tokenIdx < streamTokens.length; c++) {
+        chunk += streamTokens[tokenIdx];
+        tokenIdx++;
+      }
+      streamEvents.push({
+        type: 'delta',
+        label: 'content_block_delta',
+        raw: 'event: content_block_delta\ndata: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"' + chunk.replace(/"/g, '\\"') + '"}}',
+        text: chunk
+      });
+    }
+
+    // content_block_stop
+    streamEvents.push({
+      type: 'stop',
+      label: 'content_block_stop',
+      raw: 'event: content_block_stop\ndata: {"type":"content_block_stop","index":0}',
+      text: ''
+    });
+
+    // message_delta
+    streamEvents.push({
+      type: 'meta',
+      label: 'message_delta',
+      raw: 'event: message_delta\ndata: {"type":"message_delta","delta":{"stop_reason":"end_turn"},"usage":{"output_tokens":' + streamTokens.length + '}}',
+      text: ''
+    });
+
+    // message_stop
+    streamEvents.push({
+      type: 'stop',
+      label: 'message_stop',
+      raw: 'event: message_stop\ndata: {"type":"message_stop"}',
+      text: ''
+    });
+  }
+
+  buildStreamEvents();
+
+  function renderEventLine(evt, idx) {
+    var colorClass = 'event-type-meta';
+    if (evt.type === 'start') colorClass = 'event-type-start';
+    else if (evt.type === 'delta') colorClass = 'event-type-delta';
+    else if (evt.type === 'stop') colorClass = 'event-type-stop';
+
+    var showRaw = document.getElementById('showRawEvents').checked;
+    var displayText = showRaw ? evt.raw : ('event: ' + evt.label + (evt.text ? '  "' + evt.text + '"' : ''));
+
+    return '<div class="event-line ' + colorClass + '" id="evt-' + idx + '">' + escapeHtml(displayText) + '</div>';
+  }
+
+  function advanceStream() {
+    if (streamIdx >= streamEvents.length) {
+      streamPlaying = false;
+      document.getElementById('streamPlayBtn').textContent = 'Play';
+      document.getElementById('streamCursor').style.display = 'none';
+      return;
+    }
+
+    var evt = streamEvents[streamIdx];
+    var evtEl = document.getElementById('evt-' + streamIdx);
+
+    if (evtEl) {
+      evtEl.classList.add('visible');
+      evtEl.classList.add('flash');
+      setTimeout(function() { evtEl.classList.remove('flash'); }, 400);
+    }
+
+    // Add text to response
+    if (evt.text) {
+      var responseEl = document.getElementById('streamResponseText');
+      var cursor = document.getElementById('streamCursor');
+      // Insert text before cursor
+      var textNode = document.createTextNode(evt.text);
+      responseEl.insertBefore(textNode, cursor);
+    }
+
+    // Scroll event panel to bottom
+    var panel = document.getElementById('eventStreamPanel');
+    panel.scrollTop = panel.scrollHeight;
+
+    streamIdx++;
+
+    // Schedule next event
+    var baseDelay = evt.type === 'delta' ? 120 : 400;
+    var delay = baseDelay * speedMultiplier;
+
+    streamTimerId = setTimeout(advanceStream, delay);
+  }
+
+  window.toggleStreamPlay = function() {
+    if (streamPlaying) {
+      streamPlaying = false;
+      if (streamTimerId) clearTimeout(streamTimerId);
+      document.getElementById('streamPlayBtn').textContent = 'Play';
+    } else {
+      if (streamIdx >= streamEvents.length) {
+        resetStreamInternal();
+      }
+      streamPlaying = true;
+      document.getElementById('streamPlayBtn').textContent = 'Pause';
+      document.getElementById('streamCursor').style.display = 'inline-block';
+      advanceStream();
+    }
+  };
+
+  window.updateStreamSpeed = function() {
+    speedMultiplier = parseFloat(document.getElementById('streamSpeed').value);
+  };
+
+  window.toggleRawEvents = function() {
+    // Re-render event lines
+    var container = document.getElementById('eventLines');
+    var html = '';
+    for (var i = 0; i < streamEvents.length; i++) {
+      html += renderEventLine(streamEvents[i], i);
+    }
+    container.innerHTML = html;
+    // Re-show visible ones
+    for (var j = 0; j < streamIdx; j++) {
+      var el = document.getElementById('evt-' + j);
+      if (el) el.classList.add('visible');
+    }
+  };
+
+  function resetStreamInternal() {
+    streamIdx = 0;
+    streamPlaying = false;
+    if (streamTimerId) clearTimeout(streamTimerId);
+
+    var container = document.getElementById('eventLines');
+    var html = '';
+    for (var i = 0; i < streamEvents.length; i++) {
+      html += renderEventLine(streamEvents[i], i);
+    }
+    container.innerHTML = html;
+
+    document.getElementById('streamResponseText').innerHTML = '<span class="cursor-blink" id="streamCursor" style="display:none;"></span>';
+    document.getElementById('streamPlayBtn').textContent = 'Play';
+  }
+
+  window.resetStream = function() {
+    resetStreamInternal();
+  };
+
+  // Initial render of event lines
+  resetStreamInternal();
+
+  // ==========================================
+  // INTERACTIVE 3: TOOL USE LOOP ANIMATOR
+  // ==========================================
+  var singleToolSteps = [
+    {
+      direction: 'Your Code --> API',
+      title: 'Send message with tool definitions',
+      desc: 'Include the tools array and the user message in the request.',
+      json: '{\n  "model": "claude-sonnet-4-6-20250514",\n  "max_tokens": 1024,\n  "tools": [{\n    "name": "get_weather",\n    "description": "Get current weather for a location",\n    "input_schema": {\n      "type": "object",\n      "properties": {\n        "location": {"type": "string"},\n        "units": {"type": "string", "enum": ["celsius", "fahrenheit"]}\n      },\n      "required": ["location"]\n    }\n  }],\n  "messages": [\n    {"role": "user", "content": "What\'s the weather in Paris?"}\n  ]\n}'
+    },
+    {
+      direction: 'API --> Your Code',
+      title: 'Claude responds with tool_use',
+      desc: 'Claude decides to call get_weather and provides the arguments.',
+      json: '{\n  "id": "msg_01Xk9P7...",\n  "role": "assistant",\n  "stop_reason": "tool_use",\n  "content": [\n    {\n      "type": "text",\n      "text": "Let me check the weather in Paris for you."\n    },\n    {\n      "type": "tool_use",\n      "id": "toolu_01A09q90qw90lq917835lq",\n      "name": "get_weather",\n      "input": {"location": "Paris, France", "units": "celsius"}\n    }\n  ]\n}'
+    },
+    {
+      direction: 'Your Code',
+      title: 'Execute the function',
+      desc: 'You call your actual get_weather function with the provided arguments.',
+      json: '# Your code:\nresult = get_weather(\n    location="Paris, France",\n    units="celsius"\n)\n# result = {"temp": 18, "conditions": "Partly cloudy", "humidity": 65}'
+    },
+    {
+      direction: 'Your Code --> API',
+      title: 'Send tool_result back',
+      desc: 'Add Claude\'s response and the tool result to the messages array.',
+      json: '{\n  "model": "claude-sonnet-4-6-20250514",\n  "max_tokens": 1024,\n  "tools": [/* same tools */],\n  "messages": [\n    {"role": "user", "content": "What\'s the weather in Paris?"},\n    {"role": "assistant", "content": [\n      {"type": "text", "text": "Let me check the weather in Paris for you."},\n      {"type": "tool_use", "id": "toolu_01A09q90qw90lq917835lq", "name": "get_weather", "input": {"location": "Paris, France", "units": "celsius"}}\n    ]},\n    {"role": "user", "content": [\n      {"type": "tool_result", "tool_use_id": "toolu_01A09q90qw90lq917835lq", "content": "{\\"temp\\": 18, \\"conditions\\": \\"Partly cloudy\\", \\"humidity\\": 65}"}\n    ]}\n  ]\n}'
+    },
+    {
+      direction: 'API --> Your Code',
+      title: 'Claude responds with final text',
+      desc: 'Claude uses the tool result to formulate a natural language response.',
+      json: '{\n  "id": "msg_01Xk9P8...",\n  "role": "assistant",\n  "stop_reason": "end_turn",\n  "content": [\n    {\n      "type": "text",\n      "text": "The weather in Paris is currently 18\\u00b0C with partly cloudy skies and 65% humidity. It\'s a pleasant day!"\n    }\n  ],\n  "usage": {"input_tokens": 320, "output_tokens": 35}\n}'
+    }
+  ];
+
+  var multiToolSteps = [
+    {
+      direction: 'Your Code --> API',
+      title: 'Send message requesting two data points',
+      desc: 'User asks for weather in two cities. Tools are defined in the request.',
+      json: '{\n  "model": "claude-sonnet-4-6-20250514",\n  "max_tokens": 1024,\n  "tools": [{"name": "get_weather", ...}],\n  "messages": [\n    {"role": "user", "content": "Compare the weather in Paris and London."}\n  ]\n}'
+    },
+    {
+      direction: 'API --> Your Code',
+      title: 'Claude calls TWO tools at once',
+      desc: 'The response contains two tool_use blocks -- one for each city.',
+      json: '{\n  "stop_reason": "tool_use",\n  "content": [\n    {"type": "text", "text": "I\'ll check the weather in both cities."},\n    {\n      "type": "tool_use",\n      "id": "toolu_01_paris",\n      "name": "get_weather",\n      "input": {"location": "Paris, France", "units": "celsius"}\n    },\n    {\n      "type": "tool_use",\n      "id": "toolu_01_london",\n      "name": "get_weather",\n      "input": {"location": "London, UK", "units": "celsius"}\n    }\n  ]\n}'
+    },
+    {
+      direction: 'Your Code',
+      title: 'Execute BOTH functions',
+      desc: 'Run both tool calls (can be parallelized for performance).',
+      json: '# Execute both calls:\nparis_result = get_weather("Paris, France", "celsius")\n# {"temp": 18, "conditions": "Partly cloudy", "humidity": 65}\n\nlondon_result = get_weather("London, UK", "celsius")\n# {"temp": 14, "conditions": "Rainy", "humidity": 82}'
+    },
+    {
+      direction: 'Your Code --> API',
+      title: 'Send BOTH tool_results back',
+      desc: 'Include both tool results in a single user message.',
+      json: '{\n  "messages": [\n    {"role": "user", "content": "Compare the weather..."},\n    {"role": "assistant", "content": [/* 2 tool_use blocks */]},\n    {"role": "user", "content": [\n      {\n        "type": "tool_result",\n        "tool_use_id": "toolu_01_paris",\n        "content": "{\\"temp\\": 18, \\"conditions\\": \\"Partly cloudy\\"}"\n      },\n      {\n        "type": "tool_result",\n        "tool_use_id": "toolu_01_london",\n        "content": "{\\"temp\\": 14, \\"conditions\\": \\"Rainy\\"}"\n      }\n    ]}\n  ]\n}'
+    },
+    {
+      direction: 'API --> Your Code',
+      title: 'Claude responds with comparison',
+      desc: 'Claude uses both results to give a complete comparative answer.',
+      json: '{\n  "stop_reason": "end_turn",\n  "content": [\n    {\n      "type": "text",\n      "text": "Here\'s a comparison of the weather:\\n\\n- **Paris**: 18\\u00b0C, partly cloudy with 65% humidity\\n- **London**: 14\\u00b0C, rainy with 82% humidity\\n\\nParis is warmer and drier today. London is experiencing rain."\n    }\n  ]\n}'
+    }
+  ];
+
+  function renderToolTimeline(steps, containerId) {
+    var container = document.getElementById(containerId);
+    var html = '';
+    for (var i = 0; i < steps.length; i++) {
+      var step = steps[i];
+      if (i > 0) {
+        html += '<div class="timeline-connector" id="' + containerId + '-conn-' + i + '"></div>';
+      }
+      html += '<div class="timeline-step" id="' + containerId + '-step-' + i + '">';
+      html += '<div class="step-indicator">' + (i + 1) + '</div>';
+      html += '<div class="step-body">';
+      html += '<div class="step-direction">' + escapeHtml(step.direction) + '</div>';
+      html += '<div class="step-title">' + escapeHtml(step.title) + '</div>';
+      html += '<div class="step-desc">' + escapeHtml(step.desc) + '</div>';
+      html += '<div class="step-json" id="' + containerId + '-json-' + i + '"><pre>' + escapeHtml(step.json) + '</pre></div>';
+      html += '</div>';
+      html += '<button class="step-json-toggle" onclick="toggleStepJson(\'' + containerId + '-json-' + i + '\', this)">Show JSON</button>';
+      html += '</div>';
+    }
+    container.innerHTML = html;
+  }
+
+  renderToolTimeline(singleToolSteps, 'toolLoopSingle');
+  renderToolTimeline(multiToolSteps, 'toolLoopMulti');
+
+  var currentVariant = 'single';
+  var loopAnimTimer = null;
+
+  window.switchLoopVariant = function(variant, btn) {
+    currentVariant = variant;
+    var tabs = document.querySelectorAll('.loop-tab');
+    for (var i = 0; i < tabs.length; i++) {
+      tabs[i].classList.remove('active');
+    }
+    btn.classList.add('active');
+
+    document.getElementById('toolLoopSingle').style.display = variant === 'single' ? 'block' : 'none';
+    document.getElementById('toolLoopMulti').style.display = variant === 'multi' ? 'block' : 'none';
+  };
+
+  window.toggleStepJson = function(jsonId, btn) {
+    var el = document.getElementById(jsonId);
+    if (el.classList.contains('show')) {
+      el.classList.remove('show');
+      btn.textContent = 'Show JSON';
+    } else {
+      el.classList.add('show');
+      btn.textContent = 'Hide JSON';
+    }
+  };
+
+  window.animateToolLoop = function() {
+    if (loopAnimTimer) clearTimeout(loopAnimTimer);
+
+    var containerId = currentVariant === 'single' ? 'toolLoopSingle' : 'toolLoopMulti';
+    var steps = currentVariant === 'single' ? singleToolSteps : multiToolSteps;
+
+    // Reset all steps
+    for (var i = 0; i < steps.length; i++) {
+      var stepEl = document.getElementById(containerId + '-step-' + i);
+      stepEl.classList.remove('active', 'completed');
+      if (i > 0) {
+        var connEl = document.getElementById(containerId + '-conn-' + i);
+        if (connEl) connEl.classList.remove('active');
+      }
+    }
+
+    var currentStep = 0;
+
+    function activateStep() {
+      if (currentStep >= steps.length) return;
+
+      // Mark previous as completed
+      if (currentStep > 0) {
+        var prevEl = document.getElementById(containerId + '-step-' + (currentStep - 1));
+        prevEl.classList.remove('active');
+        prevEl.classList.add('completed');
+        var connEl = document.getElementById(containerId + '-conn-' + currentStep);
+        if (connEl) connEl.classList.add('active');
+      }
+
+      // Activate current
+      var stepEl = document.getElementById(containerId + '-step-' + currentStep);
+      stepEl.classList.add('active');
+
+      // Scroll into view
+      stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+      currentStep++;
+      if (currentStep < steps.length) {
+        loopAnimTimer = setTimeout(activateStep, 1200);
+      } else {
+        // Mark last as completed after a delay
+        loopAnimTimer = setTimeout(function() {
+          var lastEl = document.getElementById(containerId + '-step-' + (steps.length - 1));
+          lastEl.classList.remove('active');
+          lastEl.classList.add('completed');
+        }, 1200);
+      }
+    }
+
+    activateStep();
+  };
+
+  window.resetToolLoop = function() {
+    if (loopAnimTimer) clearTimeout(loopAnimTimer);
+
+    var containers = ['toolLoopSingle', 'toolLoopMulti'];
+    for (var c = 0; c < containers.length; c++) {
+      var containerId = containers[c];
+      var stepEls = document.querySelectorAll('#' + containerId + ' .timeline-step');
+      for (var i = 0; i < stepEls.length; i++) {
+        stepEls[i].classList.remove('active', 'completed');
+      }
+      var connEls = document.querySelectorAll('#' + containerId + ' .timeline-connector');
+      for (var j = 0; j < connEls.length; j++) {
+        connEls[j].classList.remove('active');
+      }
+    }
+  };
+
+  // ==========================================
+  // INTERACTIVE 4: COST CALCULATOR
+  // ==========================================
+  var modelPricing = {
+    haiku:  { input: 0.80,  output: 4.00,  name: 'Haiku 4.5' },
+    sonnet: { input: 3.00,  output: 15.00, name: 'Sonnet 4.6' },
+    opus:   { input: 15.00, output: 75.00, name: 'Opus 4.6' }
+  };
+
+  var selectedModel = 'sonnet';
+
+  window.selectModel = function(model, el) {
+    selectedModel = model;
+    var radios = document.querySelectorAll('.model-radio');
+    for (var i = 0; i < radios.length; i++) {
+      radios[i].classList.remove('selected');
+    }
+    el.classList.add('selected');
+    updateCostCalc();
+  };
+
+  window.updateCostCalc = function() {
+    var calls = parseInt(document.getElementById('costCalls').value) || 0;
+    var inputTok = parseInt(document.getElementById('costInputTokens').value) || 0;
+    var outputTok = parseInt(document.getElementById('costOutputTokens').value) || 0;
+
+    var totalInputTokens = calls * inputTok;
+    var totalOutputTokens = calls * outputTok;
+
+    // Calculate for all models
+    var costs = {};
+    var maxCost = 0;
+    var modelKeys = ['haiku', 'sonnet', 'opus'];
+
+    for (var i = 0; i < modelKeys.length; i++) {
+      var key = modelKeys[i];
+      var p = modelPricing[key];
+      var inputCost = (totalInputTokens / 1000000) * p.input;
+      var outputCost = (totalOutputTokens / 1000000) * p.output;
+      var total = inputCost + outputCost;
+      costs[key] = {
+        input: inputCost,
+        output: outputCost,
+        total: total,
+        perCall: calls > 0 ? total / calls : 0
+      };
+      if (total > maxCost) maxCost = total;
+    }
+
+    // Render summary cards for selected model
+    var sel = costs[selectedModel];
+    var cardsHtml = '';
+    cardsHtml += '<div class="cost-summary-card"><div class="cost-label">Input Cost</div><div class="cost-value">$' + sel.input.toFixed(2) + '</div></div>';
+    cardsHtml += '<div class="cost-summary-card"><div class="cost-label">Output Cost</div><div class="cost-value">$' + sel.output.toFixed(2) + '</div></div>';
+    cardsHtml += '<div class="cost-summary-card"><div class="cost-label">Total Monthly</div><div class="cost-value highlight">$' + sel.total.toFixed(2) + '</div></div>';
+    cardsHtml += '<div class="cost-summary-card"><div class="cost-label">Per API Call</div><div class="cost-value">$' + sel.perCall.toFixed(6) + '</div></div>';
+    document.getElementById('costSummaryCards').innerHTML = cardsHtml;
+
+    // Render bar chart
+    var chartHtml = '';
+    for (var j = 0; j < modelKeys.length; j++) {
+      var mk = modelKeys[j];
+      var mc = costs[mk];
+      var pct = maxCost > 0 ? (mc.total / maxCost) * 100 : 0;
+      if (pct < 2 && mc.total > 0) pct = 2;
+
+      var isSelected = mk === selectedModel;
+      chartHtml += '<div class="cost-bar-row">';
+      chartHtml += '<span class="cost-bar-label">' + modelPricing[mk].name + '</span>';
+      chartHtml += '<div class="cost-bar-track">';
+      chartHtml += '<div class="cost-bar-fill ' + mk + '" style="width:' + pct + '%;">';
+      if (pct > 15) {
+        chartHtml += '$' + mc.total.toFixed(2);
+      }
+      chartHtml += '</div>';
+      chartHtml += '</div>';
+      chartHtml += '<span class="cost-bar-amount' + (isSelected ? ' style="font-weight:700;color:var(--primary);"' : '') + '">$' + mc.total.toFixed(2) + '</span>';
+      chartHtml += '</div>';
+    }
+    document.getElementById('costChart').innerHTML = chartHtml;
+
+    // Savings recommendation
+    var savingsHtml = '';
+    if (selectedModel === 'opus') {
+      var saving = costs.opus.total - costs.sonnet.total;
+      var savingPct = costs.opus.total > 0 ? (saving / costs.opus.total * 100) : 0;
+      savingsHtml = '<h4>Potential Savings</h4><p>Switching to <strong>Sonnet 4.6</strong> would save <strong>$' + saving.toFixed(2) + '/month</strong> (' + Math.round(savingPct) + '% reduction). Consider Sonnet for tasks that don\'t require Opus-level reasoning.</p>';
+    } else if (selectedModel === 'sonnet') {
+      var saving = costs.sonnet.total - costs.haiku.total;
+      var savingPct = costs.sonnet.total > 0 ? (saving / costs.sonnet.total * 100) : 0;
+      savingsHtml = '<h4>Potential Savings</h4><p>Switching simple tasks to <strong>Haiku 4.5</strong> could save up to <strong>$' + saving.toFixed(2) + '/month</strong> (' + Math.round(savingPct) + '% reduction). Use Haiku for classification, extraction, and simple Q&amp;A.</p>';
+    } else {
+      savingsHtml = '<h4>Already Optimized</h4><p>You\'re using the most cost-effective model. Consider the <strong>Message Batches API</strong> for an additional 50% savings on non-urgent workloads.</p>';
+    }
+    document.getElementById('savingsBox').innerHTML = savingsHtml;
+  };
+
+  // Initialize cost calculator
+  updateCostCalc();
+
+  // ==========================================
+  // FINAL QUIZ
+  // ==========================================
+  var FINAL_QUIZ_KEY = 'claude-training-module-20';
+
+  var finalQuizData = [
+    { question: "What does stop_reason: 'tool_use' in a Claude API response indicate?", options: ["Claude encountered an error", "Claude wants to call a function you defined and is waiting for the result", "The conversation has ended", "Claude ran out of tokens"], correct: 1 },
+    { question: "In the Messages API, how do you maintain a multi-turn conversation?", options: ["Use a session ID header", "Send all previous messages (user and assistant) in the messages array", "Call a separate /sessions endpoint", "Claude remembers automatically"], correct: 1 },
+    { question: "What is the primary benefit of streaming API responses?", options: ["It's cheaper than non-streaming", "Users see tokens appear in real-time for a better experience", "It allows longer responses", "It's required for tool use"], correct: 1 },
+    { question: "When Claude makes a tool call, what must your code send back?", options: ["A new user message with the answer", "A tool_result message containing the function output", "An acknowledgment header", "Nothing -- Claude continues automatically"], correct: 1 },
+    { question: "What is the Message Batches API best used for?", options: ["Real-time chat applications", "Non-urgent batch processing with 50% cost savings", "Streaming responses", "Tool use orchestration"], correct: 1 },
+    { question: "Which error code indicates you should implement exponential backoff and retry?", options: ["400 (Bad Request)", "401 (Unauthorized)", "429 (Rate Limited)", "404 (Not Found)"], correct: 2 },
+    { question: "What does tool_choice: 'any' do?", options: ["Allows Claude to choose any response format", "Forces Claude to call at least one tool instead of responding with text", "Selects a random tool from the defined list", "Allows any model to be used"], correct: 1 },
+    { question: "What's the most cost-effective model for classifying 50,000 support tickets?", options: ["Opus 4.6 for best accuracy", "Sonnet 4.6 for balanced performance", "Haiku 4.5 for high-volume simple classification", "All models cost the same for classification"], correct: 2 }
+  ];
+
+  var finalQuizSelections = [];
+  var finalQuizSubmitted = false;
+
+  for (var i = 0; i < finalQuizData.length; i++) {
+    finalQuizSelections.push(null);
+  }
+
+  function renderFinalQuiz() {
+    var container = document.getElementById('finalQuizQuestions');
+    var html = '';
+
+    for (var i = 0; i < finalQuizData.length; i++) {
+      var q = finalQuizData[i];
+      html += '<div class="final-quiz-question" data-fq="' + i + '">';
+      html += '<div class="fq-number">Question ' + (i + 1) + ' of ' + finalQuizData.length + '</div>';
+      html += '<div class="fq-text">' + escapeHtml(q.question) + '</div>';
+      html += '<ul class="fq-options">';
+
+      for (var j = 0; j < q.options.length; j++) {
+        html += '<li class="fq-option" data-fq-val="' + j + '" onclick="selectFinalOption(' + i + ', this)">';
+        html += '<input type="radio" name="fq-' + i + '" value="' + j + '">';
+        html += '<span>' + escapeHtml(q.options[j]) + '</span>';
+        html += '</li>';
+      }
+
+      html += '</ul>';
+      html += '</div>';
+    }
+
+    container.innerHTML = html;
+  }
+
+  window.selectFinalOption = function(qIdx, el) {
+    if (finalQuizSubmitted) return;
+
+    var parentQ = el.closest('.final-quiz-question');
+    var options = parentQ.querySelectorAll('.fq-option');
+    for (var i = 0; i < options.length; i++) {
+      options[i].querySelector('input').checked = false;
+      options[i].style.background = '';
+    }
+
+    el.querySelector('input').checked = true;
+    finalQuizSelections[qIdx] = parseInt(el.getAttribute('data-fq-val'));
+
+    var allAnswered = true;
+    for (var k = 0; k < finalQuizSelections.length; k++) {
+      if (finalQuizSelections[k] === null) {
+        allAnswered = false;
+        break;
+      }
+    }
+    document.getElementById('finalSubmitBtn').disabled = !allAnswered;
+  };
+
+  window.submitFinalQuiz = function() {
+    if (finalQuizSubmitted) return;
+    finalQuizSubmitted = true;
+
+    var score = 0;
+
+    for (var idx = 0; idx < finalQuizData.length; idx++) {
+      var sel = finalQuizSelections[idx];
+      var correctIdx = finalQuizData[idx].correct;
+      var questionEl = document.querySelector('.final-quiz-question[data-fq="' + idx + '"]');
+      var options = questionEl.querySelectorAll('.fq-option');
+
+      for (var i = 0; i < options.length; i++) {
+        var optVal = parseInt(options[i].getAttribute('data-fq-val'));
+        options[i].style.pointerEvents = 'none';
+
+        if (optVal === correctIdx) {
+          if (sel === optVal) {
+            options[i].classList.add('selected-correct');
+            score++;
+          } else {
+            options[i].classList.add('reveal-correct');
+          }
+        } else if (optVal === sel) {
+          options[i].classList.add('selected-wrong');
+        }
+      }
+    }
+
+    var result = document.getElementById('finalResult');
+    var title = document.getElementById('finalResultTitle');
+    var text = document.getElementById('finalResultText');
+
+    result.classList.add('show');
+
+    if (score >= 6) {
+      result.classList.add('pass');
+      result.classList.remove('fail');
+      title.textContent = 'Passed! ' + score + ' / 8 correct';
+      text.textContent = 'Excellent work! You have a solid grasp of Claude API fundamentals -- from authentication and streaming to tool use and cost optimization. Your progress has been saved. Move on to Module 21 to continue your training.';
+    } else {
+      result.classList.add('fail');
+      result.classList.remove('pass');
+      title.textContent = score + ' / 8 correct -- Review needed';
+      text.textContent = 'You need at least 6 correct answers to pass. Review the material above, paying close attention to the tool use loop and the streaming event types, then try again.';
+    }
+
+    var progressData = {
+      score: score,
+      total: 8,
+      completed: score >= 6,
+      timestamp: new Date().toISOString()
+    };
+    localStorage.setItem(FINAL_QUIZ_KEY, JSON.stringify(progressData));
+
+    document.getElementById('finalSubmitBtn').disabled = true;
+    document.getElementById('finalSubmitBtn').textContent = 'Submitted';
+  };
+
+  renderFinalQuiz();
+
+  // Check for existing progress
+  function loadExistingProgress() {
+    var saved = localStorage.getItem(FINAL_QUIZ_KEY);
+    if (saved) {
+      try {
+        var data = JSON.parse(saved);
+        if (data.completed) {
+          var fill = document.getElementById('sidebarProgressFill');
+          if (fill) {
+            fill.style.width = '100%';
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+  }
+  loadExistingProgress();
+
+  // ==========================================
+  // UTILITY FUNCTIONS
+  // ==========================================
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.appendChild(document.createTextNode(str));
+    return div.innerHTML;
+  }
+
+})();
+</script>
+</body>
+</html>

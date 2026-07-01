@@ -1,0 +1,4103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 22: Tool Design &amp; MCP Integration | Claude AI Training</title>
+<style>
+/* ============================================
+   CSS CUSTOM PROPERTIES & DESIGN SYSTEM
+   Premium Edition: 3-layer shadows, spring transitions,
+   gradient headings, Inter font, deep dark mode
+   ============================================ */
+:root {
+  --primary: #7C3AED;
+  --primary-light: #A78BFA;
+  --primary-dark: #5B21B6;
+  --accent: #06B6D4;
+  --accent-light: #22D3EE;
+  --success: #10B981;
+  --success-light: #34D399;
+  --warning: #F59E0B;
+  --warning-light: #FBBF24;
+  --error: #EF4444;
+  --error-light: #F87171;
+  --bg: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --bg-code: #F1F5F9;
+  --text: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --border: #E2E8F0;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.02);
+  --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 16px -8px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.02);
+  --shadow-glow: 0 0 20px rgba(124,58,237,0.15), 0 10px 25px -5px rgba(0,0,0,0.1), 0 4px 12px rgba(0,0,0,0.04);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --transition: 0.2s ease;
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --sidebar-width: 280px;
+  --content-max: 800px;
+}
+
+[data-theme="dark"] {
+  --bg: #0B0F1A;
+  --bg-card: #141926;
+  --bg-code: #1A1F2E;
+  --text: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --border: #1E2740;
+  --shadow: 0 1px 3px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.03);
+  --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.5), 0 8px 16px -8px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.03);
+  --shadow-glow: 0 0 30px rgba(124,58,237,0.2), 0 10px 25px -5px rgba(0,0,0,0.5), 0 4px 12px rgba(0,0,0,0.3);
+}
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 24px;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  min-height: 100vh;
+  transition: background var(--transition), color var(--transition);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   PREFERS REDUCED MOTION
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================
+   THEME TOGGLE
+   ============================================ */
+.theme-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: all 0.35s var(--spring);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+.theme-toggle:hover {
+  box-shadow: var(--shadow-glow);
+  transform: scale(1.1);
+}
+
+/* ============================================
+   SIDEBAR
+   ============================================ */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  z-index: 900;
+  transition: transform 0.3s ease, background var(--transition);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.sidebar-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+  margin-bottom: 12px;
+  transition: color var(--transition);
+}
+.sidebar-back:hover { color: var(--primary-dark); }
+
+.sidebar-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.sidebar-module-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.sidebar-nav {
+  padding: 12px 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.sidebar-section {
+  margin-bottom: 4px;
+}
+
+.sidebar-section-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 20px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  text-align: left;
+  transition: color var(--transition);
+}
+.sidebar-section-toggle:hover { color: var(--text); }
+.sidebar-section-toggle .chevron {
+  transition: transform 0.2s ease;
+  font-size: 0.65rem;
+}
+.sidebar-section-toggle.collapsed .chevron {
+  transform: rotate(-90deg);
+}
+
+.sidebar-links {
+  list-style: none;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.sidebar-links.collapsed {
+  max-height: 0 !important;
+}
+
+.sidebar-link {
+  display: block;
+  padding: 7px 20px 7px 32px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: all var(--transition);
+  line-height: 1.4;
+}
+.sidebar-link:hover {
+  color: var(--text);
+  background: var(--bg);
+}
+.sidebar-link.active {
+  color: var(--primary);
+  border-left-color: var(--primary);
+  background: rgba(124, 58, 237, 0.05);
+  font-weight: 600;
+}
+[data-theme="dark"] .sidebar-link.active {
+  background: rgba(124, 58, 237, 0.12);
+}
+
+.sidebar-progress {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sidebar-progress-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.sidebar-progress-track {
+  height: 6px;
+  background: var(--bg-code);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.sidebar-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 3px;
+  transition: width 0.5s ease;
+  width: 0%;
+}
+
+/* Hamburger button (mobile) */
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1001;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+  transition: all var(--transition);
+}
+.hamburger span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--text);
+  margin: 4px auto;
+  transition: all 0.3s ease;
+  border-radius: 1px;
+}
+.hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(4px, 4px); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(4px, -4px); }
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 899;
+}
+
+/* ============================================
+   MAIN CONTENT
+   ============================================ */
+.main-content {
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+  transition: margin var(--transition);
+}
+
+.content-wrapper {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 40px 32px 80px;
+}
+
+/* Module Header */
+.module-header {
+  margin-bottom: 48px;
+}
+.module-header .breadcrumb {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+.module-header .breadcrumb a {
+  color: var(--primary);
+  text-decoration: none;
+}
+.module-header .breadcrumb a:hover { text-decoration: underline; }
+
+.module-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.module-badge .number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.module-badge .label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.module-header h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.module-header .description {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 640px;
+}
+
+.module-meta {
+  display: flex;
+  gap: 16px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.module-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  background: var(--bg-code);
+  padding: 6px 14px;
+  border-radius: 20px;
+}
+
+/* ============================================
+   SECTIONS
+   ============================================ */
+.section {
+  margin-bottom: 56px;
+  scroll-margin-top: 24px;
+}
+
+.section-heading {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+  line-height: 1.3;
+}
+
+.section h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-top: 32px;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.section h4 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-top: 24px;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.section p {
+  margin-bottom: 16px;
+  color: var(--text-secondary);
+}
+
+.section ul, .section ol {
+  margin-bottom: 16px;
+  padding-left: 24px;
+}
+.section li {
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+}
+.section li strong {
+  color: var(--text);
+}
+
+/* ============================================
+   CODE BLOCKS
+   ============================================ */
+.code-block {
+  background: #1E293B;
+  color: #E2E8F0;
+  border-radius: var(--radius-sm);
+  padding: 20px 24px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  overflow-x: auto;
+  position: relative;
+  margin: 16px 0 20px;
+  tab-size: 2;
+  box-shadow: var(--shadow);
+}
+[data-theme="dark"] .code-block {
+  background: #0D1117;
+  border: 1px solid var(--border);
+}
+.code-block .code-label {
+  position: absolute;
+  top: 8px;
+  left: 16px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #64748B;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+.code-block.has-label {
+  padding-top: 36px;
+}
+.code-block .copy-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: #94A3B8;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  transition: all var(--transition);
+}
+.code-block .copy-btn:hover { background: rgba(255,255,255,0.2); color: white; }
+.code-block .copy-btn.copied { background: var(--success); color: white; }
+
+/* Syntax highlighting classes */
+.kw { color: #C084FC; }
+.str { color: #6EE7B7; }
+.fn { color: #7DD3FC; }
+.cm { color: #64748B; }
+.num { color: #FDBA74; }
+.op { color: #FCA5A5; }
+.type { color: #67E8F9; }
+.param { color: #FDE68A; }
+.prop { color: #F0ABFC; }
+.punc { color: #94A3B8; }
+.tool-name { color: #FCA5A5; font-weight: 600; }
+.output { color: #64748B; font-style: italic; }
+.path { color: #FDBA74; }
+.flag { color: #67E8F9; }
+.dec { color: #F0ABFC; }
+
+/* Inline code */
+code {
+  background: var(--bg-code);
+  color: var(--primary);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.88em;
+}
+[data-theme="dark"] code {
+  background: #1A1F2E;
+}
+.code-block code {
+  background: none;
+  color: inherit;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+  white-space: pre-wrap;
+  display: block;
+}
+
+/* ============================================
+   CALLOUT BOXES
+   ============================================ */
+.callout {
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  margin: 20px 0;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  transition: transform 0.35s var(--spring), box-shadow 0.35s var(--spring);
+}
+.callout:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
+.callout-icon {
+  flex-shrink: 0;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+.callout-content { flex: 1; }
+.callout-content p { margin-bottom: 6px; color: inherit; }
+.callout-content p:last-child { margin-bottom: 0; }
+
+.callout.info {
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  color: #1E40AF;
+}
+.callout.tip {
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  color: #166534;
+}
+.callout.warning {
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  color: #92400E;
+}
+.callout.important {
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  color: #991B1B;
+}
+
+[data-theme="dark"] .callout.info {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: #93C5FD;
+}
+[data-theme="dark"] .callout.tip {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #6EE7B7;
+}
+[data-theme="dark"] .callout.warning {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #FCD34D;
+}
+[data-theme="dark"] .callout.important {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #FCA5A5;
+}
+
+/* ============================================
+   ACCENT CARDS (premium)
+   ============================================ */
+.accent-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin: 24px 0;
+  box-shadow: var(--shadow);
+  transition: transform 0.35s var(--spring), box-shadow 0.35s var(--spring), border-color 0.35s var(--spring);
+}
+.accent-card:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+}
+.accent-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.accent-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+.accent-icon.purple { background: rgba(124,58,237,0.12); color: #7C3AED; }
+.accent-icon.blue { background: rgba(59,130,246,0.12); color: #3B82F6; }
+.accent-icon.green { background: rgba(16,185,129,0.12); color: #10B981; }
+.accent-icon.orange { background: rgba(249,115,22,0.12); color: #F97316; }
+.accent-icon.red { background: rgba(239,68,68,0.12); color: #EF4444; }
+.accent-icon.cyan { background: rgba(6,182,212,0.12); color: #06B6D4; }
+
+[data-theme="dark"] .accent-icon.purple { background: rgba(124,58,237,0.2); }
+[data-theme="dark"] .accent-icon.blue { background: rgba(59,130,246,0.2); }
+[data-theme="dark"] .accent-icon.green { background: rgba(16,185,129,0.2); }
+[data-theme="dark"] .accent-icon.orange { background: rgba(249,115,22,0.2); }
+[data-theme="dark"] .accent-icon.red { background: rgba(239,68,68,0.2); }
+[data-theme="dark"] .accent-icon.cyan { background: rgba(6,182,212,0.2); }
+
+.accent-card-header h4 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text);
+}
+.accent-card-header .card-tag {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 10px;
+  background: var(--bg-code);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.accent-card p {
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+.accent-card ul {
+  padding-left: 20px;
+  margin-bottom: 12px;
+}
+.accent-card li {
+  margin-bottom: 6px;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+}
+
+/* ============================================
+   COMPARISON TABLE
+   ============================================ */
+.comparison-table-wrapper {
+  overflow-x: auto;
+  margin: 20px 0;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+}
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.comparison-table th {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+.comparison-table th:first-child {
+  border-radius: var(--radius-sm) 0 0 0;
+}
+.comparison-table th:last-child {
+  border-radius: 0 var(--radius-sm) 0 0;
+}
+.comparison-table td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+.comparison-table tr:nth-child(even) td {
+  background: var(--bg);
+}
+.comparison-table tr:last-child td:first-child {
+  border-radius: 0 0 0 var(--radius-sm);
+}
+.comparison-table tr:last-child td:last-child {
+  border-radius: 0 0 var(--radius-sm) 0;
+}
+
+/* ============================================
+   INTERACTIVE: TOOL SCHEMA DESIGNER
+   ============================================ */
+.schema-designer {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  box-shadow: var(--shadow);
+}
+.schema-designer h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+.schema-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 20px;
+}
+.schema-form-section { }
+.schema-preview-section {
+  position: relative;
+}
+
+.schema-field {
+  margin-bottom: 16px;
+}
+.schema-field label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.schema-field input[type="text"],
+.schema-field textarea,
+.schema-field select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-family: inherit;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+.schema-field input[type="text"]:focus,
+.schema-field textarea:focus,
+.schema-field select:focus {
+  outline: none;
+  border-color: var(--primary-light);
+  box-shadow: 0 0 0 3px rgba(124,58,237,0.12);
+}
+.schema-field textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+.schema-field .char-count {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-align: right;
+  margin-top: 2px;
+}
+
+.schema-params-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  margin-top: 16px;
+}
+.schema-params-header h4 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.add-param-btn,
+.preset-btn,
+.check-btn {
+  padding: 6px 14px;
+  border: 1px solid var(--primary);
+  background: transparent;
+  color: var(--primary);
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.35s var(--spring);
+  font-family: inherit;
+}
+.add-param-btn:hover,
+.preset-btn:hover,
+.check-btn:hover {
+  background: var(--primary);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
+
+.param-entry {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  margin-bottom: 8px;
+  transition: border-color 0.35s var(--spring);
+}
+.param-entry:hover {
+  border-color: var(--primary-light);
+}
+.param-row {
+  display: grid;
+  grid-template-columns: 1fr 100px 1fr auto;
+  gap: 8px;
+  align-items: start;
+}
+.param-row input,
+.param-row select {
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-card);
+  color: var(--text);
+  font-size: 0.82rem;
+  font-family: inherit;
+}
+.param-row input:focus,
+.param-row select:focus {
+  outline: none;
+  border-color: var(--primary-light);
+}
+.param-extras {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 6px;
+  font-size: 0.8rem;
+}
+.param-extras label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.param-extras input[type="checkbox"] {
+  accent-color: var(--primary);
+}
+.param-extras input[type="text"] {
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-card);
+  color: var(--text);
+  font-size: 0.8rem;
+  width: 160px;
+  font-family: inherit;
+}
+.remove-param-btn {
+  background: none;
+  border: none;
+  color: var(--error);
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 4px;
+  line-height: 1;
+  transition: transform 0.35s var(--spring);
+}
+.remove-param-btn:hover {
+  transform: scale(1.2);
+}
+
+.schema-preview-code {
+  background: #1E293B;
+  color: #E2E8F0;
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  max-height: 500px;
+  overflow-y: auto;
+}
+[data-theme="dark"] .schema-preview-code {
+  background: #0D1117;
+  border: 1px solid var(--border);
+}
+
+.quality-score {
+  margin-top: 16px;
+  padding: 14px 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.quality-score-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.quality-score-header span {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.quality-score-value {
+  font-size: 1rem;
+  font-weight: 700;
+}
+.quality-score-value.low { color: var(--error); }
+.quality-score-value.mid { color: var(--warning); }
+.quality-score-value.high { color: var(--success); }
+.quality-score-track {
+  height: 8px;
+  background: var(--bg-code);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.quality-score-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.4s ease, background 0.4s ease;
+}
+.quality-score-fill.low { background: var(--error); }
+.quality-score-fill.mid { background: var(--warning); }
+.quality-score-fill.high { background: linear-gradient(90deg, var(--success), var(--accent)); }
+.quality-details {
+  margin-top: 10px;
+  font-size: 0.8rem;
+}
+.quality-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 0;
+  color: var(--text-secondary);
+}
+.quality-item .qi-icon {
+  font-size: 0.9rem;
+  width: 18px;
+  text-align: center;
+}
+
+.preset-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.preset-btn.active {
+  background: var(--primary);
+  color: white;
+}
+
+/* ============================================
+   INTERACTIVE: MCP DIAGRAM
+   ============================================ */
+.mcp-diagram-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  box-shadow: var(--shadow);
+}
+.mcp-diagram-container h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.mcp-canvas {
+  position: relative;
+  width: 100%;
+  min-height: 440px;
+  margin: 20px 0;
+}
+
+.mcp-node {
+  position: absolute;
+  padding: 16px 20px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--border);
+  background: var(--bg-card);
+  cursor: pointer;
+  transition: all 0.35s var(--spring);
+  text-align: center;
+  min-width: 130px;
+  box-shadow: var(--shadow);
+  user-select: none;
+}
+.mcp-node:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-glow);
+  transform: scale(1.05);
+}
+.mcp-node.active {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-glow);
+}
+.mcp-node.central {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  border-color: var(--primary);
+  min-width: 120px;
+}
+.mcp-node.central:hover {
+  transform: scale(1.08);
+}
+.mcp-node-icon {
+  font-size: 1.5rem;
+  margin-bottom: 4px;
+}
+.mcp-node-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.mcp-node-sublabel {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.mcp-node.central .mcp-node-sublabel {
+  color: rgba(255,255,255,0.7);
+}
+
+.mcp-detail-panel {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 20px;
+  margin-top: 16px;
+  display: none;
+}
+.mcp-detail-panel.show {
+  display: block;
+}
+.mcp-detail-panel h4 {
+  margin: 0 0 12px;
+  font-size: 1rem;
+  color: var(--text);
+}
+.mcp-detail-section {
+  margin-bottom: 12px;
+}
+.mcp-detail-section h5 {
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.mcp-detail-section ul {
+  list-style: none;
+  padding: 0;
+}
+.mcp-detail-section li {
+  padding: 4px 0;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+.mcp-detail-section li::before {
+  content: "-- ";
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.mcp-connection-line {
+  position: absolute;
+  height: 2px;
+  background: var(--border);
+  transform-origin: left center;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+  pointer-events: none;
+  z-index: 0;
+}
+.mcp-connection-line.active {
+  background: var(--primary-light);
+  box-shadow: 0 0 8px rgba(124,58,237,0.3);
+}
+
+.mcp-add-server-bar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 12px;
+}
+.mcp-add-server-bar input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.88rem;
+  font-family: inherit;
+}
+.mcp-add-server-bar input:focus {
+  outline: none;
+  border-color: var(--primary-light);
+}
+
+/* ============================================
+   INTERACTIVE: ERROR RESPONSE DESIGNER
+   ============================================ */
+.error-designer {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  box-shadow: var(--shadow);
+}
+.error-designer h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.error-scenario-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 16px 0;
+  flex-wrap: wrap;
+}
+.error-scenario-tab {
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.35s var(--spring);
+  font-family: inherit;
+}
+.error-scenario-tab:hover {
+  border-color: var(--primary-light);
+  color: var(--text);
+}
+.error-scenario-tab.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+.error-scenario-tab.scored {
+  position: relative;
+}
+.error-scenario-tab.scored::after {
+  content: attr(data-score);
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: var(--success);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 8px;
+  line-height: 1.3;
+}
+.error-scenario-tab.scored.partial::after {
+  background: var(--warning);
+}
+.error-scenario-tab.scored.fail::after {
+  background: var(--error);
+}
+
+.error-scenario-body {
+  display: none;
+}
+.error-scenario-body.active {
+  display: block;
+}
+
+.error-scenario-description {
+  padding: 14px 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border-left: 4px solid var(--warning);
+  margin-bottom: 16px;
+}
+.error-scenario-description .scenario-type {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+.error-scenario-description p {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--text);
+}
+
+.error-textarea {
+  width: 100%;
+  min-height: 180px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: #1E293B;
+  color: #E2E8F0;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  resize: vertical;
+  margin-bottom: 12px;
+}
+[data-theme="dark"] .error-textarea {
+  background: #0D1117;
+  border-color: var(--border);
+}
+.error-textarea:focus {
+  outline: none;
+  border-color: var(--primary-light);
+  box-shadow: 0 0 0 3px rgba(124,58,237,0.12);
+}
+
+.error-feedback {
+  padding: 14px 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  display: none;
+  margin-top: 8px;
+}
+.error-feedback.show { display: block; }
+.error-check-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+.error-check-item .eci-icon {
+  font-size: 0.95rem;
+  width: 20px;
+  text-align: center;
+}
+.error-check-item.pass .eci-icon { color: var(--success); }
+.error-check-item.fail .eci-icon { color: var(--error); }
+
+/* ============================================
+   INTERACTIVE: TOOL DEBUG WALKTHROUGH
+   ============================================ */
+.debug-walkthrough {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  box-shadow: var(--shadow);
+}
+.debug-walkthrough h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.debug-steps {
+  position: relative;
+  margin: 20px 0;
+}
+.debug-step {
+  display: none;
+  padding: 24px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+}
+.debug-step.active {
+  display: block;
+}
+.debug-step-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.debug-step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  font-weight: 700;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+.debug-step-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.debug-step p {
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+  font-size: 0.92rem;
+}
+
+.debug-progress-bar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+.debug-progress-dot {
+  width: 40px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border);
+  transition: background 0.3s ease;
+}
+.debug-progress-dot.active {
+  background: var(--primary);
+}
+.debug-progress-dot.done {
+  background: var(--success);
+}
+
+.debug-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+}
+.debug-nav-btn {
+  padding: 8px 20px;
+  border: 1px solid var(--primary);
+  background: transparent;
+  color: var(--primary);
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.35s var(--spring);
+  font-family: inherit;
+}
+.debug-nav-btn:hover {
+  background: var(--primary);
+  color: white;
+  transform: translateY(-1px);
+}
+.debug-nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none;
+}
+.debug-nav-btn:disabled:hover {
+  background: transparent;
+  color: var(--primary);
+}
+.debug-step-counter {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* ============================================
+   QUIZ CONTAINERS
+   ============================================ */
+.final-quiz {
+  background: var(--bg-card);
+  border: 2px solid var(--primary-light);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  box-shadow: var(--shadow-glow);
+}
+.final-quiz h3 {
+  margin-top: 0;
+}
+
+.final-quiz-question {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.final-quiz-question .fq-number {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+.final-quiz-question .fq-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+.fq-options { list-style: none; padding: 0; }
+.fq-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 12px;
+  margin-bottom: 4px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+.fq-option:hover { background: rgba(124, 58, 237, 0.05); }
+.fq-option input[type="radio"] {
+  accent-color: var(--primary);
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+.fq-option.selected-correct {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+.fq-option.selected-wrong {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+}
+.fq-option.reveal-correct {
+  background: rgba(16, 185, 129, 0.08);
+  color: #059669;
+  font-weight: 600;
+}
+[data-theme="dark"] .fq-option.selected-correct { color: #6EE7B7; }
+[data-theme="dark"] .fq-option.selected-wrong { color: #FCA5A5; }
+[data-theme="dark"] .fq-option.reveal-correct { color: #6EE7B7; }
+
+.final-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 32px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.35s var(--spring);
+  margin-top: 8px;
+  font-family: inherit;
+}
+.final-submit-btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-glow); }
+.final-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.final-result {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: var(--radius-sm);
+  display: none;
+}
+.final-result.show { display: block; }
+.final-result.pass {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.final-result.fail {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.final-result h4 {
+  margin-top: 0;
+  margin-bottom: 6px;
+  font-size: 1.1rem;
+}
+.final-result p {
+  margin-bottom: 0;
+  font-size: 0.95rem;
+}
+.final-result.pass h4 { color: var(--success); }
+.final-result.fail h4 { color: var(--warning); }
+
+/* ============================================
+   NAVIGATION FOOTER
+   ============================================ */
+.module-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 16px;
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 2px solid var(--border);
+}
+.nav-link {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: all 0.35s var(--spring);
+  min-width: 0;
+  flex: 1;
+  max-width: 50%;
+  box-shadow: var(--shadow);
+}
+.nav-link:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+}
+.nav-link.next { align-items: flex-end; text-align: right; }
+.nav-link .nav-dir {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--primary);
+}
+.nav-link .nav-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================
+   KEY CONCEPT HIGHLIGHT
+   ============================================ */
+.key-concept {
+  display: inline-block;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(6, 182, 212, 0.1));
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  color: var(--primary);
+}
+[data-theme="dark"] .key-concept {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(6, 182, 212, 0.15));
+  border-color: rgba(124, 58, 237, 0.35);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 1024px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .hamburger {
+    display: flex;
+  }
+  .sidebar-overlay.show {
+    display: block;
+  }
+  .main-content {
+    margin-left: 0;
+  }
+  .theme-toggle {
+    right: 16px;
+  }
+  .schema-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .content-wrapper {
+    padding: 24px 16px 60px;
+  }
+  .module-header h1 {
+    font-size: 1.6rem;
+  }
+  .section-heading {
+    font-size: 1.3rem;
+  }
+  .module-nav {
+    flex-direction: column;
+  }
+  .nav-link {
+    max-width: 100%;
+  }
+  .nav-link.next {
+    align-items: flex-start;
+    text-align: left;
+  }
+  .param-row {
+    grid-template-columns: 1fr 1fr;
+  }
+  .error-scenario-tabs {
+    flex-direction: column;
+  }
+}
+
+/* ============================================
+   SCROLLBAR STYLING
+   ============================================ */
+.sidebar::-webkit-scrollbar,
+.code-block::-webkit-scrollbar,
+.schema-preview-code::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.sidebar::-webkit-scrollbar-track,
+.code-block::-webkit-scrollbar-track,
+.schema-preview-code::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+.code-block::-webkit-scrollbar-thumb,
+.schema-preview-code::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.section {
+  animation: fadeInUp 0.4s ease both;
+}
+
+@keyframes pulse-line {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+.mcp-connection-line.active {
+  animation: pulse-line 2s ease-in-out infinite;
+}
+</style>
+</head>
+<body>
+<!-- ============================================
+     THEME TOGGLE
+     ============================================ -->
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+  <span id="themeIcon">&#9790;</span>
+</button>
+
+<!-- ============================================
+     HAMBURGER (mobile)
+     ============================================ -->
+<button class="hamburger" id="hamburger" aria-label="Toggle sidebar">
+  <span></span>
+  <span></span>
+  <span></span>
+</button>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ============================================
+     SIDEBAR
+     ============================================ -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="../index.html" class="sidebar-back">&larr; Back to Hub</a>
+    <div class="sidebar-title">Module 22</div>
+    <div class="sidebar-module-name">Tool Design &amp; MCP</div>
+  </div>
+
+  <div class="sidebar-nav">
+    <!-- Section: Concepts -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="concepts">
+        Concepts <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-concepts">
+        <li><a href="#tool-design-principles" class="sidebar-link" data-target="tool-design-principles">Tool Design Principles</a></li>
+        <li><a href="#json-schema-tools" class="sidebar-link" data-target="json-schema-tools">JSON Schema for Tools</a></li>
+        <li><a href="#what-is-mcp" class="sidebar-link" data-target="what-is-mcp">The Model Context Protocol</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Building -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="building">
+        Building <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-building">
+        <li><a href="#building-mcp-servers" class="sidebar-link" data-target="building-mcp-servers">Building MCP Servers</a></li>
+        <li><a href="#mcp-configuration" class="sidebar-link" data-target="mcp-configuration">MCP Configuration</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Practices -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="practices">
+        Best Practices <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-practices">
+        <li><a href="#error-handling-tools" class="sidebar-link" data-target="error-handling-tools">Error Handling for Tools</a></li>
+        <li><a href="#tool-distribution" class="sidebar-link" data-target="tool-distribution">Distribution &amp; Testing</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Exercises -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="exercises">
+        Exercises <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-exercises">
+        <li><a href="#schema-designer" class="sidebar-link" data-target="schema-designer">Tool Schema Designer</a></li>
+        <li><a href="#mcp-diagram" class="sidebar-link" data-target="mcp-diagram">MCP Connection Diagram</a></li>
+        <li><a href="#error-response-designer" class="sidebar-link" data-target="error-response-designer">Error Response Designer</a></li>
+        <li><a href="#debug-walkthrough" class="sidebar-link" data-target="debug-walkthrough">Tool Debug Walkthrough</a></li>
+        <li><a href="#final-quiz" class="sidebar-link" data-target="final-quiz">End-of-Module Quiz</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sidebar-progress">
+    <div class="sidebar-progress-label">Module Progress</div>
+    <div class="sidebar-progress-track">
+      <div class="sidebar-progress-fill" id="sidebarProgressFill"></div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================
+     MAIN CONTENT
+     ============================================ -->
+<main class="main-content">
+  <div class="content-wrapper">
+
+    <!-- Module Header -->
+    <header class="module-header">
+      <div class="breadcrumb">
+        <a href="../index.html">Training Hub</a> &raquo; Module 22
+      </div>
+      <div class="module-badge">
+        <span class="number">22</span>
+        <span class="label">Advanced</span>
+      </div>
+      <h1>Tool Design &amp; MCP Integration</h1>
+      <p class="description">
+        Master the art of designing tools that Claude can use effectively, and learn how the Model Context Protocol (MCP) standardizes the connection between AI models and external capabilities.
+      </p>
+      <div class="module-meta">
+        <span class="module-meta-item">&#9201; ~90 min</span>
+        <span class="module-meta-item">&#128218; Advanced</span>
+        <span class="module-meta-item">&#127891; Developers, Architects</span>
+        <span class="module-meta-item">&#127919; 4 Interactive Exercises</span>
+      </div>
+    </header>
+
+    <!-- ========================================
+         SECTION 1: TOOL DESIGN PRINCIPLES
+         ======================================== -->
+    <section class="section" id="tool-design-principles">
+      <h2 class="section-heading">1. Tool Design Principles</h2>
+
+      <p>
+        Tools are how Claude interacts with the outside world. Every time Claude needs to read a file, query a database, call an API, or perform any action beyond generating text, it does so through a <span class="key-concept">tool call</span>. The quality of your tool design directly determines how effectively Claude can accomplish tasks.
+      </p>
+
+      <p>
+        Think of tools as the hands and eyes you give to an otherwise bodiless intelligence. If the hands are clumsy and the eyes are blurry, even the smartest mind will struggle. Great tool design is the difference between an AI assistant that frustrates users and one that delights them.
+      </p>
+
+      <h3>The Five Principles</h3>
+
+      <div class="accent-card">
+        <div class="accent-card-header">
+          <div class="accent-icon purple">&#9881;</div>
+          <h4>1. Atomic Operations</h4>
+          <span class="card-tag">Principle</span>
+        </div>
+        <p>Each tool should do <strong>one thing well</strong>. A tool called <code>manage_users</code> that can create, read, update, delete, and send emails to users is doing too much. Break it into <code>create_user</code>, <code>get_user</code>, <code>update_user</code>, <code>delete_user</code>, and <code>send_user_email</code>.</p>
+        <p>When tools do too many things, Claude must parse complex conditional logic to pick the right parameters. Atomic tools reduce ambiguity and increase reliability.</p>
+      </div>
+
+      <div class="accent-card">
+        <div class="accent-card-header">
+          <div class="accent-icon blue">&#128196;</div>
+          <h4>2. Clear Naming</h4>
+          <span class="card-tag">Principle</span>
+        </div>
+        <p>Tool names should be self-documenting verb-noun pairs. Claude reads tool names to decide which tool to use -- a clear name guides it toward the right choice.</p>
+        <ul>
+          <li><strong>Good:</strong> <code>search_documents</code>, <code>get_weather_forecast</code>, <code>create_invoice</code></li>
+          <li><strong>Bad:</strong> <code>do_stuff</code>, <code>process</code>, <code>helper</code>, <code>run_action</code></li>
+        </ul>
+      </div>
+
+      <div class="accent-card">
+        <div class="accent-card-header">
+          <div class="accent-icon green">&#128214;</div>
+          <h4>3. Exhaustive Descriptions</h4>
+          <span class="card-tag">Critical</span>
+        </div>
+        <p>The tool description is the single most important field in your tool definition. <strong>The description IS the documentation for Claude.</strong> It reads this text to decide when and how to use the tool.</p>
+        <p>A good description answers: What does this tool do? When should it be used? When should it NOT be used? What are the side effects?</p>
+      </div>
+
+      <div class="accent-card">
+        <div class="accent-card-header">
+          <div class="accent-icon orange">&#128295;</div>
+          <h4>4. Typed Parameters</h4>
+          <span class="card-tag">Principle</span>
+        </div>
+        <p>Use JSON Schema types, enums, and required fields to constrain what Claude sends. Typed parameters prevent entire classes of errors before they happen.</p>
+        <p>If a parameter accepts only <code>"asc"</code> or <code>"desc"</code>, define it as an enum -- do not rely on Claude guessing the valid values from the description alone.</p>
+      </div>
+
+      <div class="accent-card">
+        <div class="accent-card-header">
+          <div class="accent-icon red">&#9888;</div>
+          <h4>5. Error Clarity</h4>
+          <span class="card-tag">Principle</span>
+        </div>
+        <p>Return structured errors, not generic "something went wrong" messages. When Claude receives a clear error, it can decide whether to retry, adjust parameters, or inform the user. A vague error leaves Claude guessing.</p>
+        <p><strong>Bad:</strong> <code>"Error: operation failed"</code></p>
+        <p><strong>Good:</strong> <code>"Validation error: 'email' must be a valid email address. Received: 'not-an-email'. This is not retryable -- fix the input."</code></p>
+      </div>
+
+      <h3>Anti-Patterns to Avoid</h3>
+
+      <div class="callout warning">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>The Swiss Army Knife tool:</strong> A single tool with a <code>action</code> parameter that changes its entire behavior. This forces Claude to understand complex branching logic and makes error handling unpredictable.</p>
+        </div>
+      </div>
+
+      <div class="callout warning">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Missing parameter descriptions:</strong> If a parameter called <code>mode</code> has no description, Claude will guess what values are valid. It will sometimes guess wrong. Every parameter deserves a description.</p>
+        </div>
+      </div>
+
+      <div class="callout warning">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Vague tool descriptions:</strong> "Handles data processing" tells Claude nothing. Instead: "Transforms raw CSV sales data into aggregated monthly summaries grouped by region. Use when the user needs sales analytics. Input must be a valid CSV file path."</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 2: JSON SCHEMA FOR TOOLS
+         ======================================== -->
+    <section class="section" id="json-schema-tools">
+      <h2 class="section-heading">2. JSON Schema for Tools</h2>
+
+      <p>
+        Every tool definition includes a <span class="key-concept">JSON Schema</span> that describes its parameters. This schema is what Claude reads to understand what arguments a tool accepts, what types they must be, and which ones are required.
+      </p>
+
+      <h3>The Type System</h3>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>JSON Schema</th>
+              <th>Example Value</th>
+              <th>Use Case</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>string</strong></td>
+              <td><code>"type": "string"</code></td>
+              <td><code>"hello world"</code></td>
+              <td>Names, descriptions, queries, IDs</td>
+            </tr>
+            <tr>
+              <td><strong>number</strong></td>
+              <td><code>"type": "number"</code></td>
+              <td><code>3.14</code></td>
+              <td>Prices, scores, measurements</td>
+            </tr>
+            <tr>
+              <td><strong>integer</strong></td>
+              <td><code>"type": "integer"</code></td>
+              <td><code>42</code></td>
+              <td>Counts, limits, page numbers</td>
+            </tr>
+            <tr>
+              <td><strong>boolean</strong></td>
+              <td><code>"type": "boolean"</code></td>
+              <td><code>true</code></td>
+              <td>Flags, toggles, yes/no options</td>
+            </tr>
+            <tr>
+              <td><strong>array</strong></td>
+              <td><code>"type": "array"</code></td>
+              <td><code>["a", "b"]</code></td>
+              <td>Lists of tags, IDs, items</td>
+            </tr>
+            <tr>
+              <td><strong>object</strong></td>
+              <td><code>"type": "object"</code></td>
+              <td><code>{"key": "val"}</code></td>
+              <td>Nested config, filters, metadata</td>
+            </tr>
+            <tr>
+              <td><strong>null</strong></td>
+              <td><code>"type": "null"</code></td>
+              <td><code>null</code></td>
+              <td>Explicit absence (rare in tools)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Enums: Restricting Valid Values</h3>
+
+      <p>
+        Enums are one of the most powerful features for tool design. They tell Claude exactly which values are valid, eliminating guesswork entirely.
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">JSON Schema</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="punc">{</span>
+  <span class="str">"sort_order"</span><span class="punc">:</span> <span class="punc">{</span>
+    <span class="str">"type"</span><span class="punc">:</span> <span class="str">"string"</span><span class="punc">,</span>
+    <span class="str">"enum"</span><span class="punc">:</span> <span class="punc">[</span><span class="str">"asc"</span><span class="punc">,</span> <span class="str">"desc"</span><span class="punc">]</span><span class="punc">,</span>
+    <span class="str">"description"</span><span class="punc">:</span> <span class="str">"Sort direction. 'asc' for oldest first, 'desc' for newest first."</span>
+  <span class="punc">}</span>
+<span class="punc">}</span></code></div>
+
+      <h3>Required Fields</h3>
+
+      <p>
+        The <code>required</code> array specifies which parameters Claude MUST provide. Omitting a required field is an error. Make parameters required when the tool cannot function without them.
+      </p>
+
+      <h3>Descriptions on Every Parameter</h3>
+
+      <div class="callout important">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>This is critical.</strong> Claude reads parameter descriptions to understand what to pass. A parameter without a description is a parameter Claude will guess about. Every. Single. Parameter. Gets. A. Description.</p>
+        </div>
+      </div>
+
+      <h3>Complete Example: CRM Query Tool</h3>
+
+      <div class="code-block has-label">
+        <span class="code-label">Complete Tool Schema</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="punc">{</span>
+  <span class="str">"name"</span><span class="punc">:</span> <span class="str">"search_contacts"</span><span class="punc">,</span>
+  <span class="str">"description"</span><span class="punc">:</span> <span class="str">"Search the CRM for contacts matching the given criteria. Returns up to 'limit' results sorted by the specified field. Use this tool when the user asks about customers, contacts, or account holders. For company-level queries, use search_companies instead."</span><span class="punc">,</span>
+  <span class="str">"input_schema"</span><span class="punc">:</span> <span class="punc">{</span>
+    <span class="str">"type"</span><span class="punc">:</span> <span class="str">"object"</span><span class="punc">,</span>
+    <span class="str">"properties"</span><span class="punc">:</span> <span class="punc">{</span>
+      <span class="str">"query"</span><span class="punc">:</span> <span class="punc">{</span>
+        <span class="str">"type"</span><span class="punc">:</span> <span class="str">"string"</span><span class="punc">,</span>
+        <span class="str">"description"</span><span class="punc">:</span> <span class="str">"Free-text search query. Searches across name, email, and notes fields."</span>
+      <span class="punc">}</span><span class="punc">,</span>
+      <span class="str">"status"</span><span class="punc">:</span> <span class="punc">{</span>
+        <span class="str">"type"</span><span class="punc">:</span> <span class="str">"string"</span><span class="punc">,</span>
+        <span class="str">"enum"</span><span class="punc">:</span> <span class="punc">[</span><span class="str">"active"</span><span class="punc">,</span> <span class="str">"inactive"</span><span class="punc">,</span> <span class="str">"lead"</span><span class="punc">,</span> <span class="str">"churned"</span><span class="punc">]</span><span class="punc">,</span>
+        <span class="str">"description"</span><span class="punc">:</span> <span class="str">"Filter by contact status. Omit to include all statuses."</span>
+      <span class="punc">}</span><span class="punc">,</span>
+      <span class="str">"limit"</span><span class="punc">:</span> <span class="punc">{</span>
+        <span class="str">"type"</span><span class="punc">:</span> <span class="str">"integer"</span><span class="punc">,</span>
+        <span class="str">"description"</span><span class="punc">:</span> <span class="str">"Maximum number of results to return. Default is 10, max is 100."</span><span class="punc">,</span>
+        <span class="str">"default"</span><span class="punc">:</span> <span class="num">10</span><span class="punc">,</span>
+        <span class="str">"minimum"</span><span class="punc">:</span> <span class="num">1</span><span class="punc">,</span>
+        <span class="str">"maximum"</span><span class="punc">:</span> <span class="num">100</span>
+      <span class="punc">}</span><span class="punc">,</span>
+      <span class="str">"sort_by"</span><span class="punc">:</span> <span class="punc">{</span>
+        <span class="str">"type"</span><span class="punc">:</span> <span class="str">"string"</span><span class="punc">,</span>
+        <span class="str">"enum"</span><span class="punc">:</span> <span class="punc">[</span><span class="str">"name"</span><span class="punc">,</span> <span class="str">"created_at"</span><span class="punc">,</span> <span class="str">"last_activity"</span><span class="punc">]</span><span class="punc">,</span>
+        <span class="str">"description"</span><span class="punc">:</span> <span class="str">"Field to sort results by. Defaults to relevance when a query is provided, or 'created_at' otherwise."</span>
+      <span class="punc">}</span>
+    <span class="punc">}</span><span class="punc">,</span>
+    <span class="str">"required"</span><span class="punc">:</span> <span class="punc">[</span><span class="str">"query"</span><span class="punc">]</span><span class="punc">,</span>
+    <span class="str">"additionalProperties"</span><span class="punc">:</span> <span class="kw">false</span>
+  <span class="punc">}</span>
+<span class="punc">}</span></code></div>
+
+      <h3>The <code>additionalProperties: false</code> Pattern</h3>
+
+      <p>
+        Setting <code>additionalProperties: false</code> in your schema tells Claude (and the runtime) that only the explicitly defined properties are allowed. This prevents Claude from inventing extra parameters your tool cannot handle. It is a best practice for every tool schema.
+      </p>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>Pro tip:</strong> If your tool accepts nested objects, apply <code>additionalProperties: false</code> at every level of nesting, not just the top level.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 1: TOOL SCHEMA DESIGNER
+         ======================================== -->
+    <section class="section" id="schema-designer">
+      <h2 class="section-heading">Interactive: Tool Schema Designer</h2>
+
+      <p>
+        Build a tool schema interactively. Define the tool name, description, and parameters, then see the live JSON Schema preview and quality score. Try the presets for inspiration, then design your own.
+      </p>
+
+      <div class="schema-designer">
+        <h3>Design Your Tool</h3>
+
+        <div class="preset-bar">
+          <button class="preset-btn" onclick="loadPreset('weather')">Weather Tool</button>
+          <button class="preset-btn" onclick="loadPreset('database')">Database Query</button>
+          <button class="preset-btn" onclick="loadPreset('crm')">CRM Operations</button>
+          <button class="preset-btn" onclick="loadPreset('clear')">Clear All</button>
+        </div>
+
+        <div class="schema-layout">
+          <div class="schema-form-section">
+            <div class="schema-field">
+              <label>Tool Name</label>
+              <input type="text" id="schemaToolName" placeholder="e.g. search_documents" oninput="updateSchemaPreview()">
+            </div>
+
+            <div class="schema-field">
+              <label>Tool Description</label>
+              <textarea id="schemaToolDesc" placeholder="Describe what this tool does, when to use it, and when NOT to use it..." rows="4" oninput="updateSchemaPreview()"></textarea>
+              <div class="char-count"><span id="descCharCount">0</span> characters</div>
+            </div>
+
+            <div class="schema-params-header">
+              <h4>Parameters</h4>
+              <button class="add-param-btn" onclick="addParameter()">+ Add Parameter</button>
+            </div>
+
+            <div id="schemaParamsList"></div>
+          </div>
+
+          <div class="schema-preview-section">
+            <label style="display:block;font-size:0.85rem;font-weight:600;color:var(--text);margin-bottom:8px;">Live JSON Schema Preview</label>
+            <div class="schema-preview-code" id="schemaPreviewCode">{}</div>
+
+            <div class="quality-score" id="qualityScore">
+              <div class="quality-score-header">
+                <span>Quality Score</span>
+                <span class="quality-score-value low" id="qualityScoreValue">0 / 100</span>
+              </div>
+              <div class="quality-score-track">
+                <div class="quality-score-fill low" id="qualityScoreFill" style="width:0%"></div>
+              </div>
+              <div class="quality-details" id="qualityDetails"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 3: THE MODEL CONTEXT PROTOCOL
+         ======================================== -->
+    <section class="section" id="what-is-mcp">
+      <h2 class="section-heading">3. The Model Context Protocol (MCP)</h2>
+
+      <p>
+        The <span class="key-concept">Model Context Protocol (MCP)</span> is a standard protocol for connecting AI models to external tools and data sources. Think of it as a USB standard for AI -- just as USB lets any device connect to any computer, MCP lets any tool server connect to any AI client that supports the protocol.
+      </p>
+
+      <h3>The Client-Server Architecture</h3>
+
+      <p>
+        MCP uses a client-server model:
+      </p>
+
+      <ul>
+        <li><strong>MCP Client</strong> -- The AI application (Claude Code, Claude.ai, or your custom application) that wants to use external tools.</li>
+        <li><strong>MCP Server</strong> -- Your tool provider that exposes capabilities to the client.</li>
+      </ul>
+
+      <p>
+        Communication happens over a <strong>transport layer</strong>. Two transport types are supported:
+      </p>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Transport</th>
+              <th>How It Works</th>
+              <th>Best For</th>
+              <th>Example</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>stdio</strong></td>
+              <td>Client launches server as a subprocess; communicates via stdin/stdout</td>
+              <td>Local tools, development, personal servers</td>
+              <td>A Python script that queries your local database</td>
+            </tr>
+            <tr>
+              <td><strong>HTTP/SSE</strong></td>
+              <td>Client connects to a remote HTTP endpoint; server pushes events via Server-Sent Events</td>
+              <td>Remote services, shared team servers, cloud APIs</td>
+              <td>A company-wide API gateway MCP server</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        When a client connects to a server, they perform <strong>capability negotiation</strong> -- the server tells the client what it can do (which tools, resources, and prompts it exposes), and the client can then use those capabilities.
+      </p>
+
+      <h3>What MCP Servers Expose</h3>
+
+      <p>
+        An MCP server can expose three types of capabilities:
+      </p>
+
+      <div class="accent-card">
+        <div class="accent-card-header">
+          <div class="accent-icon purple">&#128295;</div>
+          <h4>Tools</h4>
+          <span class="card-tag">Functions</span>
+        </div>
+        <p>Functions that Claude can call to perform actions. These are the most common capability. Examples: querying a database, sending an email, creating a file, calling an API.</p>
+      </div>
+
+      <div class="accent-card">
+        <div class="accent-card-header">
+          <div class="accent-icon cyan">&#128194;</div>
+          <h4>Resources</h4>
+          <span class="card-tag">Data Catalogs</span>
+        </div>
+        <p>Data that Claude can browse without making function calls. Resources are like a catalog or directory. Examples: a list of database tables, file listings, issue trackers, documentation indexes. Claude reads these to understand what data is available.</p>
+      </div>
+
+      <div class="accent-card">
+        <div class="accent-card-header">
+          <div class="accent-icon green">&#128221;</div>
+          <h4>Prompts</h4>
+          <span class="card-tag">Templates</span>
+        </div>
+        <p>Pre-built prompt templates that guide Claude's behavior for specific workflows. Examples: a "code review" prompt template, a "data analysis" template, a "bug report" template. These help standardize how Claude approaches recurring tasks.</p>
+      </div>
+
+      <h3>Why MCP Matters</h3>
+
+      <p>
+        Before MCP, every AI application had to build custom integrations with every tool. If you wanted Claude to use your database, you wrote Claude-specific code. If you wanted ChatGPT to use it too, you wrote ChatGPT-specific code. This did not scale.
+      </p>
+
+      <p>
+        MCP standardizes the interface. Build one MCP server, and any MCP-compatible client can use it. This means your tool investment is portable, sharable, and future-proof.
+      </p>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>Key insight:</strong> MCP is to AI tools what REST is to web APIs -- a standard protocol that lets independently developed systems work together without custom glue code.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 2: MCP CONNECTION DIAGRAM
+         ======================================== -->
+    <section class="section" id="mcp-diagram">
+      <h2 class="section-heading">Interactive: MCP Connection Diagram</h2>
+
+      <p>
+        Click any server node to explore its tools, resources, and configuration. Add your own custom server to see how MCP scales.
+      </p>
+
+      <div class="mcp-diagram-container">
+        <h3>MCP Architecture Explorer</h3>
+        <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:16px;">Click a server node to inspect its capabilities.</p>
+
+        <div class="mcp-canvas" id="mcpCanvas">
+          <!-- Nodes are positioned by JS -->
+        </div>
+
+        <div class="mcp-detail-panel" id="mcpDetailPanel"></div>
+
+        <div class="mcp-add-server-bar">
+          <input type="text" id="mcpNewServerName" placeholder="Custom server name (e.g. Monitoring)">
+          <input type="text" id="mcpNewServerTools" placeholder="Tools (comma-separated)">
+          <button class="add-param-btn" onclick="addMcpServer()">Add Server</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 4: BUILDING MCP SERVERS
+         ======================================== -->
+    <section class="section" id="building-mcp-servers">
+      <h2 class="section-heading">4. Building MCP Servers</h2>
+
+      <p>
+        Building an MCP server is straightforward with the right library. The most popular approach is Python with <strong>FastMCP</strong>, which provides a decorator-based API similar to Flask or FastAPI.
+      </p>
+
+      <h3>Python with FastMCP</h3>
+
+      <div class="code-block has-label">
+        <span class="code-label">Python - FastMCP Server</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="kw">from</span> <span class="fn">fastmcp</span> <span class="kw">import</span> <span class="type">FastMCP</span>
+<span class="kw">import</span> <span class="fn">json</span>
+
+<span class="cm"># Create the MCP server</span>
+<span class="param">mcp</span> <span class="op">=</span> <span class="type">FastMCP</span><span class="punc">(</span><span class="str">"my-tools"</span><span class="punc">)</span>
+
+<span class="dec">@mcp.tool()</span>
+<span class="kw">def</span> <span class="fn">search_database</span><span class="punc">(</span><span class="param">query</span><span class="punc">:</span> <span class="type">str</span><span class="punc">,</span> <span class="param">limit</span><span class="punc">:</span> <span class="type">int</span> <span class="op">=</span> <span class="num">10</span><span class="punc">)</span> <span class="op">-></span> <span class="type">str</span><span class="punc">:</span>
+    <span class="str">"""Search the product database.</span>
+
+<span class="str">    Args:</span>
+<span class="str">        query: Search keywords to match against product</span>
+<span class="str">               names and descriptions.</span>
+<span class="str">        limit: Maximum number of results to return</span>
+<span class="str">               (default 10, max 100).</span>
+<span class="str">    """</span>
+    <span class="param">results</span> <span class="op">=</span> <span class="fn">db</span><span class="punc">.</span><span class="fn">search</span><span class="punc">(</span><span class="param">query</span><span class="punc">,</span> <span class="param">limit</span><span class="punc">)</span>
+    <span class="kw">return</span> <span class="fn">json</span><span class="punc">.</span><span class="fn">dumps</span><span class="punc">(</span><span class="param">results</span><span class="punc">)</span>
+
+<span class="dec">@mcp.tool()</span>
+<span class="kw">def</span> <span class="fn">get_product_by_id</span><span class="punc">(</span><span class="param">product_id</span><span class="punc">:</span> <span class="type">str</span><span class="punc">)</span> <span class="op">-></span> <span class="type">str</span><span class="punc">:</span>
+    <span class="str">"""Get detailed product information by its unique ID.</span>
+
+<span class="str">    Args:</span>
+<span class="str">        product_id: The unique product identifier</span>
+<span class="str">                    (e.g. 'PROD-12345').</span>
+<span class="str">    """</span>
+    <span class="param">product</span> <span class="op">=</span> <span class="fn">db</span><span class="punc">.</span><span class="fn">get</span><span class="punc">(</span><span class="param">product_id</span><span class="punc">)</span>
+    <span class="kw">if not</span> <span class="param">product</span><span class="punc">:</span>
+        <span class="kw">return</span> <span class="fn">json</span><span class="punc">.</span><span class="fn">dumps</span><span class="punc">(</span><span class="punc">{</span><span class="str">"error"</span><span class="punc">:</span> <span class="str">"Product not found"</span><span class="punc">}</span><span class="punc">)</span>
+    <span class="kw">return</span> <span class="fn">json</span><span class="punc">.</span><span class="fn">dumps</span><span class="punc">(</span><span class="param">product</span><span class="punc">)</span>
+
+<span class="cm"># Run the server (uses stdio transport by default)</span>
+<span class="param">mcp</span><span class="punc">.</span><span class="fn">run</span><span class="punc">()</span></code></div>
+
+      <p>
+        FastMCP automatically generates the JSON Schema from Python type hints and docstrings. The <code>@mcp.tool()</code> decorator registers the function as an MCP tool.
+      </p>
+
+      <h3>Node.js MCP Server</h3>
+
+      <div class="code-block has-label">
+        <span class="code-label">TypeScript - MCP Server</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="kw">import</span> <span class="punc">{</span> <span class="type">McpServer</span> <span class="punc">}</span> <span class="kw">from</span> <span class="str">"@modelcontextprotocol/sdk/server/mcp.js"</span><span class="punc">;</span>
+<span class="kw">import</span> <span class="punc">{</span> <span class="type">StdioServerTransport</span> <span class="punc">}</span> <span class="kw">from</span> <span class="str">"@modelcontextprotocol/sdk/server/stdio.js"</span><span class="punc">;</span>
+<span class="kw">import</span> <span class="punc">{</span> <span class="fn">z</span> <span class="punc">}</span> <span class="kw">from</span> <span class="str">"zod"</span><span class="punc">;</span>
+
+<span class="kw">const</span> <span class="param">server</span> <span class="op">=</span> <span class="kw">new</span> <span class="type">McpServer</span><span class="punc">({</span>
+  <span class="prop">name</span><span class="punc">:</span> <span class="str">"my-tools"</span><span class="punc">,</span>
+  <span class="prop">version</span><span class="punc">:</span> <span class="str">"1.0.0"</span>
+<span class="punc">});</span>
+
+<span class="param">server</span><span class="punc">.</span><span class="fn">tool</span><span class="punc">(</span>
+  <span class="str">"search_database"</span><span class="punc">,</span>
+  <span class="str">"Search the product database by keywords."</span><span class="punc">,</span>
+  <span class="punc">{</span> <span class="prop">query</span><span class="punc">:</span> <span class="fn">z</span><span class="punc">.</span><span class="fn">string</span><span class="punc">(),</span> <span class="prop">limit</span><span class="punc">:</span> <span class="fn">z</span><span class="punc">.</span><span class="fn">number</span><span class="punc">().</span><span class="fn">default</span><span class="punc">(</span><span class="num">10</span><span class="punc">)</span> <span class="punc">},</span>
+  <span class="kw">async</span> <span class="punc">(</span><span class="punc">{</span> <span class="param">query</span><span class="punc">,</span> <span class="param">limit</span> <span class="punc">}</span><span class="punc">)</span> <span class="op">=></span> <span class="punc">{</span>
+    <span class="kw">const</span> <span class="param">results</span> <span class="op">=</span> <span class="kw">await</span> <span class="fn">db</span><span class="punc">.</span><span class="fn">search</span><span class="punc">(</span><span class="param">query</span><span class="punc">,</span> <span class="param">limit</span><span class="punc">);</span>
+    <span class="kw">return</span> <span class="punc">{</span>
+      <span class="prop">content</span><span class="punc">:</span> <span class="punc">[{</span> <span class="prop">type</span><span class="punc">:</span> <span class="str">"text"</span><span class="punc">,</span> <span class="prop">text</span><span class="punc">:</span> <span class="type">JSON</span><span class="punc">.</span><span class="fn">stringify</span><span class="punc">(</span><span class="param">results</span><span class="punc">)</span> <span class="punc">}]</span>
+    <span class="punc">};</span>
+  <span class="punc">}</span>
+<span class="punc">);</span>
+
+<span class="kw">const</span> <span class="param">transport</span> <span class="op">=</span> <span class="kw">new</span> <span class="type">StdioServerTransport</span><span class="punc">();</span>
+<span class="kw">await</span> <span class="param">server</span><span class="punc">.</span><span class="fn">connect</span><span class="punc">(</span><span class="param">transport</span><span class="punc">);</span></code></div>
+
+      <h3>Exposing Resources</h3>
+
+      <p>
+        Resources give Claude contextual awareness of what data is available, without requiring tool calls. This is especially useful for database schemas, file directories, or configuration options.
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Python - Exposing Resources</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="dec">@mcp.resource</span><span class="punc">(</span><span class="str">"schema://tables"</span><span class="punc">)</span>
+<span class="kw">def</span> <span class="fn">get_database_schema</span><span class="punc">()</span> <span class="op">-></span> <span class="type">str</span><span class="punc">:</span>
+    <span class="str">"""List all database tables and their columns."""</span>
+    <span class="param">tables</span> <span class="op">=</span> <span class="fn">db</span><span class="punc">.</span><span class="fn">get_schema</span><span class="punc">()</span>
+    <span class="kw">return</span> <span class="fn">json</span><span class="punc">.</span><span class="fn">dumps</span><span class="punc">(</span><span class="param">tables</span><span class="punc">,</span> <span class="param">indent</span><span class="op">=</span><span class="num">2</span><span class="punc">)</span></code></div>
+
+      <h3>Testing Your MCP Server Locally</h3>
+
+      <p>
+        Before connecting your server to Claude Code, test it with the MCP Inspector:
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Terminal</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm"># Install the MCP inspector</span>
+<span class="fn">npx</span> <span class="flag">@modelcontextprotocol/inspector</span> <span class="path">python3 my_server.py</span>
+
+<span class="cm"># This opens a web UI where you can:</span>
+<span class="cm"># - See all tools your server exposes</span>
+<span class="cm"># - Test tool calls with sample inputs</span>
+<span class="cm"># - Inspect resources and prompts</span>
+<span class="cm"># - Debug connection issues</span></code></div>
+    </section>
+
+    <!-- ========================================
+         SECTION 5: MCP CONFIGURATION
+         ======================================== -->
+    <section class="section" id="mcp-configuration">
+      <h2 class="section-heading">5. MCP Configuration in Claude Code</h2>
+
+      <p>
+        Claude Code supports two levels of MCP configuration: project-level (shared with the team) and user-level (personal).
+      </p>
+
+      <h3>Project-Level: <code>.mcp.json</code></h3>
+
+      <p>
+        Place this file in your project root and commit it to version control. Every team member who opens this project in Claude Code will automatically connect to these MCP servers.
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">.mcp.json</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="punc">{</span>
+  <span class="str">"mcpServers"</span><span class="punc">:</span> <span class="punc">{</span>
+    <span class="str">"my-database"</span><span class="punc">:</span> <span class="punc">{</span>
+      <span class="str">"command"</span><span class="punc">:</span> <span class="str">"python3"</span><span class="punc">,</span>
+      <span class="str">"args"</span><span class="punc">:</span> <span class="punc">[</span><span class="str">"mcp_server.py"</span><span class="punc">]</span><span class="punc">,</span>
+      <span class="str">"env"</span><span class="punc">:</span> <span class="punc">{</span>
+        <span class="str">"DB_URL"</span><span class="punc">:</span> <span class="str">"${DATABASE_URL}"</span>
+      <span class="punc">}</span>
+    <span class="punc">}</span><span class="punc">,</span>
+    <span class="str">"search-engine"</span><span class="punc">:</span> <span class="punc">{</span>
+      <span class="str">"command"</span><span class="punc">:</span> <span class="str">"npx"</span><span class="punc">,</span>
+      <span class="str">"args"</span><span class="punc">:</span> <span class="punc">[</span><span class="str">"@company/search-mcp"</span><span class="punc">]</span>
+    <span class="punc">}</span>
+  <span class="punc">}</span>
+<span class="punc">}</span></code></div>
+
+      <h3>User-Level: <code>~/.claude.json</code></h3>
+
+      <p>
+        For personal MCP servers that should not be shared with the team. This is the right place for servers that use your personal API keys or access your personal tools.
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">~/.claude.json</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="punc">{</span>
+  <span class="str">"mcpServers"</span><span class="punc">:</span> <span class="punc">{</span>
+    <span class="str">"my-notes"</span><span class="punc">:</span> <span class="punc">{</span>
+      <span class="str">"command"</span><span class="punc">:</span> <span class="str">"python3"</span><span class="punc">,</span>
+      <span class="str">"args"</span><span class="punc">:</span> <span class="punc">[</span><span class="str">"/Users/me/tools/notes_mcp.py"</span><span class="punc">]</span><span class="punc">,</span>
+      <span class="str">"env"</span><span class="punc">:</span> <span class="punc">{</span>
+        <span class="str">"NOTES_API_KEY"</span><span class="punc">:</span> <span class="str">"${NOTES_API_KEY}"</span>
+      <span class="punc">}</span>
+    <span class="punc">}</span>
+  <span class="punc">}</span>
+<span class="punc">}</span></code></div>
+
+      <h3>Environment Variable Expansion</h3>
+
+      <p>
+        Use <code>${VAR_NAME}</code> syntax to reference environment variables. This keeps secrets out of committed files. The variable is expanded at runtime from the user's shell environment.
+      </p>
+
+      <h3>When to Use Project vs User Level</h3>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Criteria</th>
+              <th>Project (<code>.mcp.json</code>)</th>
+              <th>User (<code>~/.claude.json</code>)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Shared with team?</strong></td>
+              <td>Yes (committed to git)</td>
+              <td>No (personal only)</td>
+            </tr>
+            <tr>
+              <td><strong>Uses team resources?</strong></td>
+              <td>Yes (shared DB, APIs)</td>
+              <td>No (personal tools)</td>
+            </tr>
+            <tr>
+              <td><strong>Contains secrets?</strong></td>
+              <td>No (use <code>${VAR}</code> expansion)</td>
+              <td>No (use <code>${VAR}</code> expansion)</td>
+            </tr>
+            <tr>
+              <td><strong>Example servers</strong></td>
+              <td>Project DB, internal APIs, CI tools</td>
+              <td>Personal notes, calendar, custom scripts</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-icon">&#9432;</span>
+        <div class="callout-content">
+          <p><strong>Note:</strong> Never put raw API keys or passwords in either config file. Always use environment variable expansion (<code>${VAR_NAME}</code>) and set the actual values in your shell profile or a <code>.env</code> file that is gitignored.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 6: ERROR HANDLING FOR TOOLS
+         ======================================== -->
+    <section class="section" id="error-handling-tools">
+      <h2 class="section-heading">6. Error Handling for Tools</h2>
+
+      <p>
+        Error handling in tools is fundamentally different from error handling in regular application code. In a tool, <strong>the consumer of the error is an AI model</strong>, not a human or another program. Claude needs enough information in the error response to make intelligent recovery decisions.
+      </p>
+
+      <h3>The <code>isError</code> Flag</h3>
+
+      <p>
+        MCP responses include an <code>isError</code> boolean that tells Claude the tool call failed. Without this flag, Claude may interpret error text as a successful result.
+      </p>
+
+      <h3>Error Taxonomy</h3>
+
+      <div class="accent-card">
+        <div class="accent-card-header">
+          <div class="accent-icon orange">&#9200;</div>
+          <h4>Transient Errors</h4>
+          <span class="card-tag">Retryable</span>
+        </div>
+        <p>Temporary failures that may succeed on retry: timeouts, rate limits, service temporarily unavailable. Claude should wait and retry.</p>
+      </div>
+
+      <div class="accent-card">
+        <div class="accent-card-header">
+          <div class="accent-icon red">&#10060;</div>
+          <h4>Validation Errors</h4>
+          <span class="card-tag">Fix Input</span>
+        </div>
+        <p>The input was malformed or invalid: wrong type, missing required field, invalid email format. Claude should fix the input and retry with corrected parameters.</p>
+      </div>
+
+      <div class="accent-card">
+        <div class="accent-card-header">
+          <div class="accent-icon blue">&#128220;</div>
+          <h4>Business Errors</h4>
+          <span class="card-tag">Redirect</span>
+        </div>
+        <p>The operation violates a business rule: refund exceeds limit, user already exists, insufficient balance. Claude should inform the user or try an alternative workflow.</p>
+      </div>
+
+      <div class="accent-card">
+        <div class="accent-card-header">
+          <div class="accent-icon purple">&#128274;</div>
+          <h4>Permission Errors</h4>
+          <span class="card-tag">Escalate</span>
+        </div>
+        <p>The caller lacks authorization: missing API key, expired token, insufficient role. Claude should inform the user that elevated access is needed.</p>
+      </div>
+
+      <h3>Structured Error Response</h3>
+
+      <div class="code-block has-label">
+        <span class="code-label">MCP Error Response</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="punc">{</span>
+  <span class="str">"content"</span><span class="punc">:</span> <span class="punc">[</span>
+    <span class="punc">{</span>
+      <span class="str">"type"</span><span class="punc">:</span> <span class="str">"text"</span><span class="punc">,</span>
+      <span class="str">"text"</span><span class="punc">:</span> <span class="str">"Rate limit exceeded. You have made 100 requests in the last minute. Retry after 30 seconds."</span>
+    <span class="punc">}</span>
+  <span class="punc">]</span><span class="punc">,</span>
+  <span class="str">"isError"</span><span class="punc">:</span> <span class="kw">true</span><span class="punc">,</span>
+  <span class="str">"_meta"</span><span class="punc">:</span> <span class="punc">{</span>
+    <span class="str">"errorCategory"</span><span class="punc">:</span> <span class="str">"transient"</span><span class="punc">,</span>
+    <span class="str">"isRetryable"</span><span class="punc">:</span> <span class="kw">true</span><span class="punc">,</span>
+    <span class="str">"retryAfter"</span><span class="punc">:</span> <span class="num">30</span>
+  <span class="punc">}</span>
+<span class="punc">}</span></code></div>
+
+      <h3>Why Generic Errors Hurt</h3>
+
+      <p>
+        When a tool returns <code>"Error: operation failed"</code>, Claude has no basis for making a recovery decision. Should it retry? Should it change the input? Should it tell the user? It does not know. The result is either a confusing error message passed to the user, or a wasted retry that was never going to succeed.
+      </p>
+
+      <p>
+        Structured errors with categories, retryable flags, and human-readable explanations let Claude make intelligent decisions autonomously, which is the entire point of agentic AI.
+      </p>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 3: ERROR RESPONSE DESIGNER
+         ======================================== -->
+    <section class="section" id="error-response-designer">
+      <h2 class="section-heading">Interactive: Error Response Designer</h2>
+
+      <p>
+        For each failure scenario, write the error response JSON. Click "Check" to see how your response scores against best practices.
+      </p>
+
+      <div class="error-designer">
+        <h3>Design Error Responses</h3>
+
+        <div class="error-scenario-tabs" id="errorScenarioTabs"></div>
+
+        <div id="errorScenarioBodies"></div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 7: TOOL DISTRIBUTION & TESTING
+         ======================================== -->
+    <section class="section" id="tool-distribution">
+      <h2 class="section-heading">7. Tool Distribution &amp; Testing</h2>
+
+      <p>
+        Once you have built an MCP server, you need to distribute it to users and ensure it works reliably. This section covers the distribution and testing lifecycle.
+      </p>
+
+      <h3>Local Plugins for Development</h3>
+
+      <p>
+        During development, point Claude Code directly at your local MCP server using the <code>.mcp.json</code> configuration. Changes to your server code are picked up immediately (if using stdio transport, restart Claude Code or re-connect).
+      </p>
+
+      <h3>Community MCP Servers</h3>
+
+      <p>
+        The MCP ecosystem is growing rapidly. Published MCP servers are available via:
+      </p>
+
+      <ul>
+        <li><strong>npm packages:</strong> <code>npx @company/mcp-server</code> -- Node.js MCP servers installed and run via npx</li>
+        <li><strong>pip packages:</strong> <code>uvx package-name</code> -- Python MCP servers installed via pip/uvx</li>
+        <li><strong>Docker images:</strong> For isolated, reproducible server environments</li>
+        <li><strong>GitHub repositories:</strong> Clone and run from source</li>
+      </ul>
+
+      <h3>Testing Tools</h3>
+
+      <div class="accent-card">
+        <div class="accent-card-header">
+          <div class="accent-icon green">&#9989;</div>
+          <h4>Manual Testing</h4>
+        </div>
+        <p>Use the MCP Inspector to interactively test each tool with sample inputs. Verify outputs match expectations, edge cases are handled, and error responses are well-structured.</p>
+      </div>
+
+      <div class="accent-card">
+        <div class="accent-card-header">
+          <div class="accent-icon blue">&#128295;</div>
+          <h4>Mock Claude Calls</h4>
+        </div>
+        <p>Write scripts that simulate how Claude would call your tools. Test sequences of tool calls that mimic real workflows -- not just individual calls in isolation.</p>
+      </div>
+
+      <div class="accent-card">
+        <div class="accent-card-header">
+          <div class="accent-icon purple">&#128640;</div>
+          <h4>Integration Tests</h4>
+        </div>
+        <p>Connect your MCP server to Claude Code in a test project and run real prompts. Verify that Claude selects the right tools, passes correct parameters, and handles errors gracefully.</p>
+      </div>
+
+      <h3>Debugging Tool Selection</h3>
+
+      <p>
+        When Claude picks the wrong tool, the problem is almost always in the <strong>tool descriptions</strong>. Common causes:
+      </p>
+
+      <ul>
+        <li><strong>Overlapping descriptions:</strong> Two tools that sound like they do the same thing. Differentiate them clearly.</li>
+        <li><strong>Too vague:</strong> A description that could apply to multiple tools. Be specific about the tool's domain and use case.</li>
+        <li><strong>Missing "when NOT to use" guidance:</strong> Tell Claude when the tool is inappropriate, not just when it is appropriate.</li>
+        <li><strong>Too many similar tools:</strong> If you have 5 search tools, Claude may struggle to pick the right one. Consider consolidating or adding very clear differentiation in the descriptions.</li>
+      </ul>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>Debugging technique:</strong> Ask Claude "Why did you choose [tool X] instead of [tool Y]?" in the same conversation. Claude will explain its reasoning, revealing which parts of the description influenced its decision.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 4: TOOL DEBUG WALKTHROUGH
+         ======================================== -->
+    <section class="section" id="debug-walkthrough">
+      <h2 class="section-heading">Interactive: Tool Debug Walkthrough</h2>
+
+      <p>
+        Step through a real debugging scenario where Claude is selecting the wrong tool. Follow the diagnostic steps to identify and fix the problem.
+      </p>
+
+      <div class="debug-walkthrough">
+        <h3>Debugging: Why Claude Picks the Wrong Tool</h3>
+        <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:12px;">Follow the 4-step diagnostic to fix a tool selection problem.</p>
+
+        <div class="debug-progress-bar" id="debugProgressBar">
+          <div class="debug-progress-dot active" data-step="0"></div>
+          <div class="debug-progress-dot" data-step="1"></div>
+          <div class="debug-progress-dot" data-step="2"></div>
+          <div class="debug-progress-dot" data-step="3"></div>
+        </div>
+
+        <div class="debug-steps" id="debugSteps">
+          <!-- Step 1: The Problem -->
+          <div class="debug-step active" data-step="0">
+            <div class="debug-step-header">
+              <div class="debug-step-num">1</div>
+              <div class="debug-step-title">The Problem</div>
+            </div>
+            <p>
+              You built a custom <code>search_docs</code> MCP tool that searches your internal knowledge base using semantic search. But when you ask Claude Code to "find documentation about our authentication flow," Claude uses the built-in <strong>Grep</strong> tool instead.
+            </p>
+            <p>
+              This keeps happening. Claude never selects your custom tool. Why?
+            </p>
+            <div class="code-block" style="margin:12px 0;">
+<span class="cm"># What you asked:</span>
+<span class="str">"Find documentation about our authentication flow"</span>
+
+<span class="cm"># What Claude did:</span>
+<span class="fn">Grep</span> <span class="flag">--pattern</span> <span class="str">"authentication"</span> <span class="flag">--type</span> <span class="str">"md"</span>
+<span class="cm"># (exact text search in markdown files)</span>
+
+<span class="cm"># What you wanted:</span>
+<span class="fn">search_docs</span> <span class="flag">--query</span> <span class="str">"authentication flow"</span>
+<span class="cm"># (semantic search in knowledge base)</span>
+            </div>
+          </div>
+
+          <!-- Step 2: Check the Description -->
+          <div class="debug-step" data-step="1">
+            <div class="debug-step-header">
+              <div class="debug-step-num">2</div>
+              <div class="debug-step-title">Check the Tool Description</div>
+            </div>
+            <p>
+              Let us look at the current tool description. Here is what your <code>search_docs</code> tool exposes:
+            </p>
+            <div class="code-block" style="margin:12px 0;">
+<span class="str">"name"</span><span class="punc">:</span> <span class="str">"search_docs"</span><span class="punc">,</span>
+<span class="str">"description"</span><span class="punc">:</span> <span class="str">"Search documents."</span>
+            </div>
+            <p>
+              Now compare that to Grep's built-in description:
+            </p>
+            <div class="code-block" style="margin:12px 0;">
+<span class="str">"name"</span><span class="punc">:</span> <span class="str">"Grep"</span><span class="punc">,</span>
+<span class="str">"description"</span><span class="punc">:</span> <span class="str">"A powerful search tool... Supports full regex syntax... Use for search tasks."</span>
+            </div>
+            <p>
+              <strong>The problem is clear:</strong> Your description says "Search documents" -- but so does Grep, effectively. Claude sees two tools that both search, and it defaults to the one with the richer, more informative description: Grep.
+            </p>
+          </div>
+
+          <!-- Step 3: Fix the Description -->
+          <div class="debug-step" data-step="2">
+            <div class="debug-step-header">
+              <div class="debug-step-num">3</div>
+              <div class="debug-step-title">Improve the Description</div>
+            </div>
+            <p>
+              Rewrite the description to clearly differentiate your tool from Grep. Explain <em>what</em> it does, <em>when</em> to use it, and <em>how</em> it differs:
+            </p>
+            <div class="code-block" style="margin:12px 0;">
+<span class="str">"name"</span><span class="punc">:</span> <span class="str">"search_docs"</span><span class="punc">,</span>
+<span class="str">"description"</span><span class="punc">:</span> <span class="str">"Search the internal knowledge base by semantic meaning, returning ranked results with relevance scores. Use INSTEAD of Grep when searching for concepts, topics, or questions rather than exact text patterns. This tool understands natural language queries and finds conceptually related documents even when the exact keywords don't appear in the text. Input: a natural language query. Returns: ranked document excerpts with titles and relevance scores."</span>
+            </div>
+            <p>
+              Key improvements: explains semantic vs exact search, says when to use it INSTEAD of Grep, describes input and output format.
+            </p>
+          </div>
+
+          <!-- Step 4: Verify -->
+          <div class="debug-step" data-step="3">
+            <div class="debug-step-header">
+              <div class="debug-step-num">4</div>
+              <div class="debug-step-title">Re-test and Verify</div>
+            </div>
+            <p>
+              After updating the description, restart Claude Code and test again:
+            </p>
+            <div class="code-block" style="margin:12px 0;">
+<span class="cm"># Same request:</span>
+<span class="str">"Find documentation about our authentication flow"</span>
+
+<span class="cm"># Claude's new behavior:</span>
+<span class="fn">search_docs</span> <span class="flag">--query</span> <span class="str">"authentication flow"</span>
+<span class="cm"># Returns: 3 ranked results with relevance scores</span>
+<span class="cm"># 1. "OAuth2 Authentication Architecture" (0.94)</span>
+<span class="cm"># 2. "JWT Token Refresh Flow" (0.87)</span>
+<span class="cm"># 3. "SSO Integration Guide" (0.82)</span>
+            </div>
+            <p>
+              Claude now correctly selects your semantic search tool for concept-based queries, while still using Grep for exact text pattern matching. The description made the difference.
+            </p>
+            <div class="callout tip" style="margin-top:16px;">
+              <span class="callout-icon">&#128161;</span>
+              <div class="callout-content">
+                <p><strong>Takeaway:</strong> When Claude picks the wrong tool, always start by examining the tool description. In the vast majority of cases, that is where the problem lives. A great description is the single highest-leverage improvement you can make.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="debug-nav">
+          <button class="debug-nav-btn" id="debugPrevBtn" onclick="debugPrev()" disabled>Previous</button>
+          <span class="debug-step-counter" id="debugStepCounter">Step 1 of 4</span>
+          <button class="debug-nav-btn" id="debugNextBtn" onclick="debugNext()">Next</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         END-OF-MODULE QUIZ
+         ======================================== -->
+    <section class="section" id="final-quiz">
+      <h2 class="section-heading">End-of-Module Quiz</h2>
+
+      <p>
+        Complete this quiz to finish Module 22. Your score will be saved to track your progress through the training program. You need at least 5 out of 7 to pass.
+      </p>
+
+      <div class="final-quiz" id="finalQuizContainer">
+        <h3>Module 22: Assessment</h3>
+
+        <!-- Question 1 -->
+        <div class="final-quiz-question" data-fq="0">
+          <div class="fq-number">Question 1 of 7</div>
+          <div class="fq-text">
+            What is the MOST important factor in Claude's tool selection accuracy?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="0" data-fq-val="0" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="0"> The tool's name
+            </li>
+            <li class="fq-option" data-fq-idx="0" data-fq-val="1" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="1"> The tool's parameter types
+            </li>
+            <li class="fq-option" data-fq-idx="0" data-fq-val="2" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="2"> The tool's description -- it must clearly explain what the tool does and when to use it
+            </li>
+            <li class="fq-option" data-fq-idx="0" data-fq-val="3" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="3"> The tool's return type
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="final-quiz-question" data-fq="1">
+          <div class="fq-number">Question 2 of 7</div>
+          <div class="fq-text">
+            In MCP architecture, what are "resources"?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="1" data-fq-val="0" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="0"> CPU and memory allocated to the server
+            </li>
+            <li class="fq-option" data-fq-idx="1" data-fq-val="1" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="1"> Data catalogs that Claude can browse without making function calls
+            </li>
+            <li class="fq-option" data-fq-idx="1" data-fq-val="2" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="2"> The tools' return values
+            </li>
+            <li class="fq-option" data-fq-idx="1" data-fq-val="3" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="3"> MCP server configuration files
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="final-quiz-question" data-fq="2">
+          <div class="fq-number">Question 3 of 7</div>
+          <div class="fq-text">
+            Where should you put MCP server configuration that the whole team uses?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="2" data-fq-val="0" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="0"> ~/.claude.json (personal)
+            </li>
+            <li class="fq-option" data-fq-idx="2" data-fq-val="1" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="1"> .mcp.json in the project root (shared via git)
+            </li>
+            <li class="fq-option" data-fq-idx="2" data-fq-val="2" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="2"> In a Slack channel
+            </li>
+            <li class="fq-option" data-fq-idx="2" data-fq-val="3" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="3"> In CLAUDE.md
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 4 -->
+        <div class="final-quiz-question" data-fq="3">
+          <div class="fq-number">Question 4 of 7</div>
+          <div class="fq-text">
+            What should a structured error response include for a transient failure?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="3" data-fq-val="0" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="0"> Just the error message
+            </li>
+            <li class="fq-option" data-fq-idx="3" data-fq-val="1" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="1"> isError flag, error category, isRetryable: true, and retry guidance
+            </li>
+            <li class="fq-option" data-fq-idx="3" data-fq-val="2" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="2"> A stack trace
+            </li>
+            <li class="fq-option" data-fq-idx="3" data-fq-val="3" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="3"> The tool's source code
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 5 -->
+        <div class="final-quiz-question" data-fq="4">
+          <div class="fq-number">Question 5 of 7</div>
+          <div class="fq-text">
+            Why should you use <code>additionalProperties: false</code> in tool schemas?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="4" data-fq-val="0" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="0"> It makes the schema shorter
+            </li>
+            <li class="fq-option" data-fq-idx="4" data-fq-val="1" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="1"> It prevents Claude from sending unexpected parameters that your tool cannot handle
+            </li>
+            <li class="fq-option" data-fq-idx="4" data-fq-val="2" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="2"> It is required by the MCP protocol
+            </li>
+            <li class="fq-option" data-fq-idx="4" data-fq-val="3" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="3"> It improves response speed
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 6 -->
+        <div class="final-quiz-question" data-fq="5">
+          <div class="fq-number">Question 6 of 7</div>
+          <div class="fq-text">
+            When Claude consistently picks Grep over your custom search tool, what is the most likely cause?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="5" data-fq-val="0" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="0"> Grep is hardcoded as the default
+            </li>
+            <li class="fq-option" data-fq-idx="5" data-fq-val="1" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="1"> Your tool's description overlaps with Grep's -- you need to differentiate them
+            </li>
+            <li class="fq-option" data-fq-idx="5" data-fq-val="2" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="2"> Your MCP server is too slow
+            </li>
+            <li class="fq-option" data-fq-idx="5" data-fq-val="3" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="3"> Claude prefers built-in tools over custom ones
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 7 -->
+        <div class="final-quiz-question" data-fq="6">
+          <div class="fq-number">Question 7 of 7</div>
+          <div class="fq-text">
+            What transport type should you use for an MCP server running on the same machine as Claude Code?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="6" data-fq-val="0" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="0"> HTTP with authentication
+            </li>
+            <li class="fq-option" data-fq-idx="6" data-fq-val="1" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="1"> stdio (standard input/output)
+            </li>
+            <li class="fq-option" data-fq-idx="6" data-fq-val="2" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="2"> WebSocket
+            </li>
+            <li class="fq-option" data-fq-idx="6" data-fq-val="3" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="3"> gRPC
+            </li>
+          </ul>
+        </div>
+
+        <button class="final-submit-btn" id="finalSubmitBtn" onclick="submitFinalQuiz()" disabled>
+          Submit Answers
+        </button>
+
+        <div class="final-result" id="finalResult">
+          <h4 id="finalResultTitle"></h4>
+          <p id="finalResultText"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         NAVIGATION FOOTER
+         ======================================== -->
+    <nav class="module-nav">
+      <a href="21-prompt-engineering.html" class="nav-link prev">
+        <span class="nav-dir">&larr; Previous</span>
+        <span class="nav-title">Module 21: Prompt Engineering Lab</span>
+      </a>
+      <a href="23-agent-sdk.html" class="nav-link next">
+        <span class="nav-dir">Next &rarr;</span>
+        <span class="nav-title">Module 23: Agent SDK</span>
+      </a>
+    </nav>
+
+  </div>
+</main>
+
+<!-- ============================================
+     JAVASCRIPT
+     ============================================ -->
+<script>
+(function() {
+  'use strict';
+
+  // ==========================================
+  // THEME MANAGEMENT
+  // ==========================================
+  var THEME_KEY = 'claude-training-theme';
+
+  function getTheme() {
+    return localStorage.getItem(THEME_KEY) || 'light';
+  }
+
+  function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem(THEME_KEY, theme);
+    var icon = document.getElementById('themeIcon');
+    if (icon) {
+      icon.textContent = theme === 'dark' ? '\u2600' : '\u263E';
+    }
+  }
+
+  setTheme(getTheme());
+
+  document.getElementById('themeToggle').addEventListener('click', function() {
+    var current = getTheme();
+    setTheme(current === 'dark' ? 'light' : 'dark');
+  });
+
+  // ==========================================
+  // SIDEBAR MOBILE TOGGLE
+  // ==========================================
+  var hamburger = document.getElementById('hamburger');
+  var sidebar = document.getElementById('sidebar');
+  var overlay = document.getElementById('sidebarOverlay');
+
+  function toggleSidebar() {
+    var isOpen = sidebar.classList.contains('open');
+    sidebar.classList.toggle('open');
+    hamburger.classList.toggle('open');
+    if (isOpen) {
+      overlay.classList.remove('show');
+    } else {
+      overlay.classList.add('show');
+    }
+  }
+
+  hamburger.addEventListener('click', toggleSidebar);
+  overlay.addEventListener('click', toggleSidebar);
+
+  // ==========================================
+  // SIDEBAR SECTION COLLAPSING
+  // ==========================================
+  var sectionToggles = document.querySelectorAll('.sidebar-section-toggle');
+  for (var i = 0; i < sectionToggles.length; i++) {
+    (function(btn) {
+      btn.addEventListener('click', function() {
+        var sectionName = this.getAttribute('data-section');
+        var linksList = document.getElementById('nav-' + sectionName);
+        var isCollapsed = this.classList.contains('collapsed');
+
+        if (isCollapsed) {
+          this.classList.remove('collapsed');
+          linksList.classList.remove('collapsed');
+          linksList.style.maxHeight = linksList.scrollHeight + 'px';
+        } else {
+          this.classList.add('collapsed');
+          linksList.style.maxHeight = linksList.scrollHeight + 'px';
+          linksList.offsetHeight; // force reflow
+          linksList.classList.add('collapsed');
+        }
+      });
+
+      var sectionName = btn.getAttribute('data-section');
+      var linksList = document.getElementById('nav-' + sectionName);
+      if (linksList) {
+        linksList.style.maxHeight = linksList.scrollHeight + 'px';
+      }
+    })(sectionToggles[i]);
+  }
+
+  // ==========================================
+  // SCROLLSPY
+  // ==========================================
+  var sidebarLinks = document.querySelectorAll('.sidebar-link');
+  var sections = [];
+
+  for (var i = 0; i < sidebarLinks.length; i++) {
+    var targetId = sidebarLinks[i].getAttribute('data-target');
+    var section = document.getElementById(targetId);
+    if (section) {
+      sections.push({ el: section, link: sidebarLinks[i], id: targetId });
+    }
+  }
+
+  function updateScrollspy() {
+    var scrollPos = window.scrollY + 100;
+    var active = null;
+
+    for (var i = sections.length - 1; i >= 0; i--) {
+      if (sections[i].el.offsetTop <= scrollPos) {
+        active = sections[i];
+        break;
+      }
+    }
+
+    for (var j = 0; j < sidebarLinks.length; j++) {
+      sidebarLinks[j].classList.remove('active');
+    }
+    if (active) {
+      active.link.classList.add('active');
+    }
+
+    updateSidebarProgress();
+  }
+
+  var scrollTimer = null;
+  window.addEventListener('scroll', function() {
+    if (scrollTimer) return;
+    scrollTimer = setTimeout(function() {
+      scrollTimer = null;
+      updateScrollspy();
+    }, 50);
+  });
+  updateScrollspy();
+
+  // Close mobile sidebar on link click
+  for (var i = 0; i < sidebarLinks.length; i++) {
+    sidebarLinks[i].addEventListener('click', function() {
+      if (window.innerWidth <= 1024) {
+        sidebar.classList.remove('open');
+        hamburger.classList.remove('open');
+        overlay.classList.remove('show');
+      }
+    });
+  }
+
+  // ==========================================
+  // SIDEBAR PROGRESS
+  // ==========================================
+  function updateSidebarProgress() {
+    var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    var scrolled = window.scrollY;
+    var pct = docHeight > 0 ? Math.min(100, (scrolled / docHeight) * 100) : 0;
+    var fill = document.getElementById('sidebarProgressFill');
+    if (fill) {
+      fill.style.width = pct + '%';
+    }
+  }
+
+  // ==========================================
+  // COPY TO CLIPBOARD
+  // ==========================================
+  window.copyCode = function(btn) {
+    var block = btn.closest('.code-block');
+    var codeEl = block.cloneNode(true);
+    var labelEl = codeEl.querySelector('.code-label');
+    var btnEl = codeEl.querySelector('.copy-btn');
+    if (labelEl) labelEl.remove();
+    if (btnEl) btnEl.remove();
+    var text = codeEl.textContent.trim();
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function() {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(function() {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      }).catch(function() {
+        btn.textContent = 'Failed';
+        setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+      });
+    } else {
+      btn.textContent = 'Failed';
+      setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+    }
+  };
+
+  // ==========================================
+  // INTERACTIVE 1: TOOL SCHEMA DESIGNER
+  // ==========================================
+  var schemaParams = [];
+  var paramIdCounter = 0;
+
+  var presets = {
+    weather: {
+      name: 'get_weather_forecast',
+      description: 'Get the current weather forecast for a specific location. Returns temperature, humidity, wind speed, and a text summary. Use when the user asks about weather conditions or forecasts. Do NOT use for historical weather data -- use get_weather_history instead.',
+      params: [
+        { name: 'location', type: 'string', description: 'City name or coordinates (e.g. "San Francisco" or "37.7749,-122.4194")', required: true, enumVals: '' },
+        { name: 'units', type: 'string', description: 'Temperature units to use in the response', required: false, enumVals: 'metric,imperial' },
+        { name: 'days', type: 'integer', description: 'Number of forecast days to return (1-7, default 1)', required: false, enumVals: '' }
+      ]
+    },
+    database: {
+      name: 'query_database',
+      description: 'Execute a read-only SQL query against the application database. Returns results as JSON rows. Use for data retrieval and reporting queries. This tool CANNOT modify data -- use update_record for write operations. Maximum 1000 rows returned per query.',
+      params: [
+        { name: 'sql', type: 'string', description: 'The SQL SELECT query to execute. Must be a SELECT statement; INSERT/UPDATE/DELETE are rejected.', required: true, enumVals: '' },
+        { name: 'database', type: 'string', description: 'Which database to query', required: true, enumVals: 'production,staging,analytics' },
+        { name: 'limit', type: 'integer', description: 'Override the default row limit (default 100, max 1000)', required: false, enumVals: '' },
+        { name: 'format', type: 'string', description: 'Output format for the results', required: false, enumVals: 'json,csv,table' }
+      ]
+    },
+    crm: {
+      name: 'search_contacts',
+      description: 'Search the CRM for contacts matching the given criteria. Returns up to limit results sorted by the specified field. Use this tool when the user asks about customers, contacts, or account holders. For company-level queries, use search_companies instead.',
+      params: [
+        { name: 'query', type: 'string', description: 'Free-text search query. Searches across name, email, phone, and notes fields.', required: true, enumVals: '' },
+        { name: 'status', type: 'string', description: 'Filter by contact status. Omit to include all statuses.', required: false, enumVals: 'active,inactive,lead,churned' },
+        { name: 'limit', type: 'integer', description: 'Maximum number of results to return (default 10, max 100)', required: false, enumVals: '' },
+        { name: 'sort_by', type: 'string', description: 'Field to sort results by. Defaults to relevance when query is provided.', required: false, enumVals: 'name,created_at,last_activity' }
+      ]
+    },
+    clear: {
+      name: '',
+      description: '',
+      params: []
+    }
+  };
+
+  function addParameter(config) {
+    var id = paramIdCounter++;
+    var p = config || { name: '', type: 'string', description: '', required: false, enumVals: '' };
+    schemaParams.push({ id: id, name: p.name, type: p.type, description: p.description, required: p.required, enumVals: p.enumVals });
+    renderParams();
+    updateSchemaPreview();
+  }
+
+  function removeParameter(id) {
+    schemaParams = schemaParams.filter(function(p) { return p.id !== id; });
+    renderParams();
+    updateSchemaPreview();
+  }
+
+  function renderParams() {
+    var container = document.getElementById('schemaParamsList');
+    var html = '';
+    for (var i = 0; i < schemaParams.length; i++) {
+      var p = schemaParams[i];
+      html += '<div class="param-entry" data-param-id="' + p.id + '">';
+      html += '<div class="param-row">';
+      html += '<input type="text" placeholder="name" value="' + escapeAttr(p.name) + '" onchange="updateParam(' + p.id + ',\'name\',this.value)">';
+      html += '<select onchange="updateParam(' + p.id + ',\'type\',this.value)">';
+      var types = ['string', 'integer', 'number', 'boolean', 'array', 'object'];
+      for (var t = 0; t < types.length; t++) {
+        html += '<option value="' + types[t] + '"' + (p.type === types[t] ? ' selected' : '') + '>' + types[t] + '</option>';
+      }
+      html += '</select>';
+      html += '<input type="text" placeholder="description" value="' + escapeAttr(p.description) + '" onchange="updateParam(' + p.id + ',\'description\',this.value)">';
+      html += '<button class="remove-param-btn" onclick="removeParameter(' + p.id + ')" title="Remove parameter">&#10005;</button>';
+      html += '</div>';
+      html += '<div class="param-extras">';
+      html += '<label><input type="checkbox"' + (p.required ? ' checked' : '') + ' onchange="updateParam(' + p.id + ',\'required\',this.checked)"> Required</label>';
+      html += '<input type="text" placeholder="enum values (comma-separated)" value="' + escapeAttr(p.enumVals) + '" onchange="updateParam(' + p.id + ',\'enumVals\',this.value)">';
+      html += '</div>';
+      html += '</div>';
+    }
+    container.innerHTML = html;
+  }
+
+  function escapeAttr(str) {
+    if (!str) return '';
+    return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  window.updateParam = function(id, field, value) {
+    for (var i = 0; i < schemaParams.length; i++) {
+      if (schemaParams[i].id === id) {
+        schemaParams[i][field] = value;
+        break;
+      }
+    }
+    updateSchemaPreview();
+  };
+
+  window.removeParameter = removeParameter;
+
+  window.addParameter = function(config) {
+    addParameter(config);
+  };
+
+  window.updateSchemaPreview = function() {
+    var name = document.getElementById('schemaToolName').value.trim();
+    var desc = document.getElementById('schemaToolDesc').value.trim();
+
+    // Update char count
+    document.getElementById('descCharCount').textContent = desc.length;
+
+    // Build schema object
+    var schema = {};
+    schema.name = name || 'unnamed_tool';
+    schema.description = desc || '';
+
+    var inputSchema = {
+      type: 'object',
+      properties: {},
+      required: [],
+      additionalProperties: false
+    };
+
+    for (var i = 0; i < schemaParams.length; i++) {
+      var p = schemaParams[i];
+      if (!p.name) continue;
+
+      var prop = { type: p.type };
+      if (p.description) prop.description = p.description;
+      if (p.enumVals) {
+        var vals = p.enumVals.split(',').map(function(v) { return v.trim(); }).filter(function(v) { return v; });
+        if (vals.length > 0) prop['enum'] = vals;
+      }
+      inputSchema.properties[p.name] = prop;
+      if (p.required) {
+        inputSchema.required.push(p.name);
+      }
+    }
+
+    if (inputSchema.required.length === 0) {
+      delete inputSchema.required;
+    }
+
+    schema.input_schema = inputSchema;
+
+    // Render preview
+    var previewEl = document.getElementById('schemaPreviewCode');
+    previewEl.textContent = JSON.stringify(schema, null, 2);
+
+    // Calculate quality score
+    calculateQuality(name, desc, schemaParams);
+  };
+
+  function calculateQuality(name, desc, params) {
+    var score = 0;
+    var details = [];
+
+    // 1. Has a name (5 pts)
+    if (name && name.length > 0) {
+      score += 5;
+      details.push({ pass: true, text: 'Tool has a name' });
+    } else {
+      details.push({ pass: false, text: 'Missing tool name' });
+    }
+
+    // 2. Name uses verb_noun pattern (10 pts)
+    if (name && name.indexOf('_') > 0) {
+      score += 10;
+      details.push({ pass: true, text: 'Name uses verb_noun pattern' });
+    } else if (name) {
+      details.push({ pass: false, text: 'Name should use verb_noun pattern (e.g. search_contacts)' });
+    }
+
+    // 3. Description exists (10 pts)
+    if (desc && desc.length > 0) {
+      score += 10;
+      details.push({ pass: true, text: 'Description provided' });
+    } else {
+      details.push({ pass: false, text: 'Missing description' });
+    }
+
+    // 4. Description length (15 pts)
+    if (desc && desc.length >= 100) {
+      score += 15;
+      details.push({ pass: true, text: 'Description is detailed (' + desc.length + ' chars)' });
+    } else if (desc && desc.length >= 30) {
+      score += 7;
+      details.push({ pass: false, text: 'Description could be more detailed (' + desc.length + '/100 chars)' });
+    } else {
+      details.push({ pass: false, text: 'Description too short (aim for 100+ characters)' });
+    }
+
+    // 5. Description explains when to use (10 pts)
+    var whenPatterns = ['use when', 'use this', 'use for', 'use instead', 'when the user', 'helpful for'];
+    var hasWhen = false;
+    var descLower = (desc || '').toLowerCase();
+    for (var w = 0; w < whenPatterns.length; w++) {
+      if (descLower.indexOf(whenPatterns[w]) >= 0) { hasWhen = true; break; }
+    }
+    if (hasWhen) {
+      score += 10;
+      details.push({ pass: true, text: 'Description explains when to use the tool' });
+    } else {
+      details.push({ pass: false, text: 'Description should explain when to use this tool' });
+    }
+
+    // 6. Description explains when NOT to use (10 pts)
+    var notPatterns = ['do not use', 'don\'t use', 'not use', 'instead of', 'cannot', 'does not'];
+    var hasNot = false;
+    for (var n = 0; n < notPatterns.length; n++) {
+      if (descLower.indexOf(notPatterns[n]) >= 0) { hasNot = true; break; }
+    }
+    if (hasNot) {
+      score += 10;
+      details.push({ pass: true, text: 'Description explains when NOT to use the tool' });
+    } else {
+      details.push({ pass: false, text: 'Consider explaining when NOT to use this tool' });
+    }
+
+    // 7. Has parameters (5 pts)
+    var validParams = params.filter(function(p) { return p.name; });
+    if (validParams.length > 0) {
+      score += 5;
+      details.push({ pass: true, text: validParams.length + ' parameter(s) defined' });
+    } else {
+      details.push({ pass: false, text: 'No parameters defined' });
+    }
+
+    // 8. All params have descriptions (15 pts)
+    var paramsWithDesc = validParams.filter(function(p) { return p.description && p.description.length > 0; });
+    if (validParams.length > 0 && paramsWithDesc.length === validParams.length) {
+      score += 15;
+      details.push({ pass: true, text: 'All parameters have descriptions' });
+    } else if (validParams.length > 0) {
+      score += Math.round(15 * (paramsWithDesc.length / validParams.length));
+      details.push({ pass: false, text: paramsWithDesc.length + '/' + validParams.length + ' parameters have descriptions' });
+    }
+
+    // 9. Uses enums where possible (10 pts)
+    var paramsWithEnum = validParams.filter(function(p) { return p.enumVals && p.enumVals.length > 0; });
+    if (paramsWithEnum.length > 0) {
+      score += 10;
+      details.push({ pass: true, text: 'Enums used for constrained parameters' });
+    } else if (validParams.length > 0) {
+      details.push({ pass: false, text: 'Consider using enums for parameters with fixed valid values' });
+    }
+
+    // 10. Has required fields (10 pts)
+    var requiredParams = validParams.filter(function(p) { return p.required; });
+    if (requiredParams.length > 0) {
+      score += 10;
+      details.push({ pass: true, text: requiredParams.length + ' required field(s) marked' });
+    } else if (validParams.length > 0) {
+      details.push({ pass: false, text: 'Consider marking essential parameters as required' });
+    }
+
+    // Render quality score
+    score = Math.min(100, score);
+    var scoreClass = score >= 70 ? 'high' : (score >= 40 ? 'mid' : 'low');
+    var scoreValueEl = document.getElementById('qualityScoreValue');
+    var scoreFillEl = document.getElementById('qualityScoreFill');
+    var detailsEl = document.getElementById('qualityDetails');
+
+    scoreValueEl.textContent = score + ' / 100';
+    scoreValueEl.className = 'quality-score-value ' + scoreClass;
+    scoreFillEl.style.width = score + '%';
+    scoreFillEl.className = 'quality-score-fill ' + scoreClass;
+
+    var detailsHtml = '';
+    for (var d = 0; d < details.length; d++) {
+      var item = details[d];
+      detailsHtml += '<div class="quality-item">';
+      detailsHtml += '<span class="qi-icon">' + (item.pass ? '&#10003;' : '&#10007;') + '</span>';
+      detailsHtml += '<span style="color:' + (item.pass ? 'var(--success)' : 'var(--text-muted)') + '">' + escapeHtml(item.text) + '</span>';
+      detailsHtml += '</div>';
+    }
+    detailsEl.innerHTML = detailsHtml;
+  }
+
+  window.loadPreset = function(key) {
+    var preset = presets[key];
+    if (!preset) return;
+
+    document.getElementById('schemaToolName').value = preset.name;
+    document.getElementById('schemaToolDesc').value = preset.description;
+
+    // Reset params
+    schemaParams = [];
+    paramIdCounter = 0;
+
+    for (var i = 0; i < preset.params.length; i++) {
+      addParameter(preset.params[i]);
+    }
+
+    // Update active preset button
+    var btns = document.querySelectorAll('.preset-btn');
+    for (var b = 0; b < btns.length; b++) {
+      btns[b].classList.remove('active');
+    }
+    if (key !== 'clear') {
+      // Find and mark active
+      for (var b = 0; b < btns.length; b++) {
+        if (btns[b].textContent.toLowerCase().indexOf(key) >= 0) {
+          btns[b].classList.add('active');
+          break;
+        }
+      }
+    }
+
+    updateSchemaPreview();
+  };
+
+  // Initialize schema designer
+  updateSchemaPreview();
+
+  // ==========================================
+  // INTERACTIVE 2: MCP CONNECTION DIAGRAM
+  // ==========================================
+  var mcpServers = [
+    {
+      id: 'database',
+      icon: '&#128451;',
+      label: 'Database',
+      sublabel: 'stdio',
+      tools: ['query_database', 'get_table_schema', 'explain_query'],
+      resources: ['schema://tables -- List of all tables and columns', 'schema://views -- Database views', 'schema://indexes -- Index definitions'],
+      config: '{\n  "command": "python3",\n  "args": ["db_mcp.py"],\n  "env": {"DB_URL": "${DATABASE_URL}"}\n}',
+      transport: 'stdio'
+    },
+    {
+      id: 'api-gateway',
+      icon: '&#127760;',
+      label: 'API Gateway',
+      sublabel: 'HTTP/SSE',
+      tools: ['call_rest_api', 'list_endpoints', 'get_api_docs'],
+      resources: ['api://endpoints -- Available REST endpoints', 'api://schemas -- Request/response schemas'],
+      config: '{\n  "url": "https://mcp.company.com/api-gateway",\n  "headers": {"Authorization": "Bearer ${API_TOKEN}"}\n}',
+      transport: 'HTTP/SSE'
+    },
+    {
+      id: 'filesystem',
+      icon: '&#128193;',
+      label: 'File System',
+      sublabel: 'stdio',
+      tools: ['read_file', 'write_file', 'list_directory', 'search_files'],
+      resources: ['files://root -- Project file tree', 'files://recent -- Recently modified files'],
+      config: '{\n  "command": "npx",\n  "args": ["@mcp/filesystem", "/project/path"]\n}',
+      transport: 'stdio'
+    },
+    {
+      id: 'search',
+      icon: '&#128269;',
+      label: 'Search Engine',
+      sublabel: 'HTTP/SSE',
+      tools: ['semantic_search', 'keyword_search', 'reindex_documents'],
+      resources: ['search://collections -- Available search collections', 'search://stats -- Index statistics'],
+      config: '{\n  "url": "https://mcp.company.com/search",\n  "headers": {"X-API-Key": "${SEARCH_KEY}"}\n}',
+      transport: 'HTTP/SSE'
+    }
+  ];
+
+  var activeServerId = null;
+
+  function renderMcpDiagram() {
+    var canvas = document.getElementById('mcpCanvas');
+    var canvasWidth = canvas.offsetWidth;
+    var centerX = canvasWidth / 2;
+    var centerY = 200;
+
+    // Calculate positions
+    var positions = [
+      { x: centerX - 220, y: 40 },    // top-left
+      { x: centerX + 90, y: 40 },      // top-right
+      { x: centerX - 220, y: 310 },    // bottom-left
+      { x: centerX + 90, y: 310 }      // bottom-right
+    ];
+
+    var html = '';
+
+    // Central Claude node
+    html += '<div class="mcp-node central" style="left:' + (centerX - 60) + 'px;top:' + (centerY - 35) + 'px;z-index:2;" onclick="selectMcpNode(null)">';
+    html += '<div class="mcp-node-icon">&#129302;</div>';
+    html += '<div class="mcp-node-label">Claude</div>';
+    html += '<div class="mcp-node-sublabel">MCP Client</div>';
+    html += '</div>';
+
+    // Server nodes
+    for (var i = 0; i < mcpServers.length; i++) {
+      var server = mcpServers[i];
+      var pos = positions[i] || { x: centerX - 65 + (i - 4) * 150, y: 380 };
+
+      html += '<div class="mcp-node' + (activeServerId === server.id ? ' active' : '') + '" ';
+      html += 'style="left:' + pos.x + 'px;top:' + pos.y + 'px;z-index:2;" ';
+      html += 'onclick="selectMcpNode(\'' + server.id + '\')" data-server-id="' + server.id + '">';
+      html += '<div class="mcp-node-icon">' + server.icon + '</div>';
+      html += '<div class="mcp-node-label">' + escapeHtml(server.label) + '</div>';
+      html += '<div class="mcp-node-sublabel">' + escapeHtml(server.sublabel) + '</div>';
+      html += '</div>';
+    }
+
+    canvas.innerHTML = html;
+
+    // Draw connection lines after render (need DOM positions)
+    setTimeout(function() { drawConnections(); }, 50);
+  }
+
+  function drawConnections() {
+    var canvas = document.getElementById('mcpCanvas');
+    var centralNode = canvas.querySelector('.mcp-node.central');
+    if (!centralNode) return;
+
+    // Remove existing lines
+    var existingLines = canvas.querySelectorAll('.mcp-connection-line');
+    for (var e = 0; e < existingLines.length; e++) {
+      existingLines[e].remove();
+    }
+
+    var cx = centralNode.offsetLeft + centralNode.offsetWidth / 2;
+    var cy = centralNode.offsetTop + centralNode.offsetHeight / 2;
+
+    var serverNodes = canvas.querySelectorAll('.mcp-node:not(.central)');
+    for (var i = 0; i < serverNodes.length; i++) {
+      var node = serverNodes[i];
+      var nx = node.offsetLeft + node.offsetWidth / 2;
+      var ny = node.offsetTop + node.offsetHeight / 2;
+
+      var dx = nx - cx;
+      var dy = ny - cy;
+      var length = Math.sqrt(dx * dx + dy * dy);
+      var angle = Math.atan2(dy, dx) * 180 / Math.PI;
+
+      var serverId = node.getAttribute('data-server-id');
+      var isActive = serverId === activeServerId;
+
+      var line = document.createElement('div');
+      line.className = 'mcp-connection-line' + (isActive ? ' active' : '');
+      line.style.width = length + 'px';
+      line.style.left = cx + 'px';
+      line.style.top = cy + 'px';
+      line.style.transform = 'rotate(' + angle + 'deg)';
+      canvas.appendChild(line);
+    }
+  }
+
+  window.selectMcpNode = function(serverId) {
+    activeServerId = serverId;
+    renderMcpDiagram();
+
+    var panel = document.getElementById('mcpDetailPanel');
+    if (!serverId) {
+      panel.classList.remove('show');
+      return;
+    }
+
+    var server = null;
+    for (var i = 0; i < mcpServers.length; i++) {
+      if (mcpServers[i].id === serverId) {
+        server = mcpServers[i];
+        break;
+      }
+    }
+    if (!server) return;
+
+    var html = '<h4>' + server.icon + ' ' + escapeHtml(server.label) + ' MCP Server</h4>';
+
+    html += '<div class="mcp-detail-section">';
+    html += '<h5>Tools</h5><ul>';
+    for (var t = 0; t < server.tools.length; t++) {
+      html += '<li>' + escapeHtml(server.tools[t]) + '</li>';
+    }
+    html += '</ul></div>';
+
+    html += '<div class="mcp-detail-section">';
+    html += '<h5>Resources</h5><ul>';
+    for (var r = 0; r < server.resources.length; r++) {
+      html += '<li>' + escapeHtml(server.resources[r]) + '</li>';
+    }
+    html += '</ul></div>';
+
+    html += '<div class="mcp-detail-section">';
+    html += '<h5>Transport</h5>';
+    html += '<p style="font-size:0.88rem;color:var(--text-secondary);margin:0;">' + escapeHtml(server.transport) + '</p>';
+    html += '</div>';
+
+    html += '<div class="mcp-detail-section">';
+    html += '<h5>Configuration</h5>';
+    html += '<div class="code-block" style="margin:4px 0 0;padding:12px 16px;font-size:0.78rem;">' + escapeHtml(server.config) + '</div>';
+    html += '</div>';
+
+    panel.innerHTML = html;
+    panel.classList.add('show');
+  };
+
+  window.addMcpServer = function() {
+    var nameInput = document.getElementById('mcpNewServerName');
+    var toolsInput = document.getElementById('mcpNewServerTools');
+    var name = nameInput.value.trim();
+    var tools = toolsInput.value.trim();
+
+    if (!name) return;
+
+    var toolList = tools ? tools.split(',').map(function(t) { return t.trim(); }).filter(function(t) { return t; }) : ['custom_tool'];
+
+    mcpServers.push({
+      id: 'custom-' + Date.now(),
+      icon: '&#128300;',
+      label: name,
+      sublabel: 'stdio',
+      tools: toolList,
+      resources: ['custom://data -- Custom data source'],
+      config: '{\n  "command": "python3",\n  "args": ["' + name.toLowerCase().replace(/\s+/g, '_') + '_mcp.py"]\n}',
+      transport: 'stdio'
+    });
+
+    nameInput.value = '';
+    toolsInput.value = '';
+    renderMcpDiagram();
+  };
+
+  // Initialize MCP diagram
+  renderMcpDiagram();
+
+  // Redraw on resize
+  var resizeTimer = null;
+  window.addEventListener('resize', function() {
+    if (resizeTimer) clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function() {
+      renderMcpDiagram();
+    }, 200);
+  });
+
+  // ==========================================
+  // INTERACTIVE 3: ERROR RESPONSE DESIGNER
+  // ==========================================
+  var errorScenarios = [
+    {
+      id: 0,
+      title: 'DB Timeout',
+      type: 'Transient Error',
+      description: 'A database query timed out after 30 seconds. The database server is under heavy load but is expected to recover shortly.',
+      bestPractice: {
+        isError: true,
+        category: 'transient',
+        retryable: true,
+        message: true,
+        guidance: true
+      }
+    },
+    {
+      id: 1,
+      title: 'Invalid Email',
+      type: 'Validation Error',
+      description: 'A user tried to create a contact with the email address "not-an-email". The email field requires a valid email format.',
+      bestPractice: {
+        isError: true,
+        category: 'validation',
+        retryable: false,
+        message: true,
+        guidance: true
+      }
+    },
+    {
+      id: 2,
+      title: 'Refund Limit',
+      type: 'Business Rule',
+      description: 'A refund request for $750 was rejected because the maximum allowed refund is $500. Company policy requires manager approval for amounts over $500.',
+      bestPractice: {
+        isError: true,
+        category: 'business',
+        retryable: false,
+        message: true,
+        guidance: true
+      }
+    },
+    {
+      id: 3,
+      title: 'Missing API Key',
+      type: 'Permission Error',
+      description: 'An API call failed because the required API key environment variable (OPENAI_API_KEY) is not set. The tool cannot function without it.',
+      bestPractice: {
+        isError: true,
+        category: 'permission',
+        retryable: false,
+        message: true,
+        guidance: true
+      }
+    },
+    {
+      id: 4,
+      title: 'Service 503',
+      type: 'Transient Error',
+      description: 'An external payment processing service returned HTTP 503 (Service Unavailable) with a Retry-After header of 60 seconds.',
+      bestPractice: {
+        isError: true,
+        category: 'transient',
+        retryable: true,
+        message: true,
+        guidance: true
+      }
+    }
+  ];
+
+  var errorResponses = {};
+  var activeErrorScenario = 0;
+
+  function renderErrorDesigner() {
+    var tabsEl = document.getElementById('errorScenarioTabs');
+    var bodiesEl = document.getElementById('errorScenarioBodies');
+
+    var tabsHtml = '';
+    var bodiesHtml = '';
+
+    for (var i = 0; i < errorScenarios.length; i++) {
+      var s = errorScenarios[i];
+      var isActive = i === activeErrorScenario;
+
+      var scoreAttr = '';
+      var scoredClass = '';
+      if (errorResponses[s.id] !== undefined && errorResponses[s.id].scored) {
+        var sc = errorResponses[s.id].score;
+        scoredClass = ' scored' + (sc >= 4 ? '' : (sc >= 2 ? ' partial' : ' fail'));
+        scoreAttr = ' data-score="' + sc + '/5"';
+      }
+
+      tabsHtml += '<button class="error-scenario-tab' + (isActive ? ' active' : '') + scoredClass + '"' + scoreAttr + ' onclick="switchErrorScenario(' + i + ')">';
+      tabsHtml += escapeHtml(s.title);
+      tabsHtml += '</button>';
+
+      bodiesHtml += '<div class="error-scenario-body' + (isActive ? ' active' : '') + '" data-scenario="' + i + '">';
+      bodiesHtml += '<div class="error-scenario-description">';
+      bodiesHtml += '<div class="scenario-type">' + escapeHtml(s.type) + '</div>';
+      bodiesHtml += '<p>' + escapeHtml(s.description) + '</p>';
+      bodiesHtml += '</div>';
+
+      var savedText = (errorResponses[s.id] && errorResponses[s.id].text) || '';
+      bodiesHtml += '<textarea class="error-textarea" id="errorTextarea' + i + '" placeholder="Write your MCP error response JSON here...">' + escapeHtml(savedText) + '</textarea>';
+
+      bodiesHtml += '<button class="check-btn" onclick="checkErrorResponse(' + i + ')">Check Response</button>';
+      bodiesHtml += '<div class="error-feedback" id="errorFeedback' + i + '"></div>';
+      bodiesHtml += '</div>';
+    }
+
+    tabsEl.innerHTML = tabsHtml;
+    bodiesEl.innerHTML = bodiesHtml;
+  }
+
+  window.switchErrorScenario = function(idx) {
+    // Save current textarea
+    var currentTextarea = document.getElementById('errorTextarea' + activeErrorScenario);
+    if (currentTextarea) {
+      if (!errorResponses[activeErrorScenario]) errorResponses[activeErrorScenario] = {};
+      errorResponses[activeErrorScenario].text = currentTextarea.value;
+    }
+
+    activeErrorScenario = idx;
+    renderErrorDesigner();
+  };
+
+  window.checkErrorResponse = function(idx) {
+    var textarea = document.getElementById('errorTextarea' + idx);
+    var text = textarea.value.trim();
+    var scenario = errorScenarios[idx];
+    var feedbackEl = document.getElementById('errorFeedback' + idx);
+
+    if (!text) {
+      feedbackEl.innerHTML = '<div class="error-check-item fail"><span class="eci-icon">&#10007;</span> Please write a response before checking.</div>';
+      feedbackEl.classList.add('show');
+      return;
+    }
+
+    // Parse JSON
+    var parsed = null;
+    try {
+      parsed = JSON.parse(text);
+    } catch (e) {
+      feedbackEl.innerHTML = '<div class="error-check-item fail"><span class="eci-icon">&#10007;</span> Invalid JSON: ' + escapeHtml(e.message) + '</div>';
+      feedbackEl.classList.add('show');
+      return;
+    }
+
+    var checks = [];
+    var score = 0;
+
+    // Check 1: isError flag
+    if (parsed.isError === true) {
+      checks.push({ pass: true, text: 'Has isError: true' });
+      score++;
+    } else {
+      checks.push({ pass: false, text: 'Missing isError: true -- Claude needs this flag to know the call failed' });
+    }
+
+    // Check 2: Error category
+    var textLower = text.toLowerCase();
+    var hasCategory = textLower.indexOf('category') >= 0 || textLower.indexOf('errorcategory') >= 0 || textLower.indexOf('error_category') >= 0 || textLower.indexOf('errortype') >= 0 || textLower.indexOf('error_type') >= 0;
+    if (hasCategory) {
+      checks.push({ pass: true, text: 'Includes error category/type' });
+      score++;
+    } else {
+      checks.push({ pass: false, text: 'Missing error category (transient, validation, business, permission)' });
+    }
+
+    // Check 3: isRetryable flag
+    var hasRetryable = textLower.indexOf('retryable') >= 0 || textLower.indexOf('retry') >= 0;
+    if (hasRetryable) {
+      checks.push({ pass: true, text: 'Includes retryable/retry information' });
+      score++;
+    } else {
+      checks.push({ pass: false, text: 'Missing isRetryable flag -- Claude needs to know whether retrying is useful' });
+    }
+
+    // Check 4: Human-readable message
+    var hasMessage = false;
+    if (parsed.content) {
+      for (var c = 0; c < parsed.content.length; c++) {
+        if (parsed.content[c].text && parsed.content[c].text.length > 10) {
+          hasMessage = true;
+          break;
+        }
+      }
+    }
+    if (!hasMessage && textLower.indexOf('message') >= 0) {
+      hasMessage = true;
+    }
+    if (hasMessage) {
+      checks.push({ pass: true, text: 'Contains human-readable error message' });
+      score++;
+    } else {
+      checks.push({ pass: false, text: 'Missing clear human-readable error message in content' });
+    }
+
+    // Check 5: Recovery guidance
+    var guidanceTerms = ['retry after', 'retryafter', 'fix', 'correct', 'instead', 'alternative', 'approval', 'contact', 'set the', 'configure', 'wait'];
+    var hasGuidance = false;
+    for (var g = 0; g < guidanceTerms.length; g++) {
+      if (textLower.indexOf(guidanceTerms[g]) >= 0) {
+        hasGuidance = true;
+        break;
+      }
+    }
+    if (hasGuidance) {
+      checks.push({ pass: true, text: 'Includes recovery guidance' });
+      score++;
+    } else {
+      checks.push({ pass: false, text: 'Missing recovery guidance -- tell Claude what to do next' });
+    }
+
+    // Save result
+    if (!errorResponses[idx]) errorResponses[idx] = {};
+    errorResponses[idx].text = text;
+    errorResponses[idx].scored = true;
+    errorResponses[idx].score = score;
+
+    // Render feedback
+    var html = '';
+    html += '<div style="font-weight:700;margin-bottom:8px;color:var(--text);font-size:0.92rem;">Score: ' + score + ' / 5</div>';
+    for (var f = 0; f < checks.length; f++) {
+      html += '<div class="error-check-item ' + (checks[f].pass ? 'pass' : 'fail') + '">';
+      html += '<span class="eci-icon">' + (checks[f].pass ? '&#10003;' : '&#10007;') + '</span>';
+      html += '<span>' + escapeHtml(checks[f].text) + '</span>';
+      html += '</div>';
+    }
+    feedbackEl.innerHTML = html;
+    feedbackEl.classList.add('show');
+
+    // Re-render tabs to show scores
+    var tabsEl = document.getElementById('errorScenarioTabs');
+    var tabs = tabsEl.querySelectorAll('.error-scenario-tab');
+    for (var t = 0; t < tabs.length; t++) {
+      if (t === idx) {
+        var sc = score;
+        tabs[t].className = 'error-scenario-tab active scored' + (sc >= 4 ? '' : (sc >= 2 ? ' partial' : ' fail'));
+        tabs[t].setAttribute('data-score', sc + '/5');
+      }
+    }
+  };
+
+  renderErrorDesigner();
+
+  // ==========================================
+  // INTERACTIVE 4: TOOL DEBUG WALKTHROUGH
+  // ==========================================
+  var debugCurrentStep = 0;
+  var debugTotalSteps = 4;
+
+  function updateDebugUI() {
+    var steps = document.querySelectorAll('.debug-step');
+    var dots = document.querySelectorAll('.debug-progress-dot');
+    var prevBtn = document.getElementById('debugPrevBtn');
+    var nextBtn = document.getElementById('debugNextBtn');
+    var counter = document.getElementById('debugStepCounter');
+
+    for (var i = 0; i < steps.length; i++) {
+      if (i === debugCurrentStep) {
+        steps[i].classList.add('active');
+      } else {
+        steps[i].classList.remove('active');
+      }
+    }
+
+    for (var d = 0; d < dots.length; d++) {
+      dots[d].classList.remove('active', 'done');
+      if (d === debugCurrentStep) {
+        dots[d].classList.add('active');
+      } else if (d < debugCurrentStep) {
+        dots[d].classList.add('done');
+      }
+    }
+
+    prevBtn.disabled = debugCurrentStep === 0;
+    nextBtn.disabled = debugCurrentStep === debugTotalSteps - 1;
+    nextBtn.textContent = debugCurrentStep === debugTotalSteps - 1 ? 'Done' : 'Next';
+
+    counter.textContent = 'Step ' + (debugCurrentStep + 1) + ' of ' + debugTotalSteps;
+  }
+
+  window.debugNext = function() {
+    if (debugCurrentStep < debugTotalSteps - 1) {
+      debugCurrentStep++;
+      updateDebugUI();
+    }
+  };
+
+  window.debugPrev = function() {
+    if (debugCurrentStep > 0) {
+      debugCurrentStep--;
+      updateDebugUI();
+    }
+  };
+
+  updateDebugUI();
+
+  // ==========================================
+  // FINAL QUIZ
+  // ==========================================
+  var FINAL_QUIZ_KEY = 'claude-training-module-22';
+
+  var finalQuizData = [
+    { correct: 2 },
+    { correct: 1 },
+    { correct: 1 },
+    { correct: 1 },
+    { correct: 1 },
+    { correct: 1 },
+    { correct: 1 }
+  ];
+
+  var finalQuizSelections = [];
+  for (var fq = 0; fq < finalQuizData.length; fq++) {
+    finalQuizSelections.push(null);
+  }
+  var finalQuizSubmitted = false;
+
+  window.selectFinalOption = function(qIdx, el) {
+    if (finalQuizSubmitted) return;
+
+    var parentQ = el.closest('.final-quiz-question');
+    var options = parentQ.querySelectorAll('.fq-option');
+    for (var o = 0; o < options.length; o++) {
+      options[o].querySelector('input').checked = false;
+      options[o].style.background = '';
+    }
+
+    el.querySelector('input').checked = true;
+    finalQuizSelections[qIdx] = parseInt(el.getAttribute('data-fq-val'));
+
+    var allAnswered = true;
+    for (var s = 0; s < finalQuizSelections.length; s++) {
+      if (finalQuizSelections[s] === null) { allAnswered = false; break; }
+    }
+    document.getElementById('finalSubmitBtn').disabled = !allAnswered;
+  };
+
+  window.submitFinalQuiz = function() {
+    if (finalQuizSubmitted) return;
+    finalQuizSubmitted = true;
+
+    var score = 0;
+
+    for (var idx = 0; idx < finalQuizSelections.length; idx++) {
+      var sel = finalQuizSelections[idx];
+      var correct = finalQuizData[idx].correct;
+      var questionEl = document.querySelector('.final-quiz-question[data-fq="' + idx + '"]');
+      var options = questionEl.querySelectorAll('.fq-option');
+
+      for (var o = 0; o < options.length; o++) {
+        var val = parseInt(options[o].getAttribute('data-fq-val'));
+        options[o].style.pointerEvents = 'none';
+
+        if (val === correct) {
+          if (sel === val) {
+            options[o].classList.add('selected-correct');
+            score++;
+          } else {
+            options[o].classList.add('reveal-correct');
+          }
+        } else if (val === sel) {
+          options[o].classList.add('selected-wrong');
+        }
+      }
+    }
+
+    var result = document.getElementById('finalResult');
+    var title = document.getElementById('finalResultTitle');
+    var text = document.getElementById('finalResultText');
+
+    result.classList.add('show');
+
+    if (score >= 5) {
+      result.classList.add('pass');
+      result.classList.remove('fail');
+      title.textContent = 'Passed! ' + score + ' / 7 correct';
+      text.textContent = 'Excellent work! You have a strong understanding of tool design and MCP integration. Your progress has been saved. You are ready to move on to the next module.';
+    } else {
+      result.classList.add('fail');
+      result.classList.remove('pass');
+      title.textContent = score + ' / 7 correct -- Review needed';
+      text.textContent = 'You need at least 5 correct answers to pass. Review the material above, paying special attention to tool descriptions, MCP configuration, and error handling. Then try again.';
+    }
+
+    var progressData = {
+      score: score,
+      total: 7,
+      completed: score >= 5,
+      timestamp: new Date().toISOString()
+    };
+    localStorage.setItem(FINAL_QUIZ_KEY, JSON.stringify(progressData));
+
+    document.getElementById('finalSubmitBtn').disabled = true;
+    document.getElementById('finalSubmitBtn').textContent = 'Submitted';
+  };
+
+  // Check for existing progress
+  function loadExistingProgress() {
+    var saved = localStorage.getItem(FINAL_QUIZ_KEY);
+    if (saved) {
+      try {
+        var data = JSON.parse(saved);
+        if (data.completed) {
+          var fill = document.getElementById('sidebarProgressFill');
+          if (fill) {
+            fill.style.width = '100%';
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+  }
+  loadExistingProgress();
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,4271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 24: Multi-Agent Systems | Claude AI Training</title>
+<style>
+/* ============================================
+   CSS CUSTOM PROPERTIES & DESIGN SYSTEM
+   Premium Edition with 3-layer shadows, spring
+   transitions, gradient headings, deep dark mode
+   ============================================ */
+:root {
+  --primary: #7C3AED;
+  --primary-light: #A78BFA;
+  --primary-dark: #5B21B6;
+  --accent: #06B6D4;
+  --accent-light: #22D3EE;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  --bg: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --bg-code: #F1F5F9;
+  --text: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --border: #E2E8F0;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04), 0 0px 0px rgba(124,58,237,0);
+  --shadow-lg: 0 4px 12px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.06), 0 0 0 rgba(124,58,237,0);
+  --shadow-glow: 0 4px 12px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.06), 0 0 24px rgba(124,58,237,0.12);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --transition: 0.2s ease;
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --sidebar-width: 280px;
+  --content-max: 800px;
+}
+
+[data-theme="dark"] {
+  --bg: #0B0F1A;
+  --bg-card: #141926;
+  --bg-code: #1A2030;
+  --text: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --border: #1E293B;
+  --shadow: 0 1px 3px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.2), 0 0 0 rgba(124,58,237,0);
+  --shadow-lg: 0 4px 12px rgba(0,0,0,0.4), 0 12px 32px rgba(0,0,0,0.3), 0 0 0 rgba(124,58,237,0);
+  --shadow-glow: 0 4px 12px rgba(0,0,0,0.4), 0 12px 32px rgba(0,0,0,0.3), 0 0 32px rgba(124,58,237,0.15);
+}
+
+/* ============================================
+   REDUCED MOTION
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  html { scroll-behavior: auto; }
+}
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 24px;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  min-height: 100vh;
+  transition: background var(--transition), color var(--transition);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   THEME TOGGLE
+   ============================================ */
+.theme-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: all 0.3s var(--spring);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+.theme-toggle:hover {
+  box-shadow: var(--shadow-glow);
+  transform: scale(1.08);
+}
+
+/* ============================================
+   SIDEBAR
+   ============================================ */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  z-index: 900;
+  transition: transform 0.3s ease, background var(--transition);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.sidebar-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+  margin-bottom: 12px;
+  transition: color var(--transition);
+}
+.sidebar-back:hover { color: var(--primary-dark); }
+
+.sidebar-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.sidebar-module-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.sidebar-nav {
+  padding: 12px 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.sidebar-section {
+  margin-bottom: 4px;
+}
+
+.sidebar-section-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 20px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  text-align: left;
+  transition: color var(--transition);
+}
+.sidebar-section-toggle:hover { color: var(--text); }
+.sidebar-section-toggle .chevron {
+  transition: transform 0.2s ease;
+  font-size: 0.65rem;
+}
+.sidebar-section-toggle.collapsed .chevron {
+  transform: rotate(-90deg);
+}
+
+.sidebar-links {
+  list-style: none;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.sidebar-links.collapsed {
+  max-height: 0 !important;
+}
+
+.sidebar-link {
+  display: block;
+  padding: 7px 20px 7px 32px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: all var(--transition);
+  line-height: 1.4;
+}
+.sidebar-link:hover {
+  color: var(--text);
+  background: var(--bg);
+}
+.sidebar-link.active {
+  color: var(--primary);
+  border-left-color: var(--primary);
+  background: rgba(124, 58, 237, 0.05);
+  font-weight: 600;
+}
+[data-theme="dark"] .sidebar-link.active {
+  background: rgba(124, 58, 237, 0.12);
+}
+
+.sidebar-progress {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sidebar-progress-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.sidebar-progress-track {
+  height: 6px;
+  background: var(--bg-code);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.sidebar-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 3px;
+  transition: width 0.5s ease;
+  width: 0%;
+}
+
+/* Hamburger button (mobile) */
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1001;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+  transition: all var(--transition);
+}
+.hamburger span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--text);
+  margin: 4px auto;
+  transition: all 0.3s ease;
+  border-radius: 1px;
+}
+.hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(4px, 4px); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(4px, -4px); }
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 899;
+}
+
+/* ============================================
+   MAIN CONTENT
+   ============================================ */
+.main-content {
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+  transition: margin var(--transition);
+}
+
+.content-wrapper {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 40px 32px 80px;
+}
+
+/* Module Header */
+.module-header {
+  margin-bottom: 48px;
+}
+.module-header .breadcrumb {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+.module-header .breadcrumb a {
+  color: var(--primary);
+  text-decoration: none;
+}
+.module-header .breadcrumb a:hover { text-decoration: underline; }
+
+.module-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.module-badge .number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.module-badge .label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.module-header h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.module-header .description {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 640px;
+}
+
+.module-meta {
+  display: flex;
+  gap: 16px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.module-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  background: var(--bg-code);
+  padding: 6px 14px;
+  border-radius: 20px;
+}
+
+/* ============================================
+   SECTIONS
+   ============================================ */
+.section {
+  margin-bottom: 56px;
+  scroll-margin-top: 24px;
+}
+
+.section-heading {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+  line-height: 1.3;
+}
+
+.section h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-top: 32px;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.section h4 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-top: 24px;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.section p {
+  margin-bottom: 16px;
+  color: var(--text-secondary);
+}
+
+.section ul, .section ol {
+  margin-bottom: 16px;
+  padding-left: 24px;
+}
+.section li {
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+}
+.section li strong {
+  color: var(--text);
+}
+
+/* ============================================
+   CODE BLOCKS
+   ============================================ */
+.code-block {
+  background: #1E293B;
+  color: #E2E8F0;
+  border-radius: var(--radius-sm);
+  padding: 20px 24px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  overflow-x: auto;
+  position: relative;
+  margin: 16px 0 20px;
+  tab-size: 2;
+}
+.code-block .code-label {
+  position: absolute;
+  top: 8px;
+  left: 16px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #64748B;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+.code-block.has-label {
+  padding-top: 36px;
+}
+.code-block .copy-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: #94A3B8;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  transition: all var(--transition);
+}
+.code-block .copy-btn:hover { background: rgba(255,255,255,0.2); color: white; }
+.code-block .copy-btn.copied { background: var(--success); color: white; }
+
+/* Syntax highlighting classes */
+.kw { color: #C084FC; }
+.str { color: #6EE7B7; }
+.fn { color: #7DD3FC; }
+.cm { color: #64748B; }
+.num { color: #FDBA74; }
+.op { color: #FCA5A5; }
+.type { color: #67E8F9; }
+.param { color: #FDE68A; }
+.prop { color: #F0ABFC; }
+.punc { color: #94A3B8; }
+
+/* Inline code */
+code {
+  background: var(--bg-code);
+  color: var(--primary);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.88em;
+}
+[data-theme="dark"] code {
+  background: #334155;
+}
+.code-block code {
+  background: none;
+  color: inherit;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+  white-space: pre-wrap;
+  display: block;
+}
+
+/* ============================================
+   CALLOUT BOXES
+   ============================================ */
+.callout {
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  margin: 20px 0;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.callout-icon {
+  flex-shrink: 0;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+.callout-content { flex: 1; }
+.callout-content p { margin-bottom: 6px; color: inherit; }
+.callout-content p:last-child { margin-bottom: 0; }
+
+.callout.info {
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  color: #1E40AF;
+}
+.callout.tip {
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  color: #166534;
+}
+.callout.warning {
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  color: #92400E;
+}
+.callout.important {
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  color: #991B1B;
+}
+
+[data-theme="dark"] .callout.info {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: #93C5FD;
+}
+[data-theme="dark"] .callout.tip {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #6EE7B7;
+}
+[data-theme="dark"] .callout.warning {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #FCD34D;
+}
+[data-theme="dark"] .callout.important {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #FCA5A5;
+}
+
+/* ============================================
+   ACCENT CARDS with ::before gradient bars
+   ============================================ */
+.accent-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin: 20px 0;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s var(--spring), box-shadow 0.3s var(--spring), transform 0.3s var(--spring);
+}
+.accent-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.accent-card:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+}
+.accent-card h4 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.accent-card p {
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+.accent-card p:last-child { margin-bottom: 0; }
+.accent-card ul {
+  padding-left: 20px;
+  margin-bottom: 12px;
+}
+.accent-card li {
+  margin-bottom: 6px;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+}
+
+/* ============================================
+   COMPARISON TABLE
+   ============================================ */
+.comparison-table-wrapper {
+  overflow-x: auto;
+  margin: 20px 0;
+}
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.comparison-table th {
+  background: var(--primary);
+  color: white;
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+.comparison-table th:first-child {
+  border-radius: var(--radius-sm) 0 0 0;
+}
+.comparison-table th:last-child {
+  border-radius: 0 var(--radius-sm) 0 0;
+}
+.comparison-table td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+.comparison-table tr:nth-child(even) td {
+  background: var(--bg);
+}
+.comparison-table tr:last-child td:first-child {
+  border-radius: 0 0 0 var(--radius-sm);
+}
+.comparison-table tr:last-child td:last-child {
+  border-radius: 0 0 var(--radius-sm) 0;
+}
+
+/* ============================================
+   PATTERN DIAGRAM (CSS-based architecture diagrams)
+   ============================================ */
+.pattern-diagram {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 24px 0;
+  overflow-x: auto;
+}
+.pattern-diagram h4 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  text-align: center;
+  font-size: 1.05rem;
+  color: var(--text);
+}
+
+.diagram-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 12px 0;
+  flex-wrap: wrap;
+}
+
+.diagram-node {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  min-width: 100px;
+  text-align: center;
+  transition: all 0.3s var(--spring);
+}
+.diagram-node.coordinator {
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
+}
+.diagram-node.worker {
+  background: var(--bg-code);
+  border: 2px solid var(--border);
+  color: var(--text);
+}
+.diagram-node.result {
+  background: linear-gradient(135deg, var(--success), #34D399);
+  color: white;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+.diagram-node.router {
+  background: linear-gradient(135deg, var(--warning), #FBBF24);
+  color: #451A03;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+}
+
+.diagram-arrow {
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+.diagram-arrow-down {
+  display: flex;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  margin: 4px 0;
+}
+.diagram-arrow-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 2px 0;
+}
+.diagram-bracket {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin: 8px 0;
+  flex-wrap: wrap;
+}
+
+/* ============================================
+   ARCHITECTURE PLAYGROUND (Interactive 1)
+   ============================================ */
+.playground-container {
+  background: var(--bg-card);
+  border: 2px solid var(--primary-light);
+  border-radius: var(--radius);
+  margin: 32px 0;
+  overflow: hidden;
+}
+.playground-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  background: var(--bg-code);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.playground-toolbar h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  flex-shrink: 0;
+}
+.playground-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  color: var(--text);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s var(--spring);
+  font-family: inherit;
+}
+.playground-btn:hover {
+  border-color: var(--primary);
+  box-shadow: var(--shadow);
+  transform: translateY(-1px);
+}
+.playground-btn.primary {
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  border-color: transparent;
+}
+.playground-btn.primary:hover {
+  box-shadow: var(--shadow-glow);
+}
+.playground-btn.success {
+  background: linear-gradient(135deg, var(--success), #34D399);
+  color: white;
+  border-color: transparent;
+}
+.playground-btn.success:hover {
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+.playground-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+.playground-select {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  color: var(--text);
+  font-size: 0.85rem;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.playground-body {
+  display: flex;
+  min-height: 480px;
+}
+
+.playground-canvas {
+  flex: 1;
+  position: relative;
+  background-image: radial-gradient(circle, var(--border) 1px, transparent 1px);
+  background-size: 24px 24px;
+  min-height: 480px;
+  overflow: hidden;
+}
+.playground-canvas svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.playground-canvas svg line {
+  stroke-width: 2;
+  marker-end: url(#arrowhead);
+}
+.playground-canvas svg line.sequential { stroke: var(--primary); stroke-dasharray: none; }
+.playground-canvas svg line.parallel { stroke: var(--accent); stroke-dasharray: 8 4; }
+.playground-canvas svg line.conditional { stroke: var(--warning); stroke-dasharray: 4 4; }
+
+.playground-canvas svg line.active {
+  stroke-width: 3;
+  filter: drop-shadow(0 0 6px currentColor);
+}
+
+.agent-node {
+  position: absolute;
+  width: 180px;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+  cursor: grab;
+  z-index: 10;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  user-select: none;
+}
+.agent-node:hover {
+  box-shadow: var(--shadow-glow);
+  border-color: var(--primary-light);
+}
+.agent-node.dragging {
+  cursor: grabbing;
+  z-index: 100;
+  box-shadow: var(--shadow-glow);
+  border-color: var(--primary);
+}
+.agent-node.executing {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2), 0 0 16px rgba(6, 182, 212, 0.3);
+  animation: agentPulse 1.5s ease-in-out infinite;
+}
+.agent-node.completed {
+  border-color: var(--success);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+
+@keyframes agentPulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2), 0 0 16px rgba(6, 182, 212, 0.3); }
+  50% { box-shadow: 0 0 0 6px rgba(6, 182, 212, 0.15), 0 0 24px rgba(6, 182, 212, 0.4); }
+}
+
+.agent-node-header {
+  padding: 8px 12px;
+  background: var(--bg-code);
+  border-bottom: 1px solid var(--border);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.agent-node-name {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text);
+  cursor: text;
+  border: none;
+  background: transparent;
+  width: 100px;
+  font-family: inherit;
+  outline: none;
+  padding: 0;
+}
+.agent-node-name:focus {
+  border-bottom: 1px solid var(--primary);
+}
+.agent-node-delete {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0 4px;
+  line-height: 1;
+  transition: color 0.2s ease;
+}
+.agent-node-delete:hover { color: var(--error); }
+
+.agent-node-body {
+  padding: 10px 12px;
+}
+.agent-node-model {
+  font-size: 0.78rem;
+  margin-bottom: 6px;
+}
+.agent-node-model select {
+  width: 100%;
+  padding: 4px 6px;
+  font-size: 0.78rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: inherit;
+}
+.agent-node-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin-top: 6px;
+}
+.agent-tool-tag {
+  font-size: 0.65rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--bg-code);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.agent-tool-tag.active {
+  background: rgba(124, 58, 237, 0.15);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.agent-node-port {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  cursor: crosshair;
+  z-index: 20;
+  transition: all 0.2s ease;
+}
+.agent-node-port:hover {
+  border-color: var(--primary);
+  background: var(--primary-light);
+  transform: scale(1.3);
+}
+.agent-node-port.output {
+  bottom: -6px;
+  left: 50%;
+  margin-left: -6px;
+}
+.agent-node-port.input {
+  top: -6px;
+  left: 50%;
+  margin-left: -6px;
+}
+
+.agent-node-status {
+  position: absolute;
+  top: 6px;
+  right: -6px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  color: white;
+  z-index: 30;
+}
+.agent-node-status.show { display: flex; }
+.agent-node-status.running {
+  background: var(--accent);
+  animation: statusPulse 1s ease infinite;
+}
+.agent-node-status.done { background: var(--success); }
+.agent-node-status.error { background: var(--error); }
+
+@keyframes statusPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+.playground-sidebar {
+  width: 300px;
+  border-left: 1px solid var(--border);
+  background: var(--bg);
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+.playground-sidebar-header {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.playground-sidebar-content {
+  padding: 12px;
+}
+.playground-json {
+  background: #1E293B;
+  color: #E2E8F0;
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 380px;
+  overflow-y: auto;
+}
+
+/* Simulation timeline */
+.sim-timeline {
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+  background: var(--bg-code);
+}
+.sim-timeline-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--bg);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.sim-timeline-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 4px;
+  transition: width 0.3s ease;
+  width: 0%;
+}
+.sim-timeline-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* ============================================
+   ORCHESTRATION SIMULATOR (Interactive 2)
+   ============================================ */
+.simulator-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin: 32px 0;
+  overflow: hidden;
+}
+.simulator-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  background: var(--bg-code);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.simulator-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.sim-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+.sim-speed {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+.sim-speed input[type="range"] {
+  width: 80px;
+  accent-color: var(--primary);
+}
+
+.simulator-body {
+  display: flex;
+  min-height: 360px;
+}
+.simulator-canvas {
+  flex: 1;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  position: relative;
+}
+
+.sim-node {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 2px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.3s var(--spring);
+  min-width: 140px;
+  justify-content: center;
+}
+.sim-node:hover { border-color: var(--primary-light); }
+.sim-node.active {
+  border-color: var(--accent);
+  background: rgba(6, 182, 212, 0.08);
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15), 0 0 12px rgba(6, 182, 212, 0.2);
+  animation: simNodePulse 1.2s ease-in-out infinite;
+}
+.sim-node.completed {
+  border-color: var(--success);
+  background: rgba(16, 185, 129, 0.08);
+}
+.sim-node .sim-node-icon {
+  font-size: 0.9rem;
+}
+
+@keyframes simNodePulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15), 0 0 12px rgba(6, 182, 212, 0.2); }
+  50% { box-shadow: 0 0 0 6px rgba(6, 182, 212, 0.1), 0 0 20px rgba(6, 182, 212, 0.3); }
+}
+
+.sim-arrow-down {
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  transition: color 0.3s ease;
+}
+.sim-arrow-down.active { color: var(--accent); }
+.sim-arrow-down.completed { color: var(--success); }
+
+.sim-parallel-group {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.simulator-detail {
+  width: 280px;
+  border-left: 1px solid var(--border);
+  background: var(--bg);
+  flex-shrink: 0;
+  padding: 16px;
+  overflow-y: auto;
+}
+.simulator-detail h4 {
+  margin: 0 0 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.sim-detail-item {
+  margin-bottom: 12px;
+  padding: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.sim-detail-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+.sim-detail-value {
+  font-size: 0.88rem;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.sim-cost-tracker {
+  margin-top: 16px;
+  padding: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.sim-cost-tracker h5 {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.sim-cost-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+.sim-cost-total {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text);
+  padding-top: 6px;
+  border-top: 1px solid var(--border);
+  margin-top: 6px;
+}
+
+/* ============================================
+   TASK DECOMPOSITION EXERCISE (Interactive 3)
+   ============================================ */
+.decomp-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+}
+.decomp-task {
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.06), rgba(6, 182, 212, 0.06));
+  border: 1px solid rgba(124, 58, 237, 0.15);
+  border-radius: var(--radius-sm);
+  margin-bottom: 24px;
+}
+.decomp-task p {
+  font-size: 0.95rem;
+  color: var(--text);
+  font-weight: 500;
+  margin-bottom: 0;
+}
+
+.decomp-form {
+  margin: 20px 0;
+}
+.decomp-agent-row {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr 100px;
+  gap: 10px;
+  align-items: start;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.decomp-agent-row:last-of-type { border-bottom: none; }
+.decomp-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+.decomp-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.88rem;
+  font-family: inherit;
+  transition: border-color 0.2s ease;
+}
+.decomp-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+.decomp-select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.88rem;
+  font-family: inherit;
+}
+
+.decomp-results {
+  display: none;
+  margin-top: 24px;
+}
+.decomp-results.show { display: block; }
+
+.decomp-score {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.decomp-score-item {
+  flex: 1;
+  min-width: 140px;
+  padding: 14px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  text-align: center;
+}
+.decomp-score-value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+.decomp-score-value.good { color: var(--success); }
+.decomp-score-value.ok { color: var(--warning); }
+.decomp-score-value.low { color: var(--error); }
+.decomp-score-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.decomp-expert {
+  padding: 20px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.decomp-expert h4 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+.decomp-expert-row {
+  display: flex;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.88rem;
+}
+.decomp-expert-row:last-child { border-bottom: none; }
+.decomp-expert-name {
+  font-weight: 700;
+  color: var(--primary);
+  min-width: 140px;
+}
+.decomp-expert-desc { color: var(--text-secondary); flex: 1; }
+.decomp-expert-deps {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  min-width: 120px;
+}
+
+/* ============================================
+   FINAL QUIZ
+   ============================================ */
+.final-quiz {
+  background: var(--bg-card);
+  border: 2px solid var(--primary-light);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+}
+.final-quiz h3 {
+  margin-top: 0;
+}
+
+.final-quiz-question {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.final-quiz-question .fq-number {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+.final-quiz-question .fq-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+.fq-options { list-style: none; padding: 0; }
+.fq-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 12px;
+  margin-bottom: 4px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+.fq-option:hover { background: rgba(124, 58, 237, 0.05); }
+.fq-option input[type="radio"] {
+  accent-color: var(--primary);
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+.fq-option.selected-correct {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+.fq-option.selected-wrong {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+}
+.fq-option.reveal-correct {
+  background: rgba(16, 185, 129, 0.08);
+  color: #059669;
+  font-weight: 600;
+}
+[data-theme="dark"] .fq-option.selected-correct { color: #6EE7B7; }
+[data-theme="dark"] .fq-option.selected-wrong { color: #FCA5A5; }
+[data-theme="dark"] .fq-option.reveal-correct { color: #6EE7B7; }
+
+.final-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 32px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s var(--spring);
+  margin-top: 8px;
+  font-family: inherit;
+}
+.final-submit-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-lg); }
+.final-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.final-result {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: var(--radius-sm);
+  display: none;
+}
+.final-result.show { display: block; }
+.final-result.pass {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.final-result.fail {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.final-result h4 {
+  margin-top: 0;
+  margin-bottom: 6px;
+  font-size: 1.1rem;
+}
+.final-result p {
+  margin-bottom: 0;
+  font-size: 0.95rem;
+}
+.final-result.pass h4 { color: var(--success); }
+.final-result.fail h4 { color: var(--warning); }
+
+/* ============================================
+   KEY CONCEPT HIGHLIGHT
+   ============================================ */
+.key-concept {
+  display: inline-block;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(6, 182, 212, 0.1));
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  color: var(--primary);
+}
+[data-theme="dark"] .key-concept {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(6, 182, 212, 0.15));
+  border-color: rgba(124, 58, 237, 0.35);
+}
+
+/* ============================================
+   NAVIGATION FOOTER
+   ============================================ */
+.module-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 16px;
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 2px solid var(--border);
+}
+.nav-link {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: all 0.3s var(--spring);
+  min-width: 0;
+  flex: 1;
+  max-width: 50%;
+}
+.nav-link:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow);
+  transform: translateY(-2px);
+}
+.nav-link.next { align-items: flex-end; text-align: right; }
+.nav-link .nav-dir {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--primary);
+}
+.nav-link .nav-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 1024px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .hamburger {
+    display: flex;
+  }
+  .sidebar-overlay.show {
+    display: block;
+  }
+  .main-content {
+    margin-left: 0;
+  }
+  .theme-toggle {
+    right: 16px;
+  }
+  .playground-body {
+    flex-direction: column;
+  }
+  .playground-sidebar {
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid var(--border);
+    max-height: 300px;
+  }
+  .simulator-body {
+    flex-direction: column;
+  }
+  .simulator-detail {
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid var(--border);
+  }
+}
+
+@media (max-width: 640px) {
+  .content-wrapper {
+    padding: 24px 16px 60px;
+  }
+  .module-header h1 {
+    font-size: 1.6rem;
+  }
+  .section-heading {
+    font-size: 1.3rem;
+  }
+  .module-nav {
+    flex-direction: column;
+  }
+  .nav-link {
+    max-width: 100%;
+  }
+  .nav-link.next {
+    align-items: flex-start;
+    text-align: left;
+  }
+  .decomp-agent-row {
+    grid-template-columns: 1fr;
+  }
+  .playground-toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* ============================================
+   SCROLLBAR STYLING
+   ============================================ */
+.sidebar::-webkit-scrollbar,
+.code-block::-webkit-scrollbar,
+.playground-json::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.sidebar::-webkit-scrollbar-track,
+.code-block::-webkit-scrollbar-track,
+.playground-json::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+.code-block::-webkit-scrollbar-thumb,
+.playground-json::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.section {
+  animation: fadeInUp 0.4s ease both;
+}
+
+/* ============================================
+   STEP LIST
+   ============================================ */
+.step-list {
+  counter-reset: step-counter;
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+.step-item {
+  counter-increment: step-counter;
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: border-color 0.3s var(--spring), box-shadow 0.3s var(--spring);
+}
+.step-item:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow);
+}
+.step-item::before {
+  content: counter(step-counter);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+.step-content h4 {
+  margin-top: 0;
+  margin-bottom: 6px;
+}
+.step-content p {
+  margin-bottom: 8px;
+}
+</style>
+</head>
+<body>
+<!-- ============================================
+     THEME TOGGLE
+     ============================================ -->
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+  <span id="themeIcon">&#9790;</span>
+</button>
+
+<!-- ============================================
+     HAMBURGER (mobile)
+     ============================================ -->
+<button class="hamburger" id="hamburger" aria-label="Toggle sidebar">
+  <span></span>
+  <span></span>
+  <span></span>
+</button>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ============================================
+     SIDEBAR
+     ============================================ -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="../index.html" class="sidebar-back">&larr; Back to Hub</a>
+    <div class="sidebar-title">Module 24</div>
+    <div class="sidebar-module-name">Multi-Agent Systems</div>
+  </div>
+
+  <div class="sidebar-nav">
+    <!-- Section: Concepts -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="concepts">
+        Concepts <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-concepts">
+        <li><a href="#why-multi-agent" class="sidebar-link" data-target="why-multi-agent">Why Multi-Agent?</a></li>
+        <li><a href="#orchestration-patterns" class="sidebar-link" data-target="orchestration-patterns">Orchestration Patterns</a></li>
+        <li><a href="#task-decomposition" class="sidebar-link" data-target="task-decomposition">Task Decomposition</a></li>
+        <li><a href="#state-communication" class="sidebar-link" data-target="state-communication">State &amp; Communication</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Production -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="production">
+        Production Patterns <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-production">
+        <li><a href="#jumpstarter-pattern" class="sidebar-link" data-target="jumpstarter-pattern">The Jumpstarter Pattern</a></li>
+        <li><a href="#failure-handling" class="sidebar-link" data-target="failure-handling">Failure &amp; Recovery</a></li>
+        <li><a href="#cost-optimization" class="sidebar-link" data-target="cost-optimization">Cost &amp; Performance</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Exercises -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="exercises">
+        Exercises <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-exercises">
+        <li><a href="#architecture-playground" class="sidebar-link" data-target="architecture-playground">Architecture Playground</a></li>
+        <li><a href="#orchestration-simulator" class="sidebar-link" data-target="orchestration-simulator">Orchestration Simulator</a></li>
+        <li><a href="#decomposition-exercise" class="sidebar-link" data-target="decomposition-exercise">Decomposition Exercise</a></li>
+        <li><a href="#final-quiz" class="sidebar-link" data-target="final-quiz">End-of-Module Quiz</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sidebar-progress">
+    <div class="sidebar-progress-label">Module Progress</div>
+    <div class="sidebar-progress-track">
+      <div class="sidebar-progress-fill" id="sidebarProgressFill"></div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================
+     MAIN CONTENT
+     ============================================ -->
+<main class="main-content">
+  <div class="content-wrapper">
+
+    <!-- Module Header -->
+    <header class="module-header">
+      <div class="breadcrumb">
+        <a href="../index.html">Training Hub</a> &raquo; Module 24
+      </div>
+      <div class="module-badge">
+        <span class="number">24</span>
+        <span class="label">Advanced</span>
+      </div>
+      <h1>Multi-Agent Systems</h1>
+      <p class="description">
+        Design, build, and operate systems where multiple AI agents collaborate to solve problems no single agent can tackle alone. Learn orchestration patterns, state management, and production-grade failure handling.
+      </p>
+      <div class="module-meta">
+        <span class="module-meta-item">&#9201; ~90 min</span>
+        <span class="module-meta-item">&#128218; Advanced</span>
+        <span class="module-meta-item">&#127891; Architects</span>
+        <span class="module-meta-item">&#127919; 3 Interactive Exercises + Quiz</span>
+      </div>
+    </header>
+
+    <!-- ========================================
+         SECTION 1: WHY MULTI-AGENT?
+         ======================================== -->
+    <section class="section" id="why-multi-agent">
+      <h2 class="section-heading">1. Why Multi-Agent?</h2>
+
+      <p>
+        A single AI agent is remarkably capable -- it can read files, write code, run tests, and reason through complex problems. But every single agent has hard limits. Understanding these limits tells you exactly when to reach for a multi-agent architecture.
+      </p>
+
+      <h3>The Limits of a Single Agent</h3>
+
+      <ul>
+        <li>
+          <strong>Context window fills up.</strong> Even with 200K tokens, a single agent reading a large codebase, holding conversation history, and processing tool outputs will eventually run out of room. When context fills, the agent starts losing earlier information -- and quality degrades.
+        </li>
+        <li>
+          <strong>One agent cannot know everything.</strong> An agent that's excellent at React frontend work may struggle with Kubernetes deployment configs. Prompting a single agent with expertise in 10 different domains dilutes its performance in all of them.
+        </li>
+        <li>
+          <strong>Sequential bottleneck.</strong> A single agent processes one tool call at a time. If you need security review, performance analysis, and accessibility audit, a single agent does them one after another. Three agents do them simultaneously.
+        </li>
+        <li>
+          <strong>Blast radius.</strong> If a single agent hallucinates or makes an error deep into a 50-step workflow, all subsequent steps may build on that error. Multiple agents provide natural checkpoints and validation boundaries.
+        </li>
+      </ul>
+
+      <h3>Benefits of Multi-Agent Architecture</h3>
+
+      <div class="accent-card">
+        <h4>Context Isolation</h4>
+        <p>Each agent gets its own context window -- its own 200K tokens. A research agent can read 50 files without crowding the coordinator's context. When the research is done, only a concise summary flows back to the coordinator. This is the single most important benefit of multi-agent systems.</p>
+      </div>
+
+      <div class="accent-card">
+        <h4>Specialization</h4>
+        <p>An agent with a focused system prompt (e.g., "You are an expert security reviewer. Your only job is to find vulnerabilities.") consistently outperforms a generalist agent asked to "review this code for everything." Specialization allows shorter, more targeted prompts and more precise tool configurations.</p>
+      </div>
+
+      <div class="accent-card">
+        <h4>Parallelism</h4>
+        <p>Multiple agents can work simultaneously. Three parallel reviewers complete in the time of one. A research network that fans out to five specialists gathers information 5x faster in wall-clock time, even though total token usage is similar.</p>
+      </div>
+
+      <div class="accent-card">
+        <h4>Fault Isolation</h4>
+        <p>If the security reviewer agent fails, the performance reviewer and code quality reviewer continue independently. The coordinator can still synthesize partial results. In a single-agent system, one failure often derails the entire workflow.</p>
+      </div>
+
+      <h3>The Fundamental Tradeoff</h3>
+
+      <p>
+        Multi-agent systems are not free. Every inter-agent communication adds latency and tokens. The coordinator must spend context summarizing tasks, dispatching work, and synthesizing results. There is always a <span class="key-concept">coordination overhead vs. specialization benefit</span> tradeoff.
+      </p>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>Rule of thumb:</strong> Use multi-agent when a task requires more than 3 distinct knowledge domains or more than 50K tokens of context. Below that threshold, a single well-prompted agent is simpler, cheaper, and often faster.</p>
+        </div>
+      </div>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Dimension</th>
+              <th>Single Agent</th>
+              <th>Multi-Agent</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Context capacity</strong></td>
+              <td>200K tokens shared</td>
+              <td>200K per agent</td>
+            </tr>
+            <tr>
+              <td><strong>Specialization</strong></td>
+              <td>Jack-of-all-trades</td>
+              <td>Deep expertise per agent</td>
+            </tr>
+            <tr>
+              <td><strong>Parallelism</strong></td>
+              <td>Sequential only</td>
+              <td>Concurrent execution</td>
+            </tr>
+            <tr>
+              <td><strong>Failure blast radius</strong></td>
+              <td>Entire workflow at risk</td>
+              <td>Isolated per agent</td>
+            </tr>
+            <tr>
+              <td><strong>Implementation complexity</strong></td>
+              <td>Simple</td>
+              <td>Requires orchestration logic</td>
+            </tr>
+            <tr>
+              <td><strong>Cost (tokens)</strong></td>
+              <td>Lower baseline</td>
+              <td>Higher due to coordination</td>
+            </tr>
+            <tr>
+              <td><strong>Debugging</strong></td>
+              <td>Single conversation to inspect</td>
+              <td>Multiple conversations to trace</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 2: ORCHESTRATION PATTERNS
+         ======================================== -->
+    <section class="section" id="orchestration-patterns">
+      <h2 class="section-heading">2. Orchestration Patterns</h2>
+
+      <p>
+        There are four major patterns for organizing multi-agent systems. Each has distinct strengths and is suited to different types of work. Understanding these patterns is the foundation for designing effective multi-agent architectures.
+      </p>
+
+      <!-- Pattern 1: Sequential Pipeline -->
+      <h3>Pattern 1: Sequential Pipeline</h3>
+
+      <p>
+        Each agent passes its output to the next agent in a fixed order. The output of agent A becomes the input of agent B, whose output becomes the input of agent C.
+      </p>
+
+      <div class="pattern-diagram">
+        <h4>Sequential Pipeline: A &rarr; B &rarr; C &rarr; D</h4>
+        <div class="diagram-row">
+          <div class="diagram-node coordinator">Extract Agent</div>
+          <div class="diagram-arrow">&rarr;</div>
+          <div class="diagram-node worker">Validate Agent</div>
+          <div class="diagram-arrow">&rarr;</div>
+          <div class="diagram-node worker">Enrich Agent</div>
+          <div class="diagram-arrow">&rarr;</div>
+          <div class="diagram-node result">Store Agent</div>
+        </div>
+      </div>
+
+      <ul>
+        <li><strong>Best for:</strong> Document processing, data transformation, staged analysis, ETL pipelines</li>
+        <li><strong>Strengths:</strong> Predictable execution, easy to monitor, simple error handling</li>
+        <li><strong>Weaknesses:</strong> Slowest overall -- total time = sum of all agents. No parallelism.</li>
+        <li><strong>Example:</strong> Extract raw data from PDFs &rarr; Validate schema compliance &rarr; Enrich with external lookups &rarr; Store in database</li>
+      </ul>
+
+      <!-- Pattern 2: Parallel Fan-Out/Fan-In -->
+      <h3>Pattern 2: Parallel Fan-Out / Fan-In</h3>
+
+      <p>
+        A coordinator spawns multiple specialist agents simultaneously. They all work in parallel on different aspects of the same input. When all complete, their results are merged by a synthesizer.
+      </p>
+
+      <div class="pattern-diagram">
+        <h4>Parallel Fan-Out / Fan-In</h4>
+        <div class="diagram-row">
+          <div class="diagram-node coordinator">Coordinator</div>
+        </div>
+        <div class="diagram-arrow-down">&#8595; fan-out</div>
+        <div class="diagram-bracket">
+          <div class="diagram-node worker">Security Reviewer</div>
+          <div class="diagram-node worker">Performance Reviewer</div>
+          <div class="diagram-node worker">Code Quality Reviewer</div>
+        </div>
+        <div class="diagram-arrow-down">&#8595; fan-in</div>
+        <div class="diagram-row">
+          <div class="diagram-node result">Synthesizer</div>
+        </div>
+      </div>
+
+      <ul>
+        <li><strong>Best for:</strong> Multi-aspect analysis, research, broad codebase exploration, code review</li>
+        <li><strong>Strengths:</strong> Fast wall-clock time (limited by slowest agent, not sum). Each agent has full context for its domain.</li>
+        <li><strong>Weaknesses:</strong> Higher total token cost. Synthesis step can be complex.</li>
+        <li><strong>Example:</strong> Code review where Security + Performance + Style reviewers run simultaneously, then a Synthesizer combines their findings into a unified report.</li>
+      </ul>
+
+      <!-- Pattern 3: Hierarchical Delegation -->
+      <h3>Pattern 3: Hierarchical Delegation</h3>
+
+      <p>
+        A top-level coordinator delegates to team leads, who further delegate to workers. This creates a tree of management -- mirroring how large engineering teams actually operate.
+      </p>
+
+      <div class="pattern-diagram">
+        <h4>Hierarchical Delegation</h4>
+        <div class="diagram-row">
+          <div class="diagram-node coordinator">Architect</div>
+        </div>
+        <div class="diagram-arrow-down">&#8595;</div>
+        <div class="diagram-bracket">
+          <div style="text-align:center">
+            <div class="diagram-node worker">Frontend Lead</div>
+            <div class="diagram-arrow-down">&#8595;</div>
+            <div class="diagram-bracket">
+              <div class="diagram-node worker" style="min-width:70px;padding:6px 12px;font-size:0.78rem">Page A</div>
+              <div class="diagram-node worker" style="min-width:70px;padding:6px 12px;font-size:0.78rem">Page B</div>
+            </div>
+          </div>
+          <div style="text-align:center">
+            <div class="diagram-node worker">Backend Lead</div>
+            <div class="diagram-arrow-down">&#8595;</div>
+            <div class="diagram-bracket">
+              <div class="diagram-node worker" style="min-width:70px;padding:6px 12px;font-size:0.78rem">API Routes</div>
+              <div class="diagram-node worker" style="min-width:70px;padding:6px 12px;font-size:0.78rem">DB Schema</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <ul>
+        <li><strong>Best for:</strong> Large-scale code generation, enterprise workflows, complex projects with multiple subsystems</li>
+        <li><strong>Strengths:</strong> Scales to very large tasks. Each level can focus on its scope. Natural abstraction boundaries.</li>
+        <li><strong>Weaknesses:</strong> Most complex to implement. Communication overhead at each level. Debugging requires tracing through the tree.</li>
+        <li><strong>Example:</strong> Architect designs the system &rarr; Frontend Lead builds the UI components (delegating individual pages) while Backend Lead builds the API (delegating individual routes).</li>
+      </ul>
+
+      <!-- Pattern 4: Conditional Routing -->
+      <h3>Pattern 4: Conditional Routing</h3>
+
+      <p>
+        A router agent inspects each incoming task and directs it to the most appropriate specialist. Different inputs take different paths through the system.
+      </p>
+
+      <div class="pattern-diagram">
+        <h4>Conditional Routing</h4>
+        <div class="diagram-row">
+          <div class="diagram-node router">Router Agent</div>
+        </div>
+        <div class="diagram-arrow-down">&#8595; classify input</div>
+        <div class="diagram-arrow-label">if billing &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if technical &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if account</div>
+        <div class="diagram-bracket">
+          <div class="diagram-node worker">Billing Agent</div>
+          <div class="diagram-node worker">Technical Agent</div>
+          <div class="diagram-node worker">Account Agent</div>
+        </div>
+      </div>
+
+      <ul>
+        <li><strong>Best for:</strong> Customer support (route by topic), code review (route by language), document processing (route by type)</li>
+        <li><strong>Strengths:</strong> Each specialist handles only what it's good at. Router can be a small, fast model (Haiku).</li>
+        <li><strong>Weaknesses:</strong> Misrouting sends work to the wrong specialist. Needs a fallback for unrecognized categories.</li>
+        <li><strong>Example:</strong> Incoming support ticket &rarr; Router classifies as billing/technical/account &rarr; Specialized agent handles it.</li>
+      </ul>
+
+      <div class="callout info">
+        <span class="callout-icon">&#9432;</span>
+        <div class="callout-content">
+          <p><strong>Combining patterns:</strong> Most production systems combine multiple patterns. A hierarchical system might use conditional routing at the top level and parallel fan-out within each branch. The patterns are building blocks, not mutually exclusive choices.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 1: ARCHITECTURE PLAYGROUND
+         ======================================== -->
+    <section class="section" id="architecture-playground">
+      <h2 class="section-heading">Architecture Playground</h2>
+
+      <p>
+        Design your own multi-agent system. Add agents, connect them, configure their models and tools, then simulate execution. The JSON specification updates in real-time as you build.
+      </p>
+
+      <div class="playground-container" id="playgroundContainer">
+        <div class="playground-toolbar">
+          <h3>Agent Designer</h3>
+          <button class="playground-btn primary" id="addAgentBtn" onclick="addAgent()">+ Add Agent</button>
+          <select class="playground-select" id="templateSelect" onchange="loadTemplate(this.value)">
+            <option value="">Load Template...</option>
+            <option value="pipeline">Document Processing Pipeline</option>
+            <option value="review">Code Review System</option>
+            <option value="research">Research Network</option>
+          </select>
+          <select class="playground-select" id="connectionTypeSelect">
+            <option value="sequential">Sequential (solid)</option>
+            <option value="parallel">Parallel (dashed)</option>
+            <option value="conditional">Conditional (dotted)</option>
+          </select>
+          <button class="playground-btn success" id="simulateBtn" onclick="simulatePlayground()">Simulate</button>
+          <button class="playground-btn" id="resetPlaygroundBtn" onclick="resetPlayground()">Reset</button>
+        </div>
+
+        <div class="playground-body">
+          <div class="playground-canvas" id="playgroundCanvas">
+            <svg id="playgroundSvg">
+              <defs>
+                <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                  <polygon points="0 0, 10 3.5, 0 7" fill="#94A3B8" />
+                </marker>
+                <marker id="arrowhead-active" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                  <polygon points="0 0, 10 3.5, 0 7" fill="#06B6D4" />
+                </marker>
+              </defs>
+            </svg>
+          </div>
+
+          <div class="playground-sidebar">
+            <div class="playground-sidebar-header">
+              <span>JSON Specification</span>
+              <button class="playground-btn" onclick="copyPlaygroundJson()" style="padding:4px 10px;font-size:0.75rem">Copy</button>
+            </div>
+            <div class="playground-sidebar-content">
+              <div class="playground-json" id="playgroundJson">{
+  "agents": [],
+  "connections": []
+}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sim-timeline" id="simTimeline" style="display:none">
+          <div class="sim-timeline-bar">
+            <div class="sim-timeline-fill" id="simTimelineFill"></div>
+          </div>
+          <div class="sim-timeline-label" id="simTimelineLabel">Ready to simulate</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 3: TASK DECOMPOSITION
+         ======================================== -->
+    <section class="section" id="task-decomposition">
+      <h2 class="section-heading">3. Task Decomposition Strategies</h2>
+
+      <p>
+        Before agents can collaborate, you need to break the task into pieces. How you decompose the work determines how well the multi-agent system performs. There are three approaches.
+      </p>
+
+      <h3>Fixed Decomposition</h3>
+
+      <p>
+        Predefined stages that always run in the same order, regardless of the input. The pipeline is designed once and executed many times.
+      </p>
+
+      <div class="accent-card">
+        <h4>Example: Document Processing Pipeline</h4>
+        <p>Every document goes through: Parse &rarr; Classify &rarr; Extract Entities &rarr; Validate &rarr; Store. The stages never change, only the content varies.</p>
+        <ul>
+          <li><strong>Pro:</strong> Predictable execution time and cost. Easy to monitor and debug.</li>
+          <li><strong>Con:</strong> Cannot adapt to unexpected findings. A simple document still goes through all stages.</li>
+        </ul>
+      </div>
+
+      <h3>Dynamic Decomposition</h3>
+
+      <p>
+        A coordinator agent analyzes the task and creates subtasks on the fly. The number of subtasks, their nature, and their dependencies are determined at runtime.
+      </p>
+
+      <div class="accent-card">
+        <h4>Example: "Build a feature for user onboarding"</h4>
+        <p>The coordinator analyzes the request and decides it needs: database schema changes, API endpoint, email template, frontend form, and test suite. It creates five subtasks with the correct dependencies.</p>
+        <ul>
+          <li><strong>Pro:</strong> Adapts to the complexity of each specific task. Simple tasks get fewer agents.</li>
+          <li><strong>Con:</strong> Harder to predict duration and cost. The coordinator can make poor decomposition decisions.</li>
+        </ul>
+      </div>
+
+      <h3>Hybrid: Fixed Phases, Dynamic Sub-tasks</h3>
+
+      <p>
+        Most production systems use this approach. The high-level phases are fixed (e.g., Plan &rarr; Build &rarr; Test &rarr; Deploy), but within each phase, the system dynamically decides what work is needed.
+      </p>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>The "agent-sized chunk" heuristic:</strong> Each subtask should be completable within 20-30 tool calls. If a subtask requires more, it should be decomposed further. If it requires fewer than 5, it's probably too granular and should be merged with another.</p>
+        </div>
+      </div>
+
+      <h3>Dependency Analysis</h3>
+
+      <p>
+        After decomposing a task into subtasks, the critical question is: which tasks can run in parallel vs. which must be sequential?
+      </p>
+
+      <ul>
+        <li><strong>Independent tasks:</strong> No shared inputs or outputs. Run in parallel. Example: Security review and performance review of the same code.</li>
+        <li><strong>Dependent tasks:</strong> One task's output is another's input. Must be sequential. Example: Database schema must be created before API routes that reference those tables.</li>
+        <li><strong>Partially dependent:</strong> Some outputs are shared. Can partially overlap. Example: Frontend can start with mock data while the backend API is being built, then integrate once both are done.</li>
+      </ul>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Strategy</th>
+              <th>When to Use</th>
+              <th>Predictability</th>
+              <th>Adaptability</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Fixed</strong></td>
+              <td>Well-understood, repeatable workflows</td>
+              <td>High</td>
+              <td>Low</td>
+            </tr>
+            <tr>
+              <td><strong>Dynamic</strong></td>
+              <td>Novel, varying-complexity tasks</td>
+              <td>Low</td>
+              <td>High</td>
+            </tr>
+            <tr>
+              <td><strong>Hybrid</strong></td>
+              <td>Production systems (most common)</td>
+              <td>Medium</td>
+              <td>Medium-High</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 3: TASK DECOMPOSITION EXERCISE
+         ======================================== -->
+    <section class="section" id="decomposition-exercise">
+      <h2 class="section-heading">Task Decomposition Exercise</h2>
+
+      <p>
+        Practice decomposing a complex task into agent-sized subtasks. Define agents, their responsibilities, and dependencies, then compare your decomposition against an expert solution.
+      </p>
+
+      <div class="decomp-container" id="decompContainer">
+        <h3 style="margin-top:0;margin-bottom:16px">Your Task</h3>
+
+        <div class="decomp-task">
+          <p><strong>Build a customer onboarding system</strong> with email verification, profile creation, and welcome tutorial. The system needs a database schema, REST API endpoints, email sending service, a multi-step frontend wizard, and integration tests.</p>
+        </div>
+
+        <h4>Define Your Agents</h4>
+        <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:16px">Fill in up to 6 agents. Specify each agent's name, responsibility, which other agents it depends on, and the estimated complexity.</p>
+
+        <div class="decomp-form" id="decompForm">
+          <div style="display:grid;grid-template-columns:1fr 2fr 1fr 100px;gap:10px;margin-bottom:8px">
+            <div class="decomp-label">Agent Name</div>
+            <div class="decomp-label">Responsibility</div>
+            <div class="decomp-label">Dependencies</div>
+            <div class="decomp-label">Complexity</div>
+          </div>
+          <div class="decomp-agent-row">
+            <input class="decomp-input" type="text" placeholder="e.g., Schema Architect" id="dName0">
+            <input class="decomp-input" type="text" placeholder="e.g., Design database tables for users, profiles, verification tokens" id="dResp0">
+            <input class="decomp-input" type="text" placeholder="e.g., None" id="dDeps0">
+            <select class="decomp-select" id="dComp0"><option value="">--</option><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select>
+          </div>
+          <div class="decomp-agent-row">
+            <input class="decomp-input" type="text" placeholder="Agent name" id="dName1">
+            <input class="decomp-input" type="text" placeholder="Responsibility" id="dResp1">
+            <input class="decomp-input" type="text" placeholder="Dependencies" id="dDeps1">
+            <select class="decomp-select" id="dComp1"><option value="">--</option><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select>
+          </div>
+          <div class="decomp-agent-row">
+            <input class="decomp-input" type="text" placeholder="Agent name" id="dName2">
+            <input class="decomp-input" type="text" placeholder="Responsibility" id="dResp2">
+            <input class="decomp-input" type="text" placeholder="Dependencies" id="dDeps2">
+            <select class="decomp-select" id="dComp2"><option value="">--</option><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select>
+          </div>
+          <div class="decomp-agent-row">
+            <input class="decomp-input" type="text" placeholder="Agent name" id="dName3">
+            <input class="decomp-input" type="text" placeholder="Responsibility" id="dResp3">
+            <input class="decomp-input" type="text" placeholder="Dependencies" id="dDeps3">
+            <select class="decomp-select" id="dComp3"><option value="">--</option><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select>
+          </div>
+          <div class="decomp-agent-row">
+            <input class="decomp-input" type="text" placeholder="Agent name" id="dName4">
+            <input class="decomp-input" type="text" placeholder="Responsibility" id="dResp4">
+            <input class="decomp-input" type="text" placeholder="Dependencies" id="dDeps4">
+            <select class="decomp-select" id="dComp4"><option value="">--</option><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select>
+          </div>
+          <div class="decomp-agent-row">
+            <input class="decomp-input" type="text" placeholder="Agent name" id="dName5">
+            <input class="decomp-input" type="text" placeholder="Responsibility" id="dResp5">
+            <input class="decomp-input" type="text" placeholder="Dependencies" id="dDeps5">
+            <select class="decomp-select" id="dComp5"><option value="">--</option><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select>
+          </div>
+        </div>
+
+        <button class="playground-btn primary" onclick="submitDecomposition()" style="margin-top:16px">Submit Decomposition</button>
+
+        <div class="decomp-results" id="decompResults">
+          <h4>Your Scores</h4>
+          <div class="decomp-score" id="decompScores"></div>
+
+          <div class="decomp-expert">
+            <h4>Expert Decomposition</h4>
+            <div class="decomp-expert-row">
+              <span class="decomp-expert-name">Schema Architect</span>
+              <span class="decomp-expert-desc">Design database tables: users, profiles, email_verifications, tutorial_progress</span>
+              <span class="decomp-expert-deps">None (first)</span>
+            </div>
+            <div class="decomp-expert-row">
+              <span class="decomp-expert-name">API Builder</span>
+              <span class="decomp-expert-desc">Create REST endpoints: POST /register, POST /verify-email, GET/PUT /profile, GET /tutorial</span>
+              <span class="decomp-expert-deps">Schema Architect</span>
+            </div>
+            <div class="decomp-expert-row">
+              <span class="decomp-expert-name">Email Service Agent</span>
+              <span class="decomp-expert-desc">Build email verification sender with templates, token generation, and retry logic</span>
+              <span class="decomp-expert-deps">Schema Architect</span>
+            </div>
+            <div class="decomp-expert-row">
+              <span class="decomp-expert-name">Frontend Wizard Agent</span>
+              <span class="decomp-expert-desc">Build multi-step onboarding form: registration, email verification wait screen, profile setup, tutorial</span>
+              <span class="decomp-expert-deps">API Builder</span>
+            </div>
+            <div class="decomp-expert-row">
+              <span class="decomp-expert-name">Test Engineer</span>
+              <span class="decomp-expert-desc">Write integration tests covering full onboarding flow, edge cases (expired tokens, duplicate emails)</span>
+              <span class="decomp-expert-deps">API Builder, Email Service</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 4: STATE MANAGEMENT & COMMUNICATION
+         ======================================== -->
+    <section class="section" id="state-communication">
+      <h2 class="section-heading">4. State Management and Communication</h2>
+
+      <p>
+        The hardest part of multi-agent systems is not the individual agents -- it's the glue between them. How do agents share state? How do they communicate? How do you keep everything consistent?
+      </p>
+
+      <h3>Shared State Patterns</h3>
+
+      <div class="accent-card">
+        <h4>State File on Disk (JSON)</h4>
+        <p>The simplest pattern. A single JSON file on disk that all agents read from and write to. The coordinator manages writes to prevent conflicts.</p>
+        <ul>
+          <li><strong>Pro:</strong> Simple, durable, human-readable, works with any tooling</li>
+          <li><strong>Con:</strong> Needs locking for concurrent writes. Not suitable for real-time updates.</li>
+        </ul>
+      </div>
+
+      <div class="accent-card">
+        <h4>Event-Driven (WebSocket / SSE)</h4>
+        <p>Agents publish events as they make progress. Other agents (and the UI) subscribe to these events. State is reconstructed from the event stream.</p>
+        <ul>
+          <li><strong>Pro:</strong> Real-time visibility. Agents can react to each other's progress.</li>
+          <li><strong>Con:</strong> More complex infrastructure. Event ordering and replay need careful handling.</li>
+        </ul>
+      </div>
+
+      <div class="accent-card">
+        <h4>Database-Backed</h4>
+        <p>Agents read from and write to a shared database. Transactions ensure consistency. Queries enable complex state lookups.</p>
+        <ul>
+          <li><strong>Pro:</strong> Most robust for production. Built-in concurrency control. Rich querying.</li>
+          <li><strong>Con:</strong> Requires database infrastructure. More setup than a flat file.</li>
+        </ul>
+      </div>
+
+      <h3>Inter-Agent Communication</h3>
+
+      <div class="accent-card">
+        <h4>Hub-and-Spoke (Through the Coordinator)</h4>
+        <p>Agents never communicate directly. All messages flow through the coordinator. Agent A sends results to the coordinator, which decides what to pass to Agent B.</p>
+        <p><strong>When to use:</strong> Most systems. This is the default pattern. It keeps agents independent and gives the coordinator full control over information flow.</p>
+      </div>
+
+      <div class="accent-card">
+        <h4>Via Shared Files</h4>
+        <p>Agents read from and write to shared file locations. Agent A writes <code>analysis-results.json</code>, Agent B reads it. The file system is the communication channel.</p>
+        <p><strong>When to use:</strong> Claude Code agents using the Agent tool. The spawned sub-agent can write files that the parent reads after it returns.</p>
+      </div>
+
+      <div class="accent-card">
+        <h4>Via Database</h4>
+        <p>Agents write their results to database tables. Other agents query those tables for input. This is hub-and-spoke with the database as the hub.</p>
+        <p><strong>When to use:</strong> Production systems where durability and queryability matter more than simplicity.</p>
+      </div>
+
+      <h3>Context Passing Best Practices</h3>
+
+      <div class="callout warning">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Critical rule:</strong> Never dump an agent's entire context to another agent. Summaries, not transcripts. Structured data, not raw text.</p>
+        </div>
+      </div>
+
+      <ul>
+        <li><strong>Pass structured data, not raw text.</strong> A JSON object with named fields is far more useful than a paragraph of natural language. Downstream agents can reliably extract what they need.</li>
+        <li><strong>Include metadata.</strong> Every piece of data passed between agents should include: source (which agent produced it), confidence level, timestamp, and any caveats or limitations.</li>
+        <li><strong>Summarize before passing.</strong> If Agent A reads 30 files and produces 40K tokens of analysis, summarize it to 2K tokens of key findings before passing to Agent B. This is the entire point of context isolation.</li>
+      </ul>
+
+      <div class="code-block has-label">
+        <span class="code-label">Structured Inter-Agent Message</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>{
+  <span class="prop">"source_agent"</span>: <span class="str">"security-reviewer"</span>,
+  <span class="prop">"timestamp"</span>: <span class="str">"2025-01-15T14:30:00Z"</span>,
+  <span class="prop">"confidence"</span>: <span class="num">0.92</span>,
+  <span class="prop">"findings"</span>: [
+    {
+      <span class="prop">"severity"</span>: <span class="str">"high"</span>,
+      <span class="prop">"file"</span>: <span class="str">"src/auth/login.py"</span>,
+      <span class="prop">"line"</span>: <span class="num">47</span>,
+      <span class="prop">"issue"</span>: <span class="str">"SQL injection via unsanitized user input"</span>,
+      <span class="prop">"recommendation"</span>: <span class="str">"Use parameterized query"</span>
+    }
+  ],
+  <span class="prop">"summary"</span>: <span class="str">"1 high-severity, 2 medium-severity issues found. No critical vulnerabilities."</span>
+}</code></div>
+    </section>
+
+    <!-- ========================================
+         SECTION 5: THE JUMPSTARTER PATTERN
+         ======================================== -->
+    <section class="section" id="jumpstarter-pattern">
+      <h2 class="section-heading">5. The Jumpstarter Pattern</h2>
+
+      <p>
+        The Jumpstarter pattern is a production-proven approach to multi-phase autonomous code generation. It has been used to generate over 50,000 lines of production code in a single run, with minimal human intervention.
+      </p>
+
+      <h3>How It Works</h3>
+
+      <p>
+        At the core is a state file -- <code>.jumpstarter-state.json</code> -- that tracks the entire workflow. A stop hook forces Claude to continue through all phases rather than stopping early. Each phase uses a specialized agent with deep expertise in its domain.
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">.jumpstarter-state.json</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>{
+  <span class="prop">"current_phase"</span>: <span class="str">"api"</span>,
+  <span class="prop">"completed_phases"</span>: [<span class="str">"scaffold"</span>, <span class="str">"database"</span>],
+  <span class="prop">"remaining_phases"</span>: [<span class="str">"api"</span>, <span class="str">"frontend"</span>, <span class="str">"tests"</span>, <span class="str">"qa"</span>],
+  <span class="prop">"iteration"</span>: <span class="num">3</span>,
+  <span class="prop">"max_iterations"</span>: <span class="num">15</span>,
+  <span class="prop">"phase_results"</span>: {
+    <span class="prop">"scaffold"</span>: { <span class="prop">"status"</span>: <span class="str">"complete"</span>, <span class="prop">"files_created"</span>: <span class="num">12</span> },
+    <span class="prop">"database"</span>: { <span class="prop">"status"</span>: <span class="str">"complete"</span>, <span class="prop">"tables"</span>: <span class="num">8</span> }
+  }
+}</code></div>
+
+      <h3>The Phase Agents</h3>
+
+      <div class="step-list">
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Scaffold Architect</h4>
+            <p>Creates the entire directory structure, configuration files (package.json, tsconfig.json, vite.config.ts), and base templates. Establishes the project skeleton that all subsequent phases build upon.</p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Data Architect</h4>
+            <p>Generates the database schema -- tables, relationships, indexes, and migrations. Uses the project specification to determine the data model. Produces SQL schema files and ORM models.</p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-content">
+            <h4>API Architect</h4>
+            <p>Creates REST (or GraphQL) endpoints. Reads the database schema to understand available data, then generates routes, controllers, validation, and error handling. Follows patterns established by the scaffold.</p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Frontend Architect</h4>
+            <p>Builds React components, pages, and state management. Reads the API endpoints to understand available data, then creates the UI that consumes them. Includes routing, forms, and data display.</p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-content">
+            <h4>QA Validator</h4>
+            <p>Runs multi-phase testing: linting, type checking, unit tests, integration tests. Reads all generated code, verifies it compiles and passes tests. Reports any issues back for the coordinator to fix.</p>
+          </div>
+        </div>
+      </div>
+
+      <h3>The Stop Hook Pattern</h3>
+
+      <p>
+        The key innovation is the <span class="key-concept">stop hook</span>. After each Claude Code session completes (or hits its context limit), the stop hook checks <code>.jumpstarter-state.json</code>. If there are remaining phases, it automatically restarts Claude with a fresh context window, pointed at the next phase. This allows the system to generate far more code than fits in a single context window.
+      </p>
+
+      <div class="callout important">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Why this works:</strong> Each phase gets a clean 200K context window. The state file provides continuity between phases. The stop hook provides automation. The result: unlimited effective context for code generation, bounded only by the number of phases and the max_iterations safety valve.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 2: ORCHESTRATION SIMULATOR
+         ======================================== -->
+    <section class="section" id="orchestration-simulator">
+      <h2 class="section-heading">Agent Orchestration Simulator</h2>
+
+      <p>
+        Watch multi-agent orchestration in action. Select a scenario, then press Play to see agents activate, communicate, and complete their work. Click any agent to inspect its details.
+      </p>
+
+      <div class="simulator-container" id="simulatorContainer">
+        <div class="simulator-header">
+          <h3>Orchestration Simulator</h3>
+          <select class="playground-select" id="simScenarioSelect" onchange="loadSimScenario(this.value)">
+            <option value="pipeline">Document Processing Pipeline</option>
+            <option value="parallel">Code Review System</option>
+            <option value="hierarchical">Research Network</option>
+          </select>
+          <div class="sim-controls">
+            <button class="playground-btn primary" id="simPlayBtn" onclick="simPlay()">Play</button>
+            <button class="playground-btn" id="simPauseBtn" onclick="simPause()" disabled>Pause</button>
+            <button class="playground-btn" id="simResetBtn" onclick="simReset()">Reset</button>
+            <div class="sim-speed">
+              <span>Speed:</span>
+              <input type="range" min="1" max="3" value="1" id="simSpeedSlider" oninput="updateSimSpeed(this.value)">
+              <span id="simSpeedLabel">1x</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="simulator-body">
+          <div class="simulator-canvas" id="simCanvas">
+            <!-- Injected by JS -->
+          </div>
+
+          <div class="simulator-detail" id="simDetail">
+            <h4>Agent Details</h4>
+            <p style="font-size:0.85rem;color:var(--text-muted)">Click any agent to inspect its configuration and progress.</p>
+
+            <div id="simDetailContent"></div>
+
+            <div class="sim-cost-tracker" id="simCostTracker">
+              <h5>Token Cost Tracker</h5>
+              <div id="simCostRows"></div>
+              <div class="sim-cost-total">
+                <span>Total</span>
+                <span id="simCostTotal">0 tokens</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sim-timeline">
+          <div class="sim-timeline-bar">
+            <div class="sim-timeline-fill" id="simProgressFill"></div>
+          </div>
+          <div class="sim-timeline-label" id="simProgressLabel">Select a scenario and press Play</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 6: FAILURE HANDLING & RECOVERY
+         ======================================== -->
+    <section class="section" id="failure-handling">
+      <h2 class="section-heading">6. Failure Handling and Recovery</h2>
+
+      <p>
+        In a multi-agent system, failures are not exceptional -- they are expected. Network calls fail, agents hallucinate, context windows overflow, and API rate limits trigger. Robust failure handling is what separates a demo from a production system.
+      </p>
+
+      <h3>Agent-Level Retries</h3>
+
+      <p>
+        The simplest recovery mechanism: if an agent fails, try again. But do it intelligently.
+      </p>
+
+      <ul>
+        <li><strong>Retry 2-3 times maximum.</strong> If an agent fails 3 times on the same input, it is likely a systematic issue, not a transient failure.</li>
+        <li><strong>Vary the approach on retry.</strong> Don't just re-run the same prompt. Simplify the task, provide more context, or use a different model.</li>
+        <li><strong>Exponential backoff for rate limits.</strong> Wait 1s, then 2s, then 4s. Respect API rate limits.</li>
+      </ul>
+
+      <h3>Fallback Agents</h3>
+
+      <p>
+        If a specialist agent fails, try a generalist. A dedicated security reviewer might fail on an unusual codebase, but a general-purpose Opus agent can often produce a reasonable (if less targeted) analysis.
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Fallback Pattern</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm"># Pseudocode: fallback agent strategy</span>
+<span class="kw">try</span>:
+    result = <span class="fn">run_specialist_agent</span>(<span class="str">"security-reviewer"</span>, task)
+<span class="kw">except</span> <span class="type">AgentFailure</span>:
+    <span class="cm"># Specialist failed -- fall back to generalist</span>
+    result = <span class="fn">run_generalist_agent</span>(<span class="str">"opus-general"</span>, task)
+    result.metadata[<span class="str">"fallback"</span>] = <span class="kw">True</span></code></div>
+
+      <h3>Graceful Degradation</h3>
+
+      <p>
+        When one agent in a parallel group fails, continue with partial results rather than failing the entire system. Three out of four reviewers completing is better than zero.
+      </p>
+
+      <div class="accent-card">
+        <h4>Example: Code Review with Partial Results</h4>
+        <p>Security reviewer, performance reviewer, and style reviewer run in parallel. The security reviewer hits a rate limit and fails after retries. The coordinator still synthesizes results from the other two reviewers, noting that security review is missing. The final report includes a clear caveat: "Security review could not be completed -- manual review recommended."</p>
+      </div>
+
+      <h3>Checkpoint Recovery</h3>
+
+      <p>
+        Save state after each successful phase. If the system crashes in phase 4, restart from the phase 4 checkpoint instead of re-running phases 1 through 3. This is exactly what <code>.jumpstarter-state.json</code> enables.
+      </p>
+
+      <h3>The max_iterations Safety Valve</h3>
+
+      <p>
+        Every multi-agent loop must have a hard upper bound on iterations. Without it, a confused coordinator can loop forever, burning tokens and producing nothing useful. Set <code>max_iterations</code> based on the expected complexity of the task, plus a comfortable margin.
+      </p>
+
+      <h3>Error Propagation</h3>
+
+      <p>
+        When an agent fails, the error context must flow up to the coordinator in a structured format.
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Structured Error Report</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>{
+  <span class="prop">"agent"</span>: <span class="str">"security-reviewer"</span>,
+  <span class="prop">"status"</span>: <span class="str">"failed"</span>,
+  <span class="prop">"error"</span>: <span class="str">"Rate limit exceeded after 3 retries"</span>,
+  <span class="prop">"attempts"</span>: <span class="num">3</span>,
+  <span class="prop">"partial_results"</span>: {
+    <span class="prop">"files_reviewed"</span>: <span class="num">12</span>,
+    <span class="prop">"issues_found"</span>: <span class="num">2</span>
+  },
+  <span class="prop">"suggestion"</span>: <span class="str">"Retry in 60 seconds or use fallback agent"</span>
+}</code></div>
+    </section>
+
+    <!-- ========================================
+         SECTION 7: COST & PERFORMANCE OPTIMIZATION
+         ======================================== -->
+    <section class="section" id="cost-optimization">
+      <h2 class="section-heading">7. Cost and Performance Optimization</h2>
+
+      <p>
+        Multi-agent systems can be expensive if not designed carefully. The key optimization levers are model selection, parallelism, token budgets, and caching.
+      </p>
+
+      <h3>Model Selection Per Agent</h3>
+
+      <p>
+        Not every agent needs the most powerful model. Match the model to the task complexity.
+      </p>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Best For</th>
+              <th>Cost</th>
+              <th>Speed</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Haiku</strong></td>
+              <td>Routing, classification, simple extraction, formatting</td>
+              <td>Lowest</td>
+              <td>Fastest</td>
+            </tr>
+            <tr>
+              <td><strong>Sonnet</strong></td>
+              <td>Most coding work, analysis, research, writing</td>
+              <td>Medium</td>
+              <td>Fast</td>
+            </tr>
+            <tr>
+              <td><strong>Opus</strong></td>
+              <td>Complex reasoning, architecture decisions, synthesis of conflicting findings</td>
+              <td>Highest</td>
+              <td>Slowest</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>Common pattern:</strong> Use Haiku for the router agent, Sonnet for specialist workers, and Opus for the coordinator/synthesizer. This gives you the best quality where it matters most (synthesis) while keeping costs down for high-volume work (routing, individual analysis).</p>
+        </div>
+      </div>
+
+      <h3>Parallel vs Sequential Cost</h3>
+
+      <p>
+        Parallel and sequential execution use the same total tokens. The difference is wall-clock time. Three parallel agents at 10K tokens each = 30K total. Three sequential agents at 10K tokens each = 30K total. But parallel finishes in ~10 seconds, while sequential takes ~30 seconds.
+      </p>
+
+      <h3>Token Budgets Per Agent</h3>
+
+      <p>
+        Set <code>max_tokens</code> on each agent to prevent runaway responses. An agent that should produce a 500-token summary does not need 4,096 output tokens. Tight budgets also encourage conciseness.
+      </p>
+
+      <h3>Caching Strategies</h3>
+
+      <ul>
+        <li><strong>Prompt caching:</strong> If multiple agents share the same system prompt prefix, prompt caching reduces input token costs significantly.</li>
+        <li><strong>Result caching:</strong> If the same file is analyzed by multiple agents, cache the file content so it is only read once.</li>
+        <li><strong>Session caching:</strong> Reuse common context across invocations of the same agent on different inputs.</li>
+      </ul>
+
+      <h3>Monitoring</h3>
+
+      <p>
+        Track cost per agent, per phase, and per run. Over time, you'll identify which agents are the most expensive and whether they deliver proportional value. Common monitoring metrics:
+      </p>
+
+      <ul>
+        <li>Input tokens per agent per run</li>
+        <li>Output tokens per agent per run</li>
+        <li>Wall-clock time per phase</li>
+        <li>Retry count per agent</li>
+        <li>Total run cost (in dollars)</li>
+        <li>Success rate per agent</li>
+      </ul>
+    </section>
+
+    <!-- ========================================
+         END-OF-MODULE QUIZ
+         ======================================== -->
+    <section class="section" id="final-quiz">
+      <h2 class="section-heading">End-of-Module Quiz</h2>
+
+      <p>
+        Test your understanding of multi-agent systems. You need at least 6 out of 8 correct to pass. Your progress is saved to <code>localStorage</code>.
+      </p>
+
+      <div class="final-quiz" id="finalQuiz">
+        <h3 style="margin-bottom:20px">Multi-Agent Systems Assessment</h3>
+
+        <div class="final-quiz-question" data-fq="0">
+          <div class="fq-number">Question 1 of 8</div>
+          <div class="fq-text">When should you use a multi-agent system instead of a single agent?</div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="0" data-fq-val="a" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="a"> Always -- multi-agent is always better
+            </li>
+            <li class="fq-option" data-fq-idx="0" data-fq-val="b" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="b"> When the task requires more than 3 distinct knowledge domains or more than 50K tokens of context
+            </li>
+            <li class="fq-option" data-fq-idx="0" data-fq-val="c" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="c"> Only when using the Opus model
+            </li>
+            <li class="fq-option" data-fq-idx="0" data-fq-val="d" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="d"> Never -- single agents are more reliable
+            </li>
+          </ul>
+        </div>
+
+        <div class="final-quiz-question" data-fq="1">
+          <div class="fq-number">Question 2 of 8</div>
+          <div class="fq-text">What is the primary advantage of the Parallel Fan-Out pattern?</div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="1" data-fq-val="a" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="a"> It uses less tokens total
+            </li>
+            <li class="fq-option" data-fq-idx="1" data-fq-val="b" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="b"> Multiple agents work simultaneously, reducing wall-clock time
+            </li>
+            <li class="fq-option" data-fq-idx="1" data-fq-val="c" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="c"> It is simpler to implement
+            </li>
+            <li class="fq-option" data-fq-idx="1" data-fq-val="d" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="d"> It does not require a coordinator
+            </li>
+          </ul>
+        </div>
+
+        <div class="final-quiz-question" data-fq="2">
+          <div class="fq-number">Question 3 of 8</div>
+          <div class="fq-text">In the hub-and-spoke communication pattern, how do agents communicate?</div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="2" data-fq-val="a" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="a"> Directly with each other via shared memory
+            </li>
+            <li class="fq-option" data-fq-idx="2" data-fq-val="b" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="b"> All communication goes through the coordinator agent
+            </li>
+            <li class="fq-option" data-fq-idx="2" data-fq-val="c" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="c"> Via a message queue
+            </li>
+            <li class="fq-option" data-fq-idx="2" data-fq-val="d" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="d"> They do not communicate -- each works independently
+            </li>
+          </ul>
+        </div>
+
+        <div class="final-quiz-question" data-fq="3">
+          <div class="fq-number">Question 4 of 8</div>
+          <div class="fq-text">What is the "agent-sized chunk" heuristic?</div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="3" data-fq-val="a" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="a"> Each agent should use exactly 200K tokens
+            </li>
+            <li class="fq-option" data-fq-idx="3" data-fq-val="b" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="b"> Each subtask should be completable within 20-30 tool calls
+            </li>
+            <li class="fq-option" data-fq-idx="3" data-fq-val="c" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="c"> Agents should be small Python files
+            </li>
+            <li class="fq-option" data-fq-idx="3" data-fq-val="d" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="d"> Each agent should handle one HTTP request
+            </li>
+          </ul>
+        </div>
+
+        <div class="final-quiz-question" data-fq="4">
+          <div class="fq-number">Question 5 of 8</div>
+          <div class="fq-text">What does the .jumpstarter-state.json file track?</div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="4" data-fq-val="a" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="a"> API keys and secrets
+            </li>
+            <li class="fq-option" data-fq-idx="4" data-fq-val="b" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="b"> Current phase, completed phases, remaining phases, and iteration count for multi-phase workflows
+            </li>
+            <li class="fq-option" data-fq-idx="4" data-fq-val="c" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="c"> Agent conversation history
+            </li>
+            <li class="fq-option" data-fq-idx="4" data-fq-val="d" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="d"> Model performance metrics
+            </li>
+          </ul>
+        </div>
+
+        <div class="final-quiz-question" data-fq="5">
+          <div class="fq-number">Question 6 of 8</div>
+          <div class="fq-text">What is "graceful degradation" in a multi-agent system?</div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="5" data-fq-val="a" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="a"> Slowly shutting down all agents
+            </li>
+            <li class="fq-option" data-fq-idx="5" data-fq-val="b" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="b"> Continuing with partial results when one agent fails, rather than failing the entire system
+            </li>
+            <li class="fq-option" data-fq-idx="5" data-fq-val="c" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="c"> Using progressively simpler models
+            </li>
+            <li class="fq-option" data-fq-idx="5" data-fq-val="d" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="d"> Reducing the number of agents over time
+            </li>
+          </ul>
+        </div>
+
+        <div class="final-quiz-question" data-fq="6">
+          <div class="fq-number">Question 7 of 8</div>
+          <div class="fq-text">For a simple routing agent that classifies incoming requests, which model is most appropriate?</div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="6" data-fq-val="a" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="a"> Opus -- routing requires the best model
+            </li>
+            <li class="fq-option" data-fq-idx="6" data-fq-val="b" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="b"> Sonnet -- balanced for all tasks
+            </li>
+            <li class="fq-option" data-fq-idx="6" data-fq-val="c" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="c"> Haiku -- fast and cheap, perfect for simple classification
+            </li>
+            <li class="fq-option" data-fq-idx="6" data-fq-val="d" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="d"> Any model -- it does not matter
+            </li>
+          </ul>
+        </div>
+
+        <div class="final-quiz-question" data-fq="7">
+          <div class="fq-number">Question 8 of 8</div>
+          <div class="fq-text">Why should agents pass structured data rather than raw text between each other?</div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="7" data-fq-val="a" onclick="selectFinalOption(7, this)">
+              <input type="radio" name="fq7" value="a"> Structured data is smaller
+            </li>
+            <li class="fq-option" data-fq-idx="7" data-fq-val="b" onclick="selectFinalOption(7, this)">
+              <input type="radio" name="fq7" value="b"> It preserves metadata (source, confidence, timestamp) and enables reliable downstream processing
+            </li>
+            <li class="fq-option" data-fq-idx="7" data-fq-val="c" onclick="selectFinalOption(7, this)">
+              <input type="radio" name="fq7" value="c"> Claude can only read JSON
+            </li>
+            <li class="fq-option" data-fq-idx="7" data-fq-val="d" onclick="selectFinalOption(7, this)">
+              <input type="radio" name="fq7" value="d"> Raw text causes encoding errors
+            </li>
+          </ul>
+        </div>
+
+        <button class="final-submit-btn" id="finalSubmitBtn" onclick="submitFinalQuiz()" disabled>
+          Submit Answers
+        </button>
+
+        <div class="final-result" id="finalResult">
+          <h4 id="finalResultTitle"></h4>
+          <p id="finalResultText"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         NAVIGATION FOOTER
+         ======================================== -->
+    <nav class="module-nav">
+      <a href="23-agent-sdk.html" class="nav-link prev">
+        <span class="nav-dir">&larr; Previous</span>
+        <span class="nav-title">Module 23: Agent SDK</span>
+      </a>
+      <a href="25-evals-reliability.html" class="nav-link next">
+        <span class="nav-dir">Next &rarr;</span>
+        <span class="nav-title">Module 25: Evals &amp; Reliability</span>
+      </a>
+    </nav>
+
+  </div>
+</main>
+
+<!-- ============================================
+     JAVASCRIPT
+     ============================================ -->
+<script>
+(function() {
+  'use strict';
+
+  // ==========================================
+  // THEME MANAGEMENT
+  // ==========================================
+  var THEME_KEY = 'claude-training-theme';
+
+  function getTheme() {
+    return localStorage.getItem(THEME_KEY) || 'light';
+  }
+
+  function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem(THEME_KEY, theme);
+    var icon = document.getElementById('themeIcon');
+    if (icon) {
+      icon.textContent = theme === 'dark' ? '\u2600' : '\u263E';
+    }
+  }
+
+  setTheme(getTheme());
+
+  document.getElementById('themeToggle').addEventListener('click', function() {
+    var current = getTheme();
+    setTheme(current === 'dark' ? 'light' : 'dark');
+  });
+
+  // ==========================================
+  // SIDEBAR MOBILE TOGGLE
+  // ==========================================
+  var hamburger = document.getElementById('hamburger');
+  var sidebar = document.getElementById('sidebar');
+  var overlay = document.getElementById('sidebarOverlay');
+
+  function toggleSidebar() {
+    var isOpen = sidebar.classList.contains('open');
+    sidebar.classList.toggle('open');
+    hamburger.classList.toggle('open');
+    if (isOpen) {
+      overlay.classList.remove('show');
+    } else {
+      overlay.classList.add('show');
+    }
+  }
+
+  hamburger.addEventListener('click', toggleSidebar);
+  overlay.addEventListener('click', toggleSidebar);
+
+  // ==========================================
+  // SIDEBAR SECTION COLLAPSING
+  // ==========================================
+  var sectionToggles = document.querySelectorAll('.sidebar-section-toggle');
+  for (var i = 0; i < sectionToggles.length; i++) {
+    (function(btn) {
+      btn.addEventListener('click', function() {
+        var sectionName = this.getAttribute('data-section');
+        var linksList = document.getElementById('nav-' + sectionName);
+        var isCollapsed = this.classList.contains('collapsed');
+
+        if (isCollapsed) {
+          this.classList.remove('collapsed');
+          linksList.classList.remove('collapsed');
+          linksList.style.maxHeight = linksList.scrollHeight + 'px';
+        } else {
+          this.classList.add('collapsed');
+          linksList.style.maxHeight = linksList.scrollHeight + 'px';
+          linksList.offsetHeight; // force reflow
+          linksList.classList.add('collapsed');
+        }
+      });
+
+      var sectionName = btn.getAttribute('data-section');
+      var linksList = document.getElementById('nav-' + sectionName);
+      if (linksList) {
+        linksList.style.maxHeight = linksList.scrollHeight + 'px';
+      }
+    })(sectionToggles[i]);
+  }
+
+  // ==========================================
+  // SCROLLSPY
+  // ==========================================
+  var sidebarLinks = document.querySelectorAll('.sidebar-link');
+  var sections = [];
+
+  for (var i = 0; i < sidebarLinks.length; i++) {
+    var targetId = sidebarLinks[i].getAttribute('data-target');
+    var sectionEl = document.getElementById(targetId);
+    if (sectionEl) {
+      sections.push({ el: sectionEl, link: sidebarLinks[i], id: targetId });
+    }
+  }
+
+  function updateScrollspy() {
+    var scrollPos = window.scrollY + 100;
+    var active = null;
+
+    for (var i = sections.length - 1; i >= 0; i--) {
+      if (sections[i].el.offsetTop <= scrollPos) {
+        active = sections[i];
+        break;
+      }
+    }
+
+    for (var j = 0; j < sidebarLinks.length; j++) {
+      sidebarLinks[j].classList.remove('active');
+    }
+    if (active) {
+      active.link.classList.add('active');
+    }
+
+    updateSidebarProgress();
+  }
+
+  var scrollTimer = null;
+  window.addEventListener('scroll', function() {
+    if (scrollTimer) return;
+    scrollTimer = setTimeout(function() {
+      scrollTimer = null;
+      updateScrollspy();
+    }, 50);
+  });
+  updateScrollspy();
+
+  // Close mobile sidebar on link click
+  for (var i = 0; i < sidebarLinks.length; i++) {
+    sidebarLinks[i].addEventListener('click', function() {
+      if (window.innerWidth <= 1024) {
+        sidebar.classList.remove('open');
+        hamburger.classList.remove('open');
+        overlay.classList.remove('show');
+      }
+    });
+  }
+
+  // ==========================================
+  // SIDEBAR PROGRESS
+  // ==========================================
+  function updateSidebarProgress() {
+    var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    var scrolled = window.scrollY;
+    var pct = docHeight > 0 ? Math.min(100, (scrolled / docHeight) * 100) : 0;
+
+    var fill = document.getElementById('sidebarProgressFill');
+    if (fill) {
+      fill.style.width = pct + '%';
+    }
+  }
+
+  // ==========================================
+  // COPY TO CLIPBOARD
+  // ==========================================
+  window.copyCode = function(btn) {
+    var block = btn.closest('.code-block');
+    var codeEl = block.cloneNode(true);
+    var labelEl = codeEl.querySelector('.code-label');
+    var btnEl = codeEl.querySelector('.copy-btn');
+    if (labelEl) labelEl.remove();
+    if (btnEl) btnEl.remove();
+
+    var text = codeEl.textContent.trim();
+
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(function() {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(function() {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    }
+  };
+
+  // ==========================================
+  // ARCHITECTURE PLAYGROUND
+  // ==========================================
+  var pgState = {
+    agents: [],
+    connections: [],
+    nextId: 1,
+    connecting: null, // { fromId: string, fromPort: 'output' }
+    dragging: null,
+    dragOffset: { x: 0, y: 0 },
+    simulating: false
+  };
+
+  var TOOLS_LIST = ['Read', 'Write', 'Edit', 'Bash', 'Grep', 'Glob', 'Agent'];
+
+  function generateAgentId() {
+    return 'agent-' + pgState.nextId++;
+  }
+
+  window.addAgent = function(preset) {
+    var canvas = document.getElementById('playgroundCanvas');
+    var canvasRect = canvas.getBoundingClientRect();
+
+    var id = generateAgentId();
+    var name = (preset && preset.name) ? preset.name : 'Agent ' + (pgState.agents.length + 1);
+    var model = (preset && preset.model) ? preset.model : 'sonnet';
+    var tools = (preset && preset.tools) ? preset.tools : ['Read', 'Grep'];
+    var x = (preset && typeof preset.x === 'number') ? preset.x : 40 + (pgState.agents.length % 3) * 200;
+    var y = (preset && typeof preset.y === 'number') ? preset.y : 40 + Math.floor(pgState.agents.length / 3) * 160;
+
+    var agent = {
+      id: id,
+      name: name,
+      model: model,
+      tools: tools.slice(),
+      x: x,
+      y: y
+    };
+
+    pgState.agents.push(agent);
+    renderAgentNode(agent, canvas);
+    updatePlaygroundJson();
+  };
+
+  function renderAgentNode(agent, canvas) {
+    var node = document.createElement('div');
+    node.className = 'agent-node';
+    node.id = 'node-' + agent.id;
+    node.style.left = agent.x + 'px';
+    node.style.top = agent.y + 'px';
+
+    // Status indicator
+    var status = document.createElement('div');
+    status.className = 'agent-node-status';
+    status.id = 'status-' + agent.id;
+    node.appendChild(status);
+
+    // Input port
+    var inputPort = document.createElement('div');
+    inputPort.className = 'agent-node-port input';
+    inputPort.setAttribute('data-agent', agent.id);
+    inputPort.setAttribute('data-port', 'input');
+    inputPort.addEventListener('click', function(e) {
+      e.stopPropagation();
+      handlePortClick(agent.id, 'input');
+    });
+    node.appendChild(inputPort);
+
+    // Header
+    var header = document.createElement('div');
+    header.className = 'agent-node-header';
+
+    var nameInput = document.createElement('input');
+    nameInput.className = 'agent-node-name';
+    nameInput.type = 'text';
+    nameInput.value = agent.name;
+    nameInput.addEventListener('change', function() {
+      agent.name = this.value;
+      updatePlaygroundJson();
+    });
+    nameInput.addEventListener('mousedown', function(e) { e.stopPropagation(); });
+    header.appendChild(nameInput);
+
+    var deleteBtn = document.createElement('button');
+    deleteBtn.className = 'agent-node-delete';
+    deleteBtn.innerHTML = '&times;';
+    deleteBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      removeAgent(agent.id);
+    });
+    header.appendChild(deleteBtn);
+
+    node.appendChild(header);
+
+    // Body
+    var body = document.createElement('div');
+    body.className = 'agent-node-body';
+
+    var modelDiv = document.createElement('div');
+    modelDiv.className = 'agent-node-model';
+    var modelSelect = document.createElement('select');
+    var models = ['haiku', 'sonnet', 'opus'];
+    for (var m = 0; m < models.length; m++) {
+      var opt = document.createElement('option');
+      opt.value = models[m];
+      opt.textContent = models[m].charAt(0).toUpperCase() + models[m].slice(1);
+      if (models[m] === agent.model) opt.selected = true;
+      modelSelect.appendChild(opt);
+    }
+    modelSelect.addEventListener('change', function() {
+      agent.model = this.value;
+      updatePlaygroundJson();
+    });
+    modelSelect.addEventListener('mousedown', function(e) { e.stopPropagation(); });
+    modelDiv.appendChild(modelSelect);
+    body.appendChild(modelDiv);
+
+    var toolsDiv = document.createElement('div');
+    toolsDiv.className = 'agent-node-tools';
+    for (var t = 0; t < TOOLS_LIST.length; t++) {
+      (function(toolName) {
+        var tag = document.createElement('span');
+        tag.className = 'agent-tool-tag';
+        if (agent.tools.indexOf(toolName) >= 0) {
+          tag.className += ' active';
+        }
+        tag.textContent = toolName;
+        tag.addEventListener('click', function(e) {
+          e.stopPropagation();
+          var idx = agent.tools.indexOf(toolName);
+          if (idx >= 0) {
+            agent.tools.splice(idx, 1);
+            tag.classList.remove('active');
+          } else {
+            agent.tools.push(toolName);
+            tag.classList.add('active');
+          }
+          updatePlaygroundJson();
+        });
+        toolsDiv.appendChild(tag);
+      })(TOOLS_LIST[t]);
+    }
+    body.appendChild(toolsDiv);
+    node.appendChild(body);
+
+    // Output port
+    var outputPort = document.createElement('div');
+    outputPort.className = 'agent-node-port output';
+    outputPort.setAttribute('data-agent', agent.id);
+    outputPort.setAttribute('data-port', 'output');
+    outputPort.addEventListener('click', function(e) {
+      e.stopPropagation();
+      handlePortClick(agent.id, 'output');
+    });
+    node.appendChild(outputPort);
+
+    // Drag handling
+    node.addEventListener('mousedown', function(e) {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'BUTTON' || e.target.classList.contains('agent-tool-tag') || e.target.classList.contains('agent-node-port')) return;
+      pgState.dragging = agent;
+      var nodeRect = node.getBoundingClientRect();
+      pgState.dragOffset.x = e.clientX - nodeRect.left;
+      pgState.dragOffset.y = e.clientY - nodeRect.top;
+      node.classList.add('dragging');
+      e.preventDefault();
+    });
+
+    canvas.appendChild(node);
+  }
+
+  document.addEventListener('mousemove', function(e) {
+    if (!pgState.dragging) return;
+    var canvas = document.getElementById('playgroundCanvas');
+    var canvasRect = canvas.getBoundingClientRect();
+    var agent = pgState.dragging;
+    var node = document.getElementById('node-' + agent.id);
+
+    var x = e.clientX - canvasRect.left - pgState.dragOffset.x;
+    var y = e.clientY - canvasRect.top - pgState.dragOffset.y;
+
+    x = Math.max(0, Math.min(x, canvasRect.width - 180));
+    y = Math.max(0, Math.min(y, canvasRect.height - 120));
+
+    agent.x = x;
+    agent.y = y;
+    node.style.left = x + 'px';
+    node.style.top = y + 'px';
+
+    renderConnections();
+  });
+
+  document.addEventListener('mouseup', function() {
+    if (pgState.dragging) {
+      var node = document.getElementById('node-' + pgState.dragging.id);
+      if (node) node.classList.remove('dragging');
+      pgState.dragging = null;
+    }
+  });
+
+  function handlePortClick(agentId, portType) {
+    if (pgState.simulating) return;
+
+    if (portType === 'output') {
+      // Start connection
+      pgState.connecting = { fromId: agentId };
+    } else if (portType === 'input' && pgState.connecting) {
+      // Complete connection
+      var fromId = pgState.connecting.fromId;
+      if (fromId !== agentId) {
+        // Check for duplicate
+        var exists = false;
+        for (var i = 0; i < pgState.connections.length; i++) {
+          if (pgState.connections[i].from === fromId && pgState.connections[i].to === agentId) {
+            exists = true;
+            break;
+          }
+        }
+        if (!exists) {
+          var typeSelect = document.getElementById('connectionTypeSelect');
+          pgState.connections.push({
+            from: fromId,
+            to: agentId,
+            type: typeSelect.value
+          });
+          renderConnections();
+          updatePlaygroundJson();
+        }
+      }
+      pgState.connecting = null;
+    }
+  }
+
+  function renderConnections() {
+    var svg = document.getElementById('playgroundSvg');
+    // Remove existing lines
+    var lines = svg.querySelectorAll('line');
+    for (var i = 0; i < lines.length; i++) {
+      lines[i].remove();
+    }
+
+    for (var c = 0; c < pgState.connections.length; c++) {
+      var conn = pgState.connections[c];
+      var fromAgent = findAgent(conn.from);
+      var toAgent = findAgent(conn.to);
+      if (!fromAgent || !toAgent) continue;
+
+      var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', fromAgent.x + 90);
+      line.setAttribute('y1', fromAgent.y + getNodeHeight(fromAgent.id));
+      line.setAttribute('x2', toAgent.x + 90);
+      line.setAttribute('y2', toAgent.y);
+      line.setAttribute('class', conn.type);
+      line.id = 'conn-' + conn.from + '-' + conn.to;
+
+      svg.appendChild(line);
+    }
+  }
+
+  function getNodeHeight(agentId) {
+    var node = document.getElementById('node-' + agentId);
+    return node ? node.offsetHeight : 100;
+  }
+
+  function findAgent(id) {
+    for (var i = 0; i < pgState.agents.length; i++) {
+      if (pgState.agents[i].id === id) return pgState.agents[i];
+    }
+    return null;
+  }
+
+  function removeAgent(id) {
+    // Remove connections
+    pgState.connections = pgState.connections.filter(function(c) {
+      return c.from !== id && c.to !== id;
+    });
+
+    // Remove agent
+    pgState.agents = pgState.agents.filter(function(a) { return a.id !== id; });
+
+    // Remove DOM node
+    var node = document.getElementById('node-' + id);
+    if (node) node.remove();
+
+    renderConnections();
+    updatePlaygroundJson();
+  }
+
+  function updatePlaygroundJson() {
+    var spec = {
+      agents: pgState.agents.map(function(a) {
+        return {
+          id: a.id,
+          name: a.name,
+          model: a.model,
+          tools: a.tools
+        };
+      }),
+      connections: pgState.connections.map(function(c) {
+        var fromAgent = findAgent(c.from);
+        var toAgent = findAgent(c.to);
+        return {
+          from: fromAgent ? fromAgent.name : c.from,
+          to: toAgent ? toAgent.name : c.to,
+          type: c.type
+        };
+      })
+    };
+
+    var jsonEl = document.getElementById('playgroundJson');
+    jsonEl.textContent = JSON.stringify(spec, null, 2);
+  }
+
+  window.copyPlaygroundJson = function() {
+    var jsonEl = document.getElementById('playgroundJson');
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(jsonEl.textContent);
+    }
+  };
+
+  // Templates
+  window.loadTemplate = function(templateName) {
+    if (!templateName) return;
+    resetPlayground();
+
+    var templates = {
+      pipeline: {
+        agents: [
+          { name: 'Parser', model: 'haiku', tools: ['Read'], x: 60, y: 30 },
+          { name: 'Validator', model: 'sonnet', tools: ['Read', 'Grep'], x: 60, y: 150 },
+          { name: 'Enricher', model: 'sonnet', tools: ['Read', 'Bash', 'Grep'], x: 60, y: 270 },
+          { name: 'Store Agent', model: 'haiku', tools: ['Write', 'Bash'], x: 60, y: 390 }
+        ],
+        connections: [
+          { fromIdx: 0, toIdx: 1, type: 'sequential' },
+          { fromIdx: 1, toIdx: 2, type: 'sequential' },
+          { fromIdx: 2, toIdx: 3, type: 'sequential' }
+        ]
+      },
+      review: {
+        agents: [
+          { name: 'Coordinator', model: 'opus', tools: ['Read', 'Agent'], x: 170, y: 20 },
+          { name: 'Security Review', model: 'sonnet', tools: ['Read', 'Grep'], x: 20, y: 170 },
+          { name: 'Perf Review', model: 'sonnet', tools: ['Read', 'Grep', 'Bash'], x: 170, y: 170 },
+          { name: 'Style Review', model: 'sonnet', tools: ['Read', 'Grep'], x: 320, y: 170 },
+          { name: 'Synthesizer', model: 'opus', tools: ['Read', 'Write'], x: 170, y: 330 }
+        ],
+        connections: [
+          { fromIdx: 0, toIdx: 1, type: 'parallel' },
+          { fromIdx: 0, toIdx: 2, type: 'parallel' },
+          { fromIdx: 0, toIdx: 3, type: 'parallel' },
+          { fromIdx: 1, toIdx: 4, type: 'sequential' },
+          { fromIdx: 2, toIdx: 4, type: 'sequential' },
+          { fromIdx: 3, toIdx: 4, type: 'sequential' }
+        ]
+      },
+      research: {
+        agents: [
+          { name: 'Director', model: 'opus', tools: ['Read', 'Agent'], x: 170, y: 20 },
+          { name: 'Web Researcher', model: 'sonnet', tools: ['Bash', 'Read', 'Grep'], x: 60, y: 160 },
+          { name: 'Doc Researcher', model: 'sonnet', tools: ['Read', 'Grep', 'Glob'], x: 300, y: 160 },
+          { name: 'Synthesizer', model: 'opus', tools: ['Read', 'Write'], x: 170, y: 320 }
+        ],
+        connections: [
+          { fromIdx: 0, toIdx: 1, type: 'parallel' },
+          { fromIdx: 0, toIdx: 2, type: 'parallel' },
+          { fromIdx: 1, toIdx: 3, type: 'sequential' },
+          { fromIdx: 2, toIdx: 3, type: 'sequential' }
+        ]
+      }
+    };
+
+    var tpl = templates[templateName];
+    if (!tpl) return;
+
+    var idMap = [];
+
+    for (var a = 0; a < tpl.agents.length; a++) {
+      var preset = tpl.agents[a];
+      var id = generateAgentId();
+      var agent = {
+        id: id,
+        name: preset.name,
+        model: preset.model,
+        tools: preset.tools.slice(),
+        x: preset.x,
+        y: preset.y
+      };
+      idMap.push(id);
+      pgState.agents.push(agent);
+      renderAgentNode(agent, document.getElementById('playgroundCanvas'));
+    }
+
+    for (var c = 0; c < tpl.connections.length; c++) {
+      pgState.connections.push({
+        from: idMap[tpl.connections[c].fromIdx],
+        to: idMap[tpl.connections[c].toIdx],
+        type: tpl.connections[c].type
+      });
+    }
+
+    renderConnections();
+    updatePlaygroundJson();
+    document.getElementById('templateSelect').value = '';
+  };
+
+  window.resetPlayground = function() {
+    pgState.agents = [];
+    pgState.connections = [];
+    pgState.connecting = null;
+    pgState.dragging = null;
+    pgState.simulating = false;
+
+    var canvas = document.getElementById('playgroundCanvas');
+    var nodes = canvas.querySelectorAll('.agent-node');
+    for (var i = 0; i < nodes.length; i++) {
+      nodes[i].remove();
+    }
+
+    var svg = document.getElementById('playgroundSvg');
+    var lines = svg.querySelectorAll('line');
+    for (var j = 0; j < lines.length; j++) {
+      lines[j].remove();
+    }
+
+    updatePlaygroundJson();
+
+    var timeline = document.getElementById('simTimeline');
+    timeline.style.display = 'none';
+  };
+
+  // Simulation
+  window.simulatePlayground = function() {
+    if (pgState.agents.length === 0 || pgState.simulating) return;
+    pgState.simulating = true;
+
+    var timeline = document.getElementById('simTimeline');
+    timeline.style.display = 'block';
+
+    // Determine execution order using topological sort
+    var order = topologicalSort();
+    var totalSteps = order.length;
+    var currentStep = 0;
+
+    // Reset all node statuses
+    for (var i = 0; i < pgState.agents.length; i++) {
+      var statusEl = document.getElementById('status-' + pgState.agents[i].id);
+      var nodeEl = document.getElementById('node-' + pgState.agents[i].id);
+      if (statusEl) { statusEl.className = 'agent-node-status'; statusEl.textContent = ''; }
+      if (nodeEl) { nodeEl.classList.remove('executing', 'completed'); }
+    }
+
+    function executeStep() {
+      if (currentStep >= totalSteps) {
+        pgState.simulating = false;
+        document.getElementById('simTimelineLabel').textContent = 'Simulation complete!';
+        document.getElementById('simTimelineFill').style.width = '100%';
+        return;
+      }
+
+      var agentId = order[currentStep];
+      var statusEl = document.getElementById('status-' + agentId);
+      var nodeEl = document.getElementById('node-' + agentId);
+      var agent = findAgent(agentId);
+
+      // Show executing
+      if (statusEl) {
+        statusEl.className = 'agent-node-status show running';
+        statusEl.innerHTML = '&#8987;';
+      }
+      if (nodeEl) nodeEl.classList.add('executing');
+
+      document.getElementById('simTimelineLabel').textContent = 'Executing: ' + (agent ? agent.name : agentId);
+      document.getElementById('simTimelineFill').style.width = ((currentStep + 0.5) / totalSteps * 100) + '%';
+
+      // Activate connection lines leading TO this agent
+      for (var c = 0; c < pgState.connections.length; c++) {
+        if (pgState.connections[c].to === agentId) {
+          var lineEl = document.getElementById('conn-' + pgState.connections[c].from + '-' + pgState.connections[c].to);
+          if (lineEl) lineEl.classList.add('active');
+        }
+      }
+
+      // Simulate execution time based on model
+      var delay = 1200;
+      if (agent) {
+        if (agent.model === 'haiku') delay = 600;
+        else if (agent.model === 'opus') delay = 1800;
+      }
+
+      setTimeout(function() {
+        // Mark completed
+        if (statusEl) {
+          statusEl.className = 'agent-node-status show done';
+          statusEl.innerHTML = '&#10003;';
+        }
+        if (nodeEl) {
+          nodeEl.classList.remove('executing');
+          nodeEl.classList.add('completed');
+        }
+
+        // Deactivate connection lines
+        for (var c = 0; c < pgState.connections.length; c++) {
+          if (pgState.connections[c].to === agentId) {
+            var lineEl = document.getElementById('conn-' + pgState.connections[c].from + '-' + pgState.connections[c].to);
+            if (lineEl) lineEl.classList.remove('active');
+          }
+        }
+
+        document.getElementById('simTimelineFill').style.width = ((currentStep + 1) / totalSteps * 100) + '%';
+
+        currentStep++;
+        setTimeout(executeStep, 300);
+      }, delay);
+    }
+
+    executeStep();
+  };
+
+  function topologicalSort() {
+    // Build adjacency and in-degree
+    var inDegree = {};
+    var adj = {};
+    for (var i = 0; i < pgState.agents.length; i++) {
+      var id = pgState.agents[i].id;
+      inDegree[id] = 0;
+      adj[id] = [];
+    }
+    for (var c = 0; c < pgState.connections.length; c++) {
+      adj[pgState.connections[c].from].push(pgState.connections[c].to);
+      inDegree[pgState.connections[c].to]++;
+    }
+
+    // Kahn's algorithm
+    var queue = [];
+    for (var id in inDegree) {
+      if (inDegree.hasOwnProperty(id) && inDegree[id] === 0) {
+        queue.push(id);
+      }
+    }
+
+    var result = [];
+    while (queue.length > 0) {
+      var node = queue.shift();
+      result.push(node);
+      var neighbors = adj[node] || [];
+      for (var n = 0; n < neighbors.length; n++) {
+        inDegree[neighbors[n]]--;
+        if (inDegree[neighbors[n]] === 0) {
+          queue.push(neighbors[n]);
+        }
+      }
+    }
+
+    // Add any unconnected agents not yet in result
+    for (var i = 0; i < pgState.agents.length; i++) {
+      if (result.indexOf(pgState.agents[i].id) < 0) {
+        result.push(pgState.agents[i].id);
+      }
+    }
+
+    return result;
+  }
+
+  // ==========================================
+  // ORCHESTRATION SIMULATOR
+  // ==========================================
+  var simState = {
+    scenario: 'pipeline',
+    playing: false,
+    paused: false,
+    speed: 1,
+    timer: null,
+    currentStep: 0,
+    steps: [],
+    costs: {}
+  };
+
+  var simScenarios = {
+    pipeline: {
+      title: 'Document Processing Pipeline',
+      agents: [
+        { id: 'extract', name: 'Extract Agent', model: 'haiku', tools: 'Read, Grep', desc: 'Parses raw documents and extracts structured text', tokens: 8000 },
+        { id: 'validate', name: 'Validate Agent', model: 'sonnet', tools: 'Read, Grep', desc: 'Validates extracted data against schema rules', tokens: 12000 },
+        { id: 'enrich', name: 'Enrich Agent', model: 'sonnet', tools: 'Read, Bash, Grep', desc: 'Enriches data with external lookups and cross-references', tokens: 15000 },
+        { id: 'store', name: 'Store Agent', model: 'haiku', tools: 'Write, Bash', desc: 'Persists validated and enriched data to the database', tokens: 5000 }
+      ],
+      steps: [
+        { type: 'activate', agent: 'extract' },
+        { type: 'complete', agent: 'extract' },
+        { type: 'activate', agent: 'validate' },
+        { type: 'complete', agent: 'validate' },
+        { type: 'activate', agent: 'enrich' },
+        { type: 'complete', agent: 'enrich' },
+        { type: 'activate', agent: 'store' },
+        { type: 'complete', agent: 'store' }
+      ],
+      layout: 'sequential'
+    },
+    parallel: {
+      title: 'Code Review System',
+      agents: [
+        { id: 'coord', name: 'Coordinator', model: 'opus', tools: 'Read, Agent', desc: 'Dispatches review tasks and synthesizes results', tokens: 10000 },
+        { id: 'security', name: 'Security Reviewer', model: 'sonnet', tools: 'Read, Grep', desc: 'Scans for vulnerabilities, injection risks, auth issues', tokens: 18000 },
+        { id: 'perf', name: 'Performance Reviewer', model: 'sonnet', tools: 'Read, Grep, Bash', desc: 'Identifies N+1 queries, memory leaks, bottlenecks', tokens: 16000 },
+        { id: 'style', name: 'Style Reviewer', model: 'sonnet', tools: 'Read, Grep', desc: 'Checks naming conventions, code organization, readability', tokens: 14000 },
+        { id: 'synth', name: 'Synthesizer', model: 'opus', tools: 'Read, Write', desc: 'Merges all findings into a unified review report', tokens: 12000 }
+      ],
+      steps: [
+        { type: 'activate', agent: 'coord' },
+        { type: 'complete', agent: 'coord' },
+        { type: 'activate', agent: 'security' },
+        { type: 'activate', agent: 'perf' },
+        { type: 'activate', agent: 'style' },
+        { type: 'complete', agent: 'style' },
+        { type: 'complete', agent: 'perf' },
+        { type: 'complete', agent: 'security' },
+        { type: 'activate', agent: 'synth' },
+        { type: 'complete', agent: 'synth' }
+      ],
+      layout: 'fanout'
+    },
+    hierarchical: {
+      title: 'Research Network',
+      agents: [
+        { id: 'director', name: 'Director', model: 'opus', tools: 'Read, Agent', desc: 'Plans research strategy and synthesizes final output', tokens: 12000 },
+        { id: 'web-lead', name: 'Web Research Lead', model: 'sonnet', tools: 'Bash, Read', desc: 'Coordinates web research and summarizes findings', tokens: 14000 },
+        { id: 'doc-lead', name: 'Doc Research Lead', model: 'sonnet', tools: 'Read, Grep, Glob', desc: 'Coordinates document analysis and summarizes findings', tokens: 14000 },
+        { id: 'web-r1', name: 'Web Researcher 1', model: 'haiku', tools: 'Bash, Read', desc: 'Searches and extracts information from web sources', tokens: 8000 },
+        { id: 'web-r2', name: 'Web Researcher 2', model: 'haiku', tools: 'Bash, Read', desc: 'Searches and extracts information from web sources', tokens: 8000 },
+        { id: 'doc-r1', name: 'Doc Analyst 1', model: 'haiku', tools: 'Read, Grep', desc: 'Analyzes and extracts information from documents', tokens: 8000 },
+        { id: 'doc-r2', name: 'Doc Analyst 2', model: 'haiku', tools: 'Read, Grep', desc: 'Analyzes and extracts information from documents', tokens: 8000 }
+      ],
+      steps: [
+        { type: 'activate', agent: 'director' },
+        { type: 'complete', agent: 'director' },
+        { type: 'activate', agent: 'web-lead' },
+        { type: 'activate', agent: 'doc-lead' },
+        { type: 'activate', agent: 'web-r1' },
+        { type: 'activate', agent: 'web-r2' },
+        { type: 'activate', agent: 'doc-r1' },
+        { type: 'activate', agent: 'doc-r2' },
+        { type: 'complete', agent: 'web-r1' },
+        { type: 'complete', agent: 'doc-r2' },
+        { type: 'complete', agent: 'web-r2' },
+        { type: 'complete', agent: 'doc-r1' },
+        { type: 'complete', agent: 'web-lead' },
+        { type: 'complete', agent: 'doc-lead' },
+        { type: 'activate', agent: 'director' },
+        { type: 'complete', agent: 'director' }
+      ],
+      layout: 'hierarchical'
+    }
+  };
+
+  function renderSimScenario(scenarioKey) {
+    var scenario = simScenarios[scenarioKey];
+    if (!scenario) return;
+
+    simState.scenario = scenarioKey;
+    simState.steps = scenario.steps;
+    simState.costs = {};
+
+    var canvas = document.getElementById('simCanvas');
+    var html = '';
+
+    if (scenario.layout === 'sequential') {
+      for (var i = 0; i < scenario.agents.length; i++) {
+        if (i > 0) html += '<div class="sim-arrow-down" id="sim-arrow-' + i + '">&#8595;</div>';
+        html += '<div class="sim-node" id="sim-' + scenario.agents[i].id + '" onclick="inspectSimAgent(\'' + scenario.agents[i].id + '\')">';
+        html += '<span class="sim-node-icon">&#9679;</span> ' + scenario.agents[i].name;
+        html += '</div>';
+      }
+    } else if (scenario.layout === 'fanout') {
+      html += '<div class="sim-node" id="sim-coord" onclick="inspectSimAgent(\'coord\')">';
+      html += '<span class="sim-node-icon">&#9679;</span> ' + scenario.agents[0].name;
+      html += '</div>';
+      html += '<div class="sim-arrow-down" id="sim-arrow-fan">&#8595; fan-out</div>';
+      html += '<div class="sim-parallel-group">';
+      for (var i = 1; i < scenario.agents.length - 1; i++) {
+        html += '<div class="sim-node" id="sim-' + scenario.agents[i].id + '" onclick="inspectSimAgent(\'' + scenario.agents[i].id + '\')">';
+        html += '<span class="sim-node-icon">&#9679;</span> ' + scenario.agents[i].name;
+        html += '</div>';
+      }
+      html += '</div>';
+      html += '<div class="sim-arrow-down" id="sim-arrow-in">&#8595; fan-in</div>';
+      var last = scenario.agents[scenario.agents.length - 1];
+      html += '<div class="sim-node" id="sim-' + last.id + '" onclick="inspectSimAgent(\'' + last.id + '\')">';
+      html += '<span class="sim-node-icon">&#9679;</span> ' + last.name;
+      html += '</div>';
+    } else if (scenario.layout === 'hierarchical') {
+      html += '<div class="sim-node" id="sim-director" onclick="inspectSimAgent(\'director\')">';
+      html += '<span class="sim-node-icon">&#9679;</span> Director</div>';
+      html += '<div class="sim-arrow-down" id="sim-arrow-h1">&#8595;</div>';
+      html += '<div class="sim-parallel-group">';
+      html += '<div style="text-align:center">';
+      html += '<div class="sim-node" id="sim-web-lead" onclick="inspectSimAgent(\'web-lead\')">';
+      html += '<span class="sim-node-icon">&#9679;</span> Web Research Lead</div>';
+      html += '<div class="sim-arrow-down" id="sim-arrow-h2">&#8595;</div>';
+      html += '<div class="sim-parallel-group">';
+      html += '<div class="sim-node" id="sim-web-r1" onclick="inspectSimAgent(\'web-r1\')" style="min-width:110px;font-size:0.78rem">';
+      html += '<span class="sim-node-icon">&#9679;</span> Researcher 1</div>';
+      html += '<div class="sim-node" id="sim-web-r2" onclick="inspectSimAgent(\'web-r2\')" style="min-width:110px;font-size:0.78rem">';
+      html += '<span class="sim-node-icon">&#9679;</span> Researcher 2</div>';
+      html += '</div></div>';
+      html += '<div style="text-align:center">';
+      html += '<div class="sim-node" id="sim-doc-lead" onclick="inspectSimAgent(\'doc-lead\')">';
+      html += '<span class="sim-node-icon">&#9679;</span> Doc Research Lead</div>';
+      html += '<div class="sim-arrow-down" id="sim-arrow-h3">&#8595;</div>';
+      html += '<div class="sim-parallel-group">';
+      html += '<div class="sim-node" id="sim-doc-r1" onclick="inspectSimAgent(\'doc-r1\')" style="min-width:110px;font-size:0.78rem">';
+      html += '<span class="sim-node-icon">&#9679;</span> Analyst 1</div>';
+      html += '<div class="sim-node" id="sim-doc-r2" onclick="inspectSimAgent(\'doc-r2\')" style="min-width:110px;font-size:0.78rem">';
+      html += '<span class="sim-node-icon">&#9679;</span> Analyst 2</div>';
+      html += '</div></div>';
+      html += '</div>';
+    }
+
+    canvas.innerHTML = html;
+
+    // Reset cost display
+    var costHtml = '';
+    for (var i = 0; i < scenario.agents.length; i++) {
+      costHtml += '<div class="sim-cost-row"><span>' + scenario.agents[i].name + '</span><span id="sim-cost-' + scenario.agents[i].id + '">--</span></div>';
+    }
+    document.getElementById('simCostRows').innerHTML = costHtml;
+    document.getElementById('simCostTotal').textContent = '0 tokens';
+
+    document.getElementById('simProgressFill').style.width = '0%';
+    document.getElementById('simProgressLabel').textContent = 'Ready -- press Play to start';
+
+    document.getElementById('simDetailContent').innerHTML = '<p style="font-size:0.85rem;color:var(--text-muted)">Click any agent to inspect its configuration and progress.</p>';
+  }
+
+  window.inspectSimAgent = function(agentId) {
+    var scenario = simScenarios[simState.scenario];
+    var agent = null;
+    for (var i = 0; i < scenario.agents.length; i++) {
+      if (scenario.agents[i].id === agentId) {
+        agent = scenario.agents[i];
+        break;
+      }
+    }
+    if (!agent) return;
+
+    var html = '';
+    html += '<div class="sim-detail-item"><div class="sim-detail-label">Name</div><div class="sim-detail-value">' + agent.name + '</div></div>';
+    html += '<div class="sim-detail-item"><div class="sim-detail-label">Model</div><div class="sim-detail-value">' + agent.model.charAt(0).toUpperCase() + agent.model.slice(1) + '</div></div>';
+    html += '<div class="sim-detail-item"><div class="sim-detail-label">Tools</div><div class="sim-detail-value">' + agent.tools + '</div></div>';
+    html += '<div class="sim-detail-item"><div class="sim-detail-label">Description</div><div class="sim-detail-value">' + agent.desc + '</div></div>';
+    html += '<div class="sim-detail-item"><div class="sim-detail-label">Est. Tokens</div><div class="sim-detail-value">' + agent.tokens.toLocaleString() + '</div></div>';
+
+    document.getElementById('simDetailContent').innerHTML = html;
+  };
+
+  window.loadSimScenario = function(val) {
+    simReset();
+    renderSimScenario(val);
+  };
+
+  window.simPlay = function() {
+    if (simState.playing && !simState.paused) return;
+
+    if (simState.paused) {
+      simState.paused = false;
+      document.getElementById('simPlayBtn').disabled = true;
+      document.getElementById('simPauseBtn').disabled = false;
+      executeSimStep();
+      return;
+    }
+
+    simState.playing = true;
+    simState.paused = false;
+    simState.currentStep = 0;
+
+    // Reset node states
+    var scenario = simScenarios[simState.scenario];
+    for (var i = 0; i < scenario.agents.length; i++) {
+      var el = document.getElementById('sim-' + scenario.agents[i].id);
+      if (el) {
+        el.classList.remove('active', 'completed');
+      }
+    }
+
+    document.getElementById('simPlayBtn').disabled = true;
+    document.getElementById('simPauseBtn').disabled = false;
+
+    executeSimStep();
+  };
+
+  function executeSimStep() {
+    if (simState.paused || !simState.playing) return;
+
+    var scenario = simScenarios[simState.scenario];
+    var steps = simState.steps;
+
+    if (simState.currentStep >= steps.length) {
+      // Done
+      simState.playing = false;
+      document.getElementById('simPlayBtn').disabled = false;
+      document.getElementById('simPauseBtn').disabled = true;
+      document.getElementById('simProgressFill').style.width = '100%';
+      document.getElementById('simProgressLabel').textContent = 'Simulation complete! Total: ' + calcSimTotalCost().toLocaleString() + ' tokens';
+      return;
+    }
+
+    var step = steps[simState.currentStep];
+    var el = document.getElementById('sim-' + step.agent);
+
+    if (step.type === 'activate') {
+      if (el) el.classList.add('active');
+      document.getElementById('simProgressLabel').textContent = 'Executing: ' + getSimAgentName(step.agent);
+    } else if (step.type === 'complete') {
+      if (el) {
+        el.classList.remove('active');
+        el.classList.add('completed');
+      }
+      // Update cost
+      var agentData = getSimAgent(step.agent);
+      if (agentData) {
+        simState.costs[step.agent] = agentData.tokens;
+        var costEl = document.getElementById('sim-cost-' + step.agent);
+        if (costEl) costEl.textContent = agentData.tokens.toLocaleString();
+      }
+      document.getElementById('simCostTotal').textContent = calcSimTotalCost().toLocaleString() + ' tokens';
+    }
+
+    var pct = ((simState.currentStep + 1) / steps.length) * 100;
+    document.getElementById('simProgressFill').style.width = pct + '%';
+
+    simState.currentStep++;
+
+    var delay = step.type === 'activate' ? (800 / simState.speed) : (400 / simState.speed);
+    simState.timer = setTimeout(executeSimStep, delay);
+  }
+
+  function getSimAgentName(agentId) {
+    var scenario = simScenarios[simState.scenario];
+    for (var i = 0; i < scenario.agents.length; i++) {
+      if (scenario.agents[i].id === agentId) return scenario.agents[i].name;
+    }
+    return agentId;
+  }
+
+  function getSimAgent(agentId) {
+    var scenario = simScenarios[simState.scenario];
+    for (var i = 0; i < scenario.agents.length; i++) {
+      if (scenario.agents[i].id === agentId) return scenario.agents[i];
+    }
+    return null;
+  }
+
+  function calcSimTotalCost() {
+    var total = 0;
+    for (var key in simState.costs) {
+      if (simState.costs.hasOwnProperty(key)) {
+        total += simState.costs[key];
+      }
+    }
+    return total;
+  }
+
+  window.simPause = function() {
+    simState.paused = true;
+    if (simState.timer) {
+      clearTimeout(simState.timer);
+      simState.timer = null;
+    }
+    document.getElementById('simPlayBtn').disabled = false;
+    document.getElementById('simPauseBtn').disabled = true;
+  };
+
+  window.simReset = function() {
+    simState.playing = false;
+    simState.paused = false;
+    simState.currentStep = 0;
+    simState.costs = {};
+    if (simState.timer) {
+      clearTimeout(simState.timer);
+      simState.timer = null;
+    }
+    document.getElementById('simPlayBtn').disabled = false;
+    document.getElementById('simPauseBtn').disabled = true;
+
+    renderSimScenario(simState.scenario);
+  };
+
+  window.updateSimSpeed = function(val) {
+    var speeds = [1, 2, 5];
+    simState.speed = speeds[parseInt(val) - 1] || 1;
+    document.getElementById('simSpeedLabel').textContent = simState.speed + 'x';
+  };
+
+  // Initialize default scenario
+  renderSimScenario('pipeline');
+
+  // ==========================================
+  // TASK DECOMPOSITION EXERCISE
+  // ==========================================
+  var expertDecomp = [
+    { name: 'schema', keywords: ['schema', 'database', 'data', 'table', 'model', 'db'] },
+    { name: 'api', keywords: ['api', 'endpoint', 'route', 'rest', 'backend', 'server'] },
+    { name: 'email', keywords: ['email', 'verification', 'verify', 'mail', 'send', 'token'] },
+    { name: 'frontend', keywords: ['frontend', 'ui', 'wizard', 'form', 'page', 'component', 'react'] },
+    { name: 'test', keywords: ['test', 'qa', 'quality', 'integration', 'validation'] }
+  ];
+
+  window.submitDecomposition = function() {
+    var agents = [];
+    for (var i = 0; i < 6; i++) {
+      var name = document.getElementById('dName' + i).value.trim();
+      var resp = document.getElementById('dResp' + i).value.trim();
+      var deps = document.getElementById('dDeps' + i).value.trim();
+      var comp = document.getElementById('dComp' + i).value;
+      if (name || resp) {
+        agents.push({ name: name, resp: resp, deps: deps, comp: comp });
+      }
+    }
+
+    if (agents.length === 0) return;
+
+    // Score: completeness, granularity, dependencies
+    var completenessScore = scoreCompleteness(agents);
+    var granularityScore = scoreGranularity(agents);
+    var dependencyScore = scoreDependencies(agents);
+
+    var resultsEl = document.getElementById('decompResults');
+    resultsEl.classList.add('show');
+
+    var scoresHtml = '';
+    scoresHtml += renderScoreItem('Completeness', completenessScore, 'Did you cover all aspects?');
+    scoresHtml += renderScoreItem('Granularity', granularityScore, 'Right-sized agents?');
+    scoresHtml += renderScoreItem('Dependencies', dependencyScore, 'Correct sequencing?');
+
+    document.getElementById('decompScores').innerHTML = scoresHtml;
+
+    resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  function scoreCompleteness(agents) {
+    var covered = 0;
+    var allText = '';
+    for (var a = 0; a < agents.length; a++) {
+      allText += ' ' + agents[a].name.toLowerCase() + ' ' + agents[a].resp.toLowerCase();
+    }
+
+    for (var e = 0; e < expertDecomp.length; e++) {
+      var keywords = expertDecomp[e].keywords;
+      for (var k = 0; k < keywords.length; k++) {
+        if (allText.indexOf(keywords[k]) >= 0) {
+          covered++;
+          break;
+        }
+      }
+    }
+
+    return Math.round((covered / expertDecomp.length) * 100);
+  }
+
+  function scoreGranularity(agents) {
+    // Ideal: 4-6 agents. Too few or too many penalized.
+    var count = agents.length;
+    if (count >= 4 && count <= 6) return 100;
+    if (count === 3 || count === 7) return 75;
+    if (count === 2 || count === 8) return 50;
+    return 25;
+  }
+
+  function scoreDependencies(agents) {
+    // Check if at least one agent has no dependencies (starting point)
+    // and at least one agent depends on another
+    var hasRoot = false;
+    var hasDep = false;
+    for (var a = 0; a < agents.length; a++) {
+      var deps = agents[a].deps.toLowerCase();
+      if (!deps || deps === 'none' || deps === 'n/a' || deps === '-') {
+        hasRoot = true;
+      } else if (deps.length > 0) {
+        hasDep = true;
+      }
+    }
+
+    if (hasRoot && hasDep) return 100;
+    if (hasRoot || hasDep) return 60;
+    return 30;
+  }
+
+  function renderScoreItem(label, score, desc) {
+    var scoreClass = 'good';
+    if (score < 60) scoreClass = 'low';
+    else if (score < 80) scoreClass = 'ok';
+
+    return '<div class="decomp-score-item">' +
+      '<div class="decomp-score-value ' + scoreClass + '">' + score + '%</div>' +
+      '<div class="decomp-score-label">' + label + '</div>' +
+      '</div>';
+  }
+
+  // ==========================================
+  // FINAL QUIZ
+  // ==========================================
+  var FINAL_QUIZ_KEY = 'claude-training-module-24';
+
+  var finalQuizAnswers = ['b', 'b', 'b', 'b', 'b', 'b', 'c', 'b'];
+  var finalQuizSelections = [null, null, null, null, null, null, null, null];
+  var finalQuizSubmitted = false;
+
+  window.selectFinalOption = function(qIdx, el) {
+    if (finalQuizSubmitted) return;
+
+    var parentQ = el.closest('.final-quiz-question');
+    var options = parentQ.querySelectorAll('.fq-option');
+    for (var i = 0; i < options.length; i++) {
+      options[i].querySelector('input').checked = false;
+    }
+
+    el.querySelector('input').checked = true;
+    finalQuizSelections[qIdx] = el.getAttribute('data-fq-val');
+
+    var allAnswered = true;
+    for (var j = 0; j < finalQuizSelections.length; j++) {
+      if (finalQuizSelections[j] === null) { allAnswered = false; break; }
+    }
+    document.getElementById('finalSubmitBtn').disabled = !allAnswered;
+  };
+
+  window.submitFinalQuiz = function() {
+    if (finalQuizSubmitted) return;
+    finalQuizSubmitted = true;
+
+    var score = 0;
+
+    for (var idx = 0; idx < finalQuizSelections.length; idx++) {
+      var sel = finalQuizSelections[idx];
+      var questionEl = document.querySelector('.final-quiz-question[data-fq="' + idx + '"]');
+      var options = questionEl.querySelectorAll('.fq-option');
+
+      for (var o = 0; o < options.length; o++) {
+        var opt = options[o];
+        var val = opt.getAttribute('data-fq-val');
+        opt.style.pointerEvents = 'none';
+
+        if (val === finalQuizAnswers[idx]) {
+          if (sel === val) {
+            opt.classList.add('selected-correct');
+            score++;
+          } else {
+            opt.classList.add('reveal-correct');
+          }
+        } else if (val === sel) {
+          opt.classList.add('selected-wrong');
+        }
+      }
+    }
+
+    var result = document.getElementById('finalResult');
+    var title = document.getElementById('finalResultTitle');
+    var text = document.getElementById('finalResultText');
+
+    result.classList.add('show');
+
+    if (score >= 6) {
+      result.classList.add('pass');
+      result.classList.remove('fail');
+      title.textContent = 'Passed! ' + score + ' / 8 correct';
+      text.textContent = 'Excellent work! You have a strong understanding of multi-agent system design. Your progress has been saved. Move on to Module 25: Enterprise Deployment to continue your training.';
+    } else {
+      result.classList.add('fail');
+      result.classList.remove('pass');
+      title.textContent = score + ' / 8 correct -- Review needed';
+      text.textContent = 'You need at least 6 correct answers to pass. Review the material above, paying special attention to orchestration patterns, the Jumpstarter state pattern, and failure handling strategies.';
+    }
+
+    var progressData = {
+      score: score,
+      total: 8,
+      completed: score >= 6,
+      timestamp: new Date().toISOString()
+    };
+    localStorage.setItem(FINAL_QUIZ_KEY, JSON.stringify(progressData));
+
+    document.getElementById('finalSubmitBtn').disabled = true;
+    document.getElementById('finalSubmitBtn').textContent = 'Submitted';
+  };
+
+  // Check for existing progress
+  function loadExistingProgress() {
+    var saved = localStorage.getItem(FINAL_QUIZ_KEY);
+    if (saved) {
+      try {
+        var data = JSON.parse(saved);
+        if (data.completed) {
+          var fill = document.getElementById('sidebarProgressFill');
+          if (fill) {
+            fill.style.width = '100%';
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+  }
+  loadExistingProgress();
+
+})();
+</script>
+</body>
+</html>

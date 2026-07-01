@@ -1,0 +1,4131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 03: Claude Code Introduction | Claude AI Training</title>
+<style>
+/* ============================================
+   CSS CUSTOM PROPERTIES & PREMIUM DESIGN SYSTEM
+   ============================================ */
+:root {
+  --primary: #7C3AED;
+  --primary-light: #A78BFA;
+  --primary-dark: #5B21B6;
+  --accent: #06B6D4;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  --bg: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --bg-code: #F1F5F9;
+  --text: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --border: #E2E8F0;
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.04);
+  --shadow-lg: 0 8px 30px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-glow: 0 0 20px rgba(124,58,237,0.15);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --transition: 0.2s ease;
+  --transition-spring: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --sidebar-width: 280px;
+  --content-max: 800px;
+}
+
+[data-theme="dark"] {
+  --bg: #0B0F1A;
+  --bg-card: #141926;
+  --bg-code: #1E293B;
+  --text: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --border: #1E293B;
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.2);
+  --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.2);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.2);
+  --shadow-lg: 0 8px 30px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.2);
+  --shadow-glow: 0 0 20px rgba(124,58,237,0.25);
+}
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 24px;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  min-height: 100vh;
+  transition: background var(--transition), color var(--transition);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   REDUCED MOTION
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================
+   THEME TOGGLE
+   ============================================ */
+.theme-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: all var(--transition-spring);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+.theme-toggle:hover {
+  box-shadow: var(--shadow-lg);
+  transform: scale(1.08);
+}
+
+/* ============================================
+   SIDEBAR
+   ============================================ */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  z-index: 900;
+  transition: transform 0.3s ease, background var(--transition);
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow);
+}
+
+.sidebar-header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.sidebar-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+  margin-bottom: 12px;
+  transition: color var(--transition);
+}
+.sidebar-back:hover { color: var(--primary-dark); }
+
+.sidebar-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.sidebar-module-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.sidebar-nav {
+  padding: 12px 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.sidebar-section {
+  margin-bottom: 4px;
+}
+
+.sidebar-section-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 20px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  text-align: left;
+  transition: color var(--transition);
+}
+.sidebar-section-toggle:hover { color: var(--text); }
+.sidebar-section-toggle .chevron {
+  transition: transform 0.2s ease;
+  font-size: 0.65rem;
+}
+.sidebar-section-toggle.collapsed .chevron {
+  transform: rotate(-90deg);
+}
+
+.sidebar-links {
+  list-style: none;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.sidebar-links.collapsed {
+  max-height: 0 !important;
+}
+
+.sidebar-link {
+  display: block;
+  padding: 7px 20px 7px 32px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: all var(--transition);
+  line-height: 1.4;
+}
+.sidebar-link:hover {
+  color: var(--text);
+  background: var(--bg);
+}
+.sidebar-link.active {
+  color: var(--primary);
+  border-left-color: var(--primary);
+  background: rgba(124, 58, 237, 0.05);
+  font-weight: 600;
+}
+[data-theme="dark"] .sidebar-link.active {
+  background: rgba(124, 58, 237, 0.12);
+}
+
+.sidebar-progress {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sidebar-progress-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.sidebar-progress-track {
+  height: 6px;
+  background: var(--bg-code);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.sidebar-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 3px;
+  transition: width 0.5s ease;
+  width: 0%;
+}
+
+/* Hamburger button (mobile) */
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1001;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+  transition: all var(--transition);
+}
+.hamburger span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--text);
+  margin: 4px auto;
+  transition: all 0.3s ease;
+  border-radius: 1px;
+}
+.hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(4px, 4px); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(4px, -4px); }
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 899;
+}
+
+/* ============================================
+   MAIN CONTENT
+   ============================================ */
+.main-content {
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+  transition: margin var(--transition);
+}
+
+.content-wrapper {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 40px 32px 80px;
+}
+
+/* Module Header */
+.module-header {
+  margin-bottom: 48px;
+}
+.module-header .breadcrumb {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+.module-header .breadcrumb a {
+  color: var(--primary);
+  text-decoration: none;
+}
+.module-header .breadcrumb a:hover { text-decoration: underline; }
+
+.module-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.module-badge .number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+  box-shadow: var(--shadow-glow);
+}
+.module-badge .label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.module-header h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, var(--text), var(--primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.module-header .description {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 640px;
+}
+
+.module-meta {
+  display: flex;
+  gap: 16px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.module-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  background: var(--bg-code);
+  padding: 6px 14px;
+  border-radius: 20px;
+  box-shadow: var(--shadow-xs);
+}
+
+/* ============================================
+   SECTIONS
+   ============================================ */
+.section {
+  margin-bottom: 56px;
+  scroll-margin-top: 24px;
+}
+
+.section-heading {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+  line-height: 1.3;
+}
+
+.section h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-top: 32px;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.section h4 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-top: 24px;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.section p {
+  margin-bottom: 16px;
+  color: var(--text-secondary);
+}
+
+.section ul, .section ol {
+  margin-bottom: 16px;
+  padding-left: 24px;
+}
+.section li {
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+}
+.section li strong {
+  color: var(--text);
+}
+
+/* ============================================
+   CODE BLOCKS
+   ============================================ */
+.code-block {
+  background: #1E293B;
+  color: #E2E8F0;
+  border-radius: var(--radius-sm);
+  padding: 20px 24px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  overflow-x: auto;
+  position: relative;
+  margin: 16px 0 20px;
+  tab-size: 2;
+  box-shadow: var(--shadow-md);
+}
+.code-block .code-label {
+  position: absolute;
+  top: 8px;
+  left: 16px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #64748B;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+.code-block.has-label {
+  padding-top: 36px;
+}
+.code-block .copy-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: #94A3B8;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  transition: all var(--transition-spring);
+}
+.code-block .copy-btn:hover { background: rgba(255,255,255,0.2); color: white; }
+.code-block .copy-btn.copied { background: var(--success); color: white; }
+
+/* Syntax highlighting classes */
+.kw { color: #C084FC; }
+.str { color: #6EE7B7; }
+.fn { color: #7DD3FC; }
+.cm { color: #64748B; }
+.num { color: #FDBA74; }
+.op { color: #FCA5A5; }
+.type { color: #67E8F9; }
+.param { color: #FDE68A; }
+.prop { color: #F0ABFC; }
+.punc { color: #94A3B8; }
+.tool-name { color: #FCA5A5; font-weight: 600; }
+.output { color: #64748B; font-style: italic; }
+.path { color: #FDBA74; }
+.flag { color: #67E8F9; }
+
+/* Inline code */
+code {
+  background: var(--bg-code);
+  color: var(--primary);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.88em;
+}
+[data-theme="dark"] code {
+  background: #1E293B;
+}
+.code-block code {
+  background: none;
+  color: inherit;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+  white-space: pre-wrap;
+  display: block;
+}
+
+/* ============================================
+   CALLOUT BOXES (with top gradient accent)
+   ============================================ */
+.callout {
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  margin: 20px 0;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-xs);
+}
+.callout::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+}
+.callout-icon {
+  flex-shrink: 0;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+.callout-content { flex: 1; }
+.callout-content p { margin-bottom: 6px; color: inherit; }
+.callout-content p:last-child { margin-bottom: 0; }
+
+.callout.info {
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  color: #1E40AF;
+}
+.callout.info::before { background: linear-gradient(90deg, #3B82F6, #60A5FA); }
+
+.callout.tip {
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  color: #166534;
+}
+.callout.tip::before { background: linear-gradient(90deg, #10B981, #34D399); }
+
+.callout.warning {
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  color: #92400E;
+}
+.callout.warning::before { background: linear-gradient(90deg, #F59E0B, #FBBF24); }
+
+.callout.important {
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  color: #991B1B;
+}
+.callout.important::before { background: linear-gradient(90deg, #EF4444, #F87171); }
+
+[data-theme="dark"] .callout.info {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: #93C5FD;
+}
+[data-theme="dark"] .callout.tip {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #6EE7B7;
+}
+[data-theme="dark"] .callout.warning {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #FCD34D;
+}
+[data-theme="dark"] .callout.important {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #FCA5A5;
+}
+
+/* ============================================
+   TOOL CARDS (with top gradient accent)
+   ============================================ */
+.tool-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin: 24px 0;
+  transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.tool-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+.tool-card:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-md);
+}
+.tool-card:hover::before {
+  opacity: 1;
+}
+.tool-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.tool-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-xs);
+}
+.tool-icon.read { background: #DBEAFE; color: #2563EB; }
+.tool-icon.write { background: #D1FAE5; color: #059669; }
+.tool-icon.edit { background: #FEF3C7; color: #D97706; }
+.tool-icon.bash { background: #E0E7FF; color: #4F46E5; }
+.tool-icon.glob { background: #FCE7F3; color: #DB2777; }
+.tool-icon.grep { background: #CCFBF1; color: #0D9488; }
+.tool-icon.agent { background: #EDE9FE; color: #7C3AED; }
+.tool-icon.web { background: #FFF7ED; color: #EA580C; }
+
+[data-theme="dark"] .tool-icon.read { background: #1E3A5F; }
+[data-theme="dark"] .tool-icon.write { background: #064E3B; }
+[data-theme="dark"] .tool-icon.edit { background: #451A03; }
+[data-theme="dark"] .tool-icon.bash { background: #312E81; }
+[data-theme="dark"] .tool-icon.glob { background: #500724; }
+[data-theme="dark"] .tool-icon.grep { background: #042F2E; }
+[data-theme="dark"] .tool-icon.agent { background: #3B0764; }
+[data-theme="dark"] .tool-icon.web { background: #431407; }
+
+.tool-card-header h4 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text);
+}
+.tool-card-header .tool-tag {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-code);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.tool-card p {
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+.tool-card ul {
+  padding-left: 20px;
+  margin-bottom: 12px;
+}
+.tool-card li {
+  margin-bottom: 6px;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+}
+
+/* ============================================
+   COMPARISON TABLE
+   ============================================ */
+.comparison-table-wrapper {
+  overflow-x: auto;
+  margin: 20px 0;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+}
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.comparison-table th {
+  background: var(--primary);
+  color: white;
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+.comparison-table th:first-child {
+  border-radius: var(--radius-sm) 0 0 0;
+}
+.comparison-table th:last-child {
+  border-radius: 0 var(--radius-sm) 0 0;
+}
+.comparison-table td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+.comparison-table tr:nth-child(even) td {
+  background: var(--bg);
+}
+.comparison-table tr:last-child td:first-child {
+  border-radius: 0 0 0 var(--radius-sm);
+}
+.comparison-table tr:last-child td:last-child {
+  border-radius: 0 0 var(--radius-sm) 0;
+}
+
+/* ============================================
+   STEP-BY-STEP
+   ============================================ */
+.step-list {
+  counter-reset: step-counter;
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+.step-item {
+  counter-increment: step-counter;
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+  transition: box-shadow var(--transition), transform var(--transition);
+}
+.step-item:hover {
+  box-shadow: var(--shadow-md);
+}
+.step-item::before {
+  content: counter(step-counter);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-glow);
+}
+.step-content h4 {
+  margin-top: 0;
+  margin-bottom: 6px;
+}
+.step-content p {
+  margin-bottom: 8px;
+}
+
+/* ============================================
+   SVG DIAGRAM
+   ============================================ */
+.loop-diagram {
+  margin: 32px auto;
+  padding: 32px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow-x: auto;
+  box-shadow: var(--shadow);
+}
+.loop-diagram svg {
+  display: block;
+  margin: 0 auto;
+}
+
+/* ============================================
+   CLI SIMULATOR
+   ============================================ */
+.cli-simulator {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0;
+  margin: 32px 0;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+.cli-simulator-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #1a1a2e;
+  border-bottom: 1px solid #2a2a4e;
+}
+.cli-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+.cli-dot.red { background: #FF5F57; }
+.cli-dot.yellow { background: #FEBC2E; }
+.cli-dot.green { background: #28C840; }
+.cli-simulator-title {
+  flex: 1;
+  text-align: center;
+  font-size: 0.8rem;
+  color: #8888aa;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+.cli-clear-btn {
+  background: rgba(255,255,255,0.08);
+  border: none;
+  color: #8888aa;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  transition: all var(--transition);
+}
+.cli-clear-btn:hover { background: rgba(255,255,255,0.15); color: #ccccee; }
+
+.cli-output-area {
+  background: #1a1a2e;
+  min-height: 300px;
+  max-height: 500px;
+  overflow-y: auto;
+  padding: 16px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+.cli-output-area::-webkit-scrollbar {
+  width: 6px;
+}
+.cli-output-area::-webkit-scrollbar-track {
+  background: transparent;
+}
+.cli-output-area::-webkit-scrollbar-thumb {
+  background: #3a3a5e;
+  border-radius: 3px;
+}
+
+.cli-line {
+  margin-bottom: 4px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+.cli-line.prompt-line { color: #6EE7B7; }
+.cli-line.output-line { color: #c8c8e0; }
+.cli-line.welcome-line { color: #A78BFA; }
+
+.cli-input-area {
+  display: flex;
+  align-items: center;
+  background: #12122a;
+  border-top: 1px solid #2a2a4e;
+  padding: 12px 16px;
+}
+.cli-prompt-symbol {
+  color: #6EE7B7;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.85rem;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+.cli-input {
+  flex: 1;
+  background: none;
+  border: none;
+  color: #E2E8F0;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.85rem;
+  outline: none;
+  caret-color: #6EE7B7;
+}
+.cli-input::placeholder {
+  color: #4a4a6e;
+}
+
+.cli-suggestions {
+  padding: 8px 16px;
+  background: #12122a;
+  border-top: 1px solid #2a2a4e;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.cli-suggestion {
+  background: rgba(124,58,237,0.15);
+  border: 1px solid rgba(124,58,237,0.3);
+  color: #A78BFA;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  transition: all var(--transition-spring);
+}
+.cli-suggestion:hover {
+  background: rgba(124,58,237,0.25);
+  border-color: rgba(124,58,237,0.5);
+  transform: translateY(-1px);
+}
+
+/* ============================================
+   INTERACTIVE: TOOL PICKER QUIZ
+   ============================================ */
+.quiz-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+.quiz-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+}
+.quiz-container h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.quiz-score-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 12px 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+}
+.quiz-score-bar .score-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.quiz-score-track {
+  flex: 1;
+  height: 8px;
+  background: var(--bg-code);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.quiz-score-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--success));
+  border-radius: 4px;
+  transition: width 0.4s ease;
+  width: 0%;
+}
+.quiz-score-text {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  min-width: 50px;
+  text-align: right;
+}
+
+.quiz-question {
+  margin-bottom: 24px;
+  padding: 20px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  transition: border-color 0.3s ease;
+}
+.quiz-question.correct { border-color: var(--success); }
+.quiz-question.incorrect { border-color: var(--error); }
+
+.quiz-q-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.quiz-q-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  font-weight: 700;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+.quiz-q-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.quiz-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.quiz-option {
+  padding: 10px 14px;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-spring);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text);
+  text-align: center;
+  user-select: none;
+}
+.quiz-option:hover:not(.disabled) {
+  border-color: var(--primary-light);
+  background: rgba(124, 58, 237, 0.05);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.quiz-option.selected {
+  border-color: var(--primary);
+  background: rgba(124, 58, 237, 0.1);
+  color: var(--primary);
+}
+.quiz-option.correct-answer {
+  border-color: var(--success);
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+[data-theme="dark"] .quiz-option.correct-answer {
+  color: #6EE7B7;
+}
+.quiz-option.wrong-answer {
+  border-color: var(--error);
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+}
+.quiz-option.disabled {
+  cursor: default;
+  opacity: 0.7;
+  transform: none !important;
+  box-shadow: none !important;
+}
+.quiz-option.disabled:not(.correct-answer):not(.wrong-answer) {
+  opacity: 0.5;
+}
+
+.quiz-feedback {
+  margin-top: 10px;
+  font-size: 0.85rem;
+  padding: 8px 12px;
+  border-radius: 6px;
+  display: none;
+}
+.quiz-feedback.show { display: block; }
+.quiz-feedback.correct {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+.quiz-feedback.incorrect {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+}
+[data-theme="dark"] .quiz-feedback.correct { color: #6EE7B7; }
+[data-theme="dark"] .quiz-feedback.incorrect { color: #FCA5A5; }
+
+/* ============================================
+   INTERACTIVE: CONTEXT BUDGET CALCULATOR
+   ============================================ */
+.context-calc {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+.context-calc::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--success));
+}
+
+.context-budget-visual {
+  margin: 24px 0;
+  position: relative;
+}
+.budget-bar {
+  width: 100%;
+  height: 48px;
+  background: var(--bg-code);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  position: relative;
+}
+.budget-fill {
+  height: 100%;
+  transition: width 0.4s ease;
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+}
+.budget-fill.safe { background: linear-gradient(90deg, #10B981, #34D399); }
+.budget-fill.moderate { background: linear-gradient(90deg, #F59E0B, #FBBF24); }
+.budget-fill.danger { background: linear-gradient(90deg, #EF4444, #F87171); }
+.budget-label {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.budget-fill-label {
+  padding-left: 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: white;
+  white-space: nowrap;
+}
+
+.context-items {
+  margin: 20px 0;
+}
+.context-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.context-item:last-child { border-bottom: none; }
+.context-item-label {
+  flex: 1;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+.context-item-tokens {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  min-width: 80px;
+  text-align: right;
+}
+.context-item-slider {
+  width: 120px;
+}
+.context-item-slider input[type="range"] {
+  width: 100%;
+  accent-color: var(--primary);
+}
+.context-item-count {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary);
+  min-width: 24px;
+  text-align: center;
+}
+
+.budget-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  margin-top: 16px;
+}
+.budget-summary-label {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+.budget-summary-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+.budget-summary-value.safe { color: var(--success); }
+.budget-summary-value.moderate { color: var(--warning); }
+.budget-summary-value.danger { color: var(--error); }
+
+/* ============================================
+   CLAUDE.MD BUILDER
+   ============================================ */
+.claudemd-builder {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin: 32px 0;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  position: relative;
+}
+.claudemd-builder::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--primary-light));
+  z-index: 1;
+}
+.claudemd-builder-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.claudemd-builder-header h3 {
+  margin: 0 0 4px;
+  font-size: 1.15rem;
+}
+.claudemd-builder-header p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.claudemd-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 400px;
+}
+.claudemd-form {
+  padding: 24px;
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  max-height: 550px;
+}
+.claudemd-form label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+  margin-top: 16px;
+}
+.claudemd-form label:first-child {
+  margin-top: 0;
+}
+.claudemd-form input[type="text"],
+.claudemd-form textarea {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 0.88rem;
+  transition: border-color var(--transition);
+  outline: none;
+}
+.claudemd-form input[type="text"]:focus,
+.claudemd-form textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(124,58,237,0.1);
+}
+.claudemd-form textarea {
+  min-height: 70px;
+  resize: vertical;
+}
+.claudemd-checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+.claudemd-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  transition: all var(--transition-spring);
+  user-select: none;
+}
+.claudemd-checkbox:hover {
+  border-color: var(--primary-light);
+}
+.claudemd-checkbox input {
+  accent-color: var(--primary);
+}
+.claudemd-checkbox.checked {
+  background: rgba(124,58,237,0.08);
+  border-color: var(--primary-light);
+  color: var(--primary);
+}
+
+.claudemd-preview {
+  position: relative;
+  background: #1E293B;
+  overflow-y: auto;
+  max-height: 550px;
+}
+.claudemd-preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: #151d2e;
+  border-bottom: 1px solid #2a3a50;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.claudemd-preview-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #8888aa;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+.claudemd-copy-btn {
+  background: rgba(255,255,255,0.08);
+  border: none;
+  color: #8888aa;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  transition: all var(--transition);
+}
+.claudemd-copy-btn:hover { background: rgba(255,255,255,0.15); color: #ccccee; }
+.claudemd-copy-btn.copied { background: var(--success); color: white; }
+
+.claudemd-preview-content {
+  padding: 16px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.82rem;
+  line-height: 1.7;
+  color: #E2E8F0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* ============================================
+   INTERACTIVE: END-OF-MODULE QUIZ
+   ============================================ */
+.final-quiz {
+  background: var(--bg-card);
+  border: 2px solid var(--primary-light);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  box-shadow: var(--shadow-glow);
+  position: relative;
+  overflow: hidden;
+}
+.final-quiz::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--primary-light), var(--accent));
+}
+.final-quiz h3 {
+  margin-top: 0;
+}
+
+.final-quiz-question {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.final-quiz-question .fq-number {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+.final-quiz-question .fq-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+.fq-options { list-style: none; padding: 0; }
+.fq-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 12px;
+  margin-bottom: 4px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+.fq-option:hover { background: rgba(124, 58, 237, 0.05); }
+.fq-option input[type="radio"] {
+  accent-color: var(--primary);
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+.fq-option.selected-correct {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+.fq-option.selected-wrong {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+}
+.fq-option.reveal-correct {
+  background: rgba(16, 185, 129, 0.08);
+  color: #059669;
+  font-weight: 600;
+}
+[data-theme="dark"] .fq-option.selected-correct { color: #6EE7B7; }
+[data-theme="dark"] .fq-option.selected-wrong { color: #FCA5A5; }
+[data-theme="dark"] .fq-option.reveal-correct { color: #6EE7B7; }
+
+.final-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 32px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-spring);
+  margin-top: 8px;
+  box-shadow: var(--shadow);
+}
+.final-submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+}
+.final-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.final-result {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: var(--radius-sm);
+  display: none;
+}
+.final-result.show { display: block; }
+.final-result.pass {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.final-result.fail {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.final-result h4 {
+  margin-top: 0;
+  margin-bottom: 6px;
+  font-size: 1.1rem;
+}
+.final-result p {
+  margin-bottom: 0;
+  font-size: 0.95rem;
+}
+.final-result.pass h4 { color: var(--success); }
+.final-result.fail h4 { color: var(--warning); }
+
+/* ============================================
+   NAVIGATION FOOTER
+   ============================================ */
+.module-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 16px;
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 2px solid var(--border);
+}
+.nav-link {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: all var(--transition-spring);
+  min-width: 0;
+  flex: 1;
+  max-width: 50%;
+  box-shadow: var(--shadow-xs);
+}
+.nav-link:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+.nav-link.next { align-items: flex-end; text-align: right; }
+.nav-link .nav-dir {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--primary);
+}
+.nav-link .nav-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 1024px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .hamburger {
+    display: flex;
+  }
+  .sidebar-overlay.show {
+    display: block;
+  }
+  .main-content {
+    margin-left: 0;
+  }
+  .theme-toggle {
+    right: 16px;
+  }
+  .claudemd-split {
+    grid-template-columns: 1fr;
+  }
+  .claudemd-form {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    max-height: none;
+  }
+  .claudemd-preview {
+    max-height: 350px;
+  }
+}
+
+@media (max-width: 640px) {
+  .content-wrapper {
+    padding: 24px 16px 60px;
+  }
+  .module-header h1 {
+    font-size: 1.6rem;
+  }
+  .section-heading {
+    font-size: 1.3rem;
+  }
+  .quiz-options {
+    grid-template-columns: 1fr;
+  }
+  .module-nav {
+    flex-direction: column;
+  }
+  .nav-link {
+    max-width: 100%;
+  }
+  .nav-link.next {
+    align-items: flex-start;
+    text-align: left;
+  }
+  .context-item {
+    flex-wrap: wrap;
+  }
+  .context-item-slider {
+    width: 100%;
+    order: 4;
+  }
+}
+
+/* ============================================
+   SCROLLBAR STYLING
+   ============================================ */
+.sidebar::-webkit-scrollbar,
+.code-block::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.sidebar::-webkit-scrollbar-track,
+.code-block::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+.code-block::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.section {
+  animation: fadeInUp 0.4s ease both;
+}
+
+/* Key concept highlight */
+.key-concept {
+  display: inline-block;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(6, 182, 212, 0.1));
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  color: var(--primary);
+}
+[data-theme="dark"] .key-concept {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(6, 182, 212, 0.15));
+  border-color: rgba(124, 58, 237, 0.35);
+}
+
+/* Blinking cursor */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.cli-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 16px;
+  background: #6EE7B7;
+  animation: blink 1s step-end infinite;
+  vertical-align: middle;
+  margin-left: 2px;
+}
+</style>
+</head>
+<body>
+<!-- ============================================
+     THEME TOGGLE
+     ============================================ -->
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+  <span id="themeIcon">&#9790;</span>
+</button>
+
+<!-- ============================================
+     HAMBURGER (mobile)
+     ============================================ -->
+<button class="hamburger" id="hamburger" aria-label="Toggle sidebar">
+  <span></span>
+  <span></span>
+  <span></span>
+</button>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ============================================
+     SIDEBAR
+     ============================================ -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="../index.html" class="sidebar-back">&larr; Back to Hub</a>
+    <div class="sidebar-title">Module 03</div>
+    <div class="sidebar-module-name">Claude Code Introduction</div>
+  </div>
+
+  <div class="sidebar-nav">
+    <!-- Section: Getting Started -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="getting-started">
+        Getting Started <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-getting-started">
+        <li><a href="#getting-started" class="sidebar-link" data-target="getting-started">Getting Started</a></li>
+        <li><a href="#agentic-loop" class="sidebar-link" data-target="agentic-loop">The Agentic Loop</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Core Tools -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="tools">
+        Core Tools <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-tools">
+        <li><a href="#core-tools" class="sidebar-link" data-target="core-tools">Tools Arsenal</a></li>
+        <li><a href="#tool-read" class="sidebar-link" data-target="tool-read">Read</a></li>
+        <li><a href="#tool-write" class="sidebar-link" data-target="tool-write">Write</a></li>
+        <li><a href="#tool-edit" class="sidebar-link" data-target="tool-edit">Edit</a></li>
+        <li><a href="#tool-bash" class="sidebar-link" data-target="tool-bash">Bash</a></li>
+        <li><a href="#tool-glob" class="sidebar-link" data-target="tool-glob">Glob</a></li>
+        <li><a href="#tool-grep" class="sidebar-link" data-target="tool-grep">Grep</a></li>
+        <li><a href="#tool-agent" class="sidebar-link" data-target="tool-agent">Agent</a></li>
+        <li><a href="#tool-web" class="sidebar-link" data-target="tool-web">WebSearch / WebFetch</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Workflows -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="workflows">
+        Workflows <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-workflows">
+        <li><a href="#exploration-patterns" class="sidebar-link" data-target="exploration-patterns">Exploration Patterns</a></li>
+        <li><a href="#making-changes" class="sidebar-link" data-target="making-changes">Making Changes</a></li>
+        <li><a href="#context-management" class="sidebar-link" data-target="context-management">Context Window</a></li>
+        <li><a href="#claude-md" class="sidebar-link" data-target="claude-md">CLAUDE.md</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Exercises -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="exercises">
+        Exercises <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-exercises">
+        <li><a href="#cli-simulator" class="sidebar-link" data-target="cli-simulator">CLI Simulator</a></li>
+        <li><a href="#tool-picker-quiz" class="sidebar-link" data-target="tool-picker-quiz">Tool Picker Quiz</a></li>
+        <li><a href="#context-calculator" class="sidebar-link" data-target="context-calculator">Context Calculator</a></li>
+        <li><a href="#claudemd-builder" class="sidebar-link" data-target="claudemd-builder">CLAUDE.md Builder</a></li>
+        <li><a href="#final-quiz" class="sidebar-link" data-target="final-quiz">End-of-Module Quiz</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sidebar-progress">
+    <div class="sidebar-progress-label">Module Progress</div>
+    <div class="sidebar-progress-track">
+      <div class="sidebar-progress-fill" id="sidebarProgressFill"></div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================
+     MAIN CONTENT
+     ============================================ -->
+<main class="main-content">
+  <div class="content-wrapper">
+
+    <!-- Module Header -->
+    <header class="module-header">
+      <div class="breadcrumb">
+        <a href="../index.html">Training Hub</a> &raquo; Module 03
+      </div>
+      <div class="module-badge">
+        <span class="number">3</span>
+        <span class="label">Beginner</span>
+      </div>
+      <h1>Claude Code -- Your AI Pair Programmer</h1>
+      <p class="description">
+        Learn how to use Claude Code, an AI coding assistant that lives in your terminal. It reads files, writes code,
+        runs commands, and executes multi-step tasks autonomously. This module covers installation, the core tools,
+        effective workflows, and hands-on practice with a CLI simulator.
+      </p>
+      <div class="module-meta">
+        <span class="module-meta-item">&#9201; ~75 min</span>
+        <span class="module-meta-item">&#128218; Beginner</span>
+        <span class="module-meta-item">&#127891; Everyone</span>
+        <span class="module-meta-item">&#127919; 4 Interactive Exercises</span>
+      </div>
+    </header>
+
+    <!-- ========================================
+         SECTION 1: GETTING STARTED
+         ======================================== -->
+    <section class="section" id="getting-started">
+      <h2 class="section-heading">1. Getting Started with Claude Code</h2>
+
+      <p>
+        <strong>Claude Code</strong> is an AI coding assistant that lives in your terminal. It is not a chatbot and
+        it is not an autocomplete plugin. It is an <span class="key-concept">autonomous agent</span> that can read
+        your files, write code, run commands, search your codebase, and manage complex multi-step tasks -- all while
+        reasoning about the best approach.
+      </p>
+
+      <p>
+        Think of it as a highly skilled pair programmer who sits inside your terminal, has deep knowledge of
+        software engineering, and can actually touch your files and run your tools. You describe <em>what</em>
+        you want, and Claude figures out <em>how</em> to accomplish it.
+      </p>
+
+      <h3>What Makes Claude Code Different?</h3>
+
+      <p>
+        Unlike browser-based AI chat tools where you copy-paste code, or IDE extensions that offer line-level
+        suggestions, Claude Code operates on your actual project. It has full access to your filesystem,
+        can run any command in your terminal, and executes multi-step workflows autonomously.
+      </p>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Capability</th>
+              <th>Browser AI Chat</th>
+              <th>IDE Autocomplete</th>
+              <th>Claude Code</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Where it runs</strong></td>
+              <td>Browser tab</td>
+              <td>IDE extension</td>
+              <td>Your terminal (local machine)</td>
+            </tr>
+            <tr>
+              <td><strong>Read your files</strong></td>
+              <td>Only if you paste them</td>
+              <td>Current file + neighbors</td>
+              <td>Any file on your filesystem</td>
+            </tr>
+            <tr>
+              <td><strong>Write/edit files</strong></td>
+              <td>No -- you copy/paste</td>
+              <td>Inline suggestions only</td>
+              <td>Yes -- creates, edits, overwrites</td>
+            </tr>
+            <tr>
+              <td><strong>Run commands</strong></td>
+              <td>No</td>
+              <td>No</td>
+              <td>Yes -- full shell access</td>
+            </tr>
+            <tr>
+              <td><strong>Multi-step tasks</strong></td>
+              <td>Manual back-and-forth</td>
+              <td>Single completions</td>
+              <td>Autonomous multi-step execution</td>
+            </tr>
+            <tr>
+              <td><strong>Codebase search</strong></td>
+              <td>No</td>
+              <td>Limited</td>
+              <td>Grep, Glob, full regex</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Installation</h3>
+
+      <p>
+        Getting started requires Node.js (v18 or later). Install Claude Code globally via npm:
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Terminal</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm"># Install Claude Code globally</span>
+<span class="fn">npm</span> <span class="flag">install</span> <span class="flag">-g</span> <span class="str">@anthropic-ai/claude-code</span>
+
+<span class="cm"># Verify installation</span>
+<span class="fn">claude</span> <span class="flag">--version</span></code></div>
+
+      <h3>First Launch</h3>
+
+      <p>
+        Navigate to any project directory and type <code>claude</code>. That is it. Claude Code will start,
+        read your project's <code>CLAUDE.md</code> file (if one exists), and present an interactive prompt
+        where you type natural-language requests.
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Terminal</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm"># Start Claude Code in your project</span>
+<span class="fn">cd</span> <span class="path">~/my-project</span>
+<span class="fn">claude</span>
+
+<span class="cm"># Or run a one-shot command</span>
+<span class="fn">claude</span> <span class="str">"What does this project do?"</span></code></div>
+
+      <p>
+        The interactive prompt is where you type requests and watch Claude work. You can ask it to explore
+        the project, fix bugs, add features, run tests, create files, and more.
+      </p>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>Quick demo:</strong> Try running <code>claude "What does this project do?"</code> in any
+          project directory. Claude will read key files (package.json, README, entry points) and give you a
+          comprehensive overview -- without you needing to specify which files to read.</p>
+        </div>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-icon">&#9432;</span>
+        <div class="callout-content">
+          <p><strong>Note:</strong> Claude Code requires an Anthropic API key set as the environment variable
+          <code>ANTHROPIC_API_KEY</code>. Your organization may provide this through a centralized configuration.
+          Check with your team lead if you are unsure.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 2: THE AGENTIC LOOP
+         ======================================== -->
+    <section class="section" id="agentic-loop">
+      <h2 class="section-heading">2. The Agentic Loop -- How Claude Code Thinks</h2>
+
+      <p>
+        Understanding how Claude Code works under the hood is essential to using it effectively. Claude Code
+        operates through a <span class="key-concept">tool-use loop</span> -- a cycle of observing, thinking,
+        acting, and observing results that repeats until the task is complete.
+      </p>
+
+      <h3>The Core Loop: Observe, Think, Act, Repeat</h3>
+
+      <p>
+        Claude does not just answer your question and stop. It <strong>plans</strong>, <strong>executes</strong>,
+        <strong>observes results</strong>, and <strong>adjusts</strong>. Each interaction follows this pattern:
+      </p>
+
+      <ol>
+        <li><strong>Observe</strong> -- Claude receives your request or the output from a previous tool call.</li>
+        <li><strong>Think</strong> -- Claude analyzes the situation and decides what needs to happen next.</li>
+        <li><strong>Act</strong> -- Claude picks the right tool and executes it with the appropriate parameters.</li>
+        <li><strong>Observe results</strong> -- Claude reads the tool's output (file contents, command output, search results).</li>
+        <li><strong>Repeat or respond</strong> -- If the task is not done, loop back to step 2. If done, present the result.</li>
+      </ol>
+
+      <!-- SVG Diagram -->
+      <div class="loop-diagram">
+        <svg viewBox="0 0 700 280" width="100%" height="280" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;">
+          <defs>
+            <marker id="arrowPurple" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+              <polygon points="0 0, 10 3.5, 0 7" fill="#7C3AED"/>
+            </marker>
+            <marker id="arrowCyan" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+              <polygon points="0 0, 10 3.5, 0 7" fill="#06B6D4"/>
+            </marker>
+          </defs>
+
+          <!-- Observe -->
+          <rect x="20" y="100" width="120" height="60" rx="12" fill="#F59E0B" opacity="0.15" stroke="#F59E0B" stroke-width="2"/>
+          <text x="80" y="126" text-anchor="middle" fill="#F59E0B" font-weight="700" font-size="15" font-family="system-ui">Observe</text>
+          <text x="80" y="146" text-anchor="middle" fill="#F59E0B" font-size="11" font-family="system-ui" opacity="0.8">Read context</text>
+
+          <!-- Think -->
+          <rect x="180" y="100" width="120" height="60" rx="12" fill="#7C3AED" opacity="0.15" stroke="#7C3AED" stroke-width="2"/>
+          <text x="240" y="126" text-anchor="middle" fill="#7C3AED" font-weight="700" font-size="15" font-family="system-ui">Think</text>
+          <text x="240" y="146" text-anchor="middle" fill="#7C3AED" font-size="11" font-family="system-ui" opacity="0.8">Reason &amp; plan</text>
+
+          <!-- Act -->
+          <rect x="340" y="100" width="120" height="60" rx="12" fill="#10B981" opacity="0.15" stroke="#10B981" stroke-width="2"/>
+          <text x="400" y="126" text-anchor="middle" fill="#10B981" font-weight="700" font-size="15" font-family="system-ui">Act</text>
+          <text x="400" y="146" text-anchor="middle" fill="#10B981" font-size="11" font-family="system-ui" opacity="0.8">Use a tool</text>
+
+          <!-- Observe Results -->
+          <rect x="500" y="100" width="140" height="60" rx="12" fill="#06B6D4" opacity="0.15" stroke="#06B6D4" stroke-width="2"/>
+          <text x="570" y="126" text-anchor="middle" fill="#06B6D4" font-weight="700" font-size="14" font-family="system-ui">Observe</text>
+          <text x="570" y="146" text-anchor="middle" fill="#06B6D4" font-size="11" font-family="system-ui" opacity="0.8">Read results</text>
+
+          <!-- Arrows -->
+          <line x1="140" y1="130" x2="178" y2="130" stroke="#F59E0B" stroke-width="2" marker-end="url(#arrowPurple)"/>
+          <line x1="300" y1="130" x2="338" y2="130" stroke="#7C3AED" stroke-width="2" marker-end="url(#arrowCyan)"/>
+          <line x1="460" y1="130" x2="498" y2="130" stroke="#10B981" stroke-width="2" marker-end="url(#arrowCyan)"/>
+
+          <!-- Loop-back arrow -->
+          <path d="M 570 160 Q 570 220 400 230 Q 240 240 80 230 Q 40 228 40 200 L 40 165"
+                fill="none" stroke="#06B6D4" stroke-width="2" stroke-dasharray="6 3"
+                marker-end="url(#arrowPurple)"/>
+          <text x="310" y="260" text-anchor="middle" fill="#06B6D4" font-size="12" font-family="system-ui" font-weight="600">
+            Repeat until complete
+          </text>
+
+          <!-- User input -->
+          <rect x="250" y="20" width="200" height="44" rx="10" fill="#EF4444" opacity="0.1" stroke="#EF4444" stroke-width="1.5" stroke-dasharray="4 3"/>
+          <text x="350" y="47" text-anchor="middle" fill="#EF4444" font-size="12" font-family="system-ui" font-weight="600">You: "Add error handling"</text>
+          <line x1="260" y1="56" x2="100" y2="98" stroke="#EF4444" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arrowPurple)"/>
+
+          <!-- Done -->
+          <rect x="560" y="20" width="120" height="44" rx="10" fill="#10B981" opacity="0.1" stroke="#10B981" stroke-width="1.5"/>
+          <text x="620" y="40" text-anchor="middle" fill="#10B981" font-size="12" font-family="system-ui" font-weight="600">Done!</text>
+          <text x="620" y="55" text-anchor="middle" fill="#10B981" font-size="10" font-family="system-ui" opacity="0.8">Present results</text>
+        </svg>
+      </div>
+
+      <h3>Example Walkthrough</h3>
+
+      <p>
+        Suppose you ask: <em>"Add error handling to the login function."</em> Here is what the agentic loop looks like:
+      </p>
+
+      <div class="step-list">
+        <div class="step-item">
+          <div class="step-content">
+            <h4>You ask Claude</h4>
+            <p>"Add error handling to the login function."</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Claude uses Glob to find login files</h4>
+            <p><code>Glob: **/*login*</code> -- Finds <code>src/auth/login.ts</code>, <code>src/auth/login.test.ts</code></p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Claude uses Read to examine the function</h4>
+            <p><code>Read: src/auth/login.ts</code> -- Reads the file and understands the current code structure.</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Claude uses Edit to add try/catch blocks</h4>
+            <p><code>Edit: src/auth/login.ts</code> -- Adds error handling with proper error types and logging.</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Claude uses Bash to run tests and verify</h4>
+            <p><code>Bash: npm test -- --testPathPattern login</code> -- Runs tests to ensure nothing broke.</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Claude reports results to you</h4>
+            <p>"Added error handling to the login function in src/auth/login.ts. All 8 tests pass."</p>
+          </div>
+        </div>
+      </div>
+
+      <h3>The Permission System</h3>
+
+      <p>
+        Claude Code does not execute tools silently. Every tool call requires your permission unless it has been
+        pre-approved in your settings. When Claude wants to use a tool, you will see the tool name and parameters,
+        and you can approve or reject:
+      </p>
+
+      <ul>
+        <li><strong>Approve</strong> the action (press Enter or type "y")</li>
+        <li><strong>Reject</strong> the action (type "n") -- Claude will re-plan</li>
+        <li><strong>Auto-approve</strong> certain tools via settings for faster workflows</li>
+      </ul>
+
+      <div class="callout warning">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>You stay in control:</strong> Even though Claude is powerful, always review tool calls before
+          approving -- especially Bash commands that could modify files, install packages, or interact with
+          production systems. Trust, but verify.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 1: CLI SIMULATOR
+         ======================================== -->
+    <section class="section" id="cli-simulator">
+      <h2 class="section-heading">Try It: CLI Simulator</h2>
+
+      <p>
+        Experience Claude Code without installing it. Type commands in the terminal below and see
+        realistic simulated output. Try any of the suggested commands, or type your own.
+      </p>
+
+      <div class="cli-simulator" id="cliSimulator">
+        <div class="cli-simulator-header">
+          <span class="cli-dot red"></span>
+          <span class="cli-dot yellow"></span>
+          <span class="cli-dot green"></span>
+          <span class="cli-simulator-title">Claude Code v2.1 -- ~/my-project</span>
+          <button class="cli-clear-btn" id="cliClearBtn">Clear</button>
+        </div>
+        <div class="cli-output-area" id="cliOutput">
+          <div class="cli-line welcome-line">Welcome to the Claude Code Simulator!</div>
+          <div class="cli-line welcome-line">Type a command below, or click one of the suggestions.</div>
+          <div class="cli-line welcome-line">&nbsp;</div>
+        </div>
+        <div class="cli-suggestions" id="cliSuggestions">
+          <button class="cli-suggestion" data-cmd="claude">claude</button>
+          <button class="cli-suggestion" data-cmd='claude "what does this project do?"'>claude "what does this project do?"</button>
+          <button class="cli-suggestion" data-cmd='claude "find all test files"'>claude "find all test files"</button>
+          <button class="cli-suggestion" data-cmd='claude "run the tests"'>claude "run the tests"</button>
+          <button class="cli-suggestion" data-cmd='claude "fix the failing test"'>claude "fix the failing test"</button>
+          <button class="cli-suggestion" data-cmd="/help">/help</button>
+          <button class="cli-suggestion" data-cmd="/status">/status</button>
+          <button class="cli-suggestion" data-cmd='claude "add a health check endpoint"'>claude "add a health check"</button>
+        </div>
+        <div class="cli-input-area">
+          <span class="cli-prompt-symbol">$ </span>
+          <input type="text" class="cli-input" id="cliInput" placeholder="Type a command..." autocomplete="off">
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 3: THE CORE TOOLS ARSENAL
+         ======================================== -->
+    <section class="section" id="core-tools">
+      <h2 class="section-heading">3. The Core Tools Arsenal</h2>
+
+      <p>
+        Claude Code has eight built-in tools. Each one is purpose-built for specific operations. Understanding
+        when and how to use each tool is the foundation of working effectively with Claude Code. Here is your
+        complete reference.
+      </p>
+
+      <!-- ----- Read ----- -->
+      <div class="tool-card" id="tool-read">
+        <div class="tool-card-header">
+          <span class="tool-icon read">&#128196;</span>
+          <h4>Read</h4>
+          <span class="tool-tag">File I/O</span>
+        </div>
+        <p>
+          Reads a file from the local filesystem and returns its contents with line numbers. This is Claude's
+          primary way to understand existing code. It can read text files, images (Claude is multimodal),
+          PDFs, and Jupyter notebooks.
+        </p>
+        <h4>When to use it</h4>
+        <ul>
+          <li>Understanding an existing file's structure and contents</li>
+          <li>Reviewing code before making edits (required before Write on existing files)</li>
+          <li>Reading configuration files, logs, or documentation</li>
+          <li>Viewing images, screenshots, PDFs, or notebooks</li>
+        </ul>
+        <h4>Key parameters</h4>
+        <ul>
+          <li><code>file_path</code> (required) -- absolute path to the file</li>
+          <li><code>offset</code> -- start reading from this line number (for large files)</li>
+          <li><code>limit</code> -- only read this many lines</li>
+          <li><code>pages</code> -- page range for PDFs (e.g., "1-5")</li>
+        </ul>
+        <h4>Example</h4>
+        <div class="code-block">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm"># Read an entire file</span>
+<span class="tool-name">Read:</span> file_path=<span class="path">/src/auth/login.ts</span>
+
+<span class="output">  1  import { hash, compare } from 'bcrypt';</span>
+<span class="output">  2  import { signToken } from './jwt';</span>
+<span class="output">  3  </span>
+<span class="output">  4  export async function login(email: string, password: string) {</span>
+<span class="output">  5    const user = await findUserByEmail(email);</span>
+<span class="output">  6    // ...</span>
+
+<span class="cm"># Read only lines 50-80 of a large file</span>
+<span class="tool-name">Read:</span> file_path=<span class="path">/src/engine.ts</span> offset=<span class="num">50</span> limit=<span class="num">30</span></code></div>
+
+        <div class="callout tip">
+          <span class="callout-icon">&#128161;</span>
+          <div class="callout-content">
+            <p><strong>Pro tip:</strong> For large files, use <code>offset</code> and <code>limit</code> to read
+            only the section you need. This saves tokens in your context window.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ----- Write ----- -->
+      <div class="tool-card" id="tool-write">
+        <div class="tool-card-header">
+          <span class="tool-icon write">&#9997;</span>
+          <h4>Write</h4>
+          <span class="tool-tag">File I/O</span>
+        </div>
+        <p>
+          Creates a new file or completely overwrites an existing file. This is the go-to tool for creating
+          brand-new files from scratch. For modifying existing files, the Edit tool is preferred.
+        </p>
+        <h4>When to use it</h4>
+        <ul>
+          <li>Creating a new file that does not exist yet</li>
+          <li>Completely rewriting a file (rare -- prefer Edit for partial changes)</li>
+          <li>Generating configuration files, new components, or boilerplate</li>
+        </ul>
+        <h4>Example</h4>
+        <div class="code-block">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm"># Creating a new test file</span>
+<span class="tool-name">Write:</span> file_path=<span class="path">/src/auth/login.test.ts</span>
+  content=<span class="str">"import { login } from './login';
+import { describe, it, expect } from 'vitest';
+
+describe('login', () =&gt; {
+  it('should return a token for valid credentials', async () =&gt; {
+    const result = await login('user@test.com', 'password123');
+    expect(result.token).toBeDefined();
+  });
+});"</span></code></div>
+
+        <div class="callout important">
+          <span class="callout-icon">&#9888;</span>
+          <div class="callout-content">
+            <p><strong>Important:</strong> Claude must Read an existing file before it can Write to it. This
+            safeguard ensures Claude understands the current contents before overwriting.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ----- Edit ----- -->
+      <div class="tool-card" id="tool-edit">
+        <div class="tool-card-header">
+          <span class="tool-icon edit">&#128295;</span>
+          <h4>Edit</h4>
+          <span class="tool-tag">File I/O</span>
+        </div>
+        <p>
+          Makes targeted, surgical edits to existing files. Instead of rewriting the whole file, Edit replaces
+          a specific string with a new string. This is the <strong>preferred tool for modifying existing code</strong>
+          because it minimizes the chance of accidentally changing unrelated code.
+        </p>
+        <h4>When to use it</h4>
+        <ul>
+          <li>Fixing a bug in a specific function</li>
+          <li>Adding a new import statement</li>
+          <li>Renaming a variable across a file (with <code>replace_all</code>)</li>
+          <li>Any targeted change to existing code</li>
+        </ul>
+        <h4>Key parameters</h4>
+        <ul>
+          <li><code>file_path</code> (required) -- the file to modify</li>
+          <li><code>old_string</code> (required) -- the exact text to find and replace</li>
+          <li><code>new_string</code> (required) -- the replacement text</li>
+          <li><code>replace_all</code> -- if true, replaces all occurrences (default: false)</li>
+        </ul>
+        <h4>Example</h4>
+        <div class="code-block">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm"># Rename a function</span>
+<span class="tool-name">Edit:</span> file_path=<span class="path">/src/services/user.ts</span>
+  old_string=<span class="str">"function getUserData("</span>
+  new_string=<span class="str">"function fetchUserProfile("</span>
+
+<span class="output">  Applied edit to /src/services/user.ts</span>
+
+<span class="cm"># Rename a variable everywhere in a file</span>
+<span class="tool-name">Edit:</span> file_path=<span class="path">/src/models.ts</span>
+  old_string=<span class="str">"user_name"</span>
+  new_string=<span class="str">"username"</span>
+  replace_all=<span class="kw">true</span>
+
+<span class="output">  Replaced 7 occurrences</span></code></div>
+
+        <div class="callout info">
+          <span class="callout-icon">&#9432;</span>
+          <div class="callout-content">
+            <p><strong>How it works:</strong> The <code>old_string</code> must be unique in the file (unless using
+            <code>replace_all</code>). If it is not unique, the edit will fail. To fix this, include more surrounding
+            context in the old_string.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ----- Bash ----- -->
+      <div class="tool-card" id="tool-bash">
+        <div class="tool-card-header">
+          <span class="tool-icon bash">&#128187;</span>
+          <h4>Bash</h4>
+          <span class="tool-tag">System</span>
+        </div>
+        <p>
+          Executes shell commands and returns their output. This is Claude's interface to the operating system --
+          it can run tests, install packages, manage git, start servers, and anything else you would normally
+          do in a terminal.
+        </p>
+        <h4>When to use it</h4>
+        <ul>
+          <li>Running tests: <code>npm test</code>, <code>pytest</code>, <code>cargo test</code></li>
+          <li>Installing dependencies: <code>npm install</code>, <code>pip install</code></li>
+          <li>Git operations: <code>git status</code>, <code>git diff</code>, <code>git commit</code></li>
+          <li>Building projects: <code>npm run build</code>, <code>make</code></li>
+          <li>Running scripts: <code>python3 script.py</code>, <code>node index.js</code></li>
+        </ul>
+        <h4>Example</h4>
+        <div class="code-block">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm"># Run the test suite</span>
+<span class="tool-name">Bash:</span> command=<span class="str">"npm test"</span>
+
+<span class="output">  PASS  src/tests/auth.test.ts (1.2s)</span>
+<span class="output">  PASS  src/tests/users.test.ts (0.8s)</span>
+<span class="output">  FAIL  src/tests/tasks.test.ts (1.5s)</span>
+<span class="output">  </span>
+<span class="output">  Tests: 1 failed, 2 passed, 3 total</span>
+
+<span class="cm"># Check git status</span>
+<span class="tool-name">Bash:</span> command=<span class="str">"git status"</span></code></div>
+
+        <div class="callout warning">
+          <span class="callout-icon">&#9888;</span>
+          <div class="callout-content">
+            <p><strong>Be mindful:</strong> Bash commands can do anything on your system. Always review commands
+            before approving, especially those involving <code>rm</code>, <code>git push --force</code>,
+            or anything that touches production systems.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ----- Glob ----- -->
+      <div class="tool-card" id="tool-glob">
+        <div class="tool-card-header">
+          <span class="tool-icon glob">&#128269;</span>
+          <h4>Glob</h4>
+          <span class="tool-tag">Search</span>
+        </div>
+        <p>
+          Fast file pattern matching -- finds files by their names and paths. Think of it as a more intuitive
+          <code>find</code> command. It supports glob patterns and returns matching file paths sorted by
+          modification time.
+        </p>
+        <h4>When to use it</h4>
+        <ul>
+          <li>Finding all files of a certain type: <code>**/*.py</code></li>
+          <li>Locating test files: <code>**/*.test.tsx</code></li>
+          <li>Finding config files: <code>**/tsconfig*.json</code></li>
+          <li>Understanding project structure before diving into code</li>
+        </ul>
+        <h4>Example</h4>
+        <div class="code-block">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm"># Find all TypeScript React components</span>
+<span class="tool-name">Glob:</span> pattern=<span class="str">"src/**/*.tsx"</span>
+
+<span class="output">  src/App.tsx</span>
+<span class="output">  src/components/Header.tsx</span>
+<span class="output">  src/components/Sidebar.tsx</span>
+<span class="output">  src/pages/Dashboard.tsx</span>
+
+<span class="cm"># Find all test files</span>
+<span class="tool-name">Glob:</span> pattern=<span class="str">"**/test_*.py"</span>
+
+<span class="output">  tests/test_auth.py</span>
+<span class="output">  tests/test_api.py</span>
+<span class="output">  tests/test_models.py</span></code></div>
+      </div>
+
+      <!-- ----- Grep ----- -->
+      <div class="tool-card" id="tool-grep">
+        <div class="tool-card-header">
+          <span class="tool-icon grep">&#128270;</span>
+          <h4>Grep</h4>
+          <span class="tool-tag">Search</span>
+        </div>
+        <p>
+          Powerful content search built on ripgrep. Searches <em>inside</em> files for patterns -- text,
+          function names, API endpoints, error messages, or any regular expression. This is one of Claude's
+          most-used tools for understanding unfamiliar codebases.
+        </p>
+        <h4>When to use it</h4>
+        <ul>
+          <li>Finding where a function or variable is defined or used</li>
+          <li>Locating all API endpoint definitions</li>
+          <li>Searching for TODO/FIXME comments</li>
+          <li>Finding configuration values or environment variables</li>
+          <li>Tracing imports and dependencies</li>
+        </ul>
+        <h4>Key parameters</h4>
+        <ul>
+          <li><code>pattern</code> (required) -- regex pattern to search for</li>
+          <li><code>type</code> -- file type filter (e.g., "py", "js", "ts")</li>
+          <li><code>output_mode</code> -- "files_with_matches" (default), "content", or "count"</li>
+          <li><code>-i</code> -- case-insensitive search</li>
+          <li><code>-C</code> -- context lines around matches</li>
+        </ul>
+        <h4>Example</h4>
+        <div class="code-block">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm"># Find all route definitions</span>
+<span class="tool-name">Grep:</span> pattern=<span class="str">"@app\.(get|post|put|delete)"</span> type=<span class="str">"py"</span> output_mode=<span class="str">"content"</span>
+
+<span class="output">  main.py:12:  @app.get("/")</span>
+<span class="output">  main.py:17:  @app.get("/health")</span>
+<span class="output">  main.py:22:  @app.post("/users")</span>
+
+<span class="cm"># Find files importing a specific module</span>
+<span class="tool-name">Grep:</span> pattern=<span class="str">"from database import"</span> output_mode=<span class="str">"files_with_matches"</span>
+
+<span class="output">  backend/main.py</span>
+<span class="output">  backend/services/user_service.py</span></code></div>
+      </div>
+
+      <!-- ----- Agent ----- -->
+      <div class="tool-card" id="tool-agent">
+        <div class="tool-card-header">
+          <span class="tool-icon agent">&#129302;</span>
+          <h4>Agent</h4>
+          <span class="tool-tag">Advanced</span>
+        </div>
+        <p>
+          Launches a sub-agent with its own <strong>fresh context window</strong>. The Agent tool is used for
+          complex research tasks that require reading many files, or tasks that can be parallelized. Because
+          each agent gets a clean context, it will not crowd your main conversation's context window.
+        </p>
+        <h4>When to use it</h4>
+        <ul>
+          <li>Researching how a feature works across dozens of files</li>
+          <li>Running multiple independent investigations in parallel</li>
+          <li>Tasks that require deep exploration but whose details you do not need in your main context</li>
+          <li>Complex refactoring analysis before making changes</li>
+        </ul>
+        <h4>Example</h4>
+        <div class="code-block">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm"># Research authentication flow across the codebase</span>
+<span class="tool-name">Agent:</span> prompt=<span class="str">"Analyze how user authentication works in this project.
+  Find the login endpoint, trace the token generation,
+  identify where tokens are validated, and summarize the
+  complete auth flow with file paths and line numbers."</span>
+
+<span class="output">  [Sub-agent reads ~30 files, follows imports, traces the flow]</span>
+<span class="output">  Returns a comprehensive summary of the auth system</span></code></div>
+
+        <div class="callout tip">
+          <span class="callout-icon">&#128161;</span>
+          <div class="callout-content">
+            <p><strong>Why this matters:</strong> The Agent tool is your secret weapon for staying within context limits.
+            Instead of reading 30 files yourself and filling up the context window, delegate the research to a sub-agent.
+            You only get back the summary.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ----- WebSearch / WebFetch ----- -->
+      <div class="tool-card" id="tool-web">
+        <div class="tool-card-header">
+          <span class="tool-icon web">&#127760;</span>
+          <h4>WebSearch / WebFetch</h4>
+          <span class="tool-tag">Internet</span>
+        </div>
+        <p>
+          Access the web for documentation, API references, examples, and up-to-date information.
+          <strong>WebSearch</strong> performs web searches to find relevant pages, while <strong>WebFetch</strong>
+          retrieves the content of a specific URL.
+        </p>
+        <h4>When to use it</h4>
+        <ul>
+          <li>Looking up library documentation or API references</li>
+          <li>Finding examples for unfamiliar APIs</li>
+          <li>Checking for the latest version of a package</li>
+          <li>Researching error messages or stack traces</li>
+        </ul>
+        <h4>Example</h4>
+        <div class="code-block">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm"># Search for documentation</span>
+<span class="tool-name">WebSearch:</span> query=<span class="str">"FastAPI middleware authentication tutorial"</span>
+
+<span class="cm"># Fetch a specific docs page</span>
+<span class="tool-name">WebFetch:</span> url=<span class="str">"https://fastapi.tiangolo.com/tutorial/middleware/"</span></code></div>
+      </div>
+
+      <h3>Quick Reference Table</h3>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Tool</th>
+              <th>Purpose</th>
+              <th>When to Use</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Read</strong></td>
+              <td>View file contents</td>
+              <td>Understanding existing code</td>
+            </tr>
+            <tr>
+              <td><strong>Write</strong></td>
+              <td>Create new files</td>
+              <td>New features, new tests</td>
+            </tr>
+            <tr>
+              <td><strong>Edit</strong></td>
+              <td>Modify existing files</td>
+              <td>Bug fixes, refactoring</td>
+            </tr>
+            <tr>
+              <td><strong>Bash</strong></td>
+              <td>Run commands</td>
+              <td>Build, test, deploy</td>
+            </tr>
+            <tr>
+              <td><strong>Glob</strong></td>
+              <td>Find files by name</td>
+              <td>Navigate large codebases</td>
+            </tr>
+            <tr>
+              <td><strong>Grep</strong></td>
+              <td>Search file contents</td>
+              <td>Find definitions, usages</td>
+            </tr>
+            <tr>
+              <td><strong>Agent</strong></td>
+              <td>Spawn sub-tasks</td>
+              <td>Complex research, parallel work</td>
+            </tr>
+            <tr>
+              <td><strong>Web</strong></td>
+              <td>Internet access</td>
+              <td>Documentation, examples</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 2: TOOL PICKER QUIZ
+         ======================================== -->
+    <section class="section" id="tool-picker-quiz">
+      <h2 class="section-heading">Tool Picker Quiz</h2>
+
+      <p>
+        Test your understanding of when to use each tool. For each scenario, pick the best tool
+        from the four options. Try to get all 10 correct!
+      </p>
+
+      <div class="quiz-container" id="toolQuizContainer">
+        <div class="quiz-score-bar">
+          <span class="score-label">Score:</span>
+          <div class="quiz-score-track">
+            <div class="quiz-score-fill" id="toolQuizScoreFill"></div>
+          </div>
+          <span class="quiz-score-text" id="toolQuizScoreText">0 / 10</span>
+        </div>
+
+        <div id="toolQuizQuestions"></div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 4: CODEBASE EXPLORATION PATTERNS
+         ======================================== -->
+    <section class="section" id="exploration-patterns">
+      <h2 class="section-heading">4. Codebase Exploration Patterns</h2>
+
+      <p>
+        One of the most common uses for Claude Code is exploring and understanding a codebase you have
+        never seen before. The most effective approach follows a three-phase pattern:
+        <span class="key-concept">Orient, Navigate, Read</span>.
+      </p>
+
+      <h3>The "Orient, Navigate, Read" Workflow</h3>
+
+      <div class="step-list">
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Orient: See the big picture</h4>
+            <p>Use <strong>Glob</strong> to understand the project structure. What files are there? What directories exist?</p>
+            <div class="code-block">
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="tool-name">Glob:</span> pattern=<span class="str">"**/*.ts"</span>
+<span class="cm"># See all TypeScript files and their directory structure</span></code></div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Navigate: Find key code</h4>
+            <p>Use <strong>Grep</strong> to find specific patterns, function definitions, or entry points.</p>
+            <div class="code-block">
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="tool-name">Grep:</span> pattern=<span class="str">"export function"</span> type=<span class="str">"ts"</span> output_mode=<span class="str">"content"</span>
+<span class="cm"># Find all exported functions -- the public API of each module</span></code></div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Read: Understand specifics</h4>
+            <p>Use <strong>Read</strong> to examine the files you identified as important.</p>
+            <div class="code-block">
+              <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="tool-name">Read:</span> file_path=<span class="path">/src/core/engine.ts</span>
+<span class="cm"># Deep-dive into the core logic</span></code></div>
+          </div>
+        </div>
+      </div>
+
+      <h3>Following the Import Chain</h3>
+
+      <p>
+        Another powerful pattern is starting at the entry point and following imports. This is especially
+        useful for understanding how data flows through the application:
+      </p>
+
+      <ol>
+        <li>Read the entry point (e.g., <code>src/index.ts</code> or <code>main.py</code>)</li>
+        <li>Identify the key imports</li>
+        <li>Read those imported modules</li>
+        <li>Continue until you understand the full picture</li>
+      </ol>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>5-minute codebase understanding:</strong> Ask Claude: <em>"What does this project do? Give me
+          the architecture, tech stack, and main entry points."</em> Claude will use Orient-Navigate-Read
+          automatically and give you a comprehensive summary.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 5: MAKING CHANGES AND VERIFYING
+         ======================================== -->
+    <section class="section" id="making-changes">
+      <h2 class="section-heading">5. Making Changes and Verifying</h2>
+
+      <p>
+        The most productive workflow in Claude Code follows a three-step cycle:
+        <span class="key-concept">Read, Edit, Test</span>. This ensures every change is understood,
+        precise, and verified.
+      </p>
+
+      <h3>The "Read, Edit, Test" Cycle</h3>
+
+      <div class="step-list">
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Read the file to understand current state</h4>
+            <p>Claude always reads a file before modifying it. This ensures the edit is based on the actual code, not assumptions.</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Edit with precise old_string to new_string</h4>
+            <p>Surgical changes. Only the lines that need to change are modified. Everything else stays exactly the same.</p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Bash to run tests and verify</h4>
+            <p>After every change, run the test suite. If tests fail, Claude can read the output and fix the issue.</p>
+          </div>
+        </div>
+      </div>
+
+      <h3>When to Use Edit vs. Write</h3>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Situation</th>
+              <th>Use Edit</th>
+              <th>Use Write</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Fix a bug in an existing file</td>
+              <td>Yes -- targeted change</td>
+              <td>No</td>
+            </tr>
+            <tr>
+              <td>Create a brand new file</td>
+              <td>No</td>
+              <td>Yes -- file does not exist yet</td>
+            </tr>
+            <tr>
+              <td>Add an import to a file</td>
+              <td>Yes -- add one line</td>
+              <td>No</td>
+            </tr>
+            <tr>
+              <td>Rewrite a file from scratch</td>
+              <td>No</td>
+              <td>Yes -- complete replacement</td>
+            </tr>
+            <tr>
+              <td>Rename a variable</td>
+              <td>Yes -- with replace_all</td>
+              <td>No</td>
+            </tr>
+            <tr>
+              <td>Add a new function to a file</td>
+              <td>Yes -- insert at specific location</td>
+              <td>No</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Git Integration</h3>
+
+      <p>
+        Claude Code has full git integration through the Bash tool. You can ask it to:
+      </p>
+
+      <ul>
+        <li>Check status and diffs: <code>"Show me what changed"</code></li>
+        <li>Create commits: <code>"Commit these changes with an appropriate message"</code></li>
+        <li>Create branches: <code>"Create a feature branch for this change"</code></li>
+        <li>Create pull requests: <code>"Create a PR for these changes"</code></li>
+        <li>Review code: <code>"Review the changes in this PR"</code></li>
+      </ul>
+
+      <div class="callout info">
+        <span class="callout-icon">&#9432;</span>
+        <div class="callout-content">
+          <p><strong>Git safety:</strong> Claude Code is careful with git operations. It prefers creating new commits
+          over amending, never force-pushes unless explicitly asked, and always shows you the diff before committing.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 6: CONTEXT WINDOW MANAGEMENT
+         ======================================== -->
+    <section class="section" id="context-management">
+      <h2 class="section-heading">6. Context Window Management</h2>
+
+      <p>
+        Every conversation with Claude Code has a <span class="key-concept">context window</span> -- a limited
+        amount of "memory" (roughly 200,000 tokens, with Opus capable of up to 1M) that holds everything: your
+        messages, Claude's responses, tool call results, file contents, and command outputs.
+      </p>
+
+      <p>
+        When the context window fills up, older messages get compressed or dropped. Understanding this constraint
+        is key to working effectively.
+      </p>
+
+      <h3>What Consumes Tokens?</h3>
+
+      <ul>
+        <li><strong>Conversation turns:</strong> Each prompt + reply uses ~400 tokens on average</li>
+        <li><strong>File reads:</strong> A typical 100-line file uses ~800 tokens</li>
+        <li><strong>Large file reads:</strong> Files with 500+ lines use ~4,000 tokens</li>
+        <li><strong>Bash output:</strong> Test results, build logs use ~1,500 tokens</li>
+        <li><strong>Search results:</strong> Grep/Glob results use ~300 tokens</li>
+        <li><strong>Verbose output:</strong> Full test suites or webpack builds can use ~8,000 tokens</li>
+      </ul>
+
+      <h3>Strategies for Staying Efficient</h3>
+
+      <ol>
+        <li>
+          <strong>Read only what you need.</strong> Use <code>offset</code> and <code>limit</code> for large files
+          instead of reading the entire thing.
+        </li>
+        <li>
+          <strong>Use Agent for research.</strong> Delegate file-heavy research to sub-agents. They get their own
+          context window, keeping yours lean.
+        </li>
+        <li>
+          <strong>Start new sessions for new topics.</strong> If you are switching to a completely different task,
+          start a fresh Claude Code session.
+        </li>
+        <li>
+          <strong>Use <code>/compact</code> to compress context.</strong> This command summarizes the conversation
+          so far, freeing up space for new work.
+        </li>
+        <li>
+          <strong>Be specific in your requests.</strong> "Fix the TypeError in user_service.py line 42" consumes
+          fewer turns than "fix the bug" which requires Claude to search for it.
+        </li>
+      </ol>
+
+      <h3>Signs You Are Running Low</h3>
+
+      <ul>
+        <li>Claude's responses get shorter and less detailed</li>
+        <li>Claude forgets earlier context from the conversation</li>
+        <li>Claude asks you to repeat information you already provided</li>
+        <li>The <code>/status</code> command shows high context usage</li>
+      </ul>
+
+      <div class="callout warning">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Pro tip:</strong> Run <code>/status</code> periodically to check your context usage. If you
+          are above 70%, consider using <code>/compact</code> or starting a new session.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 3: CONTEXT BUDGET CALCULATOR
+         ======================================== -->
+    <section class="section" id="context-calculator">
+      <h2 class="section-heading">Context Budget Calculator</h2>
+
+      <p>
+        Use the sliders below to simulate a typical Claude Code session and see how quickly the 200K token
+        context window fills up. This helps you develop an intuition for context management.
+      </p>
+
+      <div class="context-calc" id="contextCalc">
+        <h3>Simulate Your Session</h3>
+
+        <div class="context-budget-visual">
+          <div class="budget-bar">
+            <div class="budget-fill safe" id="budgetFill">
+              <span class="budget-fill-label" id="budgetFillLabel">0 tokens used</span>
+            </div>
+            <span class="budget-label">200K tokens</span>
+          </div>
+        </div>
+
+        <div class="context-items">
+          <div class="context-item">
+            <span class="context-item-label">Conversation turns (your messages + Claude's replies)</span>
+            <span class="context-item-tokens">~400 each</span>
+            <div class="context-item-slider">
+              <input type="range" min="0" max="50" value="5" id="sliderTurns" oninput="updateBudget()">
+            </div>
+            <span class="context-item-count" id="countTurns">5</span>
+          </div>
+
+          <div class="context-item">
+            <span class="context-item-label">Files read (avg ~100 lines each)</span>
+            <span class="context-item-tokens">~800 each</span>
+            <div class="context-item-slider">
+              <input type="range" min="0" max="30" value="3" id="sliderFiles" oninput="updateBudget()">
+            </div>
+            <span class="context-item-count" id="countFiles">3</span>
+          </div>
+
+          <div class="context-item">
+            <span class="context-item-label">Large file reads (500+ line files)</span>
+            <span class="context-item-tokens">~4000 each</span>
+            <div class="context-item-slider">
+              <input type="range" min="0" max="10" value="1" id="sliderLargeFiles" oninput="updateBudget()">
+            </div>
+            <span class="context-item-count" id="countLargeFiles">1</span>
+          </div>
+
+          <div class="context-item">
+            <span class="context-item-label">Bash command outputs (test runs, builds)</span>
+            <span class="context-item-tokens">~1500 each</span>
+            <div class="context-item-slider">
+              <input type="range" min="0" max="20" value="2" id="sliderBash" oninput="updateBudget()">
+            </div>
+            <span class="context-item-count" id="countBash">2</span>
+          </div>
+
+          <div class="context-item">
+            <span class="context-item-label">Search operations (Grep/Glob)</span>
+            <span class="context-item-tokens">~300 each</span>
+            <div class="context-item-slider">
+              <input type="range" min="0" max="30" value="4" id="sliderSearch" oninput="updateBudget()">
+            </div>
+            <span class="context-item-count" id="countSearch">4</span>
+          </div>
+
+          <div class="context-item">
+            <span class="context-item-label">Verbose outputs (full pytest -v, webpack)</span>
+            <span class="context-item-tokens">~8000 each</span>
+            <div class="context-item-slider">
+              <input type="range" min="0" max="5" value="0" id="sliderVerbose" oninput="updateBudget()">
+            </div>
+            <span class="context-item-count" id="countVerbose">0</span>
+          </div>
+        </div>
+
+        <div class="budget-summary">
+          <span class="budget-summary-label">Context usage:</span>
+          <span class="budget-summary-value safe" id="budgetSummaryValue">8,600 / 200,000 tokens (4%)</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 7: CLAUDE.MD
+         ======================================== -->
+    <section class="section" id="claude-md">
+      <h2 class="section-heading">7. CLAUDE.md -- Your Project's AI Config File</h2>
+
+      <p>
+        <code>CLAUDE.md</code> is a special file that lives at the root of your project. Claude Code reads it
+        automatically at the start of every conversation. Think of it as a "briefing document" that tells Claude
+        about your project's conventions, rules, and context.
+      </p>
+
+      <p>
+        A good CLAUDE.md saves you from repeating the same instructions every session.
+      </p>
+
+      <h3>Where to Put It</h3>
+
+      <p>
+        Place it in your project root directory, right next to <code>package.json</code> or <code>pyproject.toml</code>.
+        Claude Code automatically detects and reads it when you start a session in that directory.
+      </p>
+
+      <h3>What to Include</h3>
+
+      <ul>
+        <li><strong>Tech stack and framework versions:</strong> "Python 3.11 + FastAPI + PostgreSQL"</li>
+        <li><strong>Build and test commands:</strong> "Run tests: <code>npm test</code>"</li>
+        <li><strong>Coding conventions:</strong> "Use functional components, prefer const over let"</li>
+        <li><strong>Testing requirements:</strong> "All new functions need unit tests"</li>
+        <li><strong>Important file locations:</strong> "Routes are in <code>src/routes/</code>"</li>
+        <li><strong>Things to avoid:</strong> "Never use <code>any</code> types in TypeScript"</li>
+      </ul>
+
+      <h3>Example CLAUDE.md</h3>
+
+      <div class="code-block has-label">
+        <span class="code-label">CLAUDE.md</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm"># Project: Task Management API</span>
+
+<span class="cm">## Tech Stack</span>
+- Backend: TypeScript + Express.js
+- Database: PostgreSQL with Prisma ORM
+- Testing: Vitest with fixtures
+- Deployment: Docker + Kubernetes
+
+<span class="cm">## Commands</span>
+- Run tests: <span class="str">`npm test`</span>
+- Start dev server: <span class="str">`npm run dev`</span>
+- Build: <span class="str">`npm run build`</span>
+- Lint: <span class="str">`npm run lint`</span>
+
+<span class="cm">## Coding Rules</span>
+- <span class="kw">ALWAYS</span> use TypeScript strict mode
+- <span class="kw">NEVER</span> use <span class="str">`any`</span> types -- use <span class="str">`unknown`</span> and type guards
+- Prefer functional components with hooks
+- All API routes must have input validation with Zod
+- Use <span class="str">`const`</span> over <span class="str">`let`</span> wherever possible
+
+<span class="cm">## Important Directories</span>
+- <span class="path">src/routes/</span> -- API endpoint handlers
+- <span class="path">src/services/</span> -- Business logic
+- <span class="path">src/models/</span> -- Prisma models and types
+- <span class="path">src/middleware/</span> -- Auth, validation, error handling
+- <span class="path">tests/</span> -- Test files mirror src/ structure
+
+<span class="cm">## Context</span>
+- <span class="path">src/legacy/</span> is being deprecated. Do not add new code there.
+- Use <span class="str">`node`</span> (not <span class="str">`bun`</span>) for all commands.</code></div>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>Start simple:</strong> You do not need a 50-line CLAUDE.md on day one. Start with your tech stack,
+          build commands, and one or two coding rules. Add more as you discover patterns that Claude keeps getting wrong.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 4: CLAUDE.MD BUILDER
+         ======================================== -->
+    <section class="section" id="claudemd-builder">
+      <h2 class="section-heading">CLAUDE.md Builder</h2>
+
+      <p>
+        Fill in the form on the left and watch your CLAUDE.md file generate in real-time on the right.
+        When you are happy with it, click Copy to save it to your clipboard.
+      </p>
+
+      <div class="claudemd-builder" id="claudemdBuilder">
+        <div class="claudemd-builder-header">
+          <h3>Build Your CLAUDE.md</h3>
+          <p>Customize for your project. The preview updates live.</p>
+        </div>
+        <div class="claudemd-split">
+          <div class="claudemd-form" id="claudemdForm">
+            <label for="cmdProjectName">Project Name</label>
+            <input type="text" id="cmdProjectName" placeholder="My Awesome Project" oninput="updateClaudeMdPreview()">
+
+            <label>Tech Stack</label>
+            <div class="claudemd-checkboxes" id="cmdTechStack">
+              <label class="claudemd-checkbox" onclick="toggleCheckbox(this)">
+                <input type="checkbox" value="TypeScript" onchange="updateClaudeMdPreview()"> TypeScript
+              </label>
+              <label class="claudemd-checkbox" onclick="toggleCheckbox(this)">
+                <input type="checkbox" value="Python" onchange="updateClaudeMdPreview()"> Python
+              </label>
+              <label class="claudemd-checkbox" onclick="toggleCheckbox(this)">
+                <input type="checkbox" value="React" onchange="updateClaudeMdPreview()"> React
+              </label>
+              <label class="claudemd-checkbox" onclick="toggleCheckbox(this)">
+                <input type="checkbox" value="Node.js" onchange="updateClaudeMdPreview()"> Node.js
+              </label>
+              <label class="claudemd-checkbox" onclick="toggleCheckbox(this)">
+                <input type="checkbox" value="PostgreSQL" onchange="updateClaudeMdPreview()"> PostgreSQL
+              </label>
+              <label class="claudemd-checkbox" onclick="toggleCheckbox(this)">
+                <input type="checkbox" value="Docker" onchange="updateClaudeMdPreview()"> Docker
+              </label>
+            </div>
+
+            <label for="cmdBuildCmd">Build Command</label>
+            <input type="text" id="cmdBuildCmd" placeholder="npm run build" oninput="updateClaudeMdPreview()">
+
+            <label for="cmdTestCmd">Test Command</label>
+            <input type="text" id="cmdTestCmd" placeholder="npm test" oninput="updateClaudeMdPreview()">
+
+            <label for="cmdConventions">Coding Conventions</label>
+            <textarea id="cmdConventions" placeholder="Use functional components, prefer const over let, no any types..." oninput="updateClaudeMdPreview()"></textarea>
+
+            <label for="cmdDirectories">Important Directories</label>
+            <textarea id="cmdDirectories" placeholder="src/routes/ - API endpoints&#10;src/models/ - Database models&#10;src/services/ - Business logic" oninput="updateClaudeMdPreview()"></textarea>
+          </div>
+          <div class="claudemd-preview">
+            <div class="claudemd-preview-header">
+              <span class="claudemd-preview-title">CLAUDE.md</span>
+              <button class="claudemd-copy-btn" id="claudemdCopyBtn" onclick="copyClaudeMd()">Copy</button>
+            </div>
+            <div class="claudemd-preview-content" id="claudemdPreviewContent"># Project: My Awesome Project
+
+## Tech Stack
+(Select technologies above)
+
+## Commands
+- Build: `npm run build`
+- Test: `npm test`
+
+## Coding Conventions
+(Enter your conventions above)
+
+## Important Directories
+(Enter your directories above)</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         END-OF-MODULE QUIZ
+         ======================================== -->
+    <section class="section" id="final-quiz">
+      <h2 class="section-heading">End-of-Module Quiz</h2>
+
+      <p>
+        Complete this quiz to finish Module 03. Your score will be saved to track your progress
+        through the training program. You need at least 6 out of 8 to pass.
+      </p>
+
+      <div class="final-quiz" id="finalQuizContainer">
+        <h3>Module 03: Assessment</h3>
+
+        <!-- Question 1 -->
+        <div class="final-quiz-question" data-fq="0">
+          <div class="fq-number">Question 1 of 8</div>
+          <div class="fq-text">
+            What is the correct command to install Claude Code?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="0" data-fq-val="a" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="a"> pip install claude-code
+            </li>
+            <li class="fq-option" data-fq-idx="0" data-fq-val="b" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="b"> npm install -g @anthropic-ai/claude-code
+            </li>
+            <li class="fq-option" data-fq-idx="0" data-fq-val="c" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="c"> brew install claude
+            </li>
+            <li class="fq-option" data-fq-idx="0" data-fq-val="d" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="d"> apt-get install claude-code
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="final-quiz-question" data-fq="1">
+          <div class="fq-number">Question 2 of 8</div>
+          <div class="fq-text">
+            In the agentic loop, what does Claude do after executing a tool?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="1" data-fq-val="a" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="a"> Immediately moves to the next tool
+            </li>
+            <li class="fq-option" data-fq-idx="1" data-fq-val="b" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="b"> Observes the results and decides what to do next
+            </li>
+            <li class="fq-option" data-fq-idx="1" data-fq-val="c" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="c"> Asks the user for permission to continue
+            </li>
+            <li class="fq-option" data-fq-idx="1" data-fq-val="d" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="d"> Starts a new conversation
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="final-quiz-question" data-fq="2">
+          <div class="fq-number">Question 3 of 8</div>
+          <div class="fq-text">
+            Which tool should you use to make a targeted change to one line in an existing file?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="2" data-fq-val="a" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="a"> Write (to rewrite the file)
+            </li>
+            <li class="fq-option" data-fq-idx="2" data-fq-val="b" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="b"> Edit (with old_string/new_string)
+            </li>
+            <li class="fq-option" data-fq-idx="2" data-fq-val="c" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="c"> Bash (with sed command)
+            </li>
+            <li class="fq-option" data-fq-idx="2" data-fq-val="d" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="d"> Read (then manually copy-paste)
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 4 -->
+        <div class="final-quiz-question" data-fq="3">
+          <div class="fq-number">Question 4 of 8</div>
+          <div class="fq-text">
+            What is the primary benefit of using the Agent tool for codebase research?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="3" data-fq-val="a" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="a"> It is faster than reading files directly
+            </li>
+            <li class="fq-option" data-fq-idx="3" data-fq-val="b" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="b"> It creates a fresh context window, isolating verbose research from your main session
+            </li>
+            <li class="fq-option" data-fq-idx="3" data-fq-val="c" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="c"> It can read files that other tools cannot
+            </li>
+            <li class="fq-option" data-fq-idx="3" data-fq-val="d" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="d"> It automatically generates documentation
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 5 -->
+        <div class="final-quiz-question" data-fq="4">
+          <div class="fq-number">Question 5 of 8</div>
+          <div class="fq-text">
+            Your context window is at 85% usage. What is the best next step?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="4" data-fq-val="a" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="a"> Keep going -- Claude will handle it
+            </li>
+            <li class="fq-option" data-fq-idx="4" data-fq-val="b" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="b"> Start a new session or use /compact to compress context
+            </li>
+            <li class="fq-option" data-fq-idx="4" data-fq-val="c" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="c"> Delete some files from the project
+            </li>
+            <li class="fq-option" data-fq-idx="4" data-fq-val="d" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="d"> Switch to a different AI model
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 6 -->
+        <div class="final-quiz-question" data-fq="5">
+          <div class="fq-number">Question 6 of 8</div>
+          <div class="fq-text">
+            What does CLAUDE.md do?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="5" data-fq-val="a" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="a"> It is a README file for documentation
+            </li>
+            <li class="fq-option" data-fq-idx="5" data-fq-val="b" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="b"> It provides project-level instructions that Claude reads automatically on every session
+            </li>
+            <li class="fq-option" data-fq-idx="5" data-fq-val="c" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="c"> It stores Claude's conversation history
+            </li>
+            <li class="fq-option" data-fq-idx="5" data-fq-val="d" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="d"> It configures the Claude API key
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 7 -->
+        <div class="final-quiz-question" data-fq="6">
+          <div class="fq-number">Question 7 of 8</div>
+          <div class="fq-text">
+            You want to find all files named '*.config.ts' in your project. Which tool?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="6" data-fq-val="a" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="a"> Grep
+            </li>
+            <li class="fq-option" data-fq-idx="6" data-fq-val="b" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="b"> Glob
+            </li>
+            <li class="fq-option" data-fq-idx="6" data-fq-val="c" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="c"> Read
+            </li>
+            <li class="fq-option" data-fq-idx="6" data-fq-val="d" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="d"> Bash: find .
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 8 -->
+        <div class="final-quiz-question" data-fq="7">
+          <div class="fq-number">Question 8 of 8</div>
+          <div class="fq-text">
+            What is the "Orient, Navigate, Read" workflow?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="7" data-fq-val="a" onclick="selectFinalOption(7, this)">
+              <input type="radio" name="fq7" value="a"> A git branching strategy
+            </li>
+            <li class="fq-option" data-fq-idx="7" data-fq-val="b" onclick="selectFinalOption(7, this)">
+              <input type="radio" name="fq7" value="b"> A pattern for exploring new codebases: Glob for structure, Grep for key code, Read for details
+            </li>
+            <li class="fq-option" data-fq-idx="7" data-fq-val="c" onclick="selectFinalOption(7, this)">
+              <input type="radio" name="fq7" value="c"> A way to organize your CLAUDE.md file
+            </li>
+            <li class="fq-option" data-fq-idx="7" data-fq-val="d" onclick="selectFinalOption(7, this)">
+              <input type="radio" name="fq7" value="d"> The order Claude processes your messages
+            </li>
+          </ul>
+        </div>
+
+        <button class="final-submit-btn" id="finalSubmitBtn" onclick="submitFinalQuiz()" disabled>
+          Submit Answers
+        </button>
+
+        <div class="final-result" id="finalResult">
+          <h4 id="finalResultTitle"></h4>
+          <p id="finalResultText"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         NAVIGATION FOOTER
+         ======================================== -->
+    <nav class="module-nav">
+      <a href="02-claude-browser.html" class="nav-link prev">
+        <span class="nav-dir">&larr; Previous</span>
+        <span class="nav-title">Module 02: Claude in the Browser</span>
+      </a>
+      <a href="04-claude-cowork.html" class="nav-link next">
+        <span class="nav-dir">Next &rarr;</span>
+        <span class="nav-title">Module 04: Claude Cowork</span>
+      </a>
+    </nav>
+
+  </div>
+</main>
+
+<!-- ============================================
+     JAVASCRIPT
+     ============================================ -->
+<script>
+(function() {
+  'use strict';
+
+  // ==========================================
+  // THEME MANAGEMENT
+  // ==========================================
+  var THEME_KEY = 'claude-training-theme';
+
+  function getTheme() {
+    return localStorage.getItem(THEME_KEY) || 'light';
+  }
+
+  function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem(THEME_KEY, theme);
+    var icon = document.getElementById('themeIcon');
+    if (icon) {
+      icon.textContent = theme === 'dark' ? '\u2600' : '\u263E';
+    }
+  }
+
+  setTheme(getTheme());
+
+  document.getElementById('themeToggle').addEventListener('click', function() {
+    var current = getTheme();
+    setTheme(current === 'dark' ? 'light' : 'dark');
+  });
+
+  // ==========================================
+  // SIDEBAR MOBILE TOGGLE
+  // ==========================================
+  var hamburger = document.getElementById('hamburger');
+  var sidebar = document.getElementById('sidebar');
+  var overlay = document.getElementById('sidebarOverlay');
+
+  function toggleSidebar() {
+    var isOpen = sidebar.classList.contains('open');
+    sidebar.classList.toggle('open');
+    hamburger.classList.toggle('open');
+    if (isOpen) {
+      overlay.classList.remove('show');
+    } else {
+      overlay.classList.add('show');
+    }
+  }
+
+  hamburger.addEventListener('click', toggleSidebar);
+  overlay.addEventListener('click', toggleSidebar);
+
+  // ==========================================
+  // SIDEBAR SECTION COLLAPSING
+  // ==========================================
+  var sectionToggles = document.querySelectorAll('.sidebar-section-toggle');
+  for (var i = 0; i < sectionToggles.length; i++) {
+    (function(btn) {
+      btn.addEventListener('click', function() {
+        var sectionName = this.getAttribute('data-section');
+        var linksList = document.getElementById('nav-' + sectionName);
+        var isCollapsed = this.classList.contains('collapsed');
+
+        if (isCollapsed) {
+          this.classList.remove('collapsed');
+          linksList.classList.remove('collapsed');
+          linksList.style.maxHeight = linksList.scrollHeight + 'px';
+        } else {
+          this.classList.add('collapsed');
+          linksList.style.maxHeight = linksList.scrollHeight + 'px';
+          linksList.offsetHeight; // force reflow
+          linksList.classList.add('collapsed');
+        }
+      });
+
+      // Initialize max-height
+      var sectionName = btn.getAttribute('data-section');
+      var linksList = document.getElementById('nav-' + sectionName);
+      if (linksList) {
+        linksList.style.maxHeight = linksList.scrollHeight + 'px';
+      }
+    })(sectionToggles[i]);
+  }
+
+  // ==========================================
+  // SCROLLSPY
+  // ==========================================
+  var sidebarLinks = document.querySelectorAll('.sidebar-link');
+  var sections = [];
+
+  for (var j = 0; j < sidebarLinks.length; j++) {
+    var targetId = sidebarLinks[j].getAttribute('data-target');
+    var section = document.getElementById(targetId);
+    if (section) {
+      sections.push({ el: section, link: sidebarLinks[j], id: targetId });
+    }
+  }
+
+  function updateScrollspy() {
+    var scrollPos = window.scrollY + 100;
+    var active = null;
+
+    for (var k = sections.length - 1; k >= 0; k--) {
+      if (sections[k].el.offsetTop <= scrollPos) {
+        active = sections[k];
+        break;
+      }
+    }
+
+    for (var l = 0; l < sidebarLinks.length; l++) {
+      sidebarLinks[l].classList.remove('active');
+    }
+    if (active) {
+      active.link.classList.add('active');
+    }
+
+    updateSidebarProgress();
+  }
+
+  var scrollTimer = null;
+  window.addEventListener('scroll', function() {
+    if (scrollTimer) return;
+    scrollTimer = setTimeout(function() {
+      scrollTimer = null;
+      updateScrollspy();
+    }, 50);
+  });
+  updateScrollspy();
+
+  // Close mobile sidebar on link click
+  for (var m = 0; m < sidebarLinks.length; m++) {
+    sidebarLinks[m].addEventListener('click', function() {
+      if (window.innerWidth <= 1024) {
+        sidebar.classList.remove('open');
+        hamburger.classList.remove('open');
+        overlay.classList.remove('show');
+      }
+    });
+  }
+
+  // ==========================================
+  // SIDEBAR PROGRESS
+  // ==========================================
+  function updateSidebarProgress() {
+    var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    var scrolled = window.scrollY;
+    var pct = docHeight > 0 ? Math.min(100, (scrolled / docHeight) * 100) : 0;
+
+    var fill = document.getElementById('sidebarProgressFill');
+    if (fill) {
+      fill.style.width = pct + '%';
+    }
+  }
+
+  // ==========================================
+  // COPY TO CLIPBOARD
+  // ==========================================
+  window.copyCode = function(btn) {
+    var block = btn.closest('.code-block');
+    var codeEl = block.cloneNode(true);
+    var labelEl = codeEl.querySelector('.code-label');
+    var btnEl = codeEl.querySelector('.copy-btn');
+    if (labelEl) labelEl.remove();
+    if (btnEl) btnEl.remove();
+
+    var text = codeEl.textContent.trim();
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function() {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(function() {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      }).catch(function() {
+        btn.textContent = 'Failed';
+        setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+      });
+    } else {
+      btn.textContent = 'Failed';
+      setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+    }
+  };
+
+  // ==========================================
+  // CLI SIMULATOR
+  // ==========================================
+  var cliResponses = {
+    'claude': {
+      output: 'Welcome to Claude Code v2.1!\n\nType a request to get started, or try:\n  claude "What does this project do?"\n  claude "Fix the failing tests"\n  claude "Add authentication to the API"\n\nTip: Use /help for available commands.'
+    },
+    'claude "what does this project do?"': {
+      output: 'Reading project files...\n\nUsing Glob to find key files...\n  Found: package.json, src/index.ts, README.md\n\nReading package.json...\nReading src/index.ts...\nReading README.md...\n\nThis is a Task Management API built with:\n  - TypeScript + Express.js\n  - PostgreSQL database\n  - JWT authentication\n  - REST API with 12 endpoints\n\nKey directories:\n  src/routes/    -- API route handlers\n  src/models/    -- Database models\n  src/middleware/ -- Auth & validation\n  src/tests/     -- Jest test suite'
+    },
+    'claude "find all test files"': {
+      output: 'Using Glob **/*.test.ts\n\nFound 8 test files:\n  src/tests/auth.test.ts\n  src/tests/tasks.test.ts\n  src/tests/users.test.ts\n  src/tests/middleware.test.ts\n  src/tests/models/task.test.ts\n  src/tests/models/user.test.ts\n  src/tests/routes/tasks.test.ts\n  src/tests/routes/users.test.ts\n\nTotal: 8 files, ~2,400 lines of tests'
+    },
+    'claude "run the tests"': {
+      output: 'Using Bash: npm test\n\n PASS  src/tests/auth.test.ts (1.2s)\n PASS  src/tests/users.test.ts (0.8s)\n FAIL  src/tests/tasks.test.ts (1.5s)\n   - Task creation > should validate required fields\n     Expected: 400\n     Received: 500\n PASS  src/tests/middleware.test.ts (0.3s)\n\nTests: 1 failed, 3 passed, 4 total\nTime: 3.8s\n\n1 test failing. Want me to investigate and fix it?'
+    },
+    'claude "fix the failing test"': {
+      output: 'Reading src/tests/tasks.test.ts...\nReading src/routes/tasks.ts...\n\nFound the bug! In src/routes/tasks.ts line 42:\n   The validation middleware is not catching missing fields\n   before the database query runs, causing a 500 instead of 400.\n\nUsing Edit on src/routes/tasks.ts:\n   Added field validation before database insert.\n\nRunning tests again: npm test\n\n PASS  src/tests/auth.test.ts\n PASS  src/tests/users.test.ts\n PASS  src/tests/tasks.test.ts\n PASS  src/tests/middleware.test.ts\n\nTests: 4 passed, 4 total'
+    },
+    '/help': {
+      output: 'Available commands:\n  /help          -- Show this help\n  /clear         -- Clear conversation\n  /compact       -- Compress context window\n  /status        -- Show session info\n  /doctor        -- Check installation\n  /review-pr     -- Review a pull request\n  /commit        -- Create a git commit\n  Ctrl+C         -- Cancel current operation\n  Escape (x2)    -- Exit Claude Code'
+    },
+    '/status': {
+      output: 'Session Status:\n  Model: claude-opus-4-6\n  Context: 12,450 / 200,000 tokens (6%)\n  Session: 8 minutes\n  Tool calls: 14\n  Files read: 6\n  Edits made: 1'
+    },
+    'claude "add a health check endpoint"': {
+      output: 'Reading src/routes/index.ts to understand routing pattern...\nReading src/index.ts for app setup...\n\nCreating new file: src/routes/health.ts\n\n  import { Router } from "express";\n\n  const router = Router();\n\n  router.get("/health", (req, res) => {\n    res.json({\n      status: "healthy",\n      uptime: process.uptime(),\n      timestamp: new Date().toISOString()\n    });\n  });\n\n  export default router;\n\nEditing src/index.ts to register the route...\nRunning: curl localhost:3000/health\n\n  {"status":"healthy","uptime":42.5,"timestamp":"2026-04-01T..."}\n\nHealth check endpoint added and verified!'
+    },
+    '/compact': {
+      output: 'Compacting conversation...\n\nBefore: 45,200 tokens\nAfter:  8,400 tokens\n\nContext compressed. Previous conversation summarized.\nYou can continue working normally.'
+    },
+    '/doctor': {
+      output: 'Claude Code Doctor\n\n  Node.js:          v20.11.0  OK\n  npm:              10.2.4    OK\n  Claude Code:      v2.1.0    OK\n  API Key:          Set       OK\n  Git:              2.43.0    OK\n  Shell:            zsh       OK\n  CLAUDE.md:        Found     OK\n  settings.json:    Found     OK\n\nAll checks passed!'
+    },
+    'claude "show git status"': {
+      output: 'Using Bash: git status\n\nOn branch feature/add-health-endpoint\nChanges not staged for commit:\n  modified:   src/index.ts\n\nUntracked files:\n  src/routes/health.ts\n\nno changes added to commit'
+    },
+    'claude "commit these changes"': {
+      output: 'Using Bash: git add src/index.ts src/routes/health.ts\nUsing Bash: git diff --staged\n\n  +  import healthRouter from "./routes/health";\n  +  app.use("/", healthRouter);\n  +  [new file: src/routes/health.ts - 15 lines]\n\nUsing Bash: git commit -m "Add /health endpoint for service monitoring"\n\n  [feature/add-health-endpoint abc1234] Add /health endpoint for service monitoring\n   2 files changed, 18 insertions(+)'
+    },
+    'claude "explain the auth middleware"': {
+      output: 'Using Agent to research authentication...\n\nThe sub-agent read 12 files and found:\n\nAuthentication Flow:\n  1. Client sends JWT in Authorization header\n  2. src/middleware/auth.ts extracts and verifies the token\n  3. Token payload contains userId and role\n  4. Middleware attaches user to req.user\n  5. Route handlers check req.user.role for authorization\n\nKey files:\n  src/middleware/auth.ts     -- JWT verification (lines 12-45)\n  src/services/jwt.ts        -- Token sign/verify helpers\n  src/routes/auth.ts         -- Login/register endpoints\n  src/models/user.ts         -- User model with password hashing'
+    },
+    'claude "search for all TODO comments"': {
+      output: 'Using Grep: pattern="TODO" output_mode="content"\n\nFound 6 TODOs:\n  src/routes/tasks.ts:78:    // TODO: Add pagination support\n  src/routes/users.ts:34:    // TODO: Validate email format\n  src/services/email.ts:12:  // TODO: Switch to SendGrid in production\n  src/middleware/rate-limit.ts:5: // TODO: Use Redis for distributed rate limiting\n  src/models/task.ts:45:     // TODO: Add soft delete support\n  tests/conftest.ts:8:       // TODO: Add database cleanup between tests'
+    },
+    'claude "what is my tech stack?"': {
+      output: 'Reading package.json...\nReading tsconfig.json...\n\nYour tech stack:\n  Runtime:     Node.js 20 + TypeScript 5.3\n  Framework:   Express.js 4.18\n  Database:    PostgreSQL via Prisma ORM 5.7\n  Auth:        JSON Web Tokens (jsonwebtoken)\n  Testing:     Jest 29 + Supertest\n  Validation:  Zod 3.22\n  Linting:     ESLint + Prettier\n  Build:       tsc (TypeScript compiler)\n  Package Mgr: npm'
+    }
+  };
+
+  var cliCommandHistory = [];
+  var cliHistoryIndex = -1;
+  var cliOutput = document.getElementById('cliOutput');
+  var cliInput = document.getElementById('cliInput');
+
+  // Map for partial matching (lowercase keys for comparison)
+  var cliResponseKeys = Object.keys(cliResponses);
+
+  function findCliResponse(input) {
+    var lower = input.toLowerCase().trim();
+
+    // Exact match first
+    for (var i = 0; i < cliResponseKeys.length; i++) {
+      if (cliResponseKeys[i].toLowerCase() === lower) {
+        return cliResponses[cliResponseKeys[i]];
+      }
+    }
+
+    // Partial match: check if input contains any key
+    for (var j = 0; j < cliResponseKeys.length; j++) {
+      if (lower.indexOf(cliResponseKeys[j].toLowerCase()) !== -1) {
+        return cliResponses[cliResponseKeys[j]];
+      }
+    }
+
+    // Keyword matching
+    if (lower.indexOf('test') !== -1 && lower.indexOf('run') !== -1) {
+      return cliResponses['claude "run the tests"'];
+    }
+    if (lower.indexOf('fix') !== -1 && lower.indexOf('test') !== -1) {
+      return cliResponses['claude "fix the failing test"'];
+    }
+    if (lower.indexOf('health') !== -1) {
+      return cliResponses['claude "add a health check endpoint"'];
+    }
+    if (lower.indexOf('help') !== -1) {
+      return cliResponses['/help'];
+    }
+    if (lower.indexOf('status') !== -1) {
+      return cliResponses['/status'];
+    }
+    if (lower.indexOf('what does') !== -1 || lower.indexOf('overview') !== -1) {
+      return cliResponses['claude "what does this project do?"'];
+    }
+    if (lower.indexOf('find') !== -1 && lower.indexOf('test') !== -1) {
+      return cliResponses['claude "find all test files"'];
+    }
+    if (lower.indexOf('commit') !== -1) {
+      return cliResponses['claude "commit these changes"'];
+    }
+    if (lower.indexOf('git') !== -1 && lower.indexOf('status') !== -1) {
+      return cliResponses['claude "show git status"'];
+    }
+    if (lower.indexOf('auth') !== -1 || lower.indexOf('middleware') !== -1) {
+      return cliResponses['claude "explain the auth middleware"'];
+    }
+    if (lower.indexOf('todo') !== -1) {
+      return cliResponses['claude "search for all TODO comments"'];
+    }
+    if (lower.indexOf('tech stack') !== -1 || lower.indexOf('stack') !== -1) {
+      return cliResponses['claude "what is my tech stack?"'];
+    }
+    if (lower.indexOf('compact') !== -1) {
+      return cliResponses['/compact'];
+    }
+    if (lower.indexOf('doctor') !== -1) {
+      return cliResponses['/doctor'];
+    }
+
+    return null;
+  }
+
+  function addCliLine(text, className) {
+    var line = document.createElement('div');
+    line.className = 'cli-line ' + (className || '');
+    line.textContent = text;
+    cliOutput.appendChild(line);
+  }
+
+  function typewriterOutput(text, callback) {
+    var lines = text.split('\n');
+    var lineIndex = 0;
+
+    function showNextLine() {
+      if (lineIndex >= lines.length) {
+        if (callback) callback();
+        return;
+      }
+      addCliLine(lines[lineIndex], 'output-line');
+      cliOutput.scrollTop = cliOutput.scrollHeight;
+      lineIndex++;
+      setTimeout(showNextLine, 30);
+    }
+
+    showNextLine();
+  }
+
+  function handleCliCommand(command) {
+    if (!command.trim()) return;
+
+    // Add to history
+    cliCommandHistory.push(command);
+    cliHistoryIndex = cliCommandHistory.length;
+
+    // Show the command
+    addCliLine('$ ' + command, 'prompt-line');
+
+    // Find response
+    var response = findCliResponse(command);
+
+    if (response) {
+      typewriterOutput(response.output);
+    } else {
+      var suggestions = ['claude', 'claude "what does this project do?"', 'claude "run the tests"',
+        'claude "fix the failing test"', '/help', '/status', 'claude "add a health check endpoint"',
+        'claude "find all test files"', 'claude "commit these changes"', 'claude "search for all TODO comments"'];
+      addCliLine('', 'output-line');
+      addCliLine('Command not recognized. Try one of these:', 'output-line');
+      for (var i = 0; i < suggestions.length; i++) {
+        addCliLine('  ' + suggestions[i], 'output-line');
+      }
+    }
+
+    addCliLine('', 'output-line');
+    cliOutput.scrollTop = cliOutput.scrollHeight;
+    cliInput.value = '';
+  }
+
+  cliInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' || e.keyCode === 13) {
+      handleCliCommand(this.value);
+    } else if (e.key === 'ArrowUp' || e.keyCode === 38) {
+      e.preventDefault();
+      if (cliHistoryIndex > 0) {
+        cliHistoryIndex--;
+        this.value = cliCommandHistory[cliHistoryIndex];
+      }
+    } else if (e.key === 'ArrowDown' || e.keyCode === 40) {
+      e.preventDefault();
+      if (cliHistoryIndex < cliCommandHistory.length - 1) {
+        cliHistoryIndex++;
+        this.value = cliCommandHistory[cliHistoryIndex];
+      } else {
+        cliHistoryIndex = cliCommandHistory.length;
+        this.value = '';
+      }
+    }
+  });
+
+  // Suggestion buttons
+  var suggestions = document.querySelectorAll('.cli-suggestion');
+  for (var s = 0; s < suggestions.length; s++) {
+    suggestions[s].addEventListener('click', function() {
+      var cmd = this.getAttribute('data-cmd');
+      handleCliCommand(cmd);
+    });
+  }
+
+  // Clear button
+  document.getElementById('cliClearBtn').addEventListener('click', function() {
+    cliOutput.innerHTML = '<div class="cli-line welcome-line">Terminal cleared.</div><div class="cli-line welcome-line">&nbsp;</div>';
+    cliCommandHistory = [];
+    cliHistoryIndex = -1;
+  });
+
+  // ==========================================
+  // TOOL PICKER QUIZ
+  // ==========================================
+  var toolQuizData = [
+    {
+      scenario: "You need to find all Python files in a project that import the 'pandas' library.",
+      options: ["Read", "Grep", "Glob", "Bash"],
+      correct: 1,
+      explanation: "Grep searches inside file contents for patterns. It will find all files containing 'import pandas'."
+    },
+    {
+      scenario: "You want to see the full contents of a configuration file at config/settings.json.",
+      options: ["Read", "Grep", "Glob", "Edit"],
+      correct: 0,
+      explanation: "Read displays the full contents of a specific file with line numbers."
+    },
+    {
+      scenario: "You need to rename a function from 'getUserData' to 'fetchUserProfile' in an existing file.",
+      options: ["Write", "Edit", "Bash", "Grep"],
+      correct: 1,
+      explanation: "Edit makes targeted string replacements in existing files -- perfect for renaming."
+    },
+    {
+      scenario: "You want to run the project's test suite and see the results.",
+      options: ["Read", "Edit", "Bash", "Agent"],
+      correct: 2,
+      explanation: "Bash executes shell commands like 'npm test' or 'python -m pytest'."
+    },
+    {
+      scenario: "You need to find all TypeScript files in the src/components directory.",
+      options: ["Grep", "Glob", "Read", "Bash"],
+      correct: 1,
+      explanation: "Glob finds files by name patterns. 'src/components/**/*.tsx' matches all TSX files."
+    },
+    {
+      scenario: "You want Claude to research how the database schema works while you focus on the API layer.",
+      options: ["Read", "Grep", "Agent", "Bash"],
+      correct: 2,
+      explanation: "Agent spawns a sub-agent with its own context window for independent research tasks."
+    },
+    {
+      scenario: "You need to create a brand new test file that does not exist yet.",
+      options: ["Edit", "Write", "Bash", "Read"],
+      correct: 1,
+      explanation: "Write creates new files. Edit only modifies existing files."
+    },
+    {
+      scenario: "You want to find everywhere in the codebase where 'UserService' is used.",
+      options: ["Glob", "Grep", "Read", "Agent"],
+      correct: 1,
+      explanation: "Grep searches file contents for text patterns -- it will find every usage of 'UserService'."
+    },
+    {
+      scenario: "You need to install a new npm package and verify it was added to package.json.",
+      options: ["Write", "Edit", "Bash", "Glob"],
+      correct: 2,
+      explanation: "Bash runs 'npm install package-name', which modifies package.json automatically."
+    },
+    {
+      scenario: "You want to understand a large codebase you have never seen before.",
+      options: ["Read every file", "Agent to explore", "Bash: find .", "Glob then Grep then Read"],
+      correct: 3,
+      explanation: "The 'Orient, Navigate, Read' pattern: Glob finds the structure, Grep locates key code, Read examines specifics."
+    }
+  ];
+
+  var toolQuizState = {
+    answered: 0,
+    correct: 0
+  };
+
+  function renderToolQuiz() {
+    var container = document.getElementById('toolQuizQuestions');
+    var html = '';
+
+    for (var idx = 0; idx < toolQuizData.length; idx++) {
+      var q = toolQuizData[idx];
+      html += '<div class="quiz-question" id="tq-' + idx + '">';
+      html += '<div class="quiz-q-header">';
+      html += '<span class="quiz-q-number">' + (idx + 1) + '</span>';
+      html += '<span class="quiz-q-text">' + q.scenario + '</span>';
+      html += '</div>';
+      html += '<div class="quiz-options">';
+
+      for (var optIdx = 0; optIdx < q.options.length; optIdx++) {
+        html += '<button class="quiz-option" data-tq="' + idx + '" data-opt="' + optIdx + '" onclick="answerToolQuiz(' + idx + ',' + optIdx + ')">';
+        html += q.options[optIdx];
+        html += '</button>';
+      }
+
+      html += '</div>';
+      html += '<div class="quiz-feedback" id="tq-feedback-' + idx + '"></div>';
+      html += '</div>';
+    }
+
+    container.innerHTML = html;
+  }
+
+  window.answerToolQuiz = function(qIdx, optIdx) {
+    var question = toolQuizData[qIdx];
+    var questionEl = document.getElementById('tq-' + qIdx);
+    var feedbackEl = document.getElementById('tq-feedback-' + qIdx);
+    var buttons = questionEl.querySelectorAll('.quiz-option');
+
+    if (questionEl.classList.contains('correct') || questionEl.classList.contains('incorrect')) {
+      return;
+    }
+
+    toolQuizState.answered++;
+
+    var isCorrect = optIdx === question.correct;
+
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].classList.add('disabled');
+      if (i === question.correct) {
+        buttons[i].classList.add('correct-answer');
+      }
+      if (i === optIdx && !isCorrect) {
+        buttons[i].classList.add('wrong-answer');
+      }
+    }
+
+    if (isCorrect) {
+      toolQuizState.correct++;
+      questionEl.classList.add('correct');
+      feedbackEl.className = 'quiz-feedback show correct';
+      feedbackEl.textContent = 'Correct! ' + question.explanation;
+    } else {
+      questionEl.classList.add('incorrect');
+      feedbackEl.className = 'quiz-feedback show incorrect';
+      feedbackEl.textContent = 'Not quite. ' + question.explanation;
+    }
+
+    var scoreFill = document.getElementById('toolQuizScoreFill');
+    var scoreText = document.getElementById('toolQuizScoreText');
+    var pct = (toolQuizState.correct / toolQuizData.length) * 100;
+    scoreFill.style.width = pct + '%';
+    scoreText.textContent = toolQuizState.correct + ' / ' + toolQuizData.length;
+  };
+
+  renderToolQuiz();
+
+  // ==========================================
+  // CONTEXT BUDGET CALCULATOR
+  // ==========================================
+  var TOTAL_BUDGET = 200000;
+  var TOKEN_COSTS = {
+    turns: 400,
+    files: 800,
+    largeFiles: 4000,
+    bash: 1500,
+    search: 300,
+    verbose: 8000
+  };
+
+  window.updateBudget = function() {
+    var turns = parseInt(document.getElementById('sliderTurns').value, 10);
+    var files = parseInt(document.getElementById('sliderFiles').value, 10);
+    var largeFiles = parseInt(document.getElementById('sliderLargeFiles').value, 10);
+    var bash = parseInt(document.getElementById('sliderBash').value, 10);
+    var search = parseInt(document.getElementById('sliderSearch').value, 10);
+    var verbose = parseInt(document.getElementById('sliderVerbose').value, 10);
+
+    document.getElementById('countTurns').textContent = turns;
+    document.getElementById('countFiles').textContent = files;
+    document.getElementById('countLargeFiles').textContent = largeFiles;
+    document.getElementById('countBash').textContent = bash;
+    document.getElementById('countSearch').textContent = search;
+    document.getElementById('countVerbose').textContent = verbose;
+
+    var total = (turns * TOKEN_COSTS.turns) +
+                (files * TOKEN_COSTS.files) +
+                (largeFiles * TOKEN_COSTS.largeFiles) +
+                (bash * TOKEN_COSTS.bash) +
+                (search * TOKEN_COSTS.search) +
+                (verbose * TOKEN_COSTS.verbose);
+
+    var pct = Math.min(100, (total / TOTAL_BUDGET) * 100);
+    var fill = document.getElementById('budgetFill');
+    var fillLabel = document.getElementById('budgetFillLabel');
+    var summaryValue = document.getElementById('budgetSummaryValue');
+
+    fill.style.width = pct + '%';
+
+    var stateClass = 'safe';
+    if (pct > 75) stateClass = 'danger';
+    else if (pct > 45) stateClass = 'moderate';
+
+    fill.className = 'budget-fill ' + stateClass;
+    summaryValue.className = 'budget-summary-value ' + stateClass;
+
+    var totalStr = total.toLocaleString();
+    fillLabel.textContent = totalStr + ' tokens used';
+    var pctStr = Math.round(pct);
+    summaryValue.textContent = totalStr + ' / 200,000 tokens (' + pctStr + '%)';
+
+    if (pct < 3) {
+      fillLabel.textContent = '';
+    }
+  };
+
+  updateBudget();
+
+  // ==========================================
+  // CLAUDE.MD BUILDER
+  // ==========================================
+  window.toggleCheckbox = function(label) {
+    var checkbox = label.querySelector('input[type="checkbox"]');
+    if (checkbox.checked) {
+      label.classList.add('checked');
+    } else {
+      label.classList.remove('checked');
+    }
+    // Delay to allow state change
+    setTimeout(function() {
+      if (checkbox.checked) {
+        label.classList.add('checked');
+      } else {
+        label.classList.remove('checked');
+      }
+      updateClaudeMdPreview();
+    }, 10);
+  };
+
+  window.updateClaudeMdPreview = function() {
+    var projectName = document.getElementById('cmdProjectName').value || 'My Project';
+    var buildCmd = document.getElementById('cmdBuildCmd').value || 'npm run build';
+    var testCmd = document.getElementById('cmdTestCmd').value || 'npm test';
+    var conventions = document.getElementById('cmdConventions').value;
+    var directories = document.getElementById('cmdDirectories').value;
+
+    // Get selected tech stack
+    var techStack = [];
+    var checkboxes = document.querySelectorAll('#cmdTechStack input[type="checkbox"]');
+    for (var i = 0; i < checkboxes.length; i++) {
+      if (checkboxes[i].checked) {
+        techStack.push(checkboxes[i].value);
+      }
+    }
+
+    var md = '# Project: ' + projectName + '\n\n';
+
+    md += '## Tech Stack\n';
+    if (techStack.length > 0) {
+      for (var j = 0; j < techStack.length; j++) {
+        md += '- ' + techStack[j] + '\n';
+      }
+    } else {
+      md += '(No technologies selected)\n';
+    }
+
+    md += '\n## Commands\n';
+    md += '- Build: `' + buildCmd + '`\n';
+    md += '- Test: `' + testCmd + '`\n';
+
+    if (conventions && conventions.trim()) {
+      md += '\n## Coding Conventions\n';
+      var convLines = conventions.split('\n');
+      for (var k = 0; k < convLines.length; k++) {
+        if (convLines[k].trim()) {
+          md += '- ' + convLines[k].trim() + '\n';
+        }
+      }
+    }
+
+    if (directories && directories.trim()) {
+      md += '\n## Important Directories\n';
+      var dirLines = directories.split('\n');
+      for (var l = 0; l < dirLines.length; l++) {
+        if (dirLines[l].trim()) {
+          md += '- ' + dirLines[l].trim() + '\n';
+        }
+      }
+    }
+
+    document.getElementById('claudemdPreviewContent').textContent = md;
+  };
+
+  window.copyClaudeMd = function() {
+    var content = document.getElementById('claudemdPreviewContent').textContent;
+    var btn = document.getElementById('claudemdCopyBtn');
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(content).then(function() {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(function() {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      }).catch(function() {
+        btn.textContent = 'Failed';
+        setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+      });
+    }
+  };
+
+  // Initialize preview
+  updateClaudeMdPreview();
+
+  // ==========================================
+  // FINAL QUIZ
+  // ==========================================
+  var FINAL_QUIZ_KEY = 'claude-training-module-03';
+  var FINAL_QUIZ_COUNT = 8;
+
+  var finalQuizAnswers = ['b', 'b', 'b', 'b', 'b', 'b', 'b', 'b'];
+  var finalQuizSelections = [];
+  for (var fqi = 0; fqi < FINAL_QUIZ_COUNT; fqi++) {
+    finalQuizSelections.push(null);
+  }
+  var finalQuizSubmitted = false;
+
+  window.selectFinalOption = function(qIdx, el) {
+    if (finalQuizSubmitted) return;
+
+    var parentQ = el.closest('.final-quiz-question');
+    var options = parentQ.querySelectorAll('.fq-option');
+    for (var i = 0; i < options.length; i++) {
+      options[i].querySelector('input').checked = false;
+      options[i].style.background = '';
+    }
+
+    el.querySelector('input').checked = true;
+    finalQuizSelections[qIdx] = el.getAttribute('data-fq-val');
+
+    var allAnswered = true;
+    for (var j = 0; j < finalQuizSelections.length; j++) {
+      if (finalQuizSelections[j] === null) {
+        allAnswered = false;
+        break;
+      }
+    }
+    document.getElementById('finalSubmitBtn').disabled = !allAnswered;
+  };
+
+  window.submitFinalQuiz = function() {
+    if (finalQuizSubmitted) return;
+    finalQuizSubmitted = true;
+
+    var score = 0;
+
+    for (var idx = 0; idx < finalQuizSelections.length; idx++) {
+      var sel = finalQuizSelections[idx];
+      var questionEl = document.querySelector('.final-quiz-question[data-fq="' + idx + '"]');
+      var options = questionEl.querySelectorAll('.fq-option');
+
+      for (var i = 0; i < options.length; i++) {
+        var val = options[i].getAttribute('data-fq-val');
+        options[i].style.pointerEvents = 'none';
+
+        if (val === finalQuizAnswers[idx]) {
+          if (sel === val) {
+            options[i].classList.add('selected-correct');
+            score++;
+          } else {
+            options[i].classList.add('reveal-correct');
+          }
+        } else if (val === sel) {
+          options[i].classList.add('selected-wrong');
+        }
+      }
+    }
+
+    var result = document.getElementById('finalResult');
+    var title = document.getElementById('finalResultTitle');
+    var text = document.getElementById('finalResultText');
+
+    result.classList.add('show');
+
+    var passThreshold = 6;
+
+    if (score >= passThreshold) {
+      result.classList.add('pass');
+      result.classList.remove('fail');
+      title.textContent = 'Passed! ' + score + ' / ' + FINAL_QUIZ_COUNT + ' correct';
+      text.textContent = 'Great work! You have a solid understanding of Claude Code and its core tools. ' +
+        'Your progress has been saved. Move on to Module 04: Claude Cowork to continue your training.';
+    } else {
+      result.classList.add('fail');
+      result.classList.remove('pass');
+      title.textContent = score + ' / ' + FINAL_QUIZ_COUNT + ' correct -- Review needed';
+      text.textContent = 'You need at least ' + passThreshold + ' correct answers to pass. Review the material above and try again. ' +
+        'Pay special attention to the tool descriptions and the agentic loop.';
+    }
+
+    var progressData = {
+      score: score,
+      total: FINAL_QUIZ_COUNT,
+      completed: score >= passThreshold,
+      timestamp: new Date().toISOString()
+    };
+    localStorage.setItem(FINAL_QUIZ_KEY, JSON.stringify(progressData));
+
+    document.getElementById('finalSubmitBtn').disabled = true;
+    document.getElementById('finalSubmitBtn').textContent = 'Submitted';
+  };
+
+  // Check for existing progress
+  function loadExistingProgress() {
+    var saved = localStorage.getItem(FINAL_QUIZ_KEY);
+    if (saved) {
+      try {
+        var data = JSON.parse(saved);
+        if (data.completed) {
+          var fill = document.getElementById('sidebarProgressFill');
+          if (fill) {
+            fill.style.width = '100%';
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+  }
+  loadExistingProgress();
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,3423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 32: Cert Domain 3 &mdash; Claude Code Config &amp; Workflows (20%) | Claude AI Training</title>
+<style>
+/* ============================================
+   CSS CUSTOM PROPERTIES & DESIGN SYSTEM
+   Premium Edition: 3-layer shadows, spring transitions,
+   gradient headings, Inter font, deep dark mode
+   ============================================ */
+:root {
+  --primary: #7C3AED;
+  --primary-light: #A78BFA;
+  --primary-dark: #5B21B6;
+  --accent: #06B6D4;
+  --accent-light: #22D3EE;
+  --success: #10B981;
+  --success-light: #34D399;
+  --warning: #F59E0B;
+  --warning-light: #FBBF24;
+  --error: #EF4444;
+  --error-light: #F87171;
+  --bg: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --bg-code: #F1F5F9;
+  --text: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --border: #E2E8F0;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.02);
+  --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 16px -8px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.02);
+  --shadow-glow: 0 0 20px rgba(124,58,237,0.15), 0 10px 25px -5px rgba(0,0,0,0.1), 0 4px 12px rgba(0,0,0,0.04);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --transition: 0.2s ease;
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --sidebar-width: 280px;
+  --content-max: 800px;
+}
+
+[data-theme="dark"] {
+  --bg: #0B0F1A;
+  --bg-card: #141926;
+  --bg-code: #1A1F2E;
+  --text: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --border: #1E2740;
+  --shadow: 0 1px 3px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.03);
+  --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.5), 0 8px 16px -8px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.03);
+  --shadow-glow: 0 0 30px rgba(124,58,237,0.2), 0 10px 25px -5px rgba(0,0,0,0.5), 0 4px 12px rgba(0,0,0,0.3);
+}
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 24px;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  min-height: 100vh;
+  transition: background var(--transition), color var(--transition);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   PREFERS REDUCED MOTION
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================
+   THEME TOGGLE
+   ============================================ */
+.theme-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: all 0.35s var(--spring);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+.theme-toggle:hover {
+  box-shadow: var(--shadow-glow);
+  transform: scale(1.1);
+}
+
+/* ============================================
+   SIDEBAR
+   ============================================ */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  z-index: 900;
+  transition: transform 0.3s ease, background var(--transition);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.sidebar-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+  margin-bottom: 12px;
+  transition: color var(--transition);
+}
+.sidebar-back:hover { color: var(--primary-dark); }
+
+.sidebar-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.sidebar-module-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.sidebar-nav {
+  padding: 12px 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.sidebar-section {
+  margin-bottom: 4px;
+}
+
+.sidebar-section-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 20px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  text-align: left;
+  transition: color var(--transition);
+}
+.sidebar-section-toggle:hover { color: var(--text); }
+.sidebar-section-toggle .chevron {
+  transition: transform 0.2s ease;
+  font-size: 0.65rem;
+}
+.sidebar-section-toggle.collapsed .chevron {
+  transform: rotate(-90deg);
+}
+
+.sidebar-links {
+  list-style: none;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.sidebar-links.collapsed {
+  max-height: 0 !important;
+}
+
+.sidebar-link {
+  display: block;
+  padding: 7px 20px 7px 32px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: all var(--transition);
+  line-height: 1.4;
+}
+.sidebar-link:hover {
+  color: var(--text);
+  background: var(--bg);
+}
+.sidebar-link.active {
+  color: var(--primary);
+  border-left-color: var(--primary);
+  background: rgba(124, 58, 237, 0.05);
+  font-weight: 600;
+}
+[data-theme="dark"] .sidebar-link.active {
+  background: rgba(124, 58, 237, 0.12);
+}
+
+.sidebar-progress {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sidebar-progress-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.sidebar-progress-track {
+  height: 6px;
+  background: var(--bg-code);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.sidebar-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 3px;
+  transition: width 0.5s ease;
+  width: 0%;
+}
+
+/* Hamburger button (mobile) */
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1001;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+  transition: all var(--transition);
+}
+.hamburger span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--text);
+  margin: 4px auto;
+  transition: all 0.3s ease;
+  border-radius: 1px;
+}
+.hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(4px, 4px); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(4px, -4px); }
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 899;
+}
+
+/* ============================================
+   MAIN CONTENT
+   ============================================ */
+.main-content {
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+  transition: margin var(--transition);
+}
+
+.content-wrapper {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 40px 32px 80px;
+}
+
+/* Module Header */
+.module-header {
+  margin-bottom: 48px;
+}
+.module-header .breadcrumb {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+.module-header .breadcrumb a {
+  color: var(--primary);
+  text-decoration: none;
+}
+.module-header .breadcrumb a:hover { text-decoration: underline; }
+
+.module-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.module-badge .number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.module-badge .label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.module-header h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.module-header .description {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 640px;
+}
+
+.module-meta {
+  display: flex;
+  gap: 16px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.module-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  background: var(--bg-code);
+  padding: 6px 14px;
+  border-radius: 20px;
+}
+
+/* ============================================
+   SECTIONS
+   ============================================ */
+.section {
+  margin-bottom: 56px;
+  scroll-margin-top: 24px;
+}
+
+.section-heading {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+  line-height: 1.3;
+}
+
+.section h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-top: 32px;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.section h4 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-top: 24px;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.section p {
+  margin-bottom: 16px;
+  color: var(--text-secondary);
+}
+
+.section ul, .section ol {
+  margin-bottom: 16px;
+  padding-left: 24px;
+}
+.section li {
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+}
+.section li strong {
+  color: var(--text);
+}
+
+/* ============================================
+   CODE BLOCKS
+   ============================================ */
+.code-block {
+  background: #1E293B;
+  color: #E2E8F0;
+  border-radius: var(--radius-sm);
+  padding: 20px 24px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  overflow-x: auto;
+  position: relative;
+  margin: 16px 0 20px;
+  tab-size: 2;
+}
+.code-block .code-label {
+  position: absolute;
+  top: 8px;
+  left: 16px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #64748B;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+.code-block.has-label {
+  padding-top: 36px;
+}
+.code-block .copy-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: #94A3B8;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  transition: all var(--transition);
+}
+.code-block .copy-btn:hover { background: rgba(255,255,255,0.2); color: white; }
+.code-block .copy-btn.copied { background: var(--success); color: white; }
+
+/* Syntax highlighting */
+.kw { color: #C084FC; }
+.str { color: #6EE7B7; }
+.fn { color: #7DD3FC; }
+.cm { color: #64748B; }
+.num { color: #FDBA74; }
+.op { color: #FCA5A5; }
+.type { color: #67E8F9; }
+.param { color: #FDE68A; }
+.prop { color: #F0ABFC; }
+.punc { color: #94A3B8; }
+
+/* Inline code */
+code {
+  background: var(--bg-code);
+  color: var(--primary);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.88em;
+}
+[data-theme="dark"] code {
+  background: #334155;
+}
+.code-block code {
+  background: none;
+  color: inherit;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+  white-space: pre-wrap;
+  display: block;
+}
+
+/* ============================================
+   CALLOUT BOXES
+   ============================================ */
+.callout {
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  margin: 20px 0;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.callout-icon {
+  flex-shrink: 0;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+.callout-content { flex: 1; }
+.callout-content p { margin-bottom: 6px; color: inherit; }
+.callout-content p:last-child { margin-bottom: 0; }
+
+.callout.info {
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  color: #1E40AF;
+}
+.callout.tip {
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  color: #166534;
+}
+.callout.warning {
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  color: #92400E;
+}
+.callout.important {
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  color: #991B1B;
+}
+
+[data-theme="dark"] .callout.info {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: #93C5FD;
+}
+[data-theme="dark"] .callout.tip {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #6EE7B7;
+}
+[data-theme="dark"] .callout.warning {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #FCD34D;
+}
+[data-theme="dark"] .callout.important {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #FCA5A5;
+}
+
+/* ============================================
+   ACCENT CARDS (premium)
+   ============================================ */
+.accent-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin: 24px 0;
+  box-shadow: var(--shadow);
+  transition: transform 0.35s var(--spring), box-shadow 0.35s var(--spring), border-color 0.35s var(--spring);
+}
+.accent-card:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+}
+.accent-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.accent-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+.accent-icon.purple { background: rgba(124,58,237,0.12); color: #7C3AED; }
+.accent-icon.blue { background: rgba(59,130,246,0.12); color: #3B82F6; }
+.accent-icon.green { background: rgba(16,185,129,0.12); color: #10B981; }
+.accent-icon.orange { background: rgba(249,115,22,0.12); color: #F97316; }
+.accent-icon.red { background: rgba(239,68,68,0.12); color: #EF4444; }
+.accent-icon.cyan { background: rgba(6,182,212,0.12); color: #06B6D4; }
+
+[data-theme="dark"] .accent-icon.purple { background: rgba(124,58,237,0.2); }
+[data-theme="dark"] .accent-icon.blue { background: rgba(59,130,246,0.2); }
+[data-theme="dark"] .accent-icon.green { background: rgba(16,185,129,0.2); }
+[data-theme="dark"] .accent-icon.orange { background: rgba(249,115,22,0.2); }
+[data-theme="dark"] .accent-icon.red { background: rgba(239,68,68,0.2); }
+[data-theme="dark"] .accent-icon.cyan { background: rgba(6,182,212,0.2); }
+
+.accent-card-header h4 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text);
+}
+.accent-card-header .card-tag {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 10px;
+  background: var(--bg-code);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.accent-card p {
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+.accent-card ul {
+  padding-left: 20px;
+  margin-bottom: 12px;
+}
+.accent-card li {
+  margin-bottom: 6px;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+}
+
+/* ============================================
+   COMPARISON TABLE
+   ============================================ */
+.comparison-table-wrapper {
+  overflow-x: auto;
+  margin: 20px 0;
+}
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.comparison-table th {
+  background: var(--primary);
+  color: white;
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+.comparison-table th:first-child {
+  border-radius: var(--radius-sm) 0 0 0;
+}
+.comparison-table th:last-child {
+  border-radius: 0 var(--radius-sm) 0 0;
+}
+.comparison-table td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+.comparison-table tr:nth-child(even) td {
+  background: var(--bg);
+}
+.comparison-table tr:last-child td:first-child {
+  border-radius: 0 0 0 var(--radius-sm);
+}
+.comparison-table tr:last-child td:last-child {
+  border-radius: 0 0 var(--radius-sm) 0;
+}
+
+/* ============================================
+   WEIGHT / TASK AREA BADGE
+   ============================================ */
+.weight-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+.weight-badge.large {
+  background: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(6,182,212,0.15));
+  color: var(--primary);
+  border: 1px solid rgba(124,58,237,0.25);
+  font-size: 1.2rem;
+  padding: 10px 20px;
+}
+[data-theme="dark"] .weight-badge.large {
+  background: linear-gradient(135deg, rgba(124,58,237,0.25), rgba(6,182,212,0.2));
+  border-color: rgba(124,58,237,0.4);
+}
+
+.task-area-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.task-area-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+  transition: transform 0.35s var(--spring), box-shadow 0.35s var(--spring);
+}
+.task-area-item:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+.task-area-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  font-weight: 700;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+.task-area-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* ============================================
+   INTERACTIVE: MONOREPO CLAUDE.MD DESIGNER
+   ============================================ */
+.monorepo-designer {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  box-shadow: var(--shadow);
+}
+.monorepo-designer h3 { margin-top: 0; margin-bottom: 8px; }
+
+.monorepo-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.dir-tree {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.85rem;
+  line-height: 1.8;
+  overflow-y: auto;
+  max-height: 500px;
+}
+
+.dir-item {
+  cursor: pointer;
+  padding: 2px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  display: block;
+  white-space: nowrap;
+}
+.dir-item:hover {
+  background: rgba(124,58,237,0.08);
+  color: var(--primary);
+}
+.dir-item.selected {
+  background: rgba(124,58,237,0.15);
+  color: var(--primary);
+  font-weight: 600;
+}
+.dir-item.has-claude {
+  position: relative;
+}
+.dir-item.has-claude::after {
+  content: 'CLAUDE.md';
+  font-size: 0.6rem;
+  background: var(--success);
+  color: white;
+  padding: 1px 5px;
+  border-radius: 3px;
+  margin-left: 6px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  font-family: 'Inter', sans-serif;
+}
+
+.dir-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dir-editor-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.dir-editor-path {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-family: monospace;
+}
+
+.dir-editor textarea {
+  width: 100%;
+  min-height: 160px;
+  padding: 12px 14px;
+  background: #1E293B;
+  color: #E2E8F0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  resize: vertical;
+  transition: border-color var(--transition);
+}
+.dir-editor textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+.dir-editor textarea::placeholder {
+  color: #64748B;
+}
+
+.dir-save-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  background: var(--success);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  align-self: flex-start;
+}
+.dir-save-btn:hover { opacity: 0.9; }
+
+.resolution-preview {
+  margin-top: 16px;
+  padding: 16px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.resolution-preview h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: var(--text);
+}
+.resolution-input-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.resolution-input {
+  flex: 1;
+  padding: 8px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: monospace;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+.resolution-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+.resolution-btn {
+  padding: 8px 16px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.resolution-btn:hover { opacity: 0.9; }
+
+.resolution-chain {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.resolution-rule {
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  border-left: 4px solid transparent;
+}
+.resolution-rule .rule-source {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-bottom: 4px;
+}
+.resolution-rule.global {
+  background: rgba(124,58,237,0.08);
+  border-left-color: var(--primary);
+}
+.resolution-rule.global .rule-source {
+  background: var(--primary);
+  color: white;
+}
+.resolution-rule.project {
+  background: rgba(59,130,246,0.08);
+  border-left-color: #3B82F6;
+}
+.resolution-rule.project .rule-source {
+  background: #3B82F6;
+  color: white;
+}
+.resolution-rule.directory {
+  background: rgba(16,185,129,0.08);
+  border-left-color: var(--success);
+}
+.resolution-rule.directory .rule-source {
+  background: var(--success);
+  color: white;
+}
+.resolution-rule.path-rule {
+  background: rgba(249,115,22,0.08);
+  border-left-color: #F97316;
+}
+.resolution-rule.path-rule .rule-source {
+  background: #F97316;
+  color: white;
+}
+
+/* ============================================
+   INTERACTIVE: CONFIG TROUBLESHOOTER
+   ============================================ */
+.troubleshooter {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  box-shadow: var(--shadow);
+}
+.troubleshooter h3 { margin-top: 0; margin-bottom: 8px; }
+
+.ts-scenario {
+  margin-bottom: 24px;
+  padding: 20px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  transition: border-color 0.3s ease;
+}
+.ts-scenario.correct { border-color: var(--success); }
+.ts-scenario.incorrect { border-color: var(--error); }
+
+.ts-scenario-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.ts-scenario-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--warning);
+  color: white;
+  font-weight: 700;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+.ts-scenario-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+}
+.ts-scenario-detail {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin-bottom: 14px;
+  padding: 10px 14px;
+  background: var(--bg-card);
+  border-radius: 6px;
+  border-left: 3px solid var(--warning);
+  line-height: 1.5;
+}
+
+.ts-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.ts-option {
+  padding: 10px 14px;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+.ts-option:hover:not(.disabled) {
+  border-color: var(--primary-light);
+  background: rgba(124, 58, 237, 0.05);
+}
+.ts-option.correct-answer {
+  border-color: var(--success);
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+[data-theme="dark"] .ts-option.correct-answer { color: #6EE7B7; }
+.ts-option.wrong-answer {
+  border-color: var(--error);
+  background: rgba(239, 68, 68, 0.08);
+  color: var(--error);
+}
+.ts-option.disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+.ts-feedback {
+  margin-top: 12px;
+  font-size: 0.85rem;
+  padding: 10px 14px;
+  border-radius: 6px;
+  display: none;
+  line-height: 1.5;
+}
+.ts-feedback.show { display: block; }
+.ts-feedback.correct {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+.ts-feedback.incorrect {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+}
+[data-theme="dark"] .ts-feedback.correct { color: #6EE7B7; }
+[data-theme="dark"] .ts-feedback.incorrect { color: #FCA5A5; }
+
+.ts-score-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 12px 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+}
+.ts-score-bar .score-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.ts-score-track {
+  flex: 1;
+  height: 8px;
+  background: var(--bg-code);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.ts-score-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--success));
+  border-radius: 4px;
+  transition: width 0.4s ease;
+  width: 0%;
+}
+.ts-score-text {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  min-width: 50px;
+  text-align: right;
+}
+
+/* ============================================
+   INTERACTIVE: CI/CD PIPELINE BUILDER
+   ============================================ */
+.pipeline-builder {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  box-shadow: var(--shadow);
+}
+.pipeline-builder h3 { margin-top: 0; margin-bottom: 8px; }
+
+.pipeline-stages {
+  display: flex;
+  gap: 4px;
+  margin: 20px 0;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+.pipeline-stage {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid var(--border);
+  background: var(--bg);
+  color: var(--text-secondary);
+}
+.pipeline-stage:hover {
+  border-color: var(--primary-light);
+}
+.pipeline-stage.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+.pipeline-stage.configured {
+  background: rgba(16,185,129,0.1);
+  border-color: var(--success);
+  color: var(--success);
+}
+.pipeline-stage.configured.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+.pipeline-arrow {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.pipeline-config {
+  display: none;
+  padding: 20px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 20px;
+}
+.pipeline-config.show { display: block; }
+
+.pipeline-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.pipeline-field label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.pipeline-field input,
+.pipeline-field select,
+.pipeline-field textarea {
+  padding: 10px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-family: inherit;
+  transition: border-color var(--transition);
+}
+.pipeline-field input:focus,
+.pipeline-field select:focus,
+.pipeline-field textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+.pipeline-field textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.pipeline-checkbox-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.pipeline-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.pipeline-checkbox input {
+  accent-color: var(--primary);
+}
+
+.pipeline-generate-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.35s var(--spring);
+}
+.pipeline-generate-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-glow);
+}
+
+.pipeline-output {
+  margin-top: 20px;
+  display: none;
+}
+.pipeline-output.show { display: block; }
+
+/* ============================================
+   QUIZ: PRACTICE EXAM
+   ============================================ */
+.final-quiz {
+  background: var(--bg-card);
+  border: 2px solid var(--primary-light);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  box-shadow: var(--shadow-glow);
+}
+.final-quiz h3 {
+  margin-top: 0;
+}
+
+.final-quiz-question {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.final-quiz-question .fq-number {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+.final-quiz-question .fq-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+.fq-options { list-style: none; padding: 0; }
+.fq-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 12px;
+  margin-bottom: 4px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+.fq-option:hover { background: rgba(124, 58, 237, 0.05); }
+.fq-option input[type="radio"] {
+  accent-color: var(--primary);
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+.fq-option.selected-correct {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+.fq-option.selected-wrong {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+}
+.fq-option.reveal-correct {
+  background: rgba(16, 185, 129, 0.08);
+  color: #059669;
+  font-weight: 600;
+}
+[data-theme="dark"] .fq-option.selected-correct { color: #6EE7B7; }
+[data-theme="dark"] .fq-option.selected-wrong { color: #FCA5A5; }
+[data-theme="dark"] .fq-option.reveal-correct { color: #6EE7B7; }
+
+.final-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 32px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.35s var(--spring);
+  margin-top: 8px;
+}
+.final-submit-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-glow); }
+.final-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.final-result {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: var(--radius-sm);
+  display: none;
+}
+.final-result.show { display: block; }
+.final-result.pass {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.final-result.fail {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.final-result h4 {
+  margin-top: 0;
+  margin-bottom: 6px;
+  font-size: 1.1rem;
+}
+.final-result p {
+  margin-bottom: 0;
+  font-size: 0.95rem;
+}
+.final-result.pass h4 { color: var(--success); }
+.final-result.fail h4 { color: var(--warning); }
+
+/* ============================================
+   KEY CONCEPT HIGHLIGHT
+   ============================================ */
+.key-concept {
+  display: inline-block;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(6, 182, 212, 0.1));
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  color: var(--primary);
+}
+[data-theme="dark"] .key-concept {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(6, 182, 212, 0.15));
+  border-color: rgba(124, 58, 237, 0.35);
+}
+
+/* ============================================
+   STEP-BY-STEP
+   ============================================ */
+.step-list {
+  counter-reset: step-counter;
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+.step-item {
+  counter-increment: step-counter;
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+  transition: transform 0.35s var(--spring), box-shadow 0.35s var(--spring);
+}
+.step-item:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+.step-item::before {
+  content: counter(step-counter);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+.step-content h4 {
+  margin-top: 0;
+  margin-bottom: 6px;
+}
+.step-content p {
+  margin-bottom: 8px;
+}
+
+/* ============================================
+   NAVIGATION FOOTER
+   ============================================ */
+.module-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 16px;
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 2px solid var(--border);
+}
+.nav-link {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: all 0.35s var(--spring);
+  min-width: 0;
+  flex: 1;
+  max-width: 50%;
+  box-shadow: var(--shadow);
+}
+.nav-link:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+}
+.nav-link.next { align-items: flex-end; text-align: right; }
+.nav-link .nav-dir {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--primary);
+}
+.nav-link .nav-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 1024px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .hamburger {
+    display: flex;
+  }
+  .sidebar-overlay.show {
+    display: block;
+  }
+  .main-content {
+    margin-left: 0;
+  }
+  .monorepo-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .content-wrapper {
+    padding: 24px 16px 60px;
+  }
+  .module-header h1 {
+    font-size: 1.6rem;
+  }
+  .section-heading {
+    font-size: 1.3rem;
+  }
+  .task-area-grid {
+    grid-template-columns: 1fr;
+  }
+  .ts-options {
+    grid-template-columns: 1fr;
+  }
+  .pipeline-stages {
+    flex-wrap: wrap;
+  }
+  .module-nav {
+    flex-direction: column;
+  }
+  .nav-link {
+    max-width: 100%;
+  }
+  .nav-link.next {
+    align-items: flex-start;
+    text-align: left;
+  }
+}
+
+/* ============================================
+   SCROLLBAR STYLING
+   ============================================ */
+.sidebar::-webkit-scrollbar,
+.code-block::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.sidebar::-webkit-scrollbar-track,
+.code-block::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+.code-block::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.section {
+  animation: fadeInUp 0.4s ease both;
+}
+</style>
+</head>
+<body>
+<!-- ============================================
+     THEME TOGGLE
+     ============================================ -->
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+  <span id="themeIcon">&#9790;</span>
+</button>
+
+<!-- ============================================
+     HAMBURGER (mobile)
+     ============================================ -->
+<button class="hamburger" id="hamburger" aria-label="Toggle sidebar">
+  <span></span>
+  <span></span>
+  <span></span>
+</button>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ============================================
+     SIDEBAR
+     ============================================ -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="../index.html" class="sidebar-back">&larr; Back to Hub</a>
+    <div class="sidebar-title">Module 32</div>
+    <div class="sidebar-module-name">Cert: Claude Code Config &amp; Workflows</div>
+  </div>
+
+  <div class="sidebar-nav">
+    <!-- Section: Content -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="content">
+        Content <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-content">
+        <li><a href="#domain-overview" class="sidebar-link" data-target="domain-overview">Domain Overview (20%)</a></li>
+        <li><a href="#claudemd-architecture" class="sidebar-link" data-target="claudemd-architecture">CLAUDE.md Architecture</a></li>
+        <li><a href="#commands-skills" class="sidebar-link" data-target="commands-skills">Commands, Skills &amp; Path Rules</a></li>
+        <li><a href="#plan-mode" class="sidebar-link" data-target="plan-mode">Plan Mode vs Direct Execution</a></li>
+        <li><a href="#cicd-refinement" class="sidebar-link" data-target="cicd-refinement">CI/CD &amp; Iterative Refinement</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Interactive -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="interactive">
+        Interactive <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-interactive">
+        <li><a href="#monorepo-designer" class="sidebar-link" data-target="monorepo-designer">Monorepo CLAUDE.md Designer</a></li>
+        <li><a href="#config-troubleshooter" class="sidebar-link" data-target="config-troubleshooter">Configuration Troubleshooter</a></li>
+        <li><a href="#pipeline-builder" class="sidebar-link" data-target="pipeline-builder">CI/CD Pipeline Builder</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Exam -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="exam">
+        Practice Exam <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-exam">
+        <li><a href="#practice-exam" class="sidebar-link" data-target="practice-exam">8-Question Practice Exam</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sidebar-progress">
+    <div class="sidebar-progress-label">Module Progress</div>
+    <div class="sidebar-progress-track">
+      <div class="sidebar-progress-fill" id="sidebarProgressFill"></div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================
+     MAIN CONTENT
+     ============================================ -->
+<main class="main-content">
+  <div class="content-wrapper">
+
+    <!-- Module Header -->
+    <header class="module-header">
+      <div class="breadcrumb">
+        <a href="../index.html">Training Hub</a> &raquo; Certification Prep &raquo; Module 32
+      </div>
+      <div class="module-badge">
+        <span class="number">32</span>
+        <span class="label">Certification</span>
+      </div>
+      <h1>Cert Domain 3: Claude Code Config &amp; Workflows</h1>
+      <p class="description">
+        Master the 20% of the certification exam covering CLAUDE.md hierarchy, custom commands and skills, path-specific rules, plan mode, iterative refinement, and CI/CD integration. This is the largest single domain on the exam.
+      </p>
+      <div class="module-meta">
+        <span class="module-meta-item">&#9201; ~75 min</span>
+        <span class="module-meta-item">&#9733; Expert</span>
+        <span class="module-meta-item">&#127919; 3 Interactive Exercises</span>
+        <span class="module-meta-item">&#128203; 8-Question Practice Exam</span>
+      </div>
+    </header>
+
+    <!-- ========================================
+         SECTION 1: DOMAIN OVERVIEW
+         ======================================== -->
+    <section class="section" id="domain-overview">
+      <h2 class="section-heading">1. Domain Overview</h2>
+
+      <div class="weight-badge large">20% of Exam Weight</div>
+
+      <p>
+        Domain 3 is the <strong>single largest domain</strong> on the certification exam, accounting for 20% of your total score.
+        It tests your mastery of Claude Code's configuration system, workflow modes, and integration with CI/CD pipelines.
+        This domain rewards practitioners who have spent time configuring real projects, not just reading documentation.
+      </p>
+
+      <p>
+        The domain is divided into <strong>6 task areas</strong>. The CLAUDE.md hierarchy and commands/skills areas
+        together account for the majority of questions.
+      </p>
+
+      <h3>The 6 Task Areas</h3>
+
+      <div class="task-area-grid">
+        <div class="task-area-item">
+          <span class="task-area-number">1</span>
+          <span class="task-area-label">CLAUDE.md Hierarchy</span>
+        </div>
+        <div class="task-area-item">
+          <span class="task-area-number">2</span>
+          <span class="task-area-label">Custom Commands/Skills</span>
+        </div>
+        <div class="task-area-item">
+          <span class="task-area-number">3</span>
+          <span class="task-area-label">Path-Specific Rules</span>
+        </div>
+        <div class="task-area-item">
+          <span class="task-area-number">4</span>
+          <span class="task-area-label">Plan Mode</span>
+        </div>
+        <div class="task-area-item">
+          <span class="task-area-number">5</span>
+          <span class="task-area-label">Iterative Refinement</span>
+        </div>
+        <div class="task-area-item">
+          <span class="task-area-number">6</span>
+          <span class="task-area-label">CI/CD Integration</span>
+        </div>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-icon">&#9432;</span>
+        <div class="callout-content">
+          <p><strong>Exam strategy:</strong> CLAUDE.md hierarchy questions are the most common, and they are also the most frequently missed. The exam loves to present scenarios where a rule "should" be working but is not, and asks you to diagnose the scoping issue. Practice the "Resolution Preview" exercise below until you can trace the inheritance chain instantly.</p>
+        </div>
+      </div>
+
+      <h3>What Makes This Domain Challenging</h3>
+
+      <p>
+        This domain tests <strong>system-level thinking</strong>. Individual features (plan mode, commands, path rules) are
+        simple in isolation, but the exam combines them into scenarios where multiple features interact. For example: "A team
+        uses plan mode for architecture decisions, has path-specific rules for Terraform files, and runs Claude in CI for
+        code review. Which configuration ensures the CI pipeline respects both the plan mode output and the Terraform rules?"
+      </p>
+
+      <div class="callout warning">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Common trap:</strong> Confusing <code>.claude/rules/</code> path-scoped rules with directory-level CLAUDE.md files. They solve similar problems but have different scoping mechanisms. The exam specifically tests when to use which.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 2: CLAUDE.MD ARCHITECTURE
+         ======================================== -->
+    <section class="section" id="claudemd-architecture">
+      <h2 class="section-heading">2. CLAUDE.md Architecture for the Exam</h2>
+
+      <p>
+        The CLAUDE.md system is a <span class="key-concept">hierarchical configuration cascade</span> that determines
+        what instructions Claude follows for any given file or task. Understanding the resolution order is essential
+        for both the exam and real-world usage.
+      </p>
+
+      <h3>The Three-Level Hierarchy</h3>
+
+      <div class="accent-card">
+        <div class="accent-card-header">
+          <div class="accent-icon purple">&#127760;</div>
+          <h4>Global: <code>~/.claude/CLAUDE.md</code></h4>
+          <span class="card-tag">User-level</span>
+        </div>
+        <p>
+          Personal preferences that apply to all projects. Things like preferred code style, personal shortcuts,
+          or default behaviors you always want.
+        </p>
+        <ul>
+          <li>Applies to <strong>every project</strong> this user works on</li>
+          <li>Not version-controlled (personal to this machine)</li>
+          <li>Lowest priority -- overridden by project and directory rules</li>
+          <li><strong>Exam trap:</strong> Rules here are invisible to teammates</li>
+        </ul>
+      </div>
+
+      <div class="accent-card">
+        <div class="accent-card-header">
+          <div class="accent-icon blue">&#128193;</div>
+          <h4>Project: <code>./CLAUDE.md</code></h4>
+          <span class="card-tag">Repo root</span>
+        </div>
+        <p>
+          Project-wide conventions shared by the entire team. This is the most important level for
+          team collaboration.
+        </p>
+        <ul>
+          <li>Applies to <strong>all files in this repository</strong></li>
+          <li>Version-controlled -- committed to the repository</li>
+          <li>Overrides global settings; overridden by directory-level</li>
+          <li>Can use <code>@import</code> to pull in modular config files</li>
+        </ul>
+      </div>
+
+      <div class="accent-card">
+        <div class="accent-card-header">
+          <div class="accent-icon green">&#128194;</div>
+          <h4>Directory: <code>subdir/CLAUDE.md</code></h4>
+          <span class="card-tag">Subdirectory</span>
+        </div>
+        <p>
+          Subdirectory-specific rules that apply only when working within that directory tree.
+          Highest priority in the cascade.
+        </p>
+        <ul>
+          <li>Applies to <strong>files in this directory and below</strong></li>
+          <li>Version-controlled alongside the directory's code</li>
+          <li>Highest priority -- overrides both global and project rules</li>
+          <li>Use for framework-specific conventions (e.g., React patterns in <code>frontend/</code>)</li>
+        </ul>
+      </div>
+
+      <h3>The <code>@import</code> Pattern</h3>
+
+      <p>
+        For large projects, a single CLAUDE.md file becomes unwieldy. The <code>@import</code> directive
+        lets you split configuration into modular files.
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">CLAUDE.md</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm"># Project conventions</span>
+
+Use TypeScript strict mode for all new files.
+Run <span class="str">`npm run lint`</span> before committing.
+
+<span class="kw">@import</span> .claude/rules/testing.md
+<span class="kw">@import</span> .claude/rules/security.md
+<span class="kw">@import</span> .claude/rules/api-conventions.md</code></div>
+
+      <h3>Path-Scoped Rules: <code>.claude/rules/</code></h3>
+
+      <p>
+        The <code>.claude/rules/</code> directory supports YAML frontmatter with a <code>paths</code> field
+        that scopes the rule to specific file patterns. This is a more surgical alternative to directory-level CLAUDE.md files.
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">.claude/rules/terraform.md</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>---
+<span class="prop">paths</span>: [<span class="str">"terraform/**/*"</span>, <span class="str">"*.tf"</span>]
+---
+
+<span class="cm"># Terraform Conventions</span>
+- Always use <span class="str">`terraform fmt`</span> before committing
+- Module sources must use version pins
+- State backend must be S3, never local
+- Tag all resources with team and environment</code></div>
+
+      <h3>Diagnosing Hierarchy Issues</h3>
+
+      <p>
+        The exam frequently presents scenarios where configuration is not working as expected.
+        Here is the diagnostic checklist:
+      </p>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Symptom</th>
+              <th>Likely Cause</th>
+              <th>Fix</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>New team member does not get project coding standards</td>
+              <td>Rules are in <code>~/.claude/CLAUDE.md</code> (user-level) instead of project-level</td>
+              <td>Move rules to <code>./CLAUDE.md</code> and commit to repo</td>
+            </tr>
+            <tr>
+              <td>Directory CLAUDE.md rules are being overridden</td>
+              <td>Directory-level should have highest priority -- check if the user has conflicting global rules with <code>!important</code>-style overrides</td>
+              <td>Review the full hierarchy chain; directory wins</td>
+            </tr>
+            <tr>
+              <td>Path-specific rules not applying to expected files</td>
+              <td>The <code>paths</code> glob pattern does not match the target files</td>
+              <td>Test the glob pattern; ensure <code>**/*</code> is used for recursive matching</td>
+            </tr>
+            <tr>
+              <td>Imported file rules not taking effect</td>
+              <td>The <code>@import</code> path is wrong or the file does not exist</td>
+              <td>Verify the relative path from the CLAUDE.md file's location</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 3: COMMANDS, SKILLS & PATH RULES
+         ======================================== -->
+    <section class="section" id="commands-skills">
+      <h2 class="section-heading">3. Commands, Skills &amp; Path Rules</h2>
+
+      <h3>Custom Commands</h3>
+
+      <p>
+        Custom commands extend Claude Code with project-specific or personal workflows. They live as
+        Markdown files in a <code>.claude/commands/</code> directory.
+      </p>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Aspect</th>
+              <th>Project Commands</th>
+              <th>Personal Commands</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Location</strong></td>
+              <td><code>.claude/commands/</code> (project root)</td>
+              <td><code>~/.claude/commands/</code> (home dir)</td>
+            </tr>
+            <tr>
+              <td><strong>Invocation</strong></td>
+              <td><code>/project:command-name</code></td>
+              <td><code>/user:command-name</code></td>
+            </tr>
+            <tr>
+              <td><strong>Shared with team</strong></td>
+              <td>Yes -- committed to repo</td>
+              <td>No -- personal only</td>
+            </tr>
+            <tr>
+              <td><strong>Best for</strong></td>
+              <td>Project-specific workflows (deploy, review, test)</td>
+              <td>Personal productivity shortcuts</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="code-block has-label">
+        <span class="code-label">.claude/commands/review.md</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>Review the changes in the current branch against main.
+Focus on:
+1. Type safety violations
+2. Missing error handling
+3. Security concerns (SQL injection, XSS)
+4. Test coverage for new code paths
+
+Use <span class="str">`git diff main...HEAD`</span> to see the changes.
+Provide a structured review with severity levels.</code></div>
+
+      <h3>Skills: SKILL.md Frontmatter</h3>
+
+      <p>
+        Skills are enhanced commands with metadata that controls execution context.
+        The <code>SKILL.md</code> frontmatter defines critical behavior.
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">SKILL.md Frontmatter</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>---
+<span class="prop">name</span>: <span class="str">deploy-staging</span>
+<span class="prop">context</span>: <span class="str">fork</span>
+<span class="prop">allowed-tools</span>: [<span class="str">Bash</span>, <span class="str">Read</span>, <span class="str">Glob</span>]
+<span class="prop">argument-hint</span>: <span class="str">"branch name to deploy"</span>
+---
+
+<span class="cm"># Deploy to Staging</span>
+Deploy the specified branch to the staging environment.
+1. Verify the branch exists
+2. Run the test suite
+3. Build the Docker image
+4. Push to staging registry
+5. Trigger deployment via kubectl</code></div>
+
+      <p>Key frontmatter fields for the exam:</p>
+
+      <ul>
+        <li><strong><code>context: fork</code></strong> -- Runs the skill in a separate context window (sub-agent), so it does not pollute the main conversation. Use for heavy research or long-running tasks.</li>
+        <li><strong><code>allowed-tools</code></strong> -- Restricts which tools the skill can use. Critical for security-sensitive skills that should not have shell access.</li>
+        <li><strong><code>argument-hint</code></strong> -- Tells the user what argument to pass when invoking the skill.</li>
+      </ul>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>Exam tip:</strong> The <code>context: fork</code> field is heavily tested. The exam asks when to use it (answer: when the skill involves extensive exploration or research that would fill the main context window) and what happens when it is missing (answer: the skill runs in the main context, potentially crowding out the user's conversation history).</p>
+        </div>
+      </div>
+
+      <h3>Path-Specific Rules vs Directory CLAUDE.md</h3>
+
+      <p>
+        Both mechanisms scope rules to specific parts of the codebase, but they solve different problems.
+        The exam specifically tests your ability to choose the right one.
+      </p>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Factor</th>
+              <th>Path-Specific Rules</th>
+              <th>Directory CLAUDE.md</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Scoping mechanism</strong></td>
+              <td>Glob patterns in YAML frontmatter</td>
+              <td>Physical directory location</td>
+            </tr>
+            <tr>
+              <td><strong>Can span directories</strong></td>
+              <td>Yes -- e.g., <code>["*.tf", "modules/**/*"]</code></td>
+              <td>No -- only the directory and its children</td>
+            </tr>
+            <tr>
+              <td><strong>Best for</strong></td>
+              <td>Rules that apply to a file type regardless of where it lives</td>
+              <td>Rules specific to a coherent subsystem (e.g., <code>frontend/</code>)</td>
+            </tr>
+            <tr>
+              <td><strong>Location</strong></td>
+              <td><code>.claude/rules/</code> in project root</td>
+              <td>Any subdirectory</td>
+            </tr>
+            <tr>
+              <td><strong>Example use</strong></td>
+              <td>"All Terraform files must use version pins"</td>
+              <td>"Frontend code uses React 18 patterns"</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout important">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Decision rule for the exam:</strong> If the convention applies to files <em>scattered across multiple directories</em> (like all <code>*.tf</code> files or all <code>*.test.ts</code> files), use path-specific rules. If the convention applies to a <em>cohesive subsystem</em> that lives in one directory tree, use a directory CLAUDE.md.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 4: PLAN MODE VS DIRECT EXECUTION
+         ======================================== -->
+    <section class="section" id="plan-mode">
+      <h2 class="section-heading">4. Plan Mode vs Direct Execution</h2>
+
+      <p>
+        Claude Code offers two execution modes, and the exam tests your ability to choose the right one
+        for a given scenario. This is not about personal preference -- there are objectively better choices
+        depending on the task characteristics.
+      </p>
+
+      <h3>When to Use Plan Mode</h3>
+
+      <div class="accent-card">
+        <div class="accent-card-header">
+          <div class="accent-icon blue">&#128209;</div>
+          <h4>Plan Mode</h4>
+          <span class="card-tag">Think First</span>
+        </div>
+        <p>
+          Claude analyzes the problem, proposes a plan of action, and waits for your approval before
+          making changes. Use when the cost of a wrong action is high.
+        </p>
+        <ul>
+          <li><strong>Complex multi-file refactors:</strong> Changing an interface affects 20+ files</li>
+          <li><strong>Architecture decisions:</strong> Choosing between approaches with trade-offs</li>
+          <li><strong>Unfamiliar codebases:</strong> Claude needs to explore before acting</li>
+          <li><strong>Breaking changes:</strong> Modifications that could impact other teams</li>
+          <li><strong>Database migrations:</strong> Schema changes that are hard to reverse</li>
+        </ul>
+      </div>
+
+      <h3>When to Use Direct Execution</h3>
+
+      <div class="accent-card">
+        <div class="accent-card-header">
+          <div class="accent-icon green">&#9889;</div>
+          <h4>Direct Execution</h4>
+          <span class="card-tag">Act Now</span>
+        </div>
+        <p>
+          Claude makes changes immediately without waiting for approval. Use when the task is
+          well-scoped and the risk is low.
+        </p>
+        <ul>
+          <li><strong>Simple bug fixes:</strong> Off-by-one errors, typos, missing null checks</li>
+          <li><strong>Well-defined additions:</strong> "Add a new endpoint that follows the existing pattern"</li>
+          <li><strong>Test writing:</strong> Adding tests for existing code</li>
+          <li><strong>Documentation updates:</strong> Low-risk content changes</li>
+          <li><strong>Code formatting:</strong> Running linters, fixing style issues</li>
+        </ul>
+      </div>
+
+      <h3>The Explore Sub-Agent</h3>
+
+      <p>
+        The <span class="key-concept">Explore sub-agent</span> runs in a separate context window optimized for
+        verbose discovery. It can read many files, trace call chains, and build understanding without filling
+        your main context. The exam tests when to use it.
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Combining Modes</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm">// Step 1: Plan mode -- understand the architecture</span>
+<span class="str">"Plan how to migrate the authentication system from</span>
+<span class="str"> sessions to JWT tokens."</span>
+
+<span class="cm">// Step 2: Explore sub-agent -- research details</span>
+<span class="str">"Use the Agent tool to find all session-related code</span>
+<span class="str"> across the codebase and map the dependencies."</span>
+
+<span class="cm">// Step 3: Direct execution -- implement</span>
+<span class="str">"Now implement the JWT middleware as planned."</span></code></div>
+
+      <div class="callout info">
+        <span class="callout-icon">&#9432;</span>
+        <div class="callout-content">
+          <p><strong>Exam pattern:</strong> "A developer needs to refactor the payment processing module, which touches 15 files across 3 services. What is the recommended workflow?" The answer is always: plan the architecture first, use explore to map dependencies, then execute implementation directly for each well-defined step.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 5: CI/CD AND ITERATIVE REFINEMENT
+         ======================================== -->
+    <section class="section" id="cicd-refinement">
+      <h2 class="section-heading">5. CI/CD and Iterative Refinement</h2>
+
+      <p>
+        Claude Code can run in non-interactive mode for CI/CD pipelines, automated code review, and
+        structured output generation. The exam tests your ability to configure these integrations correctly.
+      </p>
+
+      <h3>The <code>-p</code> Flag: Non-Interactive Mode</h3>
+
+      <p>
+        The <code>-p</code> (or <code>--prompt</code>) flag runs Claude Code as a one-shot command without
+        interactive input. This is the foundation of all CI/CD integration.
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Basic CI Usage</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm"># Non-interactive code review</span>
+claude -p <span class="str">"Review the changes in this PR for security issues. \
+  Focus on SQL injection, XSS, and auth bypasses."</span>
+
+<span class="cm"># With structured output</span>
+claude -p <span class="str">"Analyze this codebase for type safety issues"</span> \
+  --output-format json \
+  --json-schema <span class="str">'{"type":"object","properties":{"issues":{"type":"array"}}}'</span></code></div>
+
+      <h3>Structured Output: <code>--output-format json</code></h3>
+
+      <p>
+        For CI pipelines that need machine-readable output, combine <code>--output-format json</code> with
+        <code>--json-schema</code> to get structured, validated responses.
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Structured Review Schema</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>{
+  <span class="prop">"type"</span>: <span class="str">"object"</span>,
+  <span class="prop">"properties"</span>: {
+    <span class="prop">"summary"</span>: { <span class="prop">"type"</span>: <span class="str">"string"</span> },
+    <span class="prop">"issues"</span>: {
+      <span class="prop">"type"</span>: <span class="str">"array"</span>,
+      <span class="prop">"items"</span>: {
+        <span class="prop">"type"</span>: <span class="str">"object"</span>,
+        <span class="prop">"properties"</span>: {
+          <span class="prop">"severity"</span>: { <span class="prop">"type"</span>: <span class="str">"string"</span>,
+            <span class="prop">"enum"</span>: [<span class="str">"critical"</span>, <span class="str">"high"</span>, <span class="str">"medium"</span>, <span class="str">"low"</span>] },
+          <span class="prop">"file"</span>: { <span class="prop">"type"</span>: <span class="str">"string"</span> },
+          <span class="prop">"line"</span>: { <span class="prop">"type"</span>: <span class="str">"integer"</span> },
+          <span class="prop">"description"</span>: { <span class="prop">"type"</span>: <span class="str">"string"</span> },
+          <span class="prop">"suggestion"</span>: { <span class="prop">"type"</span>: <span class="str">"string"</span> }
+        }
+      }
+    },
+    <span class="prop">"approved"</span>: { <span class="prop">"type"</span>: <span class="str">"boolean"</span> }
+  }
+}</code></div>
+
+      <h3>Including Prior Review Findings</h3>
+
+      <p>
+        A critical exam topic: when running Claude for iterative review, you must include the previous
+        review's findings in the prompt to <strong>avoid duplicates</strong>. Without this, Claude will
+        report the same issues on every run.
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Iterative Review Pattern</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm"># First review</span>
+claude -p <span class="str">"Review this PR"</span> --output-format json > review-1.json
+
+<span class="cm"># After fixes, include prior findings</span>
+claude -p <span class="str">"Review this PR. These issues were already found</span>
+<span class="str">  and fixed in a previous review: $(cat review-1.json).</span>
+<span class="str">  Do NOT report these again. Focus on new issues only."</span> \
+  --output-format json > review-2.json</code></div>
+
+      <h3>Test-Driven Iteration</h3>
+
+      <p>
+        The <span class="key-concept">interview pattern</span> uses Claude in a loop: write code, run tests,
+        feed failures back, iterate until all tests pass. This is especially powerful in CI.
+      </p>
+
+      <ol class="step-list">
+        <li class="step-item">
+          <div class="step-content">
+            <h4>Define concrete input/output examples</h4>
+            <p>Write test cases first. Give Claude specific examples of expected behavior -- not vague descriptions, but actual input strings and expected output values.</p>
+          </div>
+        </li>
+        <li class="step-item">
+          <div class="step-content">
+            <h4>Generate implementation</h4>
+            <p>Use Claude to write the code, with the test cases as context. Claude can see exactly what "correct" looks like.</p>
+          </div>
+        </li>
+        <li class="step-item">
+          <div class="step-content">
+            <h4>Run tests, feed back failures</h4>
+            <p>Execute the test suite. If tests fail, pass the failure output back to Claude with the instruction to fix only the failing cases.</p>
+          </div>
+        </li>
+        <li class="step-item">
+          <div class="step-content">
+            <h4>Repeat until green</h4>
+            <p>Continue the loop. Each iteration should fix failures without introducing new ones. Set a maximum iteration count (typically 3-5) to prevent infinite loops.</p>
+          </div>
+        </li>
+      </ol>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>Exam tip:</strong> Questions about "concrete input/output examples" always refer to this pattern. The exam tests whether you know that vague instructions ("make it work") produce worse results than specific examples ("given input 'abc', return 'ABC'").</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 1: MONOREPO CLAUDE.MD DESIGNER
+         ======================================== -->
+    <section class="section" id="monorepo-designer">
+      <h2 class="section-heading">Interactive: Monorepo CLAUDE.md Designer</h2>
+
+      <p>
+        Click any directory to add or edit its CLAUDE.md content. Then use the Resolution Preview
+        to see the effective rules for any file path, with a color-coded inheritance chain.
+      </p>
+
+      <div class="monorepo-designer">
+        <h3>Design Your Configuration</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 4px;">Click directories to assign CLAUDE.md rules. Use the preview to trace inheritance.</p>
+
+        <div class="monorepo-layout">
+          <div class="dir-tree" id="dirTree"></div>
+
+          <div class="dir-editor">
+            <div class="dir-editor-title" id="editorTitle">Select a directory</div>
+            <div class="dir-editor-path" id="editorPath"></div>
+            <textarea id="editorTextarea" placeholder="Enter CLAUDE.md content for this directory..." disabled></textarea>
+            <button class="dir-save-btn" id="editorSaveBtn" onclick="saveDirContent()" disabled>Save CLAUDE.md</button>
+          </div>
+        </div>
+
+        <div class="resolution-preview">
+          <h4>Resolution Preview</h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">Enter a file path to see which rules apply and their inheritance chain.</p>
+          <div class="resolution-input-row">
+            <input class="resolution-input" id="resolutionInput" type="text" placeholder="e.g., frontend/src/components/Button.tsx" />
+            <button class="resolution-btn" onclick="resolveRules()">Resolve</button>
+          </div>
+          <div class="resolution-chain" id="resolutionChain"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 2: CONFIGURATION TROUBLESHOOTER
+         ======================================== -->
+    <section class="section" id="config-troubleshooter">
+      <h2 class="section-heading">Interactive: Configuration Troubleshooter</h2>
+
+      <p>
+        For each scenario, identify why Claude Code is behaving unexpectedly.
+        These mirror real exam questions about configuration diagnostics.
+      </p>
+
+      <div class="troubleshooter">
+        <h3>Diagnose the Configuration Issue</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 8px;">5 scenarios -- identify the root cause of each misconfiguration.</p>
+
+        <div class="ts-score-bar">
+          <span class="score-label">Score</span>
+          <div class="ts-score-track">
+            <div class="ts-score-fill" id="tsScoreFill"></div>
+          </div>
+          <span class="ts-score-text" id="tsScoreText">0 / 5</span>
+        </div>
+
+        <div id="tsScenariosContainer"></div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 3: CI/CD PIPELINE BUILDER
+         ======================================== -->
+    <section class="section" id="pipeline-builder">
+      <h2 class="section-heading">Interactive: CI/CD Pipeline Builder</h2>
+
+      <p>
+        Build a GitHub Actions workflow with a Claude Code review stage. Configure each pipeline
+        stage, then generate the complete YAML.
+      </p>
+
+      <div class="pipeline-builder">
+        <h3>Pipeline Configuration</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 4px;">Click a stage to configure it. The Claude Review stage generates the CI/CD YAML.</p>
+
+        <div class="pipeline-stages" id="pipelineStages">
+          <div class="pipeline-stage configured" data-stage="lint" onclick="selectPipelineStage('lint')">Lint</div>
+          <span class="pipeline-arrow">&rarr;</span>
+          <div class="pipeline-stage configured" data-stage="test" onclick="selectPipelineStage('test')">Test</div>
+          <span class="pipeline-arrow">&rarr;</span>
+          <div class="pipeline-stage" data-stage="claude" onclick="selectPipelineStage('claude')">Claude Review</div>
+          <span class="pipeline-arrow">&rarr;</span>
+          <div class="pipeline-stage configured" data-stage="deploy" onclick="selectPipelineStage('deploy')">Deploy</div>
+        </div>
+
+        <!-- Lint config -->
+        <div class="pipeline-config" id="config-lint">
+          <h4 style="margin-top:0; margin-bottom:12px;">Lint Stage</h4>
+          <div class="pipeline-field">
+            <label>Lint Command</label>
+            <input type="text" id="lintCmd" value="npm run lint" />
+          </div>
+        </div>
+
+        <!-- Test config -->
+        <div class="pipeline-config" id="config-test">
+          <h4 style="margin-top:0; margin-bottom:12px;">Test Stage</h4>
+          <div class="pipeline-field">
+            <label>Test Command</label>
+            <input type="text" id="testCmd" value="npm test -- --coverage" />
+          </div>
+        </div>
+
+        <!-- Claude Review config -->
+        <div class="pipeline-config" id="config-claude">
+          <h4 style="margin-top:0; margin-bottom:12px;">Claude Review Stage</h4>
+          <div class="pipeline-field">
+            <label>Model</label>
+            <select id="claudeModel">
+              <option value="claude-sonnet-4-20250514">Claude Sonnet 4</option>
+              <option value="claude-opus-4-20250514">Claude Opus 4</option>
+              <option value="claude-haiku-35-20250421">Claude Haiku 3.5</option>
+            </select>
+          </div>
+          <div class="pipeline-field">
+            <label>Review Prompt</label>
+            <textarea id="claudePrompt">Review the changes in this PR. Focus on:
+1. Security vulnerabilities
+2. Type safety issues
+3. Missing error handling
+4. Performance concerns
+
+Output a structured JSON review.</textarea>
+          </div>
+          <div class="pipeline-field">
+            <label>Output Format</label>
+            <select id="claudeOutput">
+              <option value="json">JSON (structured)</option>
+              <option value="text">Text (human-readable)</option>
+            </select>
+          </div>
+          <div class="pipeline-field">
+            <label>Timeout (seconds)</label>
+            <input type="number" id="claudeTimeout" value="300" min="60" max="900" />
+          </div>
+          <div class="pipeline-checkbox-row">
+            <label class="pipeline-checkbox">
+              <input type="checkbox" id="claudePermBash" /> Allow Bash tool
+            </label>
+            <label class="pipeline-checkbox">
+              <input type="checkbox" id="claudePermRead" checked /> Allow Read tool
+            </label>
+            <label class="pipeline-checkbox">
+              <input type="checkbox" id="claudePermGrep" checked /> Allow Grep tool
+            </label>
+            <label class="pipeline-checkbox">
+              <input type="checkbox" id="claudePermEdit" /> Allow Edit tool
+            </label>
+          </div>
+        </div>
+
+        <!-- Deploy config -->
+        <div class="pipeline-config" id="config-deploy">
+          <h4 style="margin-top:0; margin-bottom:12px;">Deploy Stage</h4>
+          <div class="pipeline-field">
+            <label>Deploy Command</label>
+            <input type="text" id="deployCmd" value="npm run deploy:staging" />
+          </div>
+        </div>
+
+        <button class="pipeline-generate-btn" onclick="generatePipeline()">Generate GitHub Actions YAML</button>
+
+        <div class="pipeline-output" id="pipelineOutput">
+          <div class="code-block has-label">
+            <span class="code-label">.github/workflows/ci.yml</span>
+            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+            <code><span id="pipelineOutputCode"></span></code></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         PRACTICE EXAM (8 Questions)
+         ======================================== -->
+    <section class="section" id="practice-exam">
+      <h2 class="section-heading">Practice Exam: Domain 3</h2>
+
+      <p>
+        This 8-question practice exam simulates the certification format for the Claude Code Config &amp; Workflows domain.
+        You need at least 6 correct to pass. Your score is saved to <code>localStorage</code>.
+      </p>
+
+      <div class="final-quiz">
+        <h3>Domain 3 Practice Exam</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 20px;">8 questions -- 6 correct to pass. Answer all questions before submitting.</p>
+
+        <!-- Question 1 -->
+        <div class="final-quiz-question" data-fq="0">
+          <div class="fq-number">Question 1 of 8</div>
+          <div class="fq-text">
+            A senior developer has carefully written coding standards in their <code>~/.claude/CLAUDE.md</code>. A new team member joins and reports that Claude does not follow these standards. What is the root cause?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="0" data-fq-val="a" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="a"> The new team member's Claude Code version does not support CLAUDE.md
+            </li>
+            <li class="fq-option" data-fq-idx="0" data-fq-val="b" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="b"> The rules are in user-level config (<code>~/.claude/CLAUDE.md</code>), which is personal and not shared; they should be in the project root <code>./CLAUDE.md</code>
+            </li>
+            <li class="fq-option" data-fq-idx="0" data-fq-val="c" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="c"> CLAUDE.md files can only contain 100 lines of content
+            </li>
+            <li class="fq-option" data-fq-idx="0" data-fq-val="d" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="d"> The new team member needs to manually copy the file
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="final-quiz-question" data-fq="1">
+          <div class="fq-number">Question 2 of 8</div>
+          <div class="fq-text">
+            A monorepo has a testing convention that applies to all <code>*.test.ts</code> files across <code>frontend/</code>, <code>backend/</code>, and <code>shared/</code>. Should this rule be a path-specific rule in <code>.claude/rules/</code> or a directory CLAUDE.md?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="1" data-fq-val="a" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="a"> Path-specific rule with <code>paths: ["**/*.test.ts"]</code>, because the convention spans multiple directories
+            </li>
+            <li class="fq-option" data-fq-idx="1" data-fq-val="b" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="b"> Directory CLAUDE.md in each of the three directories
+            </li>
+            <li class="fq-option" data-fq-idx="1" data-fq-val="c" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="c"> Global <code>~/.claude/CLAUDE.md</code> since it applies everywhere
+            </li>
+            <li class="fq-option" data-fq-idx="1" data-fq-val="d" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="d"> It does not matter -- both approaches are identical
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="final-quiz-question" data-fq="2">
+          <div class="fq-number">Question 3 of 8</div>
+          <div class="fq-text">
+            What is the purpose of <code>context: fork</code> in SKILL.md frontmatter?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="2" data-fq-val="a" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="a"> It creates a Git branch fork before running the skill
+            </li>
+            <li class="fq-option" data-fq-idx="2" data-fq-val="b" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="b"> It runs the skill in a separate context window (sub-agent) so heavy exploration does not fill the main conversation
+            </li>
+            <li class="fq-option" data-fq-idx="2" data-fq-val="c" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="c"> It forks the current process to run the skill in parallel
+            </li>
+            <li class="fq-option" data-fq-idx="2" data-fq-val="d" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="d"> It disables all tool access for safety
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 4 -->
+        <div class="final-quiz-question" data-fq="3">
+          <div class="fq-number">Question 4 of 8</div>
+          <div class="fq-text">
+            A developer needs to refactor a payment processing module that touches 15 files across 3 services. Which workflow is most appropriate?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="3" data-fq-val="a" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="a"> Direct execution -- just ask Claude to refactor everything at once
+            </li>
+            <li class="fq-option" data-fq-idx="3" data-fq-val="b" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="b"> Plan mode first to design the refactoring approach, then direct execution for each well-scoped implementation step
+            </li>
+            <li class="fq-option" data-fq-idx="3" data-fq-val="c" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="c"> Only use plan mode -- never switch to direct execution
+            </li>
+            <li class="fq-option" data-fq-idx="3" data-fq-val="d" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="d"> Skip Claude and do it manually since it is too complex
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 5 -->
+        <div class="final-quiz-question" data-fq="4">
+          <div class="fq-number">Question 5 of 8</div>
+          <div class="fq-text">
+            What flag makes Claude Code run in non-interactive mode for CI/CD pipelines?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="4" data-fq-val="a" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="a"> <code>--ci</code>
+            </li>
+            <li class="fq-option" data-fq-idx="4" data-fq-val="b" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="b"> <code>-p</code> (or <code>--prompt</code>)
+            </li>
+            <li class="fq-option" data-fq-idx="4" data-fq-val="c" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="c"> <code>--non-interactive</code>
+            </li>
+            <li class="fq-option" data-fq-idx="4" data-fq-val="d" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="d"> <code>--batch</code>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 6 -->
+        <div class="final-quiz-question" data-fq="5">
+          <div class="fq-number">Question 6 of 8</div>
+          <div class="fq-text">
+            When running Claude for iterative code review in CI, what must you include in subsequent review prompts to avoid duplicate findings?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="5" data-fq-val="a" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="a"> The Git commit hash of the previous review
+            </li>
+            <li class="fq-option" data-fq-idx="5" data-fq-val="b" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="b"> The previous review's findings, with instructions to skip already-reported issues
+            </li>
+            <li class="fq-option" data-fq-idx="5" data-fq-val="c" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="c"> A <code>--no-duplicates</code> flag
+            </li>
+            <li class="fq-option" data-fq-idx="5" data-fq-val="d" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="d"> Nothing -- Claude automatically remembers previous reviews
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 7 -->
+        <div class="final-quiz-question" data-fq="6">
+          <div class="fq-number">Question 7 of 8</div>
+          <div class="fq-text">
+            To get machine-readable output from Claude Code in a CI pipeline, which flags do you combine?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="6" data-fq-val="a" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="a"> <code>--format json --validate</code>
+            </li>
+            <li class="fq-option" data-fq-idx="6" data-fq-val="b" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="b"> <code>--output-format json --json-schema '...'</code>
+            </li>
+            <li class="fq-option" data-fq-idx="6" data-fq-val="c" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="c"> <code>--json --strict</code>
+            </li>
+            <li class="fq-option" data-fq-idx="6" data-fq-val="d" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="d"> Just ask Claude to "output JSON" in the prompt
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 8 -->
+        <div class="final-quiz-question" data-fq="7">
+          <div class="fq-number">Question 8 of 8</div>
+          <div class="fq-text">
+            A team uses Claude for code generation. They notice that vague prompts like "make the API better" produce poor results, while specific prompts with examples produce excellent results. What iterative refinement technique does this demonstrate?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="7" data-fq-val="a" onclick="selectFinalOption(7, this)">
+              <input type="radio" name="fq7" value="a"> Chain-of-thought prompting
+            </li>
+            <li class="fq-option" data-fq-idx="7" data-fq-val="b" onclick="selectFinalOption(7, this)">
+              <input type="radio" name="fq7" value="b"> The interview pattern -- providing concrete input/output examples rather than vague descriptions
+            </li>
+            <li class="fq-option" data-fq-idx="7" data-fq-val="c" onclick="selectFinalOption(7, this)">
+              <input type="radio" name="fq7" value="c"> Temperature tuning
+            </li>
+            <li class="fq-option" data-fq-idx="7" data-fq-val="d" onclick="selectFinalOption(7, this)">
+              <input type="radio" name="fq7" value="d"> Model fine-tuning
+            </li>
+          </ul>
+        </div>
+
+        <button class="final-submit-btn" id="finalSubmitBtn" onclick="submitFinalQuiz()" disabled>
+          Submit Answers
+        </button>
+
+        <div class="final-result" id="finalResult">
+          <h4 id="finalResultTitle"></h4>
+          <p id="finalResultText"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         NAVIGATION FOOTER
+         ======================================== -->
+    <nav class="module-nav">
+      <a href="31-cert-domain2.html" class="nav-link prev">
+        <span class="nav-dir">&larr; Previous</span>
+        <span class="nav-title">Module 31: Cert Domain 2 &mdash; Tool Design &amp; MCP</span>
+      </a>
+      <a href="33-cert-domain4.html" class="nav-link next">
+        <span class="nav-dir">Next &rarr;</span>
+        <span class="nav-title">Module 33: Cert Domain 4</span>
+      </a>
+    </nav>
+
+  </div>
+</main>
+
+<!-- ============================================
+     JAVASCRIPT
+     ============================================ -->
+<script>
+(function() {
+  'use strict';
+
+  // ==========================================
+  // THEME MANAGEMENT
+  // ==========================================
+  var THEME_KEY = 'claude-training-theme';
+
+  function getTheme() {
+    return localStorage.getItem(THEME_KEY) || 'light';
+  }
+
+  function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem(THEME_KEY, theme);
+    var icon = document.getElementById('themeIcon');
+    if (icon) {
+      icon.textContent = theme === 'dark' ? '\u2600' : '\u263E';
+    }
+  }
+
+  setTheme(getTheme());
+
+  document.getElementById('themeToggle').addEventListener('click', function() {
+    var current = getTheme();
+    setTheme(current === 'dark' ? 'light' : 'dark');
+  });
+
+  // ==========================================
+  // SIDEBAR MOBILE TOGGLE
+  // ==========================================
+  var hamburger = document.getElementById('hamburger');
+  var sidebar = document.getElementById('sidebar');
+  var overlay = document.getElementById('sidebarOverlay');
+
+  function toggleSidebar() {
+    var isOpen = sidebar.classList.contains('open');
+    sidebar.classList.toggle('open');
+    hamburger.classList.toggle('open');
+    if (isOpen) {
+      overlay.classList.remove('show');
+    } else {
+      overlay.classList.add('show');
+    }
+  }
+
+  hamburger.addEventListener('click', toggleSidebar);
+  overlay.addEventListener('click', toggleSidebar);
+
+  // ==========================================
+  // SIDEBAR SECTION COLLAPSING
+  // ==========================================
+  var sectionToggles = document.querySelectorAll('.sidebar-section-toggle');
+  for (var t = 0; t < sectionToggles.length; t++) {
+    (function(btn) {
+      btn.addEventListener('click', function() {
+        var sectionName = this.getAttribute('data-section');
+        var linksList = document.getElementById('nav-' + sectionName);
+        var isCollapsed = this.classList.contains('collapsed');
+
+        if (isCollapsed) {
+          this.classList.remove('collapsed');
+          linksList.classList.remove('collapsed');
+          linksList.style.maxHeight = linksList.scrollHeight + 'px';
+        } else {
+          this.classList.add('collapsed');
+          linksList.style.maxHeight = linksList.scrollHeight + 'px';
+          linksList.offsetHeight;
+          linksList.classList.add('collapsed');
+        }
+      });
+
+      var sectionName = btn.getAttribute('data-section');
+      var linksList = document.getElementById('nav-' + sectionName);
+      if (linksList) {
+        linksList.style.maxHeight = linksList.scrollHeight + 'px';
+      }
+    })(sectionToggles[t]);
+  }
+
+  // ==========================================
+  // SCROLLSPY
+  // ==========================================
+  var sidebarLinks = document.querySelectorAll('.sidebar-link');
+  var sections = [];
+
+  for (var s = 0; s < sidebarLinks.length; s++) {
+    var targetId = sidebarLinks[s].getAttribute('data-target');
+    var sectionEl = document.getElementById(targetId);
+    if (sectionEl) {
+      sections.push({ el: sectionEl, link: sidebarLinks[s], id: targetId });
+    }
+  }
+
+  function updateScrollspy() {
+    var scrollPos = window.scrollY + 100;
+    var active = null;
+
+    for (var i = sections.length - 1; i >= 0; i--) {
+      if (sections[i].el.offsetTop <= scrollPos) {
+        active = sections[i];
+        break;
+      }
+    }
+
+    for (var j = 0; j < sidebarLinks.length; j++) {
+      sidebarLinks[j].classList.remove('active');
+    }
+    if (active) {
+      active.link.classList.add('active');
+    }
+
+    updateSidebarProgress();
+  }
+
+  var scrollTimer = null;
+  window.addEventListener('scroll', function() {
+    if (scrollTimer) return;
+    scrollTimer = setTimeout(function() {
+      scrollTimer = null;
+      updateScrollspy();
+    }, 50);
+  });
+  updateScrollspy();
+
+  for (var sl = 0; sl < sidebarLinks.length; sl++) {
+    sidebarLinks[sl].addEventListener('click', function() {
+      if (window.innerWidth <= 1024) {
+        sidebar.classList.remove('open');
+        hamburger.classList.remove('open');
+        overlay.classList.remove('show');
+      }
+    });
+  }
+
+  // ==========================================
+  // SIDEBAR PROGRESS
+  // ==========================================
+  function updateSidebarProgress() {
+    var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    var scrolled = window.scrollY;
+    var pct = docHeight > 0 ? Math.min(100, (scrolled / docHeight) * 100) : 0;
+
+    var fill = document.getElementById('sidebarProgressFill');
+    if (fill) {
+      fill.style.width = pct + '%';
+    }
+  }
+
+  // ==========================================
+  // COPY TO CLIPBOARD
+  // ==========================================
+  window.copyCode = function(btn) {
+    var block = btn.closest('.code-block');
+    var codeEl = block.cloneNode(true);
+    var labelEl = codeEl.querySelector('.code-label');
+    var btnEl = codeEl.querySelector('.copy-btn');
+    if (labelEl) labelEl.remove();
+    if (btnEl) btnEl.remove();
+
+    var text = codeEl.textContent.trim();
+
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(function() {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(function() {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      }).catch(function() {
+        btn.textContent = 'Failed';
+        setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+      });
+    }
+  };
+
+  // ==========================================
+  // INTERACTIVE 1: MONOREPO CLAUDE.MD DESIGNER
+  // ==========================================
+  var dirStructure = [
+    { path: '/', label: '/ (project root)', depth: 0 },
+    { path: '/frontend/', label: 'frontend/', depth: 1 },
+    { path: '/frontend/src/', label: 'src/', depth: 2 },
+    { path: '/frontend/src/components/', label: 'components/', depth: 3 },
+    { path: '/frontend/src/hooks/', label: 'hooks/', depth: 3 },
+    { path: '/frontend/src/pages/', label: 'pages/', depth: 3 },
+    { path: '/backend/', label: 'backend/', depth: 1 },
+    { path: '/backend/api/', label: 'api/', depth: 2 },
+    { path: '/backend/services/', label: 'services/', depth: 2 },
+    { path: '/backend/models/', label: 'models/', depth: 2 },
+    { path: '/shared/', label: 'shared/', depth: 1 },
+    { path: '/shared/types/', label: 'types/', depth: 2 },
+    { path: '/shared/utils/', label: 'utils/', depth: 2 },
+    { path: '/infra/', label: 'infra/', depth: 1 },
+    { path: '/infra/terraform/', label: 'terraform/', depth: 2 },
+    { path: '/infra/docker/', label: 'docker/', depth: 2 }
+  ];
+
+  var dirContents = {
+    '/': 'Use TypeScript strict mode.\nRun npm run lint before committing.\nPrefer functional components.\n\n@import .claude/rules/testing.md',
+    '/frontend/': 'Use React 18 patterns.\nAll components must have proper TypeScript types.\nUse Tailwind CSS for styling.',
+    '/backend/': 'Use FastAPI patterns.\nAll endpoints must have OpenAPI docs.\nUse dependency injection.',
+    '/infra/terraform/': 'Use terraform fmt before committing.\nAll resources must have team and environment tags.\nModule sources must use version pins.'
+  };
+
+  var selectedDir = null;
+
+  function renderDirTree() {
+    var container = document.getElementById('dirTree');
+    var html = '';
+
+    for (var i = 0; i < dirStructure.length; i++) {
+      var dir = dirStructure[i];
+      var indent = '';
+      for (var d = 0; d < dir.depth; d++) {
+        indent += '&nbsp;&nbsp;';
+      }
+      var prefix = dir.depth > 0 ? '&#9492;&#9472; ' : '';
+      var hasClaude = dirContents[dir.path] ? ' has-claude' : '';
+      var sel = selectedDir === dir.path ? ' selected' : '';
+
+      html += '<div class="dir-item' + hasClaude + sel + '" data-path="' + dir.path + '" onclick="selectDir(\'' + dir.path + '\')">';
+      html += indent + prefix + dir.label;
+      html += '</div>';
+    }
+
+    container.innerHTML = html;
+  }
+
+  window.selectDir = function(path) {
+    selectedDir = path;
+
+    var titleEl = document.getElementById('editorTitle');
+    var pathEl = document.getElementById('editorPath');
+    var textareaEl = document.getElementById('editorTextarea');
+    var saveBtn = document.getElementById('editorSaveBtn');
+
+    titleEl.textContent = 'CLAUDE.md for ' + path;
+    pathEl.textContent = path + 'CLAUDE.md';
+    textareaEl.disabled = false;
+    textareaEl.value = dirContents[path] || '';
+    saveBtn.disabled = false;
+
+    renderDirTree();
+  };
+
+  window.saveDirContent = function() {
+    if (!selectedDir) return;
+    var textareaEl = document.getElementById('editorTextarea');
+    var content = textareaEl.value.trim();
+
+    if (content) {
+      dirContents[selectedDir] = content;
+    } else {
+      delete dirContents[selectedDir];
+    }
+
+    renderDirTree();
+  };
+
+  window.resolveRules = function() {
+    var input = document.getElementById('resolutionInput').value.trim();
+    var chainEl = document.getElementById('resolutionChain');
+
+    if (!input) {
+      chainEl.innerHTML = '<p style="color: var(--text-muted); font-size: 0.85rem;">Enter a file path above.</p>';
+      return;
+    }
+
+    // Normalize path
+    if (input.charAt(0) !== '/') input = '/' + input;
+
+    // Build the chain
+    var chain = [];
+
+    // 1. Global level (simulated)
+    chain.push({
+      level: 'global',
+      source: '~/.claude/CLAUDE.md',
+      content: 'Prefer concise code comments.\nUse descriptive variable names.'
+    });
+
+    // 2. Project root
+    if (dirContents['/']) {
+      chain.push({
+        level: 'project',
+        source: '/CLAUDE.md',
+        content: dirContents['/']
+      });
+    }
+
+    // 3. Check path-specific rules
+    if (input.indexOf('.test.') !== -1 || input.indexOf('.spec.') !== -1) {
+      chain.push({
+        level: 'path-rule',
+        source: '.claude/rules/testing.md (paths: ["**/*.test.*"])',
+        content: 'Use describe/it blocks.\nAim for 80% coverage.\nMock external services.'
+      });
+    }
+    if (input.indexOf('.tf') !== -1 || input.indexOf('terraform') !== -1) {
+      chain.push({
+        level: 'path-rule',
+        source: '.claude/rules/terraform.md (paths: ["terraform/**/*", "*.tf"])',
+        content: 'Use terraform fmt.\nVersion-pin module sources.\nTag all resources.'
+      });
+    }
+
+    // 4. Directory CLAUDE.md -- find the most specific match
+    var pathParts = input.split('/').filter(function(p) { return p.length > 0; });
+    for (var i = 1; i <= pathParts.length; i++) {
+      var dirPath = '/' + pathParts.slice(0, i).join('/') + '/';
+      if (dirContents[dirPath]) {
+        chain.push({
+          level: 'directory',
+          source: dirPath + 'CLAUDE.md',
+          content: dirContents[dirPath]
+        });
+      }
+    }
+
+    // Render chain
+    var html = '';
+    if (chain.length === 0) {
+      html = '<p style="color: var(--text-muted); font-size: 0.85rem;">No rules apply to this path.</p>';
+    } else {
+      html += '<p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">Rules applied (lowest to highest priority):</p>';
+      for (var c = 0; c < chain.length; c++) {
+        var rule = chain[c];
+        var levelClass = rule.level;
+        var levelLabel = rule.level === 'path-rule' ? 'Path Rule' :
+                        rule.level.charAt(0).toUpperCase() + rule.level.slice(1);
+
+        html += '<div class="resolution-rule ' + levelClass + '">';
+        html += '<div class="rule-source">' + levelLabel + '</div>';
+        html += '<div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 4px; font-family: monospace;">' + rule.source + '</div>';
+        html += '<div style="font-size: 0.85rem; color: var(--text-secondary); white-space: pre-line;">' + rule.content + '</div>';
+        html += '</div>';
+      }
+    }
+
+    chainEl.innerHTML = html;
+  };
+
+  renderDirTree();
+
+  // ==========================================
+  // INTERACTIVE 2: CONFIG TROUBLESHOOTER
+  // ==========================================
+  var tsScenarios = [
+    {
+      title: 'New team member missing coding standards',
+      detail: 'A senior developer set up comprehensive coding standards for the project. Everything works perfectly on their machine. A new developer joins, clones the repo, and reports that Claude does not follow any of the coding standards.',
+      options: [
+        'The new developer needs to install a plugin',
+        'The standards are in ~/.claude/CLAUDE.md (user-level) instead of project-level ./CLAUDE.md',
+        'Claude Code has a per-user license limit',
+        'The new developer needs to restart their terminal'
+      ],
+      correct: 1,
+      explanation: 'User-level CLAUDE.md (~/.claude/CLAUDE.md) is personal and not version-controlled. Only the developer who created it has access. The fix is to move the standards to the project root ./CLAUDE.md and commit it to the repository.'
+    },
+    {
+      title: 'Claude ignores testing rules in api/ directory',
+      detail: 'A team has a path-specific rule in .claude/rules/testing.md with paths: ["tests/**/*"]. They notice Claude does not follow these testing conventions when working on files in backend/api/tests/. The tests directory exists and contains .test.ts files.',
+      options: [
+        'Claude Code does not support nested test directories',
+        'The path pattern "tests/**/*" only matches a top-level tests/ directory, not backend/api/tests/',
+        'The .test.ts extension is not recognized',
+        'Path-specific rules are deprecated'
+      ],
+      correct: 1,
+      explanation: 'The glob pattern "tests/**/*" only matches files under a top-level tests/ directory. To match tests in any subdirectory, use "**/tests/**/*" or "backend/api/tests/**/*".'
+    },
+    {
+      title: 'Directory CLAUDE.md has no effect',
+      detail: 'A developer creates frontend/CLAUDE.md with React-specific conventions. However, when working on files in frontend/src/components/, Claude does not follow the React rules. The project root CLAUDE.md exists and works correctly.',
+      options: [
+        'The frontend/CLAUDE.md file has a syntax error in its content',
+        'Directory CLAUDE.md files only apply to files directly in that directory, not subdirectories',
+        'The @import directive in the root CLAUDE.md is overriding the directory rules',
+        'The file might not be saved, or Claude needs to be restarted to pick up new CLAUDE.md files'
+      ],
+      correct: 3,
+      explanation: 'CLAUDE.md files are read when a conversation starts. If the file was added after the conversation began, Claude will not see it until the next session. Alternatively, verify the file is actually saved and in the correct location.'
+    },
+    {
+      title: 'CI pipeline Claude review reports same issues every run',
+      detail: 'A team runs Claude Code in their CI pipeline for code review using the -p flag. After developers fix the reported issues, the next CI run reports the exact same issues again, even though the code has been changed.',
+      options: [
+        'The -p flag does not work in CI environments',
+        'The CI pipeline is using a cached version of the code',
+        'The review prompt does not include the previous review findings, so Claude has no context about what was already reported and fixed',
+        'Claude Code requires a paid CI license'
+      ],
+      correct: 2,
+      explanation: 'In non-interactive mode (-p), Claude has no memory of previous runs. To avoid duplicate findings, include the previous review output in the prompt with instructions like "These issues were already found and fixed -- do NOT report them again."'
+    },
+    {
+      title: 'Custom command not found',
+      detail: 'A developer creates a file at .claude/commands/deploy.md and tries to invoke it with /deploy. Claude responds with "Unknown command." Other project commands like /project:review work correctly.',
+      options: [
+        'Custom commands must be invoked as /project:deploy, not /deploy',
+        'The deploy.md file needs YAML frontmatter to be recognized',
+        'Custom commands only work in plan mode',
+        'The .claude/commands/ directory needs a package.json'
+      ],
+      correct: 0,
+      explanation: 'Project-scoped custom commands must be invoked with the /project: prefix (e.g., /project:deploy). The bare /deploy syntax does not resolve to project commands. Personal commands use the /user: prefix.'
+    }
+  ];
+
+  var tsState = { answered: 0, correct: 0 };
+
+  function renderTsScenarios() {
+    var container = document.getElementById('tsScenariosContainer');
+    var html = '';
+
+    for (var i = 0; i < tsScenarios.length; i++) {
+      var sc = tsScenarios[i];
+      html += '<div class="ts-scenario" id="ts-' + i + '">';
+      html += '<div class="ts-scenario-header">';
+      html += '<span class="ts-scenario-number">' + (i + 1) + '</span>';
+      html += '<span class="ts-scenario-text">' + sc.title + '</span>';
+      html += '</div>';
+      html += '<div class="ts-scenario-detail">' + sc.detail + '</div>';
+      html += '<div class="ts-options">';
+
+      for (var o = 0; o < sc.options.length; o++) {
+        html += '<div class="ts-option" id="ts-' + i + '-' + o + '" onclick="answerTs(' + i + ',' + o + ')">';
+        html += sc.options[o];
+        html += '</div>';
+      }
+
+      html += '</div>';
+      html += '<div class="ts-feedback" id="ts-feedback-' + i + '"></div>';
+      html += '</div>';
+    }
+
+    container.innerHTML = html;
+  }
+
+  window.answerTs = function(idx, optIdx) {
+    var scenarioEl = document.getElementById('ts-' + idx);
+    if (scenarioEl.classList.contains('correct') || scenarioEl.classList.contains('incorrect')) {
+      return;
+    }
+
+    var scenario = tsScenarios[idx];
+    var feedbackEl = document.getElementById('ts-feedback-' + idx);
+
+    tsState.answered++;
+
+    var isCorrect = optIdx === scenario.correct;
+
+    for (var o = 0; o < scenario.options.length; o++) {
+      var optEl = document.getElementById('ts-' + idx + '-' + o);
+      optEl.classList.add('disabled');
+      if (o === scenario.correct) {
+        optEl.classList.add('correct-answer');
+      }
+      if (o === optIdx && !isCorrect) {
+        optEl.classList.add('wrong-answer');
+      }
+    }
+
+    if (isCorrect) {
+      tsState.correct++;
+      scenarioEl.classList.add('correct');
+      feedbackEl.className = 'ts-feedback show correct';
+      feedbackEl.textContent = 'Correct! ' + scenario.explanation;
+    } else {
+      scenarioEl.classList.add('incorrect');
+      feedbackEl.className = 'ts-feedback show incorrect';
+      feedbackEl.textContent = 'Not quite. ' + scenario.explanation;
+    }
+
+    var scoreFill = document.getElementById('tsScoreFill');
+    var scoreText = document.getElementById('tsScoreText');
+    var pct = (tsState.correct / tsScenarios.length) * 100;
+    scoreFill.style.width = pct + '%';
+    scoreText.textContent = tsState.correct + ' / ' + tsScenarios.length;
+  };
+
+  renderTsScenarios();
+
+  // ==========================================
+  // INTERACTIVE 3: CI/CD PIPELINE BUILDER
+  // ==========================================
+  var activeStage = null;
+
+  window.selectPipelineStage = function(stage) {
+    activeStage = stage;
+
+    // Update stage buttons
+    var stageEls = document.querySelectorAll('.pipeline-stage');
+    for (var i = 0; i < stageEls.length; i++) {
+      stageEls[i].classList.remove('active');
+      if (stageEls[i].getAttribute('data-stage') === stage) {
+        stageEls[i].classList.add('active');
+      }
+    }
+
+    // Show correct config panel
+    var configs = document.querySelectorAll('.pipeline-config');
+    for (var c = 0; c < configs.length; c++) {
+      configs[c].classList.remove('show');
+    }
+    var target = document.getElementById('config-' + stage);
+    if (target) {
+      target.classList.add('show');
+    }
+  };
+
+  window.generatePipeline = function() {
+    var lintCmd = document.getElementById('lintCmd').value.trim() || 'npm run lint';
+    var testCmd = document.getElementById('testCmd').value.trim() || 'npm test';
+    var model = document.getElementById('claudeModel').value;
+    var prompt = document.getElementById('claudePrompt').value.trim();
+    var outputFmt = document.getElementById('claudeOutput').value;
+    var timeout = document.getElementById('claudeTimeout').value || '300';
+    var deployCmd = document.getElementById('deployCmd').value.trim() || 'npm run deploy';
+
+    var allowedTools = [];
+    if (document.getElementById('claudePermBash').checked) allowedTools.push('Bash');
+    if (document.getElementById('claudePermRead').checked) allowedTools.push('Read');
+    if (document.getElementById('claudePermGrep').checked) allowedTools.push('Grep');
+    if (document.getElementById('claudePermEdit').checked) allowedTools.push('Edit');
+
+    // Mark claude stage as configured
+    var claudeStage = document.querySelector('.pipeline-stage[data-stage="claude"]');
+    claudeStage.classList.add('configured');
+
+    // Build YAML
+    var yaml = '';
+    yaml += '<span class="prop">name</span>: <span class="str">CI/CD Pipeline</span>\n';
+    yaml += '\n';
+    yaml += '<span class="kw">on</span>:\n';
+    yaml += '  <span class="prop">pull_request</span>:\n';
+    yaml += '    <span class="prop">branches</span>: [<span class="str">main</span>]\n';
+    yaml += '  <span class="prop">push</span>:\n';
+    yaml += '    <span class="prop">branches</span>: [<span class="str">main</span>]\n';
+    yaml += '\n';
+    yaml += '<span class="kw">jobs</span>:\n';
+
+    // Lint
+    yaml += '  <span class="prop">lint</span>:\n';
+    yaml += '    <span class="prop">runs-on</span>: <span class="str">ubuntu-latest</span>\n';
+    yaml += '    <span class="prop">steps</span>:\n';
+    yaml += '      - <span class="prop">uses</span>: <span class="str">actions/checkout@v4</span>\n';
+    yaml += '      - <span class="prop">uses</span>: <span class="str">actions/setup-node@v4</span>\n';
+    yaml += '        <span class="prop">with</span>:\n';
+    yaml += '          <span class="prop">node-version</span>: <span class="str">20</span>\n';
+    yaml += '      - <span class="prop">run</span>: <span class="str">npm ci</span>\n';
+    yaml += '      - <span class="prop">run</span>: <span class="str">' + escapeHtml(lintCmd) + '</span>\n';
+    yaml += '\n';
+
+    // Test
+    yaml += '  <span class="prop">test</span>:\n';
+    yaml += '    <span class="prop">runs-on</span>: <span class="str">ubuntu-latest</span>\n';
+    yaml += '    <span class="prop">needs</span>: <span class="str">lint</span>\n';
+    yaml += '    <span class="prop">steps</span>:\n';
+    yaml += '      - <span class="prop">uses</span>: <span class="str">actions/checkout@v4</span>\n';
+    yaml += '      - <span class="prop">uses</span>: <span class="str">actions/setup-node@v4</span>\n';
+    yaml += '        <span class="prop">with</span>:\n';
+    yaml += '          <span class="prop">node-version</span>: <span class="str">20</span>\n';
+    yaml += '      - <span class="prop">run</span>: <span class="str">npm ci</span>\n';
+    yaml += '      - <span class="prop">run</span>: <span class="str">' + escapeHtml(testCmd) + '</span>\n';
+    yaml += '\n';
+
+    // Claude Review
+    yaml += '  <span class="prop">claude-review</span>:\n';
+    yaml += '    <span class="prop">runs-on</span>: <span class="str">ubuntu-latest</span>\n';
+    yaml += '    <span class="prop">needs</span>: <span class="str">test</span>\n';
+    yaml += '    <span class="prop">if</span>: <span class="str">github.event_name == \'pull_request\'</span>\n';
+    yaml += '    <span class="prop">timeout-minutes</span>: <span class="num">' + Math.ceil(parseInt(timeout) / 60) + '</span>\n';
+    yaml += '    <span class="prop">steps</span>:\n';
+    yaml += '      - <span class="prop">uses</span>: <span class="str">actions/checkout@v4</span>\n';
+    yaml += '        <span class="prop">with</span>:\n';
+    yaml += '          <span class="prop">fetch-depth</span>: <span class="num">0</span>\n';
+    yaml += '      - <span class="prop">name</span>: <span class="str">Run Claude Code Review</span>\n';
+    yaml += '        <span class="prop">env</span>:\n';
+    yaml += '          <span class="prop">ANTHROPIC_API_KEY</span>: <span class="str">${{ secrets.ANTHROPIC_API_KEY }}</span>\n';
+    yaml += '        <span class="prop">run</span>: |\n';
+
+    var claudeCmd = '          claude -p "' + escapeHtml(prompt).replace(/\n/g, ' ') + '"';
+    if (model) {
+      claudeCmd += ' \\\n            --model ' + model;
+    }
+    if (outputFmt === 'json') {
+      claudeCmd += ' \\\n            --output-format json';
+    }
+    if (allowedTools.length > 0 && allowedTools.length < 4) {
+      claudeCmd += ' \\\n            --allowedTools "' + allowedTools.join(',') + '"';
+    }
+    yaml += claudeCmd + '\n';
+    yaml += '\n';
+
+    // Deploy
+    yaml += '  <span class="prop">deploy</span>:\n';
+    yaml += '    <span class="prop">runs-on</span>: <span class="str">ubuntu-latest</span>\n';
+    yaml += '    <span class="prop">needs</span>: [<span class="str">test</span>, <span class="str">claude-review</span>]\n';
+    yaml += '    <span class="prop">if</span>: <span class="str">github.ref == \'refs/heads/main\'</span>\n';
+    yaml += '    <span class="prop">steps</span>:\n';
+    yaml += '      - <span class="prop">uses</span>: <span class="str">actions/checkout@v4</span>\n';
+    yaml += '      - <span class="prop">uses</span>: <span class="str">actions/setup-node@v4</span>\n';
+    yaml += '        <span class="prop">with</span>:\n';
+    yaml += '          <span class="prop">node-version</span>: <span class="str">20</span>\n';
+    yaml += '      - <span class="prop">run</span>: <span class="str">npm ci</span>\n';
+    yaml += '      - <span class="prop">run</span>: <span class="str">' + escapeHtml(deployCmd) + '</span>\n';
+
+    document.getElementById('pipelineOutputCode').innerHTML = yaml;
+    document.getElementById('pipelineOutput').classList.add('show');
+  };
+
+  function escapeHtml(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  // ==========================================
+  // PRACTICE EXAM
+  // ==========================================
+  var FINAL_QUIZ_KEY = 'claude-training-module-32';
+
+  var finalQuizAnswers = ['b', 'a', 'b', 'b', 'b', 'b', 'b', 'b'];
+  var finalQuizSelections = [null, null, null, null, null, null, null, null];
+  var finalQuizSubmitted = false;
+
+  window.selectFinalOption = function(qIdx, el) {
+    if (finalQuizSubmitted) return;
+
+    var parentQ = el.closest('.final-quiz-question');
+    var options = parentQ.querySelectorAll('.fq-option');
+    for (var o = 0; o < options.length; o++) {
+      options[o].querySelector('input').checked = false;
+      options[o].style.background = '';
+    }
+
+    el.querySelector('input').checked = true;
+    finalQuizSelections[qIdx] = el.getAttribute('data-fq-val');
+
+    var allAnswered = true;
+    for (var a = 0; a < finalQuizSelections.length; a++) {
+      if (finalQuizSelections[a] === null) { allAnswered = false; break; }
+    }
+    document.getElementById('finalSubmitBtn').disabled = !allAnswered;
+  };
+
+  window.submitFinalQuiz = function() {
+    if (finalQuizSubmitted) return;
+    finalQuizSubmitted = true;
+
+    var score = 0;
+
+    for (var idx = 0; idx < finalQuizSelections.length; idx++) {
+      var sel = finalQuizSelections[idx];
+      var questionEl = document.querySelector('.final-quiz-question[data-fq="' + idx + '"]');
+      var options = questionEl.querySelectorAll('.fq-option');
+
+      for (var o = 0; o < options.length; o++) {
+        var val = options[o].getAttribute('data-fq-val');
+        options[o].style.pointerEvents = 'none';
+
+        if (val === finalQuizAnswers[idx]) {
+          if (sel === val) {
+            options[o].classList.add('selected-correct');
+            score++;
+          } else {
+            options[o].classList.add('reveal-correct');
+          }
+        } else if (val === sel) {
+          options[o].classList.add('selected-wrong');
+        }
+      }
+    }
+
+    var result = document.getElementById('finalResult');
+    var title = document.getElementById('finalResultTitle');
+    var text = document.getElementById('finalResultText');
+
+    result.classList.add('show');
+
+    if (score >= 6) {
+      result.classList.add('pass');
+      result.classList.remove('fail');
+      title.textContent = 'Passed! ' + score + ' / 8 correct';
+      text.textContent = 'Excellent work on Domain 3! You have a strong grasp of CLAUDE.md hierarchy, workflow modes, and CI/CD integration. Your progress has been saved. Continue to Module 33.';
+    } else {
+      result.classList.add('fail');
+      result.classList.remove('pass');
+      title.textContent = score + ' / 8 correct -- Review needed';
+      text.textContent = 'You need at least 6 correct to pass. Review the CLAUDE.md hierarchy section (most common area) and the CI/CD integration patterns. Pay special attention to the difference between user-level and project-level configuration.';
+    }
+
+    var progressData = {
+      score: score,
+      total: 8,
+      completed: score >= 6,
+      timestamp: new Date().toISOString()
+    };
+    localStorage.setItem(FINAL_QUIZ_KEY, JSON.stringify(progressData));
+
+    document.getElementById('finalSubmitBtn').disabled = true;
+    document.getElementById('finalSubmitBtn').textContent = 'Submitted';
+  };
+
+  function loadExistingProgress() {
+    var saved = localStorage.getItem(FINAL_QUIZ_KEY);
+    if (saved) {
+      try {
+        var data = JSON.parse(saved);
+        if (data.completed) {
+          var fill = document.getElementById('sidebarProgressFill');
+          if (fill) {
+            fill.style.width = '100%';
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+  }
+  loadExistingProgress();
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,3271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 33: Cert -- Prompt Engineering &amp; Structured Output (20%) | Claude AI Training</title>
+<style>
+/* ============================================
+   CSS CUSTOM PROPERTIES & DESIGN SYSTEM
+   Premium Edition with 3-layer shadows, spring
+   transitions, gradient headings, deep dark mode
+   ============================================ */
+:root {
+  --primary: #7C3AED;
+  --primary-light: #A78BFA;
+  --primary-dark: #5B21B6;
+  --accent: #06B6D4;
+  --accent-light: #22D3EE;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  --bg: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --bg-code: #F1F5F9;
+  --text: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --border: #E2E8F0;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04), 0 0px 0px rgba(124,58,237,0);
+  --shadow-lg: 0 4px 12px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.06), 0 0 0 rgba(124,58,237,0);
+  --shadow-glow: 0 4px 12px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.06), 0 0 24px rgba(124,58,237,0.12);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --transition: 0.2s ease;
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --sidebar-width: 280px;
+  --content-max: 800px;
+}
+
+[data-theme="dark"] {
+  --bg: #0B0F1A;
+  --bg-card: #141926;
+  --bg-code: #1A2030;
+  --text: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --border: #1E293B;
+  --shadow: 0 1px 3px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.2), 0 0 0 rgba(124,58,237,0);
+  --shadow-lg: 0 4px 12px rgba(0,0,0,0.4), 0 12px 32px rgba(0,0,0,0.3), 0 0 0 rgba(124,58,237,0);
+  --shadow-glow: 0 4px 12px rgba(0,0,0,0.4), 0 12px 32px rgba(0,0,0,0.3), 0 0 32px rgba(124,58,237,0.15);
+}
+
+/* ============================================
+   REDUCED MOTION
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  html { scroll-behavior: auto; }
+}
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 24px;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  min-height: 100vh;
+  transition: background var(--transition), color var(--transition);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   THEME TOGGLE
+   ============================================ */
+.theme-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: all 0.3s var(--spring);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+.theme-toggle:hover {
+  box-shadow: var(--shadow-glow);
+  transform: scale(1.1);
+}
+
+/* ============================================
+   SIDEBAR
+   ============================================ */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  z-index: 900;
+  transition: transform 0.3s var(--spring), background var(--transition);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.sidebar-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+  margin-bottom: 12px;
+  transition: color var(--transition);
+}
+.sidebar-back:hover { color: var(--primary-dark); }
+
+.sidebar-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.sidebar-module-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.sidebar-nav {
+  padding: 12px 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.sidebar-section {
+  margin-bottom: 4px;
+}
+
+.sidebar-section-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 20px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  text-align: left;
+  transition: color var(--transition);
+}
+.sidebar-section-toggle:hover { color: var(--text); }
+.sidebar-section-toggle .chevron {
+  transition: transform 0.3s var(--spring);
+  font-size: 0.65rem;
+}
+.sidebar-section-toggle.collapsed .chevron {
+  transform: rotate(-90deg);
+}
+
+.sidebar-links {
+  list-style: none;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.sidebar-links.collapsed {
+  max-height: 0 !important;
+}
+
+.sidebar-link {
+  display: block;
+  padding: 7px 20px 7px 32px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: all var(--transition);
+  line-height: 1.4;
+}
+.sidebar-link:hover {
+  color: var(--text);
+  background: var(--bg);
+}
+.sidebar-link.active {
+  color: var(--primary);
+  border-left-color: var(--primary);
+  background: rgba(124, 58, 237, 0.05);
+  font-weight: 600;
+}
+[data-theme="dark"] .sidebar-link.active {
+  background: rgba(124, 58, 237, 0.12);
+}
+
+.sidebar-progress {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sidebar-progress-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.sidebar-progress-track {
+  height: 6px;
+  background: var(--bg-code);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.sidebar-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 3px;
+  transition: width 0.5s ease;
+  width: 0%;
+}
+
+/* Hamburger button (mobile) */
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1001;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+  transition: all var(--transition);
+}
+.hamburger span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--text);
+  margin: 4px auto;
+  transition: all 0.3s ease;
+  border-radius: 1px;
+}
+.hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(4px, 4px); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(4px, -4px); }
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 899;
+}
+
+/* ============================================
+   MAIN CONTENT
+   ============================================ */
+.main-content {
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+  transition: margin var(--transition);
+}
+
+.content-wrapper {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 40px 32px 80px;
+}
+
+/* Module Header */
+.module-header {
+  margin-bottom: 48px;
+}
+.module-header .breadcrumb {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+.module-header .breadcrumb a {
+  color: var(--primary);
+  text-decoration: none;
+}
+.module-header .breadcrumb a:hover { text-decoration: underline; }
+
+.module-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.module-badge .number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.module-badge .label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.module-header h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.module-header .description {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 640px;
+}
+
+.module-meta {
+  display: flex;
+  gap: 16px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.module-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  background: var(--bg-code);
+  padding: 6px 14px;
+  border-radius: 20px;
+}
+
+/* ============================================
+   SECTIONS
+   ============================================ */
+.section {
+  margin-bottom: 56px;
+  scroll-margin-top: 24px;
+}
+
+.section-heading {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+  line-height: 1.3;
+}
+
+.section h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-top: 32px;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.section h4 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-top: 24px;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.section p {
+  margin-bottom: 16px;
+  color: var(--text-secondary);
+}
+
+.section ul, .section ol {
+  margin-bottom: 16px;
+  padding-left: 24px;
+}
+.section li {
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+}
+.section li strong {
+  color: var(--text);
+}
+
+/* ============================================
+   CODE BLOCKS
+   ============================================ */
+.code-block {
+  background: #1E293B;
+  color: #E2E8F0;
+  border-radius: var(--radius-sm);
+  padding: 20px 24px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  overflow-x: auto;
+  position: relative;
+  margin: 16px 0 20px;
+  tab-size: 2;
+}
+.code-block .code-label {
+  position: absolute;
+  top: 8px;
+  left: 16px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #64748B;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+.code-block.has-label {
+  padding-top: 36px;
+}
+.code-block .copy-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: #94A3B8;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  transition: all var(--transition);
+}
+.code-block .copy-btn:hover { background: rgba(255,255,255,0.2); color: white; }
+.code-block .copy-btn.copied { background: var(--success); color: white; }
+
+/* Syntax highlighting classes */
+.kw { color: #C084FC; }
+.str { color: #6EE7B7; }
+.fn { color: #7DD3FC; }
+.cm { color: #64748B; }
+.num { color: #FDBA74; }
+.op { color: #FCA5A5; }
+.type { color: #67E8F9; }
+.param { color: #FDE68A; }
+.prop { color: #F0ABFC; }
+.punc { color: #94A3B8; }
+
+/* Inline code */
+code {
+  background: var(--bg-code);
+  color: var(--primary);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.88em;
+}
+[data-theme="dark"] code {
+  background: #334155;
+}
+.code-block code {
+  background: none;
+  color: inherit;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+  white-space: pre-wrap;
+  display: block;
+}
+
+/* ============================================
+   CALLOUT BOXES
+   ============================================ */
+.callout {
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  margin: 20px 0;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.callout-icon {
+  flex-shrink: 0;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+.callout-content { flex: 1; }
+.callout-content p { margin-bottom: 6px; color: inherit; }
+.callout-content p:last-child { margin-bottom: 0; }
+
+.callout.info {
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  color: #1E40AF;
+}
+.callout.tip {
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  color: #166534;
+}
+.callout.warning {
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  color: #92400E;
+}
+.callout.important {
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  color: #991B1B;
+}
+
+[data-theme="dark"] .callout.info {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: #93C5FD;
+}
+[data-theme="dark"] .callout.tip {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #6EE7B7;
+}
+[data-theme="dark"] .callout.warning {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #FCD34D;
+}
+[data-theme="dark"] .callout.important {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #FCA5A5;
+}
+
+/* ============================================
+   ACCENT CARDS
+   ============================================ */
+.accent-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin: 24px 0;
+  box-shadow: var(--shadow);
+  transition: all 0.3s var(--spring);
+}
+.accent-card:hover {
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+  border-color: var(--primary-light);
+}
+.accent-card h4 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.accent-card p {
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+.accent-card p:last-child { margin-bottom: 0; }
+
+/* ============================================
+   COMPARISON TABLE
+   ============================================ */
+.comparison-table-wrapper {
+  overflow-x: auto;
+  margin: 20px 0;
+}
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.comparison-table th {
+  background: var(--primary);
+  color: white;
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+.comparison-table th:first-child {
+  border-radius: var(--radius-sm) 0 0 0;
+}
+.comparison-table th:last-child {
+  border-radius: 0 var(--radius-sm) 0 0;
+}
+.comparison-table td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+.comparison-table tr:nth-child(even) td {
+  background: var(--bg);
+}
+.comparison-table tr:last-child td:first-child {
+  border-radius: 0 0 0 var(--radius-sm);
+}
+.comparison-table tr:last-child td:last-child {
+  border-radius: 0 0 var(--radius-sm) 0;
+}
+
+/* ============================================
+   DOMAIN WEIGHT BAR
+   ============================================ */
+.domain-weight {
+  margin: 24px 0;
+  padding: 20px 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.domain-weight-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.domain-weight-bar {
+  width: 100%;
+  height: 24px;
+  background: var(--bg-code);
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+.domain-weight-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: white;
+  letter-spacing: 0.04em;
+}
+.domain-weight-tasks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+.domain-weight-task {
+  font-size: 0.8rem;
+  padding: 4px 12px;
+  background: rgba(124, 58, 237, 0.08);
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  border-radius: 20px;
+  color: var(--primary);
+  font-weight: 500;
+}
+[data-theme="dark"] .domain-weight-task {
+  background: rgba(124, 58, 237, 0.15);
+  border-color: rgba(124, 58, 237, 0.3);
+}
+
+/* ============================================
+   INTERACTIVE LABS
+   ============================================ */
+.lab-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  box-shadow: var(--shadow);
+}
+.lab-container h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.lab-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 24px;
+}
+.lab-tab {
+  padding: 10px 20px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: all var(--transition);
+}
+.lab-tab:hover { color: var(--text); }
+.lab-tab.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+.lab-panel {
+  display: none;
+}
+.lab-panel.active {
+  display: block;
+}
+
+.lab-textarea {
+  width: 100%;
+  min-height: 200px;
+  padding: 16px;
+  background: var(--bg-code);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  resize: vertical;
+  transition: border-color var(--transition);
+}
+.lab-textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.lab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s var(--spring);
+  margin-top: 12px;
+}
+.lab-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-glow); }
+.lab-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+.lab-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  background: var(--bg-code);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  margin-top: 12px;
+  margin-left: 8px;
+}
+.lab-btn-secondary:hover { background: var(--border); }
+
+.lab-results {
+  margin-top: 20px;
+  padding: 16px 20px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  display: none;
+}
+.lab-results.show { display: block; }
+
+.lab-result-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+.lab-result-item:last-child { border-bottom: none; }
+
+.lab-pass { color: var(--success); font-weight: 600; }
+.lab-fail { color: var(--error); font-weight: 600; }
+.lab-warn { color: var(--warning); font-weight: 600; }
+
+/* Score badge */
+.score-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+.score-badge.excellent { background: rgba(16,185,129,0.15); color: var(--success); }
+.score-badge.good { background: rgba(6,182,212,0.15); color: var(--accent); }
+.score-badge.fair { background: rgba(245,158,11,0.15); color: var(--warning); }
+.score-badge.poor { background: rgba(239,68,68,0.15); color: var(--error); }
+
+/* Progress bar for batch sim */
+.batch-progress {
+  width: 100%;
+  height: 12px;
+  background: var(--bg-code);
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 12px 0;
+}
+.batch-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 6px;
+  transition: width 0.3s ease;
+  width: 0%;
+}
+
+.batch-log {
+  max-height: 200px;
+  overflow-y: auto;
+  font-family: 'SF Mono', monospace;
+  font-size: 0.8rem;
+  padding: 12px;
+  background: #1E293B;
+  color: #E2E8F0;
+  border-radius: var(--radius-sm);
+  margin-top: 12px;
+}
+.batch-log-entry { padding: 2px 0; }
+.batch-log-entry.success { color: #6EE7B7; }
+.batch-log-entry.failure { color: #FCA5A5; }
+.batch-log-entry.info { color: #7DD3FC; }
+
+/* Config row */
+.config-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.config-label {
+  min-width: 140px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.config-input {
+  flex: 1;
+  padding: 8px 12px;
+  background: var(--bg-code);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+.config-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+.config-select {
+  padding: 8px 12px;
+  background: var(--bg-code);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 0.9rem;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* Cost comparison row */
+.cost-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
+.cost-label { color: var(--text-secondary); }
+.cost-value { font-weight: 700; color: var(--text); }
+.cost-savings { color: var(--success); font-weight: 700; }
+
+/* ============================================
+   FINAL QUIZ
+   ============================================ */
+.final-quiz {
+  background: var(--bg-card);
+  border: 2px solid var(--primary-light);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  box-shadow: var(--shadow);
+}
+.final-quiz h3 {
+  margin-top: 0;
+}
+
+.final-quiz-question {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.final-quiz-question .fq-number {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+.final-quiz-question .fq-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+.fq-options { list-style: none; padding: 0; }
+.fq-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 12px;
+  margin-bottom: 4px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+.fq-option:hover { background: rgba(124, 58, 237, 0.05); }
+.fq-option input[type="radio"] {
+  accent-color: var(--primary);
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+.fq-option.selected-correct {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+.fq-option.selected-wrong {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+}
+.fq-option.reveal-correct {
+  background: rgba(16, 185, 129, 0.08);
+  color: #059669;
+  font-weight: 600;
+}
+[data-theme="dark"] .fq-option.selected-correct { color: #6EE7B7; }
+[data-theme="dark"] .fq-option.selected-wrong { color: #FCA5A5; }
+[data-theme="dark"] .fq-option.reveal-correct { color: #6EE7B7; }
+
+.final-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 32px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s var(--spring);
+  margin-top: 8px;
+}
+.final-submit-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-glow); }
+.final-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.final-result {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: var(--radius-sm);
+  display: none;
+}
+.final-result.show { display: block; }
+.final-result.pass {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.final-result.fail {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.final-result h4 {
+  margin-top: 0;
+  margin-bottom: 6px;
+  font-size: 1.1rem;
+}
+.final-result p {
+  margin-bottom: 0;
+  font-size: 0.95rem;
+}
+.final-result.pass h4 { color: var(--success); }
+.final-result.fail h4 { color: var(--warning); }
+
+/* ============================================
+   KEY CONCEPT
+   ============================================ */
+.key-concept {
+  display: inline-block;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(6, 182, 212, 0.1));
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  color: var(--primary);
+}
+[data-theme="dark"] .key-concept {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(6, 182, 212, 0.15));
+  border-color: rgba(124, 58, 237, 0.35);
+}
+
+/* ============================================
+   NAVIGATION FOOTER
+   ============================================ */
+.module-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 16px;
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 2px solid var(--border);
+}
+.nav-link {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: all 0.3s var(--spring);
+  min-width: 0;
+  flex: 1;
+  max-width: 50%;
+  box-shadow: var(--shadow);
+}
+.nav-link:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+}
+.nav-link.next { align-items: flex-end; text-align: right; }
+.nav-link .nav-dir {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--primary);
+}
+.nav-link .nav-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 1024px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .hamburger {
+    display: flex;
+  }
+  .sidebar-overlay.show {
+    display: block;
+  }
+  .main-content {
+    margin-left: 0;
+  }
+  .theme-toggle {
+    right: 16px;
+  }
+}
+
+@media (max-width: 640px) {
+  .content-wrapper {
+    padding: 24px 16px 60px;
+  }
+  .module-header h1 {
+    font-size: 1.6rem;
+  }
+  .section-heading {
+    font-size: 1.3rem;
+  }
+  .lab-tabs {
+    flex-wrap: wrap;
+  }
+  .config-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .config-label {
+    min-width: auto;
+  }
+  .module-nav {
+    flex-direction: column;
+  }
+  .nav-link {
+    max-width: 100%;
+  }
+  .nav-link.next {
+    align-items: flex-start;
+    text-align: left;
+  }
+}
+
+/* ============================================
+   SCROLLBAR STYLING
+   ============================================ */
+.sidebar::-webkit-scrollbar,
+.code-block::-webkit-scrollbar,
+.batch-log::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.sidebar::-webkit-scrollbar-track,
+.code-block::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+.code-block::-webkit-scrollbar-thumb,
+.batch-log::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.section {
+  animation: fadeInUp 0.4s ease both;
+}
+</style>
+</head>
+<body>
+<!-- ============================================
+     THEME TOGGLE
+     ============================================ -->
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+  <span id="themeIcon">&#9790;</span>
+</button>
+
+<!-- ============================================
+     HAMBURGER (mobile)
+     ============================================ -->
+<button class="hamburger" id="hamburger" aria-label="Toggle sidebar">
+  <span></span>
+  <span></span>
+  <span></span>
+</button>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ============================================
+     SIDEBAR
+     ============================================ -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="../index.html" class="sidebar-back">&larr; Back to Hub</a>
+    <div class="sidebar-title">Module 33</div>
+    <div class="sidebar-module-name">Cert: Prompt Engineering &amp; Structured Output</div>
+  </div>
+
+  <div class="sidebar-nav">
+    <!-- Section: Content -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="content">
+        Content <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-content">
+        <li><a href="#domain-overview" class="sidebar-link" data-target="domain-overview">Domain Overview</a></li>
+        <li><a href="#explicit-criteria" class="sidebar-link" data-target="explicit-criteria">Explicit Criteria</a></li>
+        <li><a href="#few-shot-engineering" class="sidebar-link" data-target="few-shot-engineering">Few-Shot Engineering</a></li>
+        <li><a href="#structured-output" class="sidebar-link" data-target="structured-output">Structured Output &amp; Validation</a></li>
+        <li><a href="#batch-multipass" class="sidebar-link" data-target="batch-multipass">Batch &amp; Multi-Pass Review</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Labs -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="labs">
+        Interactive Labs <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-labs">
+        <li><a href="#schema-lab" class="sidebar-link" data-target="schema-lab">Schema Validation Lab</a></li>
+        <li><a href="#fewshot-lab" class="sidebar-link" data-target="fewshot-lab">Few-Shot Designer</a></li>
+        <li><a href="#batch-lab" class="sidebar-link" data-target="batch-lab">Batch Processing Simulator</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Assessment -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="assessment">
+        Assessment <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-assessment">
+        <li><a href="#practice-exam" class="sidebar-link" data-target="practice-exam">Practice Exam (8 Questions)</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sidebar-progress">
+    <div class="sidebar-progress-label">Module Progress</div>
+    <div class="sidebar-progress-track">
+      <div class="sidebar-progress-fill" id="sidebarProgressFill"></div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================
+     MAIN CONTENT
+     ============================================ -->
+<main class="main-content">
+  <div class="content-wrapper">
+
+    <!-- Module Header -->
+    <header class="module-header">
+      <div class="breadcrumb">
+        <a href="../index.html">Training Hub</a> &raquo; <a href="32-cert-domain3.html">Module 32</a> &raquo; Module 33
+      </div>
+      <div class="module-badge">
+        <span class="number">33</span>
+        <span class="label">Certification</span>
+      </div>
+      <h1>Prompt Engineering &amp; Structured Output</h1>
+      <p class="description">
+        Master the 20%-weighted certification domain covering explicit criteria, few-shot prompting, structured output via tool_use, validation-retry loops, batch processing, and multi-pass review architectures.
+      </p>
+      <div class="module-meta">
+        <span class="module-meta-item">&#9201; ~75 min</span>
+        <span class="module-meta-item">&#128218; Expert</span>
+        <span class="module-meta-item">&#127919; 3 Interactive Labs</span>
+        <span class="module-meta-item">&#9989; 8-Question Practice Exam</span>
+      </div>
+    </header>
+
+    <!-- ========================================
+         SECTION 1: DOMAIN OVERVIEW
+         ======================================== -->
+    <section class="section" id="domain-overview">
+      <h2 class="section-heading">1. Domain Overview</h2>
+
+      <p>
+        Domain 4 of the Claude AI certification exam focuses on <strong>Prompt Engineering &amp; Structured Output</strong>
+        and carries a <strong>20% weight</strong> -- making it the second-highest weighted domain on the exam. This domain
+        tests your ability to design prompts that produce reliable, structured, and validated outputs in production systems.
+      </p>
+
+      <div class="domain-weight">
+        <div class="domain-weight-label">Exam Weight: Domain 4</div>
+        <div class="domain-weight-bar">
+          <div class="domain-weight-fill" style="width: 20%;">20%</div>
+        </div>
+        <div class="domain-weight-tasks">
+          <span class="domain-weight-task">Explicit Criteria</span>
+          <span class="domain-weight-task">Few-Shot Prompting</span>
+          <span class="domain-weight-task">Structured Output (tool_use)</span>
+          <span class="domain-weight-task">Validation-Retry Loops</span>
+          <span class="domain-weight-task">Batch Processing</span>
+          <span class="domain-weight-task">Multi-Pass Review</span>
+        </div>
+      </div>
+
+      <h3>Why This Domain Matters</h3>
+
+      <p>
+        In production AI systems, the difference between a prototype and a reliable product often comes down to how well
+        you engineer prompts and validate outputs. A clever prompt that works 90% of the time is useless if the other 10%
+        produces malformed JSON, hallucinated data, or confident-sounding errors. This domain tests your ability to build
+        systems that are <em>reliably correct</em>, not just <em>usually correct</em>.
+      </p>
+
+      <h3>The Six Task Areas</h3>
+
+      <ul>
+        <li>
+          <strong>Explicit Criteria:</strong> Converting vague requirements into concrete, categorical evaluation criteria
+          that Claude can apply consistently. The exam tests whether you understand why explicit criteria outperform
+          confidence-score filtering.
+        </li>
+        <li>
+          <strong>Few-Shot Prompting:</strong> Using 2-4 targeted examples to calibrate Claude's behavior for ambiguous
+          classification and extraction tasks. The exam focuses on example selection strategy, not just the mechanical
+          placement of examples.
+        </li>
+        <li>
+          <strong>Structured Output with tool_use:</strong> Using the <code>tool_use</code> mechanism to guarantee
+          schema-compliant JSON output. The exam tests <code>tool_choice</code> modes and schema design decisions
+          (required vs. optional, enum extensibility).
+        </li>
+        <li>
+          <strong>Validation-Retry Loops:</strong> Building loops that detect output errors, provide specific error
+          feedback, and know when retries are futile. The exam focuses on effective error messages and recognizing
+          data-absent situations.
+        </li>
+        <li>
+          <strong>Batch Processing:</strong> Using the Message Batches API for cost-efficient bulk processing. The exam
+          tests your understanding of the 50% cost savings, 24-hour window, limitations (no multi-turn tool calling),
+          and <code>custom_id</code> correlation.
+        </li>
+        <li>
+          <strong>Multi-Pass Review:</strong> Architectures where separate Claude instances review each other's work.
+          The exam focuses on why same-session self-review is unreliable and how to design independent review passes.
+        </li>
+      </ul>
+
+      <div class="callout info">
+        <span class="callout-icon">&#9432;</span>
+        <div class="callout-content">
+          <p><strong>Exam tip:</strong> This domain heavily rewards understanding of <em>why</em> techniques work, not
+          just <em>how</em> to use them. Expect scenario-based questions where you must choose between multiple valid-looking
+          approaches and identify the one that produces the most reliable results.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 2: EXPLICIT CRITERIA
+         ======================================== -->
+    <section class="section" id="explicit-criteria">
+      <h2 class="section-heading">2. Explicit Criteria for the Exam</h2>
+
+      <p>
+        One of the most common mistakes in production AI systems is relying on vague instructions like
+        "be conservative" or "flag important issues." These instructions feel intuitive to humans but
+        give Claude no concrete decision boundary. The exam tests whether you can convert vague requirements
+        into <span class="key-concept">explicit categorical criteria</span> that produce consistent results.
+      </p>
+
+      <h3>Converting Vague to Explicit</h3>
+
+      <p>
+        Consider a code review system where the requirement is "be conservative about flagging issues."
+        This is ambiguous. Conservative could mean "only flag critical bugs" or "flag everything but with
+        low confidence scores." The exam expects you to understand the correct approach:
+      </p>
+
+      <div class="accent-card">
+        <h4>Vague Criteria (What Not to Do)</h4>
+        <div class="code-block has-label">
+          <span class="code-label">Prompt (Vague)</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="str">"Review this code and flag issues. Be conservative -- only flag
+things you are very confident about. Rate your confidence 1-10
+for each finding."</span></code></div>
+        <p>
+          This approach fails because Claude's confidence scores are not calibrated. A "confidence: 8"
+          from one prompt might correspond to "confidence: 5" from a slightly reworded prompt. Filtering
+          by self-reported confidence is unreliable.
+        </p>
+      </div>
+
+      <div class="accent-card">
+        <h4>Explicit Criteria (The Correct Approach)</h4>
+        <div class="code-block has-label">
+          <span class="code-label">Prompt (Explicit)</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="str">"Review this code. Flag ONLY findings in these categories:
+
+1. NULL_DEREF: Variable used without null check after a function
+   that can return null (per its type signature or documentation)
+2. RESOURCE_LEAK: File handle, connection, or lock acquired but
+   not released in all code paths (including exceptions)
+3. SQL_INJECTION: String concatenation in SQL query construction
+   without parameterized queries
+4. TYPE_MISMATCH: Function called with argument type that does
+   not match the declared parameter type
+
+Do NOT flag: style issues, naming conventions, missing comments,
+potential performance improvements, or deprecated API usage."</span></code></div>
+        <p>
+          This approach works because each category has a <em>concrete, observable condition</em> that either
+          exists in the code or does not. There is no subjective judgment involved.
+        </p>
+      </div>
+
+      <h3>Impact of False Positive Rates on Trust</h3>
+
+      <p>
+        The exam tests your understanding of a critical production dynamic: <strong>false positives erode user
+        trust faster than false negatives</strong>. If a code review system flags 50 issues and 40 of them are
+        wrong, developers will stop reading the reports entirely -- even if the remaining 10 findings are
+        genuinely critical bugs.
+      </p>
+
+      <ul>
+        <li>
+          <strong>High false positive rate</strong> &rarr; Users stop trusting the system &rarr; Genuine findings
+          are ignored &rarr; The system provides negative value
+        </li>
+        <li>
+          <strong>Temporarily disabling high-FP categories</strong> is often better than keeping them enabled.
+          If "POTENTIAL_NULL_DEREF" has a 70% false positive rate, disable it until you can improve the
+          detection criteria.
+        </li>
+        <li>
+          <strong>Explicit criteria over confidence filtering:</strong> Instead of "flag everything and filter
+          by confidence > 7," define categories where the false positive rate is naturally low because the
+          criteria are unambiguous.
+        </li>
+      </ul>
+
+      <h3>Defining Severity with Concrete Code Examples</h3>
+
+      <p>
+        When you need Claude to assess severity, provide concrete examples rather than abstract definitions:
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Prompt (Severity Definitions)</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="str">"Severity definitions:
+
+CRITICAL: Will cause data loss, security breach, or system crash
+  in production under normal usage. Example: writing user password
+  to application log in plaintext.
+
+HIGH: Will cause incorrect behavior that users will notice.
+  Example: off-by-one error in pagination causing items to be
+  skipped when browsing results.
+
+MEDIUM: Could cause issues under specific conditions that are
+  plausible but not guaranteed. Example: race condition in
+  concurrent cache update that requires exact timing.
+
+Do NOT use LOW severity -- if it is not at least MEDIUM, do
+not include it in your findings."</span></code></div>
+
+      <div class="callout warning">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Exam focus:</strong> The exam will present scenarios where you must choose between
+          confidence-based filtering and explicit criteria. The answer is always explicit criteria.
+          Confidence scores are a property of the model's internal state, not of the actual finding quality.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 3: FEW-SHOT ENGINEERING
+         ======================================== -->
+    <section class="section" id="few-shot-engineering">
+      <h2 class="section-heading">3. Few-Shot Engineering</h2>
+
+      <p>
+        Few-shot prompting gives Claude 2-4 examples of the desired input-output behavior before presenting
+        the actual task. The exam focuses not on the <em>mechanics</em> of few-shot prompting (everyone knows
+        how to include examples) but on the <strong>strategy of example selection</strong> -- which examples
+        to include, why, and how many.
+      </p>
+
+      <h3>The 2-4 Rule: Targeted Examples for Ambiguous Scenarios</h3>
+
+      <p>
+        Research and practice show that 2-4 well-chosen examples outperform larger sets. Why? Because the
+        purpose of few-shot examples is not to teach Claude the task (it already knows most tasks) but to
+        <span class="key-concept">calibrate its behavior for ambiguous edge cases</span>. More examples
+        beyond 4 typically add redundancy without improving calibration.
+      </p>
+
+      <h4>What makes a good few-shot example set?</h4>
+
+      <ul>
+        <li>
+          <strong>Diversity of categories:</strong> Each example should demonstrate a different category or
+          outcome. If you have 3 examples and all show the "positive" class, you have taught Claude nothing
+          about how to handle the "negative" class.
+        </li>
+        <li>
+          <strong>Ambiguous edge cases:</strong> At least one example should be a genuinely ambiguous case where
+          the correct answer is not obvious. Show Claude how you want it to reason through borderline situations.
+        </li>
+        <li>
+          <strong>Reasoning shown:</strong> Examples should include the reasoning process, not just the final
+          answer. This calibrates Claude's thinking, not just its output format.
+        </li>
+        <li>
+          <strong>Format consistency:</strong> All examples must follow the exact same output format. If your
+          output schema has 5 fields, every example must populate all 5 fields, even if some are null.
+        </li>
+      </ul>
+
+      <h3>Showing Reasoning for Choices</h3>
+
+      <div class="code-block has-label">
+        <span class="code-label">Few-Shot with Reasoning</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="cm">// Example 1: Clear positive case</span>
+<span class="str">Input: "The patient presents with chest pain radiating to left arm,
+  diaphoresis, and ST elevation in leads II, III, aVF."
+Reasoning: ST elevation in contiguous inferior leads with classic
+  symptoms (radiating chest pain, diaphoresis) strongly indicates
+  acute inferior STEMI. This is unambiguous.
+Classification: EMERGENT
+Confidence_rationale: All three criteria met -- symptoms, ECG, distribution.</span>
+
+<span class="cm">// Example 2: Ambiguous case (critical for calibration)</span>
+<span class="str">Input: "Patient reports intermittent chest tightness for 2 weeks,
+  worse with exertion, ECG shows nonspecific ST changes."
+Reasoning: Nonspecific ST changes could indicate ischemia or could
+  be benign (medication effects, electrolyte imbalance). Exertional
+  component is concerning but 2-week history argues against acute event.
+  This does NOT meet criteria for EMERGENT because ECG changes are
+  nonspecific, not diagnostic.
+Classification: URGENT
+Confidence_rationale: Exertional symptoms warrant urgent evaluation
+  but nonspecific ECG prevents EMERGENT classification.</span>
+
+<span class="cm">// Example 3: Clear negative case</span>
+<span class="str">Input: "Patient requests refill of atorvastatin 40mg, no new
+  symptoms, last lipid panel 3 months ago within target."
+Reasoning: Routine medication management with no acute symptoms.
+Classification: ROUTINE
+Confidence_rationale: No symptoms, no abnormal findings, scheduled care.</span></code></div>
+
+      <h3>Distinguishing Acceptable Patterns from Genuine Issues</h3>
+
+      <p>
+        In classification tasks, one of the hardest challenges is teaching Claude to distinguish between
+        patterns that <em>look</em> like issues but are actually acceptable, and genuine problems. This is
+        especially important in code review, document analysis, and compliance checking.
+      </p>
+
+      <div class="accent-card">
+        <h4>Example: Code Review Pattern Calibration</h4>
+        <p>Include an example where a pattern that often indicates a bug is actually correct:</p>
+        <div class="code-block">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="str">Input: "try { result = api.fetch(url); } catch (e) { /* ignore */ }"
+Reasoning: Empty catch blocks are usually a code smell, but this
+  is in a retry loop wrapper where the outer function handles the
+  final failure. The empty catch here is intentional -- it allows
+  the loop to continue to the next retry attempt.
+Classification: NOT_AN_ISSUE
+Note: The surrounding context (retry loop) makes this acceptable.</span></code></div>
+      </div>
+
+      <h3>Handling Varied Document Structures</h3>
+
+      <p>
+        When extracting data from documents (invoices, contracts, medical records), include examples that
+        show different document formats and layouts. This teaches Claude that the <em>meaning</em> matters,
+        not the specific formatting:
+      </p>
+
+      <ul>
+        <li>One example with a clean, structured invoice with labeled fields</li>
+        <li>One example with a narrative-style invoice where amounts are embedded in paragraphs</li>
+        <li>One example with missing optional fields (showing null/absent handling)</li>
+      </ul>
+
+      <h3>Reducing Hallucination in Extraction Tasks</h3>
+
+      <p>
+        A key exam topic: few-shot examples can <strong>reduce hallucination</strong> by explicitly showing
+        Claude that it is acceptable to output <code>null</code> or "not found" when information is absent
+        from the source. Without such an example, Claude may infer or fabricate values to fill required fields.
+      </p>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>Key insight:</strong> Include at least one few-shot example where a field is legitimately
+          absent from the source and the correct output is <code>null</code>. This gives Claude explicit
+          permission to say "I don't know" rather than fabricating an answer.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 4: STRUCTURED OUTPUT & VALIDATION
+         ======================================== -->
+    <section class="section" id="structured-output">
+      <h2 class="section-heading">4. Structured Output &amp; Validation</h2>
+
+      <p>
+        The <code>tool_use</code> mechanism is Claude's primary method for producing <strong>guaranteed
+        schema-compliant structured output</strong>. Unlike asking Claude to "return JSON," which can
+        produce syntax errors, missing fields, or extra commentary, <code>tool_use</code> forces the
+        output through a JSON Schema validator at the API level.
+      </p>
+
+      <h3>How tool_use Guarantees Schema Compliance</h3>
+
+      <p>
+        When you define a tool with an <code>input_schema</code>, Claude's output for that tool call is
+        validated against the schema before being returned. This means:
+      </p>
+
+      <ul>
+        <li><strong>No JSON syntax errors:</strong> The output is always valid JSON</li>
+        <li><strong>Required fields are present:</strong> Every field marked as <code>required</code> will exist</li>
+        <li><strong>Types are correct:</strong> Strings are strings, numbers are numbers, enums match</li>
+        <li><strong>No extra commentary:</strong> The output contains only the schema-defined fields, not freeform text mixed with JSON</li>
+      </ul>
+
+      <h3>tool_choice Settings</h3>
+
+      <p>
+        The <code>tool_choice</code> parameter controls whether and which tool Claude must call:
+      </p>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Setting</th>
+              <th>Behavior</th>
+              <th>Use Case</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>"auto"</code></td>
+              <td>Claude decides whether to use a tool or respond with text</td>
+              <td>When tool use is optional and Claude may legitimately respond without it</td>
+            </tr>
+            <tr>
+              <td><code>"any"</code></td>
+              <td>Claude must call one of the available tools but chooses which one</td>
+              <td>When you have multiple output schemas and Claude picks the appropriate one</td>
+            </tr>
+            <tr>
+              <td><code>{"type": "tool", "name": "extract_invoice"}</code></td>
+              <td>Claude must call this specific tool</td>
+              <td>When you want guaranteed structured output in a specific schema</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout important">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Exam alert:</strong> The exam will test the difference between <code>"auto"</code> and
+          <code>"any"</code>. With <code>"auto"</code>, Claude can choose to <em>not</em> use a tool at all
+          and respond with plain text. With <code>"any"</code>, Claude <em>must</em> call a tool but gets to
+          choose which one. Use a specific tool name when you need guaranteed structured output.</p>
+        </div>
+      </div>
+
+      <h3>Required vs. Optional Fields (Nullable for Missing Data)</h3>
+
+      <p>
+        Schema design is a critical exam topic. The key distinction:
+      </p>
+
+      <ul>
+        <li>
+          <strong>Required fields</strong> must always be present in the output. If a field is required but
+          the data might not exist in the source, make it <strong>nullable</strong>: <code>"type": ["string", "null"]</code>.
+          This forces Claude to explicitly output <code>null</code> rather than omitting the field or hallucinating a value.
+        </li>
+        <li>
+          <strong>Optional fields</strong> can be omitted entirely. Use these for fields that only apply to
+          certain document types (e.g., a "tax_id" field that only applies to business invoices, not personal ones).
+        </li>
+      </ul>
+
+      <div class="code-block has-label">
+        <span class="code-label">JSON Schema Design</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>{
+  <span class="prop">"name"</span>: <span class="str">"extract_invoice"</span>,
+  <span class="prop">"description"</span>: <span class="str">"Extract structured data from an invoice document"</span>,
+  <span class="prop">"input_schema"</span>: {
+    <span class="prop">"type"</span>: <span class="str">"object"</span>,
+    <span class="prop">"required"</span>: [<span class="str">"vendor_name"</span>, <span class="str">"invoice_date"</span>, <span class="str">"total_amount"</span>, <span class="str">"line_items"</span>],
+    <span class="prop">"properties"</span>: {
+      <span class="prop">"vendor_name"</span>: {
+        <span class="prop">"type"</span>: <span class="str">"string"</span>,
+        <span class="prop">"description"</span>: <span class="str">"Company name of the vendor"</span>
+      },
+      <span class="prop">"invoice_date"</span>: {
+        <span class="prop">"type"</span>: [<span class="str">"string"</span>, <span class="str">"null"</span>],
+        <span class="prop">"description"</span>: <span class="str">"Invoice date in ISO 8601 format, null if not found"</span>
+      },
+      <span class="prop">"total_amount"</span>: {
+        <span class="prop">"type"</span>: <span class="str">"number"</span>,
+        <span class="prop">"description"</span>: <span class="str">"Total invoice amount in the document currency"</span>
+      },
+      <span class="prop">"currency"</span>: {
+        <span class="prop">"type"</span>: <span class="str">"string"</span>,
+        <span class="prop">"enum"</span>: [<span class="str">"USD"</span>, <span class="str">"EUR"</span>, <span class="str">"GBP"</span>, <span class="str">"other"</span>],
+        <span class="prop">"description"</span>: <span class="str">"Currency code; use 'other' for unlisted currencies"</span>
+      },
+      <span class="prop">"currency_detail"</span>: {
+        <span class="prop">"type"</span>: [<span class="str">"string"</span>, <span class="str">"null"</span>],
+        <span class="prop">"description"</span>: <span class="str">"Actual currency name when 'other' is selected, null otherwise"</span>
+      },
+      <span class="prop">"line_items"</span>: {
+        <span class="prop">"type"</span>: <span class="str">"array"</span>,
+        <span class="prop">"items"</span>: {
+          <span class="prop">"type"</span>: <span class="str">"object"</span>,
+          <span class="prop">"required"</span>: [<span class="str">"description"</span>, <span class="str">"amount"</span>],
+          <span class="prop">"properties"</span>: {
+            <span class="prop">"description"</span>: { <span class="prop">"type"</span>: <span class="str">"string"</span> },
+            <span class="prop">"quantity"</span>: { <span class="prop">"type"</span>: [<span class="str">"number"</span>, <span class="str">"null"</span>] },
+            <span class="prop">"unit_price"</span>: { <span class="prop">"type"</span>: [<span class="str">"number"</span>, <span class="str">"null"</span>] },
+            <span class="prop">"amount"</span>: { <span class="prop">"type"</span>: <span class="str">"number"</span> }
+          }
+        }
+      }
+    }
+  }
+}</code></div>
+
+      <h3>Enum Values with "other" + Detail for Extensibility</h3>
+
+      <p>
+        A best practice that the exam tests: when using enum values, always include an <code>"other"</code>
+        option paired with a detail field. This prevents Claude from forcing data into the wrong category
+        when the real value does not match any predefined enum option.
+      </p>
+
+      <h3>Validation-Retry Loops</h3>
+
+      <p>
+        Even with schema validation, the <em>semantic</em> content of the output may be wrong. A validation-retry
+        loop catches these issues:
+      </p>
+
+      <ol>
+        <li>Call Claude with the initial prompt</li>
+        <li>Validate the output against business rules (not just schema)</li>
+        <li>If validation fails, <strong>append the specific error</strong> to the conversation and retry</li>
+        <li>Limit retries (typically 2-3 attempts)</li>
+      </ol>
+
+      <div class="accent-card">
+        <h4>Effective Error Feedback (Not Just "Try Again")</h4>
+        <div class="code-block has-label">
+          <span class="code-label">Good Retry Message</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="str">"Your extraction had the following errors:
+1. total_amount (450.00) does not equal sum of line_item amounts
+   (150.00 + 200.00 = 350.00). Re-read the invoice and verify.
+2. invoice_date '2024-13-01' is not a valid date (month 13).
+   Check the date format in the source document.
+
+Please re-extract with corrections."</span></code></div>
+      </div>
+
+      <div class="accent-card">
+        <h4>Ineffective Retry Message (Common Mistake)</h4>
+        <div class="code-block has-label">
+          <span class="code-label">Bad Retry Message</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="str">"The output was incorrect. Please try again and be more careful."</span></code></div>
+        <p>This gives Claude no information about what was wrong. It will likely produce the same errors.</p>
+      </div>
+
+      <h3>Identifying When Retries Are Ineffective</h3>
+
+      <p>
+        A critical exam topic: <strong>not all errors are fixable by retrying</strong>. If the data is simply
+        absent from the source document, no amount of retrying will make Claude produce it correctly. Effective
+        systems distinguish between:
+      </p>
+
+      <ul>
+        <li><strong>Extraction errors</strong> (Claude misread something that is present) &rarr; Retry is effective</li>
+        <li><strong>Computation errors</strong> (Claude did the math wrong) &rarr; Retry is effective</li>
+        <li><strong>Data absence</strong> (the information is not in the source) &rarr; Retry is futile; accept null</li>
+        <li><strong>Ambiguous source</strong> (the source contradicts itself) &rarr; Retry is futile; escalate to human</li>
+      </ul>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>Production pattern:</strong> After 2 failed retries for the same field, check whether the
+          field's value exists anywhere in the source. If not, set it to null with a coverage annotation like
+          <code>"invoice_date_source": "not_found_in_document"</code> rather than continuing to retry.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 5: BATCH PROCESSING & MULTI-PASS
+         ======================================== -->
+    <section class="section" id="batch-multipass">
+      <h2 class="section-heading">5. Batch Processing &amp; Multi-Pass Review</h2>
+
+      <h3>Message Batches API</h3>
+
+      <p>
+        The Message Batches API allows you to submit up to 100,000 requests in a single batch, receiving
+        a <strong>50% cost reduction</strong> compared to real-time API calls. The trade-off is latency:
+        batches are processed within a 24-hour window (though most complete much sooner).
+      </p>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>Real-Time API</th>
+              <th>Message Batches API</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Cost</strong></td>
+              <td>Full price</td>
+              <td>50% discount</td>
+            </tr>
+            <tr>
+              <td><strong>Latency</strong></td>
+              <td>Seconds</td>
+              <td>Up to 24 hours (usually faster)</td>
+            </tr>
+            <tr>
+              <td><strong>Multi-turn tool calling</strong></td>
+              <td>Supported</td>
+              <td>Not supported</td>
+            </tr>
+            <tr>
+              <td><strong>Max requests per batch</strong></td>
+              <td>N/A (individual calls)</td>
+              <td>100,000</td>
+            </tr>
+            <tr>
+              <td><strong>Result correlation</strong></td>
+              <td>Direct response</td>
+              <td>Via custom_id field</td>
+            </tr>
+            <tr>
+              <td><strong>Best for</strong></td>
+              <td>Interactive, low-latency needs</td>
+              <td>Bulk processing, overnight jobs</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4>Matching API to Latency Requirements</h4>
+
+      <p>
+        The exam tests your ability to choose the right API for the task:
+      </p>
+
+      <ul>
+        <li><strong>User-facing chat:</strong> Real-time API (latency matters)</li>
+        <li><strong>Nightly document processing:</strong> Batch API (50% savings, latency acceptable)</li>
+        <li><strong>Code review on PR submission:</strong> Real-time API (developer is waiting)</li>
+        <li><strong>Monthly compliance audit of 10,000 documents:</strong> Batch API (overnight processing)</li>
+        <li><strong>Tool-dependent extraction requiring multiple API calls:</strong> Real-time API (Batch API does not support multi-turn tool calling)</li>
+      </ul>
+
+      <h4>custom_id for Correlation</h4>
+
+      <p>
+        Each request in a batch includes a <code>custom_id</code> field that is echoed back in the result.
+        This is your mechanism for correlating results to input records:
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Batch Request with custom_id</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>{
+  <span class="prop">"custom_id"</span>: <span class="str">"invoice-2024-00847"</span>,
+  <span class="prop">"params"</span>: {
+    <span class="prop">"model"</span>: <span class="str">"claude-sonnet-4-20250514"</span>,
+    <span class="prop">"max_tokens"</span>: <span class="num">1024</span>,
+    <span class="prop">"messages"</span>: [
+      {<span class="prop">"role"</span>: <span class="str">"user"</span>, <span class="prop">"content"</span>: <span class="str">"Extract data from: ..."</span>}
+    ],
+    <span class="prop">"tools"</span>: [<span class="cm">/* extraction tool definition */</span>],
+    <span class="prop">"tool_choice"</span>: {<span class="prop">"type"</span>: <span class="str">"tool"</span>, <span class="prop">"name"</span>: <span class="str">"extract_invoice"</span>}
+  }
+}</code></div>
+
+      <h3>Self-Review Limitations</h3>
+
+      <p>
+        A critical exam topic: <strong>same-session self-review retains reasoning bias</strong>. When you ask
+        Claude to review its own output within the same conversation, it has access to its own reasoning chain
+        and is biased toward confirming its original answer. This is analogous to asking someone to proofread
+        their own essay immediately after writing it -- they tend to read what they <em>intended</em> to write
+        rather than what they <em>actually</em> wrote.
+      </p>
+
+      <div class="callout important">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Exam answer:</strong> When asked about self-review reliability, the correct answer is
+          that same-session review is unreliable because the model retains its reasoning context. Independent
+          review requires a <em>separate API call</em> where the reviewing instance sees only the output, not
+          the original reasoning.</p>
+        </div>
+      </div>
+
+      <h3>Multi-Pass Architecture: Per-File + Cross-File</h3>
+
+      <p>
+        The recommended architecture for high-reliability document processing:
+      </p>
+
+      <ol>
+        <li>
+          <strong>Pass 1 -- Per-document extraction:</strong> Each document is processed independently by its own
+          API call. This produces structured output for each document.
+        </li>
+        <li>
+          <strong>Pass 2 -- Per-document review:</strong> A <em>separate</em> API call reviews each extraction
+          result against the source document. This reviewer sees the source and the extraction but NOT the
+          original reasoning.
+        </li>
+        <li>
+          <strong>Pass 3 -- Cross-document synthesis:</strong> A final pass aggregates all reviewed extractions,
+          checks for cross-document consistency (e.g., do all invoices from the same vendor use the same tax ID?),
+          and flags anomalies.
+        </li>
+      </ol>
+
+      <p>
+        This architecture is more expensive (3 API calls per document) but dramatically more reliable than
+        single-pass extraction. The exam expects you to understand when the additional cost is justified.
+      </p>
+
+      <div class="callout info">
+        <span class="callout-icon">&#9432;</span>
+        <div class="callout-content">
+          <p><strong>Cost optimization:</strong> Use the Batch API for Pass 1 and Pass 2 (50% savings each).
+          Only Pass 3 (cross-document synthesis) needs the real-time API if results are needed quickly. This
+          reduces the total cost of the 3-pass architecture by approximately 33%.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE: SCHEMA VALIDATION LAB
+         ======================================== -->
+    <section class="section" id="schema-lab">
+      <h2 class="section-heading">Schema Validation Lab</h2>
+
+      <p>
+        Write a JSON Schema for a tool's output, then test it against sample data. The validator will check
+        each test case against your schema and report specific errors. Iterate on your schema until all test
+        cases pass correctly.
+      </p>
+
+      <div class="lab-container" id="schemaLabContainer">
+        <h3>Schema Design Challenge</h3>
+
+        <div class="lab-tabs">
+          <button class="lab-tab active" onclick="switchSchemaScenario('invoice')">Invoice Extraction</button>
+          <button class="lab-tab" onclick="switchSchemaScenario('codereview')">Code Review Findings</button>
+        </div>
+
+        <div id="schemaScenarioDesc" style="margin-bottom: 16px; font-size: 0.9rem; color: var(--text-secondary);">
+          Design a JSON Schema for extracting structured data from invoice documents. Your schema must handle
+          vendor name, date, amount, line items, and currency -- including cases where some fields are missing.
+        </div>
+
+        <label style="font-size: 0.85rem; font-weight: 600; color: var(--text); display: block; margin-bottom: 6px;">
+          Your JSON Schema:
+        </label>
+        <textarea class="lab-textarea" id="schemaInput" style="min-height: 260px;">{
+  "type": "object",
+  "required": ["vendor_name", "total_amount"],
+  "properties": {
+    "vendor_name": { "type": "string" },
+    "invoice_date": { "type": ["string", "null"] },
+    "total_amount": { "type": "number" },
+    "line_items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["description", "amount"],
+        "properties": {
+          "description": { "type": "string" },
+          "amount": { "type": "number" }
+        }
+      }
+    }
+  }
+}</textarea>
+
+        <div style="display: flex; gap: 8px; margin-top: 12px;">
+          <button class="lab-btn" onclick="validateSchema()">Validate Against Test Cases</button>
+          <button class="lab-btn-secondary" onclick="showExpertSchema()">Show Expert Schema</button>
+        </div>
+
+        <div class="lab-results" id="schemaResults"></div>
+
+        <div id="expertSchemaBox" style="display: none; margin-top: 16px;">
+          <h4 style="margin-bottom: 8px;">Expert Reference Schema</h4>
+          <div class="code-block" id="expertSchemaCode" style="font-size: 0.8rem;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE: FEW-SHOT EXAMPLE DESIGNER
+         ======================================== -->
+    <section class="section" id="fewshot-lab">
+      <h2 class="section-heading">Few-Shot Example Designer</h2>
+
+      <p>
+        Given a classification task, write 3 few-shot examples. The automated analyzer will score your
+        examples on diversity, edge case coverage, format consistency, reasoning quality, and completeness.
+      </p>
+
+      <div class="lab-container" id="fewshotLabContainer">
+        <h3>Task: Customer Support Ticket Classification</h3>
+
+        <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 16px;">
+          Classify customer support tickets into: <code>BILLING</code>, <code>TECHNICAL</code>,
+          <code>ACCOUNT_ACCESS</code>, <code>FEATURE_REQUEST</code>, <code>COMPLAINT</code>.
+          Write 3 few-shot examples with input, reasoning, and classification.
+          Format each example as: <code>Input: ... | Reasoning: ... | Classification: ...</code>
+        </p>
+
+        <label style="font-size: 0.85rem; font-weight: 600; color: var(--text); display: block; margin-bottom: 6px;">
+          Example 1:
+        </label>
+        <textarea class="lab-textarea" id="fewshot1" style="min-height: 100px;">Input: "I was charged twice for my subscription this month. My card shows two $29.99 charges on March 1st."
+Reasoning: Customer reports duplicate charge with specific amount and date. This is a billing dispute, not a feature request or technical issue.
+Classification: BILLING</textarea>
+
+        <label style="font-size: 0.85rem; font-weight: 600; color: var(--text); display: block; margin-top: 12px; margin-bottom: 6px;">
+          Example 2:
+        </label>
+        <textarea class="lab-textarea" id="fewshot2" style="min-height: 100px;">Input: "The export button doesn't work. When I click it nothing happens. I'm using Chrome on Windows."
+Reasoning: Customer reports a UI element not functioning, with browser and OS details. This is a technical/bug report.
+Classification: TECHNICAL</textarea>
+
+        <label style="font-size: 0.85rem; font-weight: 600; color: var(--text); display: block; margin-top: 12px; margin-bottom: 6px;">
+          Example 3:
+        </label>
+        <textarea class="lab-textarea" id="fewshot3" style="min-height: 100px;">Input: "I forgot my password and the reset email never arrives. I've checked spam. I need access urgently for a deadline."
+Reasoning: Although frustrated, the core issue is inability to access the account due to password reset failure. The urgency and frustration are secondary to the access problem.
+Classification: ACCOUNT_ACCESS</textarea>
+
+        <div style="display: flex; gap: 8px; margin-top: 12px;">
+          <button class="lab-btn" onclick="analyzeFewShot()">Analyze Examples</button>
+          <button class="lab-btn-secondary" onclick="showExpertFewShot()">Show Expert Examples</button>
+        </div>
+
+        <div class="lab-results" id="fewshotResults"></div>
+
+        <div id="expertFewShotBox" style="display: none; margin-top: 16px;">
+          <h4 style="margin-bottom: 8px;">Expert Reference Examples</h4>
+          <div class="code-block" id="expertFewShotCode" style="font-size: 0.8rem; white-space: pre-wrap;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE: BATCH PROCESSING SIMULATOR
+         ======================================== -->
+    <section class="section" id="batch-lab">
+      <h2 class="section-heading">Batch Processing Simulator</h2>
+
+      <p>
+        Configure a batch processing job and see cost comparisons, processing timeline, and simulated
+        execution with per-item status tracking.
+      </p>
+
+      <div class="lab-container" id="batchLabContainer">
+        <h3>Configure Your Batch Job</h3>
+
+        <div class="config-row">
+          <span class="config-label">Input count:</span>
+          <input type="number" class="config-input" id="batchCount" value="500" min="1" max="100000" style="max-width: 120px;">
+        </div>
+
+        <div class="config-row">
+          <span class="config-label">Model:</span>
+          <select class="config-select" id="batchModel">
+            <option value="haiku">Claude Haiku ($0.25/$1.25 per MTok)</option>
+            <option value="sonnet" selected>Claude Sonnet ($3/$15 per MTok)</option>
+            <option value="opus">Claude Opus ($15/$75 per MTok)</option>
+          </select>
+        </div>
+
+        <div class="config-row">
+          <span class="config-label">Est. input tokens/item:</span>
+          <input type="number" class="config-input" id="batchInputTokens" value="800" min="100" max="100000" style="max-width: 120px;">
+        </div>
+
+        <div class="config-row">
+          <span class="config-label">Est. output tokens/item:</span>
+          <input type="number" class="config-input" id="batchOutputTokens" value="400" min="50" max="32000" style="max-width: 120px;">
+        </div>
+
+        <div class="config-row">
+          <span class="config-label">Failure rate (%):</span>
+          <input type="number" class="config-input" id="batchFailRate" value="3" min="0" max="50" style="max-width: 120px;">
+        </div>
+
+        <button class="lab-btn" onclick="runBatchSim()" id="batchRunBtn">Run Simulation</button>
+        <button class="lab-btn-secondary" onclick="resubmitFailed()" id="batchResubmitBtn" style="display: none;">Resubmit Failed Items</button>
+
+        <div id="batchCostComparison" style="display: none; margin-top: 20px;">
+          <h4 style="margin-bottom: 12px;">Cost Comparison</h4>
+          <div id="batchCostRows"></div>
+        </div>
+
+        <div id="batchProgressSection" style="display: none; margin-top: 20px;">
+          <h4 style="margin-bottom: 8px;">Processing Progress</h4>
+          <div class="batch-progress">
+            <div class="batch-progress-fill" id="batchProgressFill"></div>
+          </div>
+          <div id="batchProgressText" style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;"></div>
+          <div class="batch-log" id="batchLog"></div>
+        </div>
+
+        <div id="batchSummary" style="display: none; margin-top: 16px; padding: 16px; background: var(--bg); border-radius: var(--radius-sm); border: 1px solid var(--border);">
+          <div id="batchSummaryContent" style="font-size: 0.9rem;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         PRACTICE EXAM
+         ======================================== -->
+    <section class="section" id="practice-exam">
+      <h2 class="section-heading">Practice Exam: Domain 4</h2>
+
+      <p>
+        Complete this 8-question practice exam covering the key topics from Domain 4. You need at least 6
+        correct to pass. Your score will be saved to track your progress.
+      </p>
+
+      <div class="final-quiz" id="finalQuizContainer">
+        <h3>Domain 4: Prompt Engineering &amp; Structured Output</h3>
+
+        <!-- Question 1 -->
+        <div class="final-quiz-question" data-fq="0">
+          <div class="fq-number">Question 1 of 8</div>
+          <div class="fq-text">
+            A code review system flags too many false positives. Users have stopped trusting it. Which approach
+            will most effectively restore trust?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="0" data-fq-val="a" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="a"> Increase the confidence threshold from 7 to 9
+            </li>
+            <li class="fq-option" data-fq-idx="0" data-fq-val="b" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="b"> Replace confidence-based filtering with explicit categorical criteria for each finding type, and disable categories with high false positive rates
+            </li>
+            <li class="fq-option" data-fq-idx="0" data-fq-val="c" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="c"> Add a self-review step where Claude checks its own findings before reporting
+            </li>
+            <li class="fq-option" data-fq-idx="0" data-fq-val="d" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="d"> Switch to a larger model that produces more accurate confidence scores
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="final-quiz-question" data-fq="1">
+          <div class="fq-number">Question 2 of 8</div>
+          <div class="fq-text">
+            When designing few-shot examples for an ambiguous classification task, which set of 3 examples
+            would be most effective?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="1" data-fq-val="a" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="a"> 3 clear-cut examples, each from a different category, with minimal reasoning
+            </li>
+            <li class="fq-option" data-fq-idx="1" data-fq-val="b" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="b"> 2 clear-cut examples from different categories plus 1 ambiguous borderline case with detailed reasoning showing how the decision was made
+            </li>
+            <li class="fq-option" data-fq-idx="1" data-fq-val="c" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="c"> 3 examples all from the most common category to ensure that category is handled well
+            </li>
+            <li class="fq-option" data-fq-idx="1" data-fq-val="d" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="d"> 3 ambiguous examples with no clear answer to make Claude more cautious
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="final-quiz-question" data-fq="2">
+          <div class="fq-number">Question 3 of 8</div>
+          <div class="fq-text">
+            You want Claude to always return structured JSON matching a specific schema. Which <code>tool_choice</code>
+            setting guarantees this?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="2" data-fq-val="a" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="a"> <code>tool_choice: "auto"</code>
+            </li>
+            <li class="fq-option" data-fq-idx="2" data-fq-val="b" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="b"> <code>tool_choice: "any"</code>
+            </li>
+            <li class="fq-option" data-fq-idx="2" data-fq-val="c" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="c"> <code>tool_choice: {"type": "tool", "name": "your_tool_name"}</code>
+            </li>
+            <li class="fq-option" data-fq-idx="2" data-fq-val="d" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="d"> <code>tool_choice: "required"</code>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 4 -->
+        <div class="final-quiz-question" data-fq="3">
+          <div class="fq-number">Question 4 of 8</div>
+          <div class="fq-text">
+            An extraction schema has a field for "purchase_order_number" that exists on some invoices but not others.
+            What is the correct schema design?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="3" data-fq-val="a" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="a"> Make it required with type "string" and instruct Claude to output "N/A" when missing
+            </li>
+            <li class="fq-option" data-fq-idx="3" data-fq-val="b" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="b"> Make it required with type ["string", "null"] so Claude must explicitly output null when absent
+            </li>
+            <li class="fq-option" data-fq-idx="3" data-fq-val="c" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="c"> Make it optional so Claude can omit it entirely when not found
+            </li>
+            <li class="fq-option" data-fq-idx="3" data-fq-val="d" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="d"> Make it required with type "string" and set a default value of empty string
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 5 -->
+        <div class="final-quiz-question" data-fq="4">
+          <div class="fq-number">Question 5 of 8</div>
+          <div class="fq-text">
+            A validation-retry loop has failed twice to correctly extract a "tax_id" field from an invoice.
+            The invoice is a simple receipt from a coffee shop. What should the system do?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="4" data-fq-val="a" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="a"> Increase max_tokens and retry with a more detailed prompt
+            </li>
+            <li class="fq-option" data-fq-idx="4" data-fq-val="b" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="b"> Switch to a more capable model and retry
+            </li>
+            <li class="fq-option" data-fq-idx="4" data-fq-val="c" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="c"> Accept that the data is absent from the source, set tax_id to null, and annotate that it was not found in the document
+            </li>
+            <li class="fq-option" data-fq-idx="4" data-fq-val="d" onclick="selectFinalOption(4, this)">
+              <input type="radio" name="fq4" value="d"> Continue retrying up to 10 times with different prompt variations
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 6 -->
+        <div class="final-quiz-question" data-fq="5">
+          <div class="fq-number">Question 6 of 8</div>
+          <div class="fq-text">
+            Your team needs to process 10,000 compliance documents overnight. Each document requires a single
+            extraction call (no multi-turn tool use). Which API approach is optimal?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="5" data-fq-val="a" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="a"> Real-time API with parallel async calls for maximum speed
+            </li>
+            <li class="fq-option" data-fq-idx="5" data-fq-val="b" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="b"> Message Batches API for 50% cost savings since latency is acceptable for overnight processing
+            </li>
+            <li class="fq-option" data-fq-idx="5" data-fq-val="c" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="c"> Real-time API with rate limiting to avoid hitting quotas
+            </li>
+            <li class="fq-option" data-fq-idx="5" data-fq-val="d" onclick="selectFinalOption(5, this)">
+              <input type="radio" name="fq5" value="d"> Split into 10 smaller batches of 1,000 using the real-time API
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 7 -->
+        <div class="final-quiz-question" data-fq="6">
+          <div class="fq-number">Question 7 of 8</div>
+          <div class="fq-text">
+            Why is same-session self-review (asking Claude to review its own output within the same conversation)
+            unreliable for catching errors?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="6" data-fq-val="a" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="a"> Claude's context window is too small to hold both the output and the review
+            </li>
+            <li class="fq-option" data-fq-idx="6" data-fq-val="b" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="b"> Claude retains its reasoning chain and is biased toward confirming its original answer rather than critically evaluating it
+            </li>
+            <li class="fq-option" data-fq-idx="6" data-fq-val="c" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="c"> Self-review costs twice as many tokens as an independent review
+            </li>
+            <li class="fq-option" data-fq-idx="6" data-fq-val="d" onclick="selectFinalOption(6, this)">
+              <input type="radio" name="fq6" value="d"> Claude always confirms its previous output as correct when asked
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 8 -->
+        <div class="final-quiz-question" data-fq="7">
+          <div class="fq-number">Question 8 of 8</div>
+          <div class="fq-text">
+            In a multi-pass review architecture for document extraction, what does the second (review) pass receive
+            as input?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="7" data-fq-val="a" onclick="selectFinalOption(7, this)">
+              <input type="radio" name="fq7" value="a"> Only the extraction output from Pass 1
+            </li>
+            <li class="fq-option" data-fq-idx="7" data-fq-val="b" onclick="selectFinalOption(7, this)">
+              <input type="radio" name="fq7" value="b"> The original source document and the extraction output, but NOT the reasoning from Pass 1
+            </li>
+            <li class="fq-option" data-fq-idx="7" data-fq-val="c" onclick="selectFinalOption(7, this)">
+              <input type="radio" name="fq7" value="c"> The full conversation history from Pass 1 including reasoning
+            </li>
+            <li class="fq-option" data-fq-idx="7" data-fq-val="d" onclick="selectFinalOption(7, this)">
+              <input type="radio" name="fq7" value="d"> Only the original source document without the extraction output
+            </li>
+          </ul>
+        </div>
+
+        <button class="final-submit-btn" id="finalSubmitBtn" onclick="submitFinalQuiz()" disabled>
+          Submit Answers
+        </button>
+
+        <div class="final-result" id="finalResult">
+          <h4 id="finalResultTitle"></h4>
+          <p id="finalResultText"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         NAVIGATION FOOTER
+         ======================================== -->
+    <nav class="module-nav">
+      <a href="32-cert-domain3.html" class="nav-link prev">
+        <span class="nav-dir">&larr; Previous</span>
+        <span class="nav-title">Module 32: Cert -- Domain 3</span>
+      </a>
+      <a href="34-cert-domain5.html" class="nav-link next">
+        <span class="nav-dir">Next &rarr;</span>
+        <span class="nav-title">Module 34: Cert -- Context &amp; Reliability</span>
+      </a>
+    </nav>
+
+  </div>
+</main>
+
+<!-- ============================================
+     JAVASCRIPT
+     ============================================ -->
+<script>
+(function() {
+  'use strict';
+
+  // ==========================================
+  // THEME MANAGEMENT
+  // ==========================================
+  var THEME_KEY = 'claude-training-theme';
+
+  function getTheme() {
+    return localStorage.getItem(THEME_KEY) || 'light';
+  }
+
+  function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem(THEME_KEY, theme);
+    var icon = document.getElementById('themeIcon');
+    if (icon) {
+      icon.textContent = theme === 'dark' ? '\u2600' : '\u263E';
+    }
+  }
+
+  setTheme(getTheme());
+
+  document.getElementById('themeToggle').addEventListener('click', function() {
+    var current = getTheme();
+    setTheme(current === 'dark' ? 'light' : 'dark');
+  });
+
+  // ==========================================
+  // SIDEBAR MOBILE TOGGLE
+  // ==========================================
+  var hamburger = document.getElementById('hamburger');
+  var sidebar = document.getElementById('sidebar');
+  var overlay = document.getElementById('sidebarOverlay');
+
+  function toggleSidebar() {
+    var isOpen = sidebar.classList.contains('open');
+    sidebar.classList.toggle('open');
+    hamburger.classList.toggle('open');
+    if (isOpen) {
+      overlay.classList.remove('show');
+    } else {
+      overlay.classList.add('show');
+    }
+  }
+
+  hamburger.addEventListener('click', toggleSidebar);
+  overlay.addEventListener('click', toggleSidebar);
+
+  // ==========================================
+  // SIDEBAR SECTION COLLAPSING
+  // ==========================================
+  var sectionToggles = document.querySelectorAll('.sidebar-section-toggle');
+  for (var i = 0; i < sectionToggles.length; i++) {
+    (function(btn) {
+      btn.addEventListener('click', function() {
+        var sectionName = this.getAttribute('data-section');
+        var linksList = document.getElementById('nav-' + sectionName);
+        var isCollapsed = this.classList.contains('collapsed');
+
+        if (isCollapsed) {
+          this.classList.remove('collapsed');
+          linksList.classList.remove('collapsed');
+          linksList.style.maxHeight = linksList.scrollHeight + 'px';
+        } else {
+          this.classList.add('collapsed');
+          linksList.style.maxHeight = linksList.scrollHeight + 'px';
+          linksList.offsetHeight;
+          linksList.classList.add('collapsed');
+        }
+      });
+
+      var sectionName = btn.getAttribute('data-section');
+      var linksList = document.getElementById('nav-' + sectionName);
+      if (linksList) {
+        linksList.style.maxHeight = linksList.scrollHeight + 'px';
+      }
+    })(sectionToggles[i]);
+  }
+
+  // ==========================================
+  // SCROLLSPY
+  // ==========================================
+  var sidebarLinks = document.querySelectorAll('.sidebar-link');
+  var sections = [];
+
+  for (var i = 0; i < sidebarLinks.length; i++) {
+    var targetId = sidebarLinks[i].getAttribute('data-target');
+    var section = document.getElementById(targetId);
+    if (section) {
+      sections.push({ el: section, link: sidebarLinks[i], id: targetId });
+    }
+  }
+
+  function updateScrollspy() {
+    var scrollPos = window.scrollY + 100;
+    var active = null;
+
+    for (var i = sections.length - 1; i >= 0; i--) {
+      if (sections[i].el.offsetTop <= scrollPos) {
+        active = sections[i];
+        break;
+      }
+    }
+
+    for (var j = 0; j < sidebarLinks.length; j++) {
+      sidebarLinks[j].classList.remove('active');
+    }
+    if (active) {
+      active.link.classList.add('active');
+    }
+
+    updateSidebarProgress();
+  }
+
+  var scrollTimer = null;
+  window.addEventListener('scroll', function() {
+    if (scrollTimer) return;
+    scrollTimer = setTimeout(function() {
+      scrollTimer = null;
+      updateScrollspy();
+    }, 50);
+  });
+  updateScrollspy();
+
+  for (var i = 0; i < sidebarLinks.length; i++) {
+    sidebarLinks[i].addEventListener('click', function() {
+      if (window.innerWidth <= 1024) {
+        sidebar.classList.remove('open');
+        hamburger.classList.remove('open');
+        overlay.classList.remove('show');
+      }
+    });
+  }
+
+  // ==========================================
+  // SIDEBAR PROGRESS
+  // ==========================================
+  function updateSidebarProgress() {
+    var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    var scrolled = window.scrollY;
+    var pct = docHeight > 0 ? Math.min(100, (scrolled / docHeight) * 100) : 0;
+    var fill = document.getElementById('sidebarProgressFill');
+    if (fill) {
+      fill.style.width = pct + '%';
+    }
+  }
+
+  // ==========================================
+  // COPY TO CLIPBOARD
+  // ==========================================
+  window.copyCode = function(btn) {
+    var block = btn.closest('.code-block');
+    var codeEl = block.cloneNode(true);
+    var labelEl = codeEl.querySelector('.code-label');
+    var btnEl = codeEl.querySelector('.copy-btn');
+    if (labelEl) labelEl.remove();
+    if (btnEl) btnEl.remove();
+    var text = codeEl.textContent.trim();
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function() {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(function() {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      }).catch(function() {
+        btn.textContent = 'Failed';
+        setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+      });
+    } else {
+      btn.textContent = 'Failed';
+      setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+    }
+  };
+
+  // ==========================================
+  // SCHEMA VALIDATION LAB
+  // ==========================================
+  var schemaScenarios = {
+    invoice: {
+      desc: 'Design a JSON Schema for extracting structured data from invoice documents. Your schema must handle vendor name, date, amount, line items, and currency -- including cases where some fields are missing.',
+      testCases: [
+        {
+          name: 'Complete invoice',
+          data: { vendor_name: 'Acme Corp', invoice_date: '2024-03-15', total_amount: 1250.00, line_items: [{ description: 'Widget A', amount: 750.00 }, { description: 'Widget B', amount: 500.00 }] },
+          shouldPass: true
+        },
+        {
+          name: 'Missing date (null)',
+          data: { vendor_name: 'Corner Shop', invoice_date: null, total_amount: 24.99, line_items: [{ description: 'Coffee', amount: 24.99 }] },
+          shouldPass: true
+        },
+        {
+          name: 'Missing vendor (invalid)',
+          data: { invoice_date: '2024-03-15', total_amount: 100.00, line_items: [] },
+          shouldPass: false
+        },
+        {
+          name: 'String amount (type error)',
+          data: { vendor_name: 'Test Co', total_amount: '$500', line_items: [] },
+          shouldPass: false
+        },
+        {
+          name: 'Empty line items array',
+          data: { vendor_name: 'Solo Inc', invoice_date: '2024-01-01', total_amount: 0, line_items: [] },
+          shouldPass: true
+        }
+      ],
+      expertSchema: '{\n  "type": "object",\n  "required": ["vendor_name", "invoice_date", "total_amount", "currency", "line_items"],\n  "properties": {\n    "vendor_name": {\n      "type": "string",\n      "description": "Company name of the invoice sender"\n    },\n    "invoice_date": {\n      "type": ["string", "null"],\n      "description": "Date in ISO 8601 format, null if not found"\n    },\n    "total_amount": {\n      "type": "number",\n      "description": "Total invoice amount"\n    },\n    "currency": {\n      "type": "string",\n      "enum": ["USD", "EUR", "GBP", "CAD", "AUD", "other"],\n      "description": "Currency code"\n    },\n    "currency_detail": {\n      "type": ["string", "null"],\n      "description": "Currency name when other is selected"\n    },\n    "line_items": {\n      "type": "array",\n      "items": {\n        "type": "object",\n        "required": ["description", "amount"],\n        "properties": {\n          "description": { "type": "string" },\n          "quantity": { "type": ["number", "null"] },\n          "unit_price": { "type": ["number", "null"] },\n          "amount": { "type": "number" }\n        }\n      }\n    },\n    "purchase_order": {\n      "type": ["string", "null"],\n      "description": "PO number if present"\n    }\n  }\n}'
+    },
+    codereview: {
+      desc: 'Design a JSON Schema for reporting code review findings. Each finding needs a category (from a defined set), severity, file location, description, and optionally a suggested fix.',
+      testCases: [
+        {
+          name: 'Complete finding',
+          data: { category: 'NULL_DEREF', severity: 'HIGH', file: 'src/main.py', line: 42, description: 'Variable x used without null check', suggested_fix: 'Add null guard before access' },
+          shouldPass: true
+        },
+        {
+          name: 'No suggested fix (null)',
+          data: { category: 'SQL_INJECTION', severity: 'CRITICAL', file: 'api/query.py', line: 15, description: 'String concatenation in SQL', suggested_fix: null },
+          shouldPass: true
+        },
+        {
+          name: 'Invalid category',
+          data: { category: 'STYLE_ISSUE', severity: 'LOW', file: 'utils.py', line: 1, description: 'Bad naming' },
+          shouldPass: false
+        },
+        {
+          name: 'Missing file (invalid)',
+          data: { category: 'RESOURCE_LEAK', severity: 'HIGH', description: 'Connection not closed' },
+          shouldPass: false
+        },
+        {
+          name: 'Line number as string (type error)',
+          data: { category: 'TYPE_MISMATCH', severity: 'MEDIUM', file: 'service.py', line: 'ten', description: 'Wrong type' },
+          shouldPass: false
+        }
+      ],
+      expertSchema: '{\n  "type": "object",\n  "required": ["category", "severity", "file", "line", "description"],\n  "properties": {\n    "category": {\n      "type": "string",\n      "enum": ["NULL_DEREF", "RESOURCE_LEAK", "SQL_INJECTION", "TYPE_MISMATCH", "RACE_CONDITION", "other"],\n      "description": "Finding category from predefined set"\n    },\n    "category_detail": {\n      "type": ["string", "null"],\n      "description": "Custom category name when other is selected"\n    },\n    "severity": {\n      "type": "string",\n      "enum": ["CRITICAL", "HIGH", "MEDIUM"],\n      "description": "Finding severity (no LOW -- if below MEDIUM, do not report)"\n    },\n    "file": {\n      "type": "string",\n      "description": "File path relative to project root"\n    },\n    "line": {\n      "type": "integer",\n      "description": "Line number of the finding"\n    },\n    "description": {\n      "type": "string",\n      "description": "Clear description of the issue"\n    },\n    "suggested_fix": {\n      "type": ["string", "null"],\n      "description": "Suggested code fix, null if not applicable"\n    },\n    "confidence_rationale": {\n      "type": "string",\n      "description": "Why this finding is correct (not a numeric score)"\n    }\n  }\n}'
+    }
+  };
+
+  var currentSchemaScenario = 'invoice';
+
+  window.switchSchemaScenario = function(scenario) {
+    currentSchemaScenario = scenario;
+    var tabs = document.querySelectorAll('.lab-tab');
+    for (var i = 0; i < tabs.length; i++) {
+      tabs[i].classList.remove('active');
+    }
+    if (scenario === 'invoice') {
+      tabs[0].classList.add('active');
+    } else {
+      tabs[1].classList.add('active');
+    }
+    document.getElementById('schemaScenarioDesc').textContent = schemaScenarios[scenario].desc;
+    document.getElementById('schemaResults').classList.remove('show');
+    document.getElementById('schemaResults').innerHTML = '';
+    document.getElementById('expertSchemaBox').style.display = 'none';
+  };
+
+  function simpleSchemaValidate(schema, data) {
+    var errors = [];
+    try {
+      if (typeof schema !== 'object' || schema === null) {
+        return ['Schema must be a JSON object'];
+      }
+      if (schema.type === 'object') {
+        if (typeof data !== 'object' || data === null || Array.isArray(data)) {
+          return ['Expected an object, got ' + typeof data];
+        }
+        var required = schema.required || [];
+        for (var i = 0; i < required.length; i++) {
+          if (!(required[i] in data)) {
+            errors.push('Missing required field: "' + required[i] + '"');
+          }
+        }
+        var props = schema.properties || {};
+        for (var key in data) {
+          if (data.hasOwnProperty(key) && props[key]) {
+            var propSchema = props[key];
+            var val = data[key];
+            var typeSpec = propSchema.type;
+            if (typeSpec) {
+              var valid = false;
+              var types = Array.isArray(typeSpec) ? typeSpec : [typeSpec];
+              for (var t = 0; t < types.length; t++) {
+                if (types[t] === 'null' && val === null) valid = true;
+                if (types[t] === 'string' && typeof val === 'string') valid = true;
+                if (types[t] === 'number' && typeof val === 'number') valid = true;
+                if (types[t] === 'integer' && typeof val === 'number' && val % 1 === 0) valid = true;
+                if (types[t] === 'boolean' && typeof val === 'boolean') valid = true;
+                if (types[t] === 'array' && Array.isArray(val)) valid = true;
+                if (types[t] === 'object' && typeof val === 'object' && val !== null && !Array.isArray(val)) valid = true;
+              }
+              if (!valid && val !== undefined) {
+                errors.push('Field "' + key + '": expected type ' + JSON.stringify(typeSpec) + ', got ' + (val === null ? 'null' : typeof val) + ' (' + JSON.stringify(val) + ')');
+              }
+              if (propSchema.enum && val !== null && val !== undefined) {
+                var enumVals = propSchema.enum;
+                var found = false;
+                for (var e = 0; e < enumVals.length; e++) {
+                  if (enumVals[e] === val) { found = true; break; }
+                }
+                if (!found) {
+                  errors.push('Field "' + key + '": value "' + val + '" not in enum ' + JSON.stringify(enumVals));
+                }
+              }
+            }
+          }
+        }
+      }
+    } catch (err) {
+      errors.push('Validation error: ' + err.message);
+    }
+    return errors;
+  }
+
+  window.validateSchema = function() {
+    var schemaText = document.getElementById('schemaInput').value.trim();
+    var resultsEl = document.getElementById('schemaResults');
+    var schema;
+
+    try {
+      schema = JSON.parse(schemaText);
+    } catch (e) {
+      resultsEl.innerHTML = '<div class="lab-result-item"><span>JSON Parse Error</span><span class="lab-fail">' + e.message + '</span></div>';
+      resultsEl.classList.add('show');
+      return;
+    }
+
+    var scenario = schemaScenarios[currentSchemaScenario];
+    var testCases = scenario.testCases;
+    var html = '';
+    var passed = 0;
+    var total = testCases.length;
+
+    for (var i = 0; i < testCases.length; i++) {
+      var tc = testCases[i];
+      var errors = simpleSchemaValidate(schema, tc.data);
+      var schemaPass = errors.length === 0;
+      var correct = (schemaPass === tc.shouldPass);
+
+      if (correct) passed++;
+
+      var statusClass = correct ? 'lab-pass' : 'lab-fail';
+      var statusText = correct ? 'CORRECT' : 'WRONG';
+
+      html += '<div class="lab-result-item">';
+      html += '<span><strong>' + tc.name + '</strong>';
+      if (tc.shouldPass) {
+        html += ' <em style="font-size:0.8rem; color:var(--text-muted);">(should pass)</em>';
+      } else {
+        html += ' <em style="font-size:0.8rem; color:var(--text-muted);">(should fail)</em>';
+      }
+      html += '</span>';
+      html += '<span class="' + statusClass + '">' + statusText + '</span>';
+      html += '</div>';
+
+      if (!correct && errors.length > 0 && tc.shouldPass) {
+        html += '<div style="padding: 4px 0 8px; font-size: 0.8rem; color: var(--error);">';
+        for (var e = 0; e < errors.length; e++) {
+          html += '&nbsp;&nbsp;- ' + errors[e] + '<br>';
+        }
+        html += '</div>';
+      }
+      if (!correct && errors.length === 0 && !tc.shouldPass) {
+        html += '<div style="padding: 4px 0 8px; font-size: 0.8rem; color: var(--error);">';
+        html += '&nbsp;&nbsp;- Schema accepted invalid data. Check required fields and type constraints.';
+        html += '</div>';
+      }
+    }
+
+    var scoreClass = 'poor';
+    if (passed === total) scoreClass = 'excellent';
+    else if (passed >= total - 1) scoreClass = 'good';
+    else if (passed >= total - 2) scoreClass = 'fair';
+
+    html = '<div style="margin-bottom: 12px;"><span class="score-badge ' + scoreClass + '">' + passed + ' / ' + total + ' correct</span></div>' + html;
+
+    resultsEl.innerHTML = html;
+    resultsEl.classList.add('show');
+  };
+
+  window.showExpertSchema = function() {
+    var box = document.getElementById('expertSchemaBox');
+    var codeEl = document.getElementById('expertSchemaCode');
+    var scenario = schemaScenarios[currentSchemaScenario];
+    codeEl.textContent = scenario.expertSchema;
+    box.style.display = box.style.display === 'none' ? 'block' : 'none';
+  };
+
+  // ==========================================
+  // FEW-SHOT EXAMPLE DESIGNER
+  // ==========================================
+  var categories = ['BILLING', 'TECHNICAL', 'ACCOUNT_ACCESS', 'FEATURE_REQUEST', 'COMPLAINT'];
+
+  window.analyzeFewShot = function() {
+    var examples = [
+      document.getElementById('fewshot1').value.trim(),
+      document.getElementById('fewshot2').value.trim(),
+      document.getElementById('fewshot3').value.trim()
+    ];
+
+    var resultsEl = document.getElementById('fewshotResults');
+    var scores = { diversity: 0, edgeCases: 0, formatConsistency: 0, quality: 0, completeness: 0 };
+    var maxScore = 5;
+
+    // Parse categories from examples
+    var foundCategories = [];
+    var hasReasoning = [];
+    var hasInput = [];
+    var hasClassification = [];
+
+    for (var i = 0; i < examples.length; i++) {
+      var ex = examples[i].toLowerCase();
+      var catFound = '';
+      for (var c = 0; c < categories.length; c++) {
+        if (ex.indexOf(categories[c].toLowerCase()) !== -1) {
+          catFound = categories[c];
+          break;
+        }
+      }
+      foundCategories.push(catFound);
+      hasReasoning.push(ex.indexOf('reasoning:') !== -1 || ex.indexOf('reasoning :') !== -1);
+      hasInput.push(ex.indexOf('input:') !== -1 || ex.indexOf('input :') !== -1);
+      hasClassification.push(ex.indexOf('classification:') !== -1 || ex.indexOf('classification :') !== -1);
+    }
+
+    // Diversity: unique categories
+    var uniqueCats = [];
+    for (var i = 0; i < foundCategories.length; i++) {
+      if (foundCategories[i] && uniqueCats.indexOf(foundCategories[i]) === -1) {
+        uniqueCats.push(foundCategories[i]);
+      }
+    }
+    if (uniqueCats.length >= 3) scores.diversity = 5;
+    else if (uniqueCats.length === 2) scores.diversity = 3;
+    else if (uniqueCats.length === 1) scores.diversity = 1;
+    else scores.diversity = 0;
+
+    // Edge cases: look for words indicating ambiguity
+    var ambiguityMarkers = ['although', 'however', 'but', 'borderline', 'ambiguous', 'could be', 'might', 'secondary', 'primarily', 'core issue', 'frustrat'];
+    var ambiguousCount = 0;
+    for (var i = 0; i < examples.length; i++) {
+      var exLower = examples[i].toLowerCase();
+      for (var m = 0; m < ambiguityMarkers.length; m++) {
+        if (exLower.indexOf(ambiguityMarkers[m]) !== -1) {
+          ambiguousCount++;
+          break;
+        }
+      }
+    }
+    if (ambiguousCount >= 2) scores.edgeCases = 5;
+    else if (ambiguousCount === 1) scores.edgeCases = 3;
+    else scores.edgeCases = 1;
+
+    // Format consistency: all have Input, Reasoning, Classification
+    var allHaveFormat = true;
+    for (var i = 0; i < 3; i++) {
+      if (!hasInput[i] || !hasReasoning[i] || !hasClassification[i]) {
+        allHaveFormat = false;
+        break;
+      }
+    }
+    scores.formatConsistency = allHaveFormat ? 5 : 2;
+
+    // Quality: reasoning length and detail
+    var totalReasoningLen = 0;
+    for (var i = 0; i < examples.length; i++) {
+      var rMatch = examples[i].match(/[Rr]easoning:\s*([\s\S]*?)(?=[Cc]lassification:|$)/);
+      if (rMatch) {
+        totalReasoningLen += rMatch[1].trim().length;
+      }
+    }
+    if (totalReasoningLen > 300) scores.quality = 5;
+    else if (totalReasoningLen > 150) scores.quality = 3;
+    else scores.quality = 1;
+
+    // Completeness: all 3 examples non-empty and substantial
+    var allSubstantial = true;
+    for (var i = 0; i < examples.length; i++) {
+      if (examples[i].length < 50) {
+        allSubstantial = false;
+        break;
+      }
+    }
+    scores.completeness = allSubstantial ? 5 : 2;
+
+    var total = scores.diversity + scores.edgeCases + scores.formatConsistency + scores.quality + scores.completeness;
+    var maxTotal = maxScore * 5;
+    var pct = Math.round((total / maxTotal) * 100);
+
+    var overallClass = 'poor';
+    if (pct >= 85) overallClass = 'excellent';
+    else if (pct >= 65) overallClass = 'good';
+    else if (pct >= 45) overallClass = 'fair';
+
+    var html = '<div style="margin-bottom: 12px;"><span class="score-badge ' + overallClass + '">' + total + ' / ' + maxTotal + ' (' + pct + '%)</span></div>';
+
+    var dims = [
+      { name: 'Diversity (different categories)', score: scores.diversity },
+      { name: 'Edge Cases (ambiguous examples)', score: scores.edgeCases },
+      { name: 'Format Consistency (Input/Reasoning/Classification)', score: scores.formatConsistency },
+      { name: 'Quality (detailed reasoning)', score: scores.quality },
+      { name: 'Completeness (substantial examples)', score: scores.completeness }
+    ];
+
+    for (var i = 0; i < dims.length; i++) {
+      var dimClass = dims[i].score >= 4 ? 'lab-pass' : (dims[i].score >= 3 ? 'lab-warn' : 'lab-fail');
+      html += '<div class="lab-result-item"><span>' + dims[i].name + '</span><span class="' + dimClass + '">' + dims[i].score + ' / ' + maxScore + '</span></div>';
+    }
+
+    if (uniqueCats.length < 3) {
+      html += '<div style="margin-top: 8px; font-size: 0.85rem; color: var(--warning);">Tip: Cover more categories. Found: ' + (uniqueCats.length > 0 ? uniqueCats.join(', ') : 'none detected') + '. Missing categories include: ' + categories.filter(function(c) { return uniqueCats.indexOf(c) === -1; }).slice(0, 2).join(', ') + '.</div>';
+    }
+    if (ambiguousCount === 0) {
+      html += '<div style="margin-top: 4px; font-size: 0.85rem; color: var(--warning);">Tip: Include at least one ambiguous/borderline example where the classification is not obvious. Show reasoning for why one category was chosen over another.</div>';
+    }
+
+    resultsEl.innerHTML = html;
+    resultsEl.classList.add('show');
+  };
+
+  window.showExpertFewShot = function() {
+    var box = document.getElementById('expertFewShotBox');
+    var codeEl = document.getElementById('expertFewShotCode');
+    codeEl.textContent = 'Example 1 (Clear positive -- BILLING):\nInput: "I was charged $49.99 but my plan is $29.99. This happened after I downgraded last week."\nReasoning: Customer reports a specific billing discrepancy with amounts and a triggering event (plan change). This is clearly a billing issue, not a complaint -- the customer is reporting facts, not expressing dissatisfaction.\nClassification: BILLING\n\nExample 2 (Ambiguous borderline -- COMPLAINT vs TECHNICAL):\nInput: "Your app is terrible. It crashes every time I try to upload a file larger than 10MB. I have wasted hours on this. Fix it."\nReasoning: The customer is clearly frustrated (\"terrible\", \"wasted hours\"), which suggests COMPLAINT. However, the core issue is a reproducible bug (crashes on files >10MB) with specific reproduction steps. The frustration is a reaction to the technical problem, not the primary issue. Classify based on the actionable root cause, not the emotional tone.\nClassification: TECHNICAL\n\nExample 3 (Ambiguous borderline -- ACCOUNT_ACCESS vs TECHNICAL):\nInput: "I can see the login page but after entering correct credentials the page just refreshes. No error message. Works fine on my phone."\nReasoning: This could be ACCOUNT_ACCESS (cannot log in) or TECHNICAL (browser-specific bug). The key signal is \"works fine on my phone\" -- this indicates the credentials are correct and the account is not locked. The issue is a browser-specific technical bug, not an account access problem.\nClassification: TECHNICAL';
+    box.style.display = box.style.display === 'none' ? 'block' : 'none';
+  };
+
+  // ==========================================
+  // BATCH PROCESSING SIMULATOR
+  // ==========================================
+  var batchSimRunning = false;
+  var batchSimFailed = [];
+
+  var modelPricing = {
+    haiku: { input: 0.25, output: 1.25, name: 'Claude Haiku' },
+    sonnet: { input: 3, output: 15, name: 'Claude Sonnet' },
+    opus: { input: 15, output: 75, name: 'Claude Opus' }
+  };
+
+  window.runBatchSim = function() {
+    if (batchSimRunning) return;
+    batchSimRunning = true;
+    batchSimFailed = [];
+
+    var count = parseInt(document.getElementById('batchCount').value) || 500;
+    var model = document.getElementById('batchModel').value;
+    var inputTokens = parseInt(document.getElementById('batchInputTokens').value) || 800;
+    var outputTokens = parseInt(document.getElementById('batchOutputTokens').value) || 400;
+    var failRate = parseInt(document.getElementById('batchFailRate').value) || 3;
+
+    if (count > 100000) count = 100000;
+    if (count < 1) count = 1;
+
+    var pricing = modelPricing[model];
+    var totalInputTokens = count * inputTokens;
+    var totalOutputTokens = count * outputTokens;
+
+    var realtimeCostInput = (totalInputTokens / 1000000) * pricing.input;
+    var realtimeCostOutput = (totalOutputTokens / 1000000) * pricing.output;
+    var realtimeTotal = realtimeCostInput + realtimeCostOutput;
+    var batchTotal = realtimeTotal * 0.5;
+    var savings = realtimeTotal - batchTotal;
+
+    // Show cost comparison
+    var costSection = document.getElementById('batchCostComparison');
+    costSection.style.display = 'block';
+
+    var costRowsEl = document.getElementById('batchCostRows');
+    costRowsEl.innerHTML =
+      '<div class="cost-row"><span class="cost-label">Real-Time API (' + pricing.name + ')</span><span class="cost-value">$' + realtimeTotal.toFixed(2) + '</span></div>' +
+      '<div class="cost-row"><span class="cost-label">Batch API (50% discount)</span><span class="cost-value">$' + batchTotal.toFixed(2) + '</span></div>' +
+      '<div class="cost-row"><span class="cost-label">Savings</span><span class="cost-savings">$' + savings.toFixed(2) + ' saved (' + Math.round((savings / realtimeTotal) * 100) + '%)</span></div>' +
+      '<div class="cost-row"><span class="cost-label">Total tokens</span><span class="cost-value">' + ((totalInputTokens + totalOutputTokens) / 1000).toFixed(0) + 'K</span></div>';
+
+    // Show progress section
+    var progressSection = document.getElementById('batchProgressSection');
+    progressSection.style.display = 'block';
+
+    var progressFill = document.getElementById('batchProgressFill');
+    var progressText = document.getElementById('batchProgressText');
+    var logEl = document.getElementById('batchLog');
+    logEl.innerHTML = '';
+    progressFill.style.width = '0%';
+
+    document.getElementById('batchRunBtn').disabled = true;
+    document.getElementById('batchResubmitBtn').style.display = 'none';
+    document.getElementById('batchSummary').style.display = 'none';
+
+    // Simulate processing in chunks
+    var processed = 0;
+    var succeeded = 0;
+    var failed = 0;
+    var chunkSize = Math.max(1, Math.floor(count / 40));
+    var logEntries = [];
+
+    function addLog(text, cls) {
+      logEntries.push({ text: text, cls: cls });
+      if (logEntries.length > 100) logEntries.shift();
+      var html = '';
+      for (var i = 0; i < logEntries.length; i++) {
+        html += '<div class="batch-log-entry ' + logEntries[i].cls + '">' + logEntries[i].text + '</div>';
+      }
+      logEl.innerHTML = html;
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    addLog('[INFO] Batch submitted: ' + count + ' items, model: ' + pricing.name, 'info');
+    addLog('[INFO] Estimated completion: within 24 hours', 'info');
+
+    function processChunk() {
+      var chunkEnd = Math.min(processed + chunkSize, count);
+      var chunkFailed = 0;
+      var chunkSucceeded = 0;
+
+      for (var i = processed; i < chunkEnd; i++) {
+        var isFail = (Math.random() * 100) < failRate;
+        if (isFail) {
+          failed++;
+          chunkFailed++;
+          batchSimFailed.push('item-' + (i + 1));
+        } else {
+          succeeded++;
+          chunkSucceeded++;
+        }
+      }
+
+      processed = chunkEnd;
+      var pct = Math.round((processed / count) * 100);
+      progressFill.style.width = pct + '%';
+      progressText.textContent = processed + ' / ' + count + ' processed (' + pct + '%) -- ' + succeeded + ' succeeded, ' + failed + ' failed';
+
+      if (chunkSucceeded > 0) {
+        addLog('[OK] Processed items ' + (processed - chunkSize + 1) + '-' + (processed - chunkFailed) + ': ' + chunkSucceeded + ' succeeded', 'success');
+      }
+      if (chunkFailed > 0) {
+        addLog('[FAIL] ' + chunkFailed + ' items failed in chunk (rate limit, timeout, or content filter)', 'failure');
+      }
+
+      if (processed < count) {
+        setTimeout(processChunk, 80 + Math.floor(Math.random() * 60));
+      } else {
+        finishBatch(count, succeeded, failed);
+      }
+    }
+
+    setTimeout(processChunk, 300);
+  };
+
+  function finishBatch(total, succeeded, failed) {
+    batchSimRunning = false;
+    document.getElementById('batchRunBtn').disabled = false;
+
+    var addLog = function(text, cls) {
+      var logEl = document.getElementById('batchLog');
+      logEl.innerHTML += '<div class="batch-log-entry ' + cls + '">' + text + '</div>';
+      logEl.scrollTop = logEl.scrollHeight;
+    };
+
+    addLog('[INFO] Batch complete: ' + succeeded + ' succeeded, ' + failed + ' failed', 'info');
+
+    var summaryEl = document.getElementById('batchSummary');
+    summaryEl.style.display = 'block';
+
+    var summaryHtml = '<strong>Batch Complete</strong><br>';
+    summaryHtml += 'Total: ' + total + ' | Succeeded: <span style="color: var(--success);">' + succeeded + '</span> | Failed: <span style="color: var(--error);">' + failed + '</span>';
+
+    if (failed > 0) {
+      summaryHtml += '<br><br>Failed items can be resubmitted. Use the "Resubmit Failed Items" button to retry ' + failed + ' failed items.';
+      document.getElementById('batchResubmitBtn').style.display = 'inline-flex';
+    }
+
+    document.getElementById('batchSummaryContent').innerHTML = summaryHtml;
+  }
+
+  window.resubmitFailed = function() {
+    if (batchSimRunning) return;
+    if (batchSimFailed.length === 0) return;
+
+    var failCount = batchSimFailed.length;
+    batchSimFailed = [];
+
+    batchSimRunning = true;
+    document.getElementById('batchResubmitBtn').style.display = 'none';
+    document.getElementById('batchRunBtn').disabled = true;
+
+    var progressFill = document.getElementById('batchProgressFill');
+    var progressText = document.getElementById('batchProgressText');
+    progressFill.style.width = '0%';
+
+    var logEl = document.getElementById('batchLog');
+    logEl.innerHTML += '<div class="batch-log-entry info">[INFO] Resubmitting ' + failCount + ' failed items...</div>';
+
+    var processed = 0;
+    var succeeded = 0;
+    var failed = 0;
+
+    function processResubmit() {
+      var batchEnd = Math.min(processed + Math.max(1, Math.floor(failCount / 10)), failCount);
+      for (var i = processed; i < batchEnd; i++) {
+        if (Math.random() < 0.05) {
+          failed++;
+          batchSimFailed.push('resubmit-' + (i + 1));
+        } else {
+          succeeded++;
+        }
+      }
+      processed = batchEnd;
+      var pct = Math.round((processed / failCount) * 100);
+      progressFill.style.width = pct + '%';
+      progressText.textContent = 'Resubmit: ' + processed + ' / ' + failCount + ' -- ' + succeeded + ' succeeded, ' + failed + ' failed';
+
+      if (processed < failCount) {
+        setTimeout(processResubmit, 100);
+      } else {
+        logEl.innerHTML += '<div class="batch-log-entry success">[OK] Resubmit complete: ' + succeeded + ' succeeded, ' + failed + ' still failed</div>';
+        batchSimRunning = false;
+        document.getElementById('batchRunBtn').disabled = false;
+        if (failed > 0) {
+          document.getElementById('batchResubmitBtn').style.display = 'inline-flex';
+        }
+      }
+    }
+
+    setTimeout(processResubmit, 200);
+  };
+
+  // ==========================================
+  // FINAL QUIZ
+  // ==========================================
+  var FINAL_QUIZ_KEY = 'claude-training-module-33';
+
+  var finalQuizAnswers = ['b', 'b', 'c', 'b', 'c', 'b', 'b', 'b'];
+  var finalQuizSelections = [null, null, null, null, null, null, null, null];
+  var finalQuizSubmitted = false;
+
+  window.selectFinalOption = function(qIdx, el) {
+    if (finalQuizSubmitted) return;
+
+    var parentQ = el.closest('.final-quiz-question');
+    var opts = parentQ.querySelectorAll('.fq-option');
+    for (var i = 0; i < opts.length; i++) {
+      opts[i].querySelector('input').checked = false;
+      opts[i].style.background = '';
+    }
+
+    el.querySelector('input').checked = true;
+    finalQuizSelections[qIdx] = el.getAttribute('data-fq-val');
+
+    var allAnswered = true;
+    for (var i = 0; i < finalQuizSelections.length; i++) {
+      if (finalQuizSelections[i] === null) { allAnswered = false; break; }
+    }
+    document.getElementById('finalSubmitBtn').disabled = !allAnswered;
+  };
+
+  window.submitFinalQuiz = function() {
+    if (finalQuizSubmitted) return;
+    finalQuizSubmitted = true;
+
+    var score = 0;
+
+    for (var idx = 0; idx < finalQuizSelections.length; idx++) {
+      var sel = finalQuizSelections[idx];
+      var questionEl = document.querySelector('.final-quiz-question[data-fq="' + idx + '"]');
+      var options = questionEl.querySelectorAll('.fq-option');
+
+      for (var j = 0; j < options.length; j++) {
+        var opt = options[j];
+        var val = opt.getAttribute('data-fq-val');
+        opt.style.pointerEvents = 'none';
+
+        if (val === finalQuizAnswers[idx]) {
+          if (sel === val) {
+            opt.classList.add('selected-correct');
+            score++;
+          } else {
+            opt.classList.add('reveal-correct');
+          }
+        } else if (val === sel) {
+          opt.classList.add('selected-wrong');
+        }
+      }
+    }
+
+    var result = document.getElementById('finalResult');
+    var title = document.getElementById('finalResultTitle');
+    var text = document.getElementById('finalResultText');
+
+    result.classList.add('show');
+
+    if (score >= 6) {
+      result.classList.add('pass');
+      result.classList.remove('fail');
+      title.textContent = 'Passed! ' + score + ' / 8 correct';
+      text.textContent = 'Excellent work on Domain 4! You demonstrate strong understanding of prompt engineering and structured output patterns. Your progress has been saved. Continue to Module 34: Context Management & Reliability.';
+    } else {
+      result.classList.add('fail');
+      result.classList.remove('pass');
+      title.textContent = score + ' / 8 correct -- Review needed';
+      text.textContent = 'You need at least 6 correct answers to pass. Review the material on explicit criteria, tool_choice settings, and multi-pass review architecture. Pay particular attention to when retries are effective vs. futile.';
+    }
+
+    var progressData = {
+      score: score,
+      total: 8,
+      completed: score >= 6,
+      timestamp: new Date().toISOString()
+    };
+    localStorage.setItem(FINAL_QUIZ_KEY, JSON.stringify(progressData));
+
+    document.getElementById('finalSubmitBtn').disabled = true;
+    document.getElementById('finalSubmitBtn').textContent = 'Submitted';
+  };
+
+  function loadExistingProgress() {
+    var saved = localStorage.getItem(FINAL_QUIZ_KEY);
+    if (saved) {
+      try {
+        var data = JSON.parse(saved);
+        if (data.completed) {
+          var fill = document.getElementById('sidebarProgressFill');
+          if (fill) {
+            fill.style.width = '100%';
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+  }
+  loadExistingProgress();
+
+})();
+</script>
+</body>
+</html>

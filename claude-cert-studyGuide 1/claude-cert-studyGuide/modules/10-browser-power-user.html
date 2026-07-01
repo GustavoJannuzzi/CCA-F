@@ -1,0 +1,3406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 10: Browser Power User | Claude AI Training</title>
+<style>
+/* ============================================
+   CSS CUSTOM PROPERTIES & PREMIUM DESIGN SYSTEM
+   ============================================ */
+:root {
+  --primary: #7C3AED;
+  --primary-light: #A78BFA;
+  --primary-dark: #5B21B6;
+  --accent: #06B6D4;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  --bg: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --bg-code: #F1F5F9;
+  --text: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --border: #E2E8F0;
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -1px rgba(0,0,0,0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.03);
+  --shadow-glow: 0 0 20px rgba(124, 58, 237, 0.15);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --transition: 0.2s ease;
+  --transition-spring: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --sidebar-width: 280px;
+  --content-max: 800px;
+}
+
+[data-theme="dark"] {
+  --bg: #0B0F1A;
+  --bg-card: #141926;
+  --bg-code: #1A2035;
+  --text: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --border: #1E293B;
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.2);
+  --shadow: 0 1px 3px rgba(0,0,0,0.25), 0 1px 2px rgba(0,0,0,0.15);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.3), 0 2px 4px -1px rgba(0,0,0,0.2);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.35), 0 4px 6px -2px rgba(0,0,0,0.2);
+  --shadow-glow: 0 0 25px rgba(124, 58, 237, 0.25);
+}
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 24px;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  min-height: 100vh;
+  transition: background var(--transition), color var(--transition);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================
+   THEME TOGGLE
+   ============================================ */
+.theme-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: all var(--transition-spring);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+.theme-toggle:hover {
+  box-shadow: var(--shadow-glow);
+  transform: scale(1.08);
+}
+
+/* ============================================
+   SIDEBAR
+   ============================================ */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  z-index: 900;
+  transition: transform 0.3s ease, background var(--transition);
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-md);
+}
+
+.sidebar-header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.sidebar-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+  margin-bottom: 12px;
+  transition: color var(--transition);
+}
+.sidebar-back:hover { color: var(--primary-dark); }
+
+.sidebar-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.sidebar-module-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.sidebar-nav {
+  padding: 12px 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.sidebar-section {
+  margin-bottom: 4px;
+}
+
+.sidebar-section-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 20px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  text-align: left;
+  transition: color var(--transition);
+}
+.sidebar-section-toggle:hover { color: var(--text); }
+.sidebar-section-toggle .chevron {
+  transition: transform 0.2s ease;
+  font-size: 0.65rem;
+}
+.sidebar-section-toggle.collapsed .chevron {
+  transform: rotate(-90deg);
+}
+
+.sidebar-links {
+  list-style: none;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.sidebar-links.collapsed {
+  max-height: 0 !important;
+}
+
+.sidebar-link {
+  display: block;
+  padding: 7px 20px 7px 32px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: all var(--transition);
+  line-height: 1.4;
+}
+.sidebar-link:hover {
+  color: var(--text);
+  background: var(--bg);
+}
+.sidebar-link.active {
+  color: var(--primary);
+  border-left-color: var(--primary);
+  background: rgba(124, 58, 237, 0.05);
+  font-weight: 600;
+}
+[data-theme="dark"] .sidebar-link.active {
+  background: rgba(124, 58, 237, 0.12);
+}
+
+.sidebar-progress {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sidebar-progress-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.sidebar-progress-track {
+  height: 6px;
+  background: var(--bg-code);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.sidebar-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 3px;
+  transition: width 0.5s ease;
+  width: 0%;
+}
+
+/* Hamburger button (mobile) */
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1001;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+  transition: all var(--transition);
+}
+.hamburger span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--text);
+  margin: 4px auto;
+  transition: all 0.3s ease;
+  border-radius: 1px;
+}
+.hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(4px, 4px); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(4px, -4px); }
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 899;
+}
+
+/* ============================================
+   MAIN CONTENT
+   ============================================ */
+.main-content {
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+  transition: margin var(--transition);
+}
+
+.content-wrapper {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 40px 32px 80px;
+}
+
+/* Module Header */
+.module-header {
+  margin-bottom: 48px;
+}
+.module-header .breadcrumb {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+.module-header .breadcrumb a {
+  color: var(--primary);
+  text-decoration: none;
+}
+.module-header .breadcrumb a:hover { text-decoration: underline; }
+
+.module-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.module-badge .number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.module-badge .label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.module-header h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, var(--text), var(--primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.module-header .description {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 640px;
+}
+
+.module-meta {
+  display: flex;
+  gap: 16px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.module-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  background: var(--bg-code);
+  padding: 6px 14px;
+  border-radius: 20px;
+}
+
+/* ============================================
+   SECTIONS
+   ============================================ */
+.section {
+  margin-bottom: 56px;
+  scroll-margin-top: 24px;
+}
+
+.section-heading {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+  line-height: 1.3;
+}
+
+.section h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-top: 32px;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.section h4 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-top: 24px;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.section p {
+  margin-bottom: 16px;
+  color: var(--text-secondary);
+}
+
+.section ul, .section ol {
+  margin-bottom: 16px;
+  padding-left: 24px;
+}
+.section li {
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+}
+.section li strong {
+  color: var(--text);
+}
+
+/* ============================================
+   CODE BLOCKS
+   ============================================ */
+.code-block {
+  background: #1E293B;
+  color: #E2E8F0;
+  border-radius: var(--radius-sm);
+  padding: 20px 24px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  overflow-x: auto;
+  position: relative;
+  margin: 16px 0 20px;
+  tab-size: 2;
+  box-shadow: var(--shadow-md);
+}
+.code-block .code-label {
+  position: absolute;
+  top: 8px;
+  left: 16px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #64748B;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+.code-block.has-label {
+  padding-top: 36px;
+}
+.code-block .copy-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: #94A3B8;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  transition: all var(--transition);
+}
+.code-block .copy-btn:hover { background: rgba(255,255,255,0.2); color: white; }
+.code-block .copy-btn.copied { background: var(--success); color: white; }
+
+/* Syntax highlighting classes */
+.kw { color: #C084FC; }
+.str { color: #6EE7B7; }
+.fn { color: #7DD3FC; }
+.cm { color: #64748B; }
+.num { color: #FDBA74; }
+.op { color: #FCA5A5; }
+.type { color: #67E8F9; }
+.param { color: #FDE68A; }
+.prop { color: #F0ABFC; }
+.punc { color: #94A3B8; }
+
+/* Inline code */
+code {
+  background: var(--bg-code);
+  color: var(--primary);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.88em;
+}
+[data-theme="dark"] code {
+  background: #334155;
+}
+.code-block code {
+  background: none;
+  color: inherit;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+  white-space: pre-wrap;
+  display: block;
+}
+
+/* ============================================
+   CALLOUT BOXES
+   ============================================ */
+.callout {
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  margin: 20px 0;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  box-shadow: var(--shadow-xs);
+}
+.callout-icon {
+  flex-shrink: 0;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+.callout-content { flex: 1; }
+.callout-content p { margin-bottom: 6px; color: inherit; }
+.callout-content p:last-child { margin-bottom: 0; }
+
+.callout.info {
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  color: #1E40AF;
+}
+.callout.tip {
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  color: #166534;
+}
+.callout.warning {
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  color: #92400E;
+}
+.callout.important {
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  color: #991B1B;
+}
+
+[data-theme="dark"] .callout.info {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: #93C5FD;
+}
+[data-theme="dark"] .callout.tip {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #6EE7B7;
+}
+[data-theme="dark"] .callout.warning {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #FCD34D;
+}
+[data-theme="dark"] .callout.important {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #FCA5A5;
+}
+
+/* ============================================
+   ACCENT CARDS (with ::before gradient)
+   ============================================ */
+.accent-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  margin: 24px 0;
+  position: relative;
+  overflow: hidden;
+  transition: border-color var(--transition), box-shadow var(--transition-spring);
+  box-shadow: var(--shadow);
+}
+.accent-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+}
+.accent-card:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-md);
+}
+.accent-card h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.accent-card p {
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+.accent-card p:last-child {
+  margin-bottom: 0;
+}
+
+/* ============================================
+   FEATURE CARDS GRID
+   ============================================ */
+.feature-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 20px 0;
+}
+.feature-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: all var(--transition-spring);
+  box-shadow: var(--shadow);
+}
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+}
+.feature-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.feature-card .feature-icon {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  display: block;
+}
+.feature-card h4 {
+  margin: 0 0 8px 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.feature-card p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.feature-card.purple::before { background: linear-gradient(90deg, var(--primary), var(--primary-light)); }
+.feature-card.cyan::before { background: linear-gradient(90deg, var(--accent), #22D3EE); }
+.feature-card.green::before { background: linear-gradient(90deg, var(--success), #34D399); }
+.feature-card.amber::before { background: linear-gradient(90deg, var(--warning), #FBBF24); }
+.feature-card.red::before { background: linear-gradient(90deg, var(--error), #F87171); }
+.feature-card.blue::before { background: linear-gradient(90deg, #3B82F6, #60A5FA); }
+
+/* ============================================
+   COMPARISON TABLE
+   ============================================ */
+.comparison-table-wrapper {
+  overflow-x: auto;
+  margin: 20px 0;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+}
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.comparison-table th {
+  background: var(--primary);
+  color: white;
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+.comparison-table th:first-child {
+  border-radius: var(--radius-sm) 0 0 0;
+}
+.comparison-table th:last-child {
+  border-radius: 0 var(--radius-sm) 0 0;
+}
+.comparison-table td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+.comparison-table tr:nth-child(even) td {
+  background: var(--bg);
+}
+.comparison-table tr:last-child td:first-child {
+  border-radius: 0 0 0 var(--radius-sm);
+}
+.comparison-table tr:last-child td:last-child {
+  border-radius: 0 0 var(--radius-sm) 0;
+}
+
+/* ============================================
+   STEP-BY-STEP
+   ============================================ */
+.step-list {
+  counter-reset: step-counter;
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+.step-item {
+  counter-increment: step-counter;
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-xs);
+  transition: box-shadow var(--transition);
+}
+.step-item:hover {
+  box-shadow: var(--shadow);
+}
+.step-item::before {
+  content: counter(step-counter);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+.step-content h4 {
+  margin-top: 0;
+  margin-bottom: 6px;
+}
+.step-content p {
+  margin-bottom: 8px;
+}
+
+/* ============================================
+   PERSONA WORKSHOP (Interactive 1)
+   ============================================ */
+.persona-workshop {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+.persona-workshop::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--accent), var(--success));
+}
+.persona-workshop h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.persona-selector {
+  margin: 16px 0;
+}
+.persona-selector label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  display: block;
+  margin-bottom: 6px;
+}
+.persona-selector select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.95rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color var(--transition);
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+}
+.persona-selector select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.persona-panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.persona-panel {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.persona-panel-header {
+  padding: 10px 16px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.persona-panel.prompt .persona-panel-header {
+  background: rgba(124, 58, 237, 0.1);
+  color: var(--primary);
+  border-bottom: 1px solid var(--border);
+}
+.persona-panel.response .persona-panel-header {
+  background: rgba(6, 182, 212, 0.1);
+  color: var(--accent);
+  border-bottom: 1px solid var(--border);
+}
+[data-theme="dark"] .persona-panel.prompt .persona-panel-header {
+  background: rgba(124, 58, 237, 0.15);
+}
+[data-theme="dark"] .persona-panel.response .persona-panel-header {
+  background: rgba(6, 182, 212, 0.15);
+}
+
+.persona-panel-body {
+  padding: 16px;
+  font-size: 0.88rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  background: var(--bg);
+  min-height: 200px;
+  max-height: 480px;
+  overflow-y: auto;
+}
+.persona-panel-body textarea {
+  width: 100%;
+  min-height: 180px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+}
+
+.response-comparison {
+  margin-top: 16px;
+}
+.response-tab-bar {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 0;
+}
+.response-tab {
+  padding: 10px 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all var(--transition);
+}
+.response-tab:hover { color: var(--text-secondary); }
+.response-tab.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+.response-tab-content {
+  display: none;
+  padding: 20px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  font-size: 0.88rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  min-height: 200px;
+  max-height: 480px;
+  overflow-y: auto;
+}
+.response-tab-content.active { display: block; }
+.response-tab-content strong { color: var(--text); }
+.response-tab-content .response-heading {
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 12px;
+  font-size: 0.95rem;
+}
+.response-tab-content .response-item {
+  margin-bottom: 16px;
+}
+.response-tab-content .response-item-title {
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.response-tab-content .response-sub {
+  margin-left: 16px;
+  margin-bottom: 8px;
+}
+.response-tab-content em {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.persona-contrast-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.persona-contrast-label.generic {
+  background: rgba(148, 163, 184, 0.15);
+  color: var(--text-muted);
+}
+.persona-contrast-label.persona {
+  background: rgba(124, 58, 237, 0.12);
+  color: var(--primary);
+}
+
+/* ============================================
+   ARTIFACT GALLERY (Interactive 2)
+   ============================================ */
+.artifact-gallery {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+.artifact-gallery::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--primary), var(--success));
+}
+.artifact-gallery h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.artifact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 14px;
+  margin-top: 20px;
+}
+.artifact-card {
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 20px;
+  cursor: pointer;
+  transition: all var(--transition-spring);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.artifact-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+.artifact-card:hover {
+  border-color: var(--primary-light);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+.artifact-card:hover::before {
+  opacity: 1;
+}
+.artifact-card.active {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-glow);
+}
+.artifact-card.active::before {
+  opacity: 1;
+}
+.artifact-card .artifact-icon {
+  font-size: 2rem;
+  margin-bottom: 8px;
+  display: block;
+}
+.artifact-card .artifact-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.artifact-card .artifact-type {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.artifact-card.t1::before { background: linear-gradient(90deg, #3B82F6, #60A5FA); }
+.artifact-card.t2::before { background: linear-gradient(90deg, var(--success), #34D399); }
+.artifact-card.t3::before { background: linear-gradient(90deg, var(--warning), #FBBF24); }
+.artifact-card.t4::before { background: linear-gradient(90deg, var(--primary), var(--primary-light)); }
+.artifact-card.t5::before { background: linear-gradient(90deg, var(--accent), #22D3EE); }
+.artifact-card.t6::before { background: linear-gradient(90deg, var(--error), #F87171); }
+
+.artifact-detail {
+  display: none;
+  margin-top: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  animation: fadeSlideIn 0.3s ease;
+}
+.artifact-detail.active { display: block; }
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.artifact-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background: var(--bg-code);
+  border-bottom: 1px solid var(--border);
+}
+.artifact-detail-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+.artifact-close-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all var(--transition);
+}
+.artifact-close-btn:hover {
+  color: var(--text);
+  background: var(--border);
+}
+
+.artifact-detail-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+.artifact-prompt-section,
+.artifact-preview-section {
+  padding: 20px;
+}
+.artifact-prompt-section {
+  border-right: 1px solid var(--border);
+  background: var(--bg);
+}
+.artifact-section-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+.artifact-prompt-text {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+}
+.artifact-preview-section {
+  background: var(--bg-card);
+}
+.artifact-preview-content {
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+.artifact-preview-content strong { color: var(--text); }
+.artifact-preview-content .preview-box {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  background: var(--bg);
+  margin-top: 8px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
+.artifact-preview-content .preview-visual {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 20px;
+  background: var(--bg);
+  margin-top: 8px;
+  text-align: center;
+}
+.artifact-preview-content .preview-bar {
+  display: inline-block;
+  width: 48px;
+  border-radius: 4px 4px 0 0;
+  margin: 0 8px;
+  vertical-align: bottom;
+}
+.artifact-preview-content .preview-bar-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* ============================================
+   RESEARCH PIPELINE BUILDER (Interactive 3)
+   ============================================ */
+.pipeline-builder {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+.pipeline-builder::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--success), var(--accent), var(--primary));
+}
+.pipeline-builder h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.pipeline-instruction {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+}
+
+.pipeline-slots {
+  display: flex;
+  gap: 12px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+.pipeline-slot {
+  width: 48px;
+  height: 48px;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text-muted);
+  transition: all var(--transition);
+  flex-shrink: 0;
+}
+.pipeline-slot.filled {
+  border-style: solid;
+  border-color: var(--primary);
+  background: rgba(124, 58, 237, 0.08);
+  color: var(--primary);
+}
+.pipeline-slot.correct-slot {
+  border-color: var(--success);
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--success);
+}
+.pipeline-slot.wrong-slot {
+  border-color: var(--error);
+  background: rgba(239, 68, 68, 0.08);
+  color: var(--error);
+}
+
+.pipeline-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 20px 0;
+}
+.pipeline-card {
+  padding: 10px 18px;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-spring);
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text);
+  user-select: none;
+}
+.pipeline-card:hover:not(.used) {
+  border-color: var(--primary-light);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+.pipeline-card.used {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.pipeline-result {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: var(--radius-sm);
+  display: none;
+}
+.pipeline-result.show { display: block; }
+.pipeline-result.correct {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.pipeline-result.incorrect {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.pipeline-result h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+.pipeline-result.correct h4 { color: var(--success); }
+.pipeline-result.incorrect h4 { color: var(--warning); }
+.pipeline-result p { color: var(--text-secondary); font-size: 0.9rem; }
+
+[data-theme="dark"] .pipeline-result.correct { color: #6EE7B7; }
+
+.pipeline-prompts {
+  margin-top: 16px;
+}
+.pipeline-prompt-item {
+  padding: 12px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+}
+.pipeline-prompt-step {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+.pipeline-prompt-text {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.pipeline-reset-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 8px 20px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.pipeline-reset-btn:hover {
+  border-color: var(--primary-light);
+  color: var(--text);
+}
+
+/* ============================================
+   END-OF-MODULE QUIZ
+   ============================================ */
+.final-quiz {
+  background: var(--bg-card);
+  border: 2px solid var(--primary-light);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+.final-quiz::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--primary-light), var(--accent));
+}
+.final-quiz h3 {
+  margin-top: 0;
+}
+
+.final-quiz-question {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.final-quiz-question .fq-number {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+.final-quiz-question .fq-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+.fq-options { list-style: none; padding: 0; }
+.fq-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 12px;
+  margin-bottom: 4px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+.fq-option:hover { background: rgba(124, 58, 237, 0.05); }
+.fq-option input[type="radio"] {
+  accent-color: var(--primary);
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+.fq-option.selected-correct {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+.fq-option.selected-wrong {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+}
+.fq-option.reveal-correct {
+  background: rgba(16, 185, 129, 0.08);
+  color: #059669;
+  font-weight: 600;
+}
+[data-theme="dark"] .fq-option.selected-correct { color: #6EE7B7; }
+[data-theme="dark"] .fq-option.selected-wrong { color: #FCA5A5; }
+[data-theme="dark"] .fq-option.reveal-correct { color: #6EE7B7; }
+
+.final-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 32px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-spring);
+  margin-top: 8px;
+  box-shadow: var(--shadow);
+}
+.final-submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+.final-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.final-result {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: var(--radius-sm);
+  display: none;
+}
+.final-result.show { display: block; }
+.final-result.pass {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.final-result.fail {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.final-result h4 {
+  margin-top: 0;
+  margin-bottom: 6px;
+  font-size: 1.1rem;
+}
+.final-result p {
+  margin-bottom: 0;
+  font-size: 0.95rem;
+}
+.final-result.pass h4 { color: var(--success); }
+.final-result.fail h4 { color: var(--warning); }
+
+/* ============================================
+   NAVIGATION FOOTER
+   ============================================ */
+.module-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 16px;
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 2px solid var(--border);
+}
+.nav-link {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: all var(--transition-spring);
+  min-width: 0;
+  flex: 1;
+  max-width: 50%;
+  box-shadow: var(--shadow-xs);
+}
+.nav-link:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow);
+  transform: translateY(-1px);
+}
+.nav-link.next { align-items: flex-end; text-align: right; }
+.nav-link .nav-dir {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--primary);
+}
+.nav-link .nav-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================
+   KEY CONCEPT HIGHLIGHT
+   ============================================ */
+.key-concept {
+  display: inline-block;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(6, 182, 212, 0.1));
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  color: var(--primary);
+}
+[data-theme="dark"] .key-concept {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(6, 182, 212, 0.15));
+  border-color: rgba(124, 58, 237, 0.35);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 1024px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .hamburger {
+    display: flex;
+  }
+  .sidebar-overlay.show {
+    display: block;
+  }
+  .main-content {
+    margin-left: 0;
+  }
+  .theme-toggle {
+    right: 16px;
+  }
+  .persona-panels {
+    grid-template-columns: 1fr;
+  }
+  .artifact-detail-body {
+    grid-template-columns: 1fr;
+  }
+  .artifact-prompt-section {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+}
+
+@media (max-width: 640px) {
+  .content-wrapper {
+    padding: 24px 16px 60px;
+  }
+  .module-header h1 {
+    font-size: 1.6rem;
+  }
+  .section-heading {
+    font-size: 1.3rem;
+  }
+  .feature-grid {
+    grid-template-columns: 1fr;
+  }
+  .artifact-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .pipeline-slots {
+    justify-content: center;
+  }
+  .pipeline-cards {
+    justify-content: center;
+  }
+  .module-nav {
+    flex-direction: column;
+  }
+  .nav-link {
+    max-width: 100%;
+  }
+  .nav-link.next {
+    align-items: flex-start;
+    text-align: left;
+  }
+}
+
+/* ============================================
+   SCROLLBAR STYLING
+   ============================================ */
+.sidebar::-webkit-scrollbar,
+.code-block::-webkit-scrollbar,
+.persona-panel-body::-webkit-scrollbar,
+.response-tab-content::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.sidebar::-webkit-scrollbar-track,
+.code-block::-webkit-scrollbar-track,
+.persona-panel-body::-webkit-scrollbar-track,
+.response-tab-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+.code-block::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+.persona-panel-body::-webkit-scrollbar-thumb,
+.response-tab-content::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.section {
+  animation: fadeInUp 0.4s ease both;
+}
+
+/* Template card styling */
+.template-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin: 16px 0;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-xs);
+  transition: all var(--transition-spring);
+}
+.template-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+}
+.template-card:hover {
+  box-shadow: var(--shadow);
+}
+.template-card h4 {
+  margin-top: 0;
+  margin-bottom: 4px;
+}
+.template-card .template-function {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--primary);
+  margin-bottom: 8px;
+}
+.template-card p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+</style>
+</head>
+<body>
+<!-- ============================================
+     THEME TOGGLE
+     ============================================ -->
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+  <span id="themeIcon">&#9790;</span>
+</button>
+
+<!-- ============================================
+     HAMBURGER (mobile)
+     ============================================ -->
+<button class="hamburger" id="hamburger" aria-label="Toggle sidebar">
+  <span></span>
+  <span></span>
+  <span></span>
+</button>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ============================================
+     SIDEBAR
+     ============================================ -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="../index.html" class="sidebar-back">&larr; Back to Hub</a>
+    <div class="sidebar-title">Module 10</div>
+    <div class="sidebar-module-name">Browser Power User</div>
+  </div>
+
+  <div class="sidebar-nav">
+    <!-- Section: Content -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="content">
+        Content <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-content">
+        <li><a href="#advanced-projects" class="sidebar-link" data-target="advanced-projects">Advanced Projects</a></li>
+        <li><a href="#artifact-mastery" class="sidebar-link" data-target="artifact-mastery">Artifact Mastery</a></li>
+        <li><a href="#industry-personas" class="sidebar-link" data-target="industry-personas">Building Industry Personas</a></li>
+        <li><a href="#research-workflows" class="sidebar-link" data-target="research-workflows">Research &amp; Analysis</a></li>
+        <li><a href="#prompt-templates" class="sidebar-link" data-target="prompt-templates">Prompt Templates for Teams</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Interactive -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="interactive">
+        Interactive <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-interactive">
+        <li><a href="#artifact-gallery" class="sidebar-link" data-target="artifact-gallery">Artifact Gallery</a></li>
+        <li><a href="#persona-workshop" class="sidebar-link" data-target="persona-workshop">Persona Workshop</a></li>
+        <li><a href="#pipeline-builder" class="sidebar-link" data-target="pipeline-builder">Research Pipeline Builder</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Assessment -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="assessment">
+        Assessment <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-assessment">
+        <li><a href="#final-quiz" class="sidebar-link" data-target="final-quiz">End-of-Module Quiz</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sidebar-progress">
+    <div class="sidebar-progress-label">Module Progress</div>
+    <div class="sidebar-progress-track">
+      <div class="sidebar-progress-fill" id="sidebarProgressFill"></div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================
+     MAIN CONTENT
+     ============================================ -->
+<main class="main-content">
+  <div class="content-wrapper">
+
+    <!-- Module Header -->
+    <header class="module-header">
+      <div class="breadcrumb">
+        <a href="../index.html">Training Hub</a> &raquo; Module 10
+      </div>
+      <div class="module-badge">
+        <span class="number">10</span>
+        <span class="label">Intermediate</span>
+      </div>
+      <h1>Browser Power User</h1>
+      <p class="description">
+        Go beyond basic chat. Master Projects for persistent context, create stunning artifacts, build
+        industry personas, run advanced research workflows, and create prompt templates your whole
+        team can use.
+      </p>
+      <div class="module-meta">
+        <span class="module-meta-item">&#9201; ~75 min</span>
+        <span class="module-meta-item">&#128218; Intermediate</span>
+        <span class="module-meta-item">&#127919; 3 Interactive Exercises</span>
+        <span class="module-meta-item">&#128101; Consultants, Business Users, Leaders</span>
+      </div>
+    </header>
+
+    <!-- ========================================
+         SECTION 1: ADVANCED PROJECTS
+         ======================================== -->
+    <section class="section" id="advanced-projects">
+      <h2 class="section-heading">1. Advanced Projects</h2>
+
+      <p>
+        Claude <span class="key-concept">Projects</span> are your secret weapon for complex work. While a single
+        conversation loses context once you close it, a Project maintains persistent knowledge
+        across every conversation you start within it. Think of a Project as a dedicated workspace with
+        built-in memory.
+      </p>
+
+      <h3>Multi-File Context: Uploading 10+ Documents</h3>
+
+      <p>
+        The real power of Projects emerges when you upload multiple documents. Claude can hold
+        the contents of all uploaded files in its context simultaneously, enabling cross-document
+        reasoning that would be impossible in a single conversation.
+      </p>
+
+      <div class="accent-card">
+        <h4>Example: Quarterly Business Review Prep</h4>
+        <p>Upload all of these into a single Project:</p>
+        <ul>
+          <li>Q3 financial report (PDF)</li>
+          <li>Customer satisfaction survey results (CSV)</li>
+          <li>Competitor analysis deck (PDF)</li>
+          <li>Product roadmap (PDF)</li>
+          <li>Sales pipeline export (CSV)</li>
+          <li>Engineering velocity metrics (PDF)</li>
+          <li>Board meeting minutes from last quarter (DOCX)</li>
+          <li>Market research report (PDF)</li>
+          <li>Customer churn analysis (XLSX)</li>
+          <li>Employee engagement survey (PDF)</li>
+        </ul>
+        <p>
+          Now ask: <em>"Based on all uploaded documents, what are the three biggest risks to hitting
+          our Q4 targets, and what evidence from these documents supports each risk?"</em>
+        </p>
+        <p>
+          Claude will synthesize across all 10 documents, citing specific data points from each.
+        </p>
+      </div>
+
+      <h3>Version Control: Iterating Across Conversations</h3>
+
+      <p>
+        Within a Project, every conversation has access to the same uploaded documents and
+        Project instructions. This means you can:
+      </p>
+
+      <ul>
+        <li><strong>Start fresh conversations</strong> without re-explaining context -- Claude already knows your project</li>
+        <li><strong>Iterate on documents</strong> across multiple sessions -- start a strategy doc in one conversation, refine it in the next</li>
+        <li><strong>Compare outputs</strong> -- ask the same question in different conversations with different framing to get diverse perspectives</li>
+        <li><strong>Maintain a clean history</strong> -- each conversation stays focused on one topic while sharing the same foundational knowledge</li>
+      </ul>
+
+      <h3>Project Templates: Reusable Setups</h3>
+
+      <p>
+        For recurring engagements, create <span class="key-concept">template Projects</span> that you can
+        duplicate and customize. This saves significant setup time.
+      </p>
+
+      <div class="feature-grid">
+        <div class="feature-card purple">
+          <span class="feature-icon">&#128203;</span>
+          <h4>Client Onboarding</h4>
+          <p>Upload standard intake questionnaire, proposal template, and industry benchmarks. Customize per client.</p>
+        </div>
+        <div class="feature-card cyan">
+          <span class="feature-icon">&#128202;</span>
+          <h4>Due Diligence</h4>
+          <p>Pre-load financial analysis frameworks, regulatory checklists, and valuation model templates.</p>
+        </div>
+        <div class="feature-card green">
+          <span class="feature-icon">&#128221;</span>
+          <h4>Content Strategy</h4>
+          <p>Include brand voice guide, editorial calendar template, competitor content audit, and style guide.</p>
+        </div>
+        <div class="feature-card amber">
+          <span class="feature-icon">&#127891;</span>
+          <h4>Training Development</h4>
+          <p>Load learning objectives framework, assessment rubrics, and instructional design models.</p>
+        </div>
+      </div>
+
+      <h3>Sharing and Collaboration</h3>
+
+      <p>
+        Projects can be shared with team members within the same Claude organization. When you share
+        a Project, collaborators gain access to the same uploaded documents and Project instructions,
+        ensuring consistent context. Key sharing considerations:
+      </p>
+
+      <ul>
+        <li><strong>Shared context, separate conversations</strong> -- each team member has their own conversation history</li>
+        <li><strong>Permission levels</strong> -- control who can upload new documents or modify Project instructions</li>
+        <li><strong>Organization-wide templates</strong> -- publish Project templates for your entire team to use</li>
+        <li><strong>Sensitive data awareness</strong> -- remember that uploaded documents are accessible to all Project members</li>
+      </ul>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>Pro tip:</strong> Write detailed Project instructions (the "system prompt" for the Project) that
+          explain what the uploaded documents are, how they relate to each other, and what kinds of questions
+          the Project is designed to answer. This dramatically improves Claude's responses.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 2: ARTIFACT MASTERY
+         ======================================== -->
+    <section class="section" id="artifact-mastery">
+      <h2 class="section-heading">2. Artifact Mastery</h2>
+
+      <p>
+        <span class="key-concept">Artifacts</span> are Claude's ability to create substantial, standalone
+        content that appears in a dedicated panel beside the conversation. Unlike inline code
+        snippets or short text responses, artifacts are complete, functional pieces of work
+        you can preview, iterate on, and download.
+      </p>
+
+      <h3>Code Artifacts: Full Applications</h3>
+
+      <p>
+        Claude can generate complete, runnable applications -- not just code snippets. These render
+        live in the artifact panel so you can interact with them immediately.
+      </p>
+
+      <ul>
+        <li><strong>Interactive HTML games</strong> -- Snake, Tetris, memory cards, quiz apps</li>
+        <li><strong>Data visualization dashboards</strong> -- charts, graphs, interactive filters</li>
+        <li><strong>Utility tools</strong> -- calculators, converters, form builders</li>
+        <li><strong>Python scripts</strong> -- data processing, file manipulation, API clients</li>
+        <li><strong>Full React components</strong> -- stateful UI with animations and event handling</li>
+      </ul>
+
+      <div class="callout info">
+        <span class="callout-icon">&#128712;</span>
+        <div class="callout-content">
+          <p><strong>Key insight:</strong> HTML artifacts run in a sandboxed iframe with full CSS and
+          JavaScript support. This means you can create interactive applications with state management,
+          animations, and user input -- all rendered live.</p>
+        </div>
+      </div>
+
+      <h3>Mermaid Diagrams</h3>
+
+      <p>
+        Claude excels at generating <span class="key-concept">Mermaid diagrams</span> -- a text-based
+        diagramming language that renders as visual diagrams. Supported types include:
+      </p>
+
+      <ul>
+        <li><strong>Flowcharts</strong> -- business processes, decision trees, workflows</li>
+        <li><strong>Sequence diagrams</strong> -- API call flows, system interactions, protocol exchanges</li>
+        <li><strong>ER diagrams</strong> -- database schemas, data models, entity relationships</li>
+        <li><strong>Gantt charts</strong> -- project timelines, sprint planning, resource allocation</li>
+        <li><strong>State diagrams</strong> -- state machines, lifecycle models</li>
+        <li><strong>Class diagrams</strong> -- object models, inheritance hierarchies</li>
+      </ul>
+
+      <div class="code-block has-label">
+        <span class="code-label">Example Prompt</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="str">"Create a Mermaid sequence diagram showing the OAuth 2.0
+authorization code flow between a User, Client App,
+Authorization Server, and Resource Server. Include
+token refresh."</span></code></div>
+
+      <h3>SVG Graphics</h3>
+
+      <p>
+        For data visualizations, icons, and infographics, Claude can generate SVG graphics that
+        render at any resolution. This is particularly useful for:
+      </p>
+
+      <ul>
+        <li><strong>Custom data charts</strong> -- bar charts, pie charts, scatter plots with your specific data</li>
+        <li><strong>Infographics</strong> -- process flows, comparison graphics, timeline visuals</li>
+        <li><strong>Icons and illustrations</strong> -- simple graphics for presentations or documentation</li>
+        <li><strong>Architectural diagrams</strong> -- system architecture with custom styling</li>
+      </ul>
+
+      <h3>React Components</h3>
+
+      <p>
+        Claude can create interactive React components that run directly in the artifact panel.
+        These support state management, event handling, and CSS animations -- making them ideal
+        for prototyping UI concepts, building interactive demos, or creating tools.
+      </p>
+
+      <h3>Iterating Effectively</h3>
+
+      <p>
+        One of the most powerful aspects of artifacts is <span class="key-concept">in-place editing</span>.
+        Rather than regenerating the entire artifact, Claude can make targeted changes:
+      </p>
+
+      <ul>
+        <li><em>"Move the legend to the right side of the chart"</em></li>
+        <li><em>"Change the color scheme to use blues instead of reds"</em></li>
+        <li><em>"Add a tooltip that shows the exact value when hovering over a bar"</em></li>
+        <li><em>"Make the animation slower and add an easing curve"</em></li>
+      </ul>
+
+      <p>
+        Each iteration preserves the parts of the artifact you liked while making targeted
+        improvements. You can also refer to specific parts: <em>"In the second section, change
+        the heading from 'Overview' to 'Executive Summary' and make the bullet points more concise."</em>
+      </p>
+
+      <h3>The Artifact Versioning Model</h3>
+
+      <p>
+        Every time Claude modifies an artifact, it creates a new version. You can navigate between
+        versions using the version controls in the artifact panel. This means you can experiment
+        freely -- if an iteration goes in the wrong direction, simply revert to a previous version
+        and try a different approach.
+      </p>
+
+      <div class="callout warning">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Watch out:</strong> Artifacts have a maximum size. Very large applications
+          (thousands of lines) may need to be split across multiple artifacts. For complex
+          projects, ask Claude to create a modular structure with separate artifacts for
+          different components.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 2: ARTIFACT GALLERY
+         ======================================== -->
+    <section class="section" id="artifact-gallery">
+      <div class="artifact-gallery">
+        <h3>Interactive: Artifact Gallery</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 8px;">
+          Click any artifact type to see the prompt that creates it and a preview of the output.
+        </p>
+
+        <div class="artifact-grid" id="artifactGrid">
+          <!-- Cards rendered by JS -->
+        </div>
+
+        <div class="artifact-detail" id="artifactDetail">
+          <div class="artifact-detail-header">
+            <span class="artifact-detail-title" id="artifactDetailTitle"></span>
+            <button class="artifact-close-btn" onclick="closeArtifactDetail()">&times;</button>
+          </div>
+          <div class="artifact-detail-body">
+            <div class="artifact-prompt-section">
+              <div class="artifact-section-label">Prompt</div>
+              <div class="artifact-prompt-text" id="artifactPromptText"></div>
+            </div>
+            <div class="artifact-preview-section">
+              <div class="artifact-section-label">Preview</div>
+              <div class="artifact-preview-content" id="artifactPreviewContent"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 3: BUILDING INDUSTRY PERSONAS
+         ======================================== -->
+    <section class="section" id="industry-personas">
+      <h2 class="section-heading">3. Building Industry Personas</h2>
+
+      <p>
+        A generic Claude response is helpful. A Claude response shaped by a well-crafted
+        <span class="key-concept">industry persona</span> is transformative. The persona pattern
+        is arguably the single most impactful technique for business users.
+      </p>
+
+      <h3>The Persona Pattern</h3>
+
+      <p>
+        The core structure is simple but powerful:
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Persona Pattern</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="str">"You are a [role] with [expertise] who [specializes in].</span>
+<span class="str"> Always [behavioral rule 1]. [Behavioral rule 2].</span>
+<span class="str"> [Output format preference]. [Constraint]."</span></code></div>
+
+      <p>
+        The key components are:
+      </p>
+
+      <ul>
+        <li><strong>Role</strong> -- the professional identity (e.g., "senior financial analyst")</li>
+        <li><strong>Expertise</strong> -- specific domain knowledge (e.g., "specializing in equity valuation and DCF modeling")</li>
+        <li><strong>Behavioral rules</strong> -- how the persona should communicate (e.g., "always use precise financial terminology")</li>
+        <li><strong>Output format</strong> -- structural preferences (e.g., "present analysis in structured sections with clear metrics")</li>
+        <li><strong>Constraints</strong> -- guardrails (e.g., "flag any assumptions explicitly")</li>
+      </ul>
+
+      <h3>Industry-Specific Personas</h3>
+
+      <h4>Finance</h4>
+
+      <div class="code-block has-label">
+        <span class="code-label">Finance Persona</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="str">You are a senior financial analyst at a Fortune 500
+investment firm. You specialize in equity valuation,
+DCF modeling, and earnings analysis. Always use precise
+financial terminology. Support all claims with
+quantitative reasoning. Present analysis in structured
+sections with clear metrics. Flag any assumptions
+explicitly.</span></code></div>
+
+      <h4>Healthcare</h4>
+
+      <div class="code-block has-label">
+        <span class="code-label">Healthcare Persona</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="str">You are a clinical research advisor specializing in
+evidence-based medicine and healthcare operations.
+Always cite relevant clinical studies and guidelines.
+Use accessible language while maintaining medical
+accuracy. Flag any information that requires physician
+consultation. Focus on patient outcomes and quality
+metrics.</span></code></div>
+
+      <h4>Legal</h4>
+
+      <div class="code-block has-label">
+        <span class="code-label">Legal Persona</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="str">You are a legal research associate specializing in
+M&amp;A due diligence and contract analysis. Identify
+potential risks, liabilities, and regulatory
+considerations. Always note jurisdiction-specific
+variations. Never provide specific legal advice --
+frame as research findings and flag items for attorney
+review. Use structured analysis with clear issue
+spotting.</span></code></div>
+
+      <h4>Retail</h4>
+
+      <div class="code-block has-label">
+        <span class="code-label">Retail Persona</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="str">You are a retail strategy consultant specializing in
+omnichannel customer experience, conversion
+optimization, and competitive positioning. Focus on
+data-driven recommendations with clear ROI projections.
+Use retail-specific KPIs (conversion rate, AOV, LTV,
+CAC, NPS). Reference industry benchmarks from NRF,
+Forrester, and McKinsey.</span></code></div>
+
+      <h3>Testing Personas</h3>
+
+      <p>
+        Before rolling out a persona to your team, test it rigorously:
+      </p>
+
+      <ol>
+        <li><strong>Standard question test</strong> -- ask the same question with and without the persona. The difference should be dramatic.</li>
+        <li><strong>Edge case test</strong> -- ask questions outside the persona's domain. It should stay in character while acknowledging limitations.</li>
+        <li><strong>Consistency test</strong> -- ask similar questions multiple times. The tone, terminology, and depth should be consistent.</li>
+        <li><strong>Guardrail test</strong> -- try to get the persona to violate its constraints. Verify it maintains its behavioral rules.</li>
+      </ol>
+
+      <h3>Sharing Persona Prompts Across Teams</h3>
+
+      <p>
+        Once validated, distribute your persona prompts through:
+      </p>
+
+      <ul>
+        <li><strong>Project instructions</strong> -- embed the persona in a shared Project so every conversation uses it</li>
+        <li><strong>Team prompt library</strong> -- maintain a document with approved personas, organized by function and use case</li>
+        <li><strong>Onboarding materials</strong> -- include persona prompts in new team member training</li>
+        <li><strong>Regular reviews</strong> -- update personas quarterly as industry terminology and priorities evolve</li>
+      </ul>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 1: PERSONA WORKSHOP
+         ======================================== -->
+    <section class="section" id="persona-workshop">
+      <div class="persona-workshop">
+        <h3>Interactive: Persona Workshop</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 4px;">
+          Select an industry to see how a persona transforms Claude's response to the same question:
+          <strong>"What should I prioritize for Q4?"</strong>
+        </p>
+
+        <div class="persona-selector">
+          <label for="personaSelect">Industry Persona</label>
+          <select id="personaSelect" onchange="updatePersona()">
+            <option value="finance">Finance -- Senior Financial Analyst</option>
+            <option value="healthcare">Healthcare -- Clinical Research Advisor</option>
+            <option value="legal">Legal -- M&amp;A Research Associate</option>
+            <option value="retail">Retail -- Strategy Consultant</option>
+          </select>
+        </div>
+
+        <div class="persona-panels">
+          <!-- Left panel: System prompt -->
+          <div class="persona-panel prompt">
+            <div class="persona-panel-header">System Prompt</div>
+            <div class="persona-panel-body">
+              <textarea id="personaPromptText" readonly></textarea>
+            </div>
+          </div>
+
+          <!-- Right panel: Response comparison -->
+          <div class="persona-panel response">
+            <div class="persona-panel-header">Response Preview</div>
+            <div class="persona-panel-body" style="padding: 0; min-height: auto;">
+              <div class="response-tab-bar">
+                <button class="response-tab active" onclick="switchResponseTab('standard', this)">Without Persona</button>
+                <button class="response-tab" onclick="switchResponseTab('persona', this)">With Persona</button>
+              </div>
+              <div class="response-tab-content active" id="standardResponse"></div>
+              <div class="response-tab-content" id="personaResponse"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 4: RESEARCH & ANALYSIS WORKFLOWS
+         ======================================== -->
+    <section class="section" id="research-workflows">
+      <h2 class="section-heading">4. Research &amp; Analysis Workflows</h2>
+
+      <p>
+        Claude transforms research from a tedious, multi-day process into a structured,
+        efficient workflow. The key is knowing which techniques to apply and in what order.
+      </p>
+
+      <h3>Multi-Document Synthesis</h3>
+
+      <p>
+        The most powerful research technique is <span class="key-concept">cross-document synthesis</span>:
+        uploading multiple related documents and asking Claude to find patterns, contradictions,
+        and insights across all of them.
+      </p>
+
+      <div class="accent-card">
+        <h4>Example: Analyst Report Comparison</h4>
+        <p>Upload 5 analyst reports on the same company, then ask:</p>
+        <div class="code-block">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="str">"Compare the revenue forecasts across all 5 analyst reports.
+Create a table showing each analyst's projection for FY25
+and FY26. Identify where they agree, where they disagree,
+and what assumptions drive the differences. Cite the
+specific page and paragraph for each claim."</span></code></div>
+      </div>
+
+      <h3>Competitive Analysis Framework</h3>
+
+      <p>
+        Claude can apply established strategic frameworks systematically. Rather than generating
+        generic analyses, point Claude at your uploaded competitive intelligence and ask for
+        specific frameworks:
+      </p>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Framework</th>
+              <th>Best For</th>
+              <th>Example Prompt</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>SWOT Analysis</strong></td>
+              <td>Quick strategic overview</td>
+              <td>"Based on our uploaded market data, create a SWOT analysis for [Company]"</td>
+            </tr>
+            <tr>
+              <td><strong>Porter's Five Forces</strong></td>
+              <td>Industry structure analysis</td>
+              <td>"Analyze the competitive intensity of [industry] using Porter's Five Forces, citing our uploaded reports"</td>
+            </tr>
+            <tr>
+              <td><strong>Blue Ocean Strategy</strong></td>
+              <td>Market differentiation</td>
+              <td>"Using the uploaded competitor data, create a strategy canvas and identify blue ocean opportunities"</td>
+            </tr>
+            <tr>
+              <td><strong>Value Chain Analysis</strong></td>
+              <td>Operational advantage</td>
+              <td>"Map the value chain for [Company] and identify where they have cost or differentiation advantages"</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Citation Tracking</h3>
+
+      <p>
+        For any research work, <span class="key-concept">citation tracking</span> is critical.
+        Without it, you cannot verify Claude's claims or present findings to stakeholders with
+        confidence. Always include citation requirements in your prompts:
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Citation Prompt Pattern</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="str">"For every factual claim in your analysis, cite the source
+document by name and the specific section or page number.
+If a claim is based on your own reasoning rather than the
+uploaded documents, mark it as [Inference]. If you are
+uncertain about a data point, mark it as [Verify]."</span></code></div>
+
+      <h3>Executive Briefings</h3>
+
+      <p>
+        One of the highest-value workflows is transforming raw data into a structured
+        executive summary. The key is specifying the exact format:
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Executive Briefing Prompt</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="str">"Based on all uploaded documents, create a one-page executive
+briefing with the following structure:
+
+1. SITUATION (2-3 sentences): What is happening
+2. KEY FINDINGS (3-5 bullet points): The most important insights
+3. RISK FACTORS (2-3 bullet points): What could go wrong
+4. RECOMMENDATION (1-2 sentences): What we should do
+5. NEXT STEPS (numbered list): Specific actions with owners
+
+Keep language crisp and direct. No jargon. Every claim must
+reference a specific uploaded document."</span></code></div>
+
+      <h3>Data Storytelling</h3>
+
+      <p>
+        Raw numbers rarely persuade. Claude can transform spreadsheet data into compelling
+        narratives that highlight trends, anomalies, and actionable insights:
+      </p>
+
+      <ul>
+        <li><strong>Trend narratives</strong> -- "Revenue grew 12% YoY, but this masks a concerning shift: enterprise deals grew 28% while SMB declined 8%, suggesting increasing customer concentration risk"</li>
+        <li><strong>Benchmark comparisons</strong> -- "Our 38-day DSO compares favorably to the industry median of 45 days, but top-quartile performers achieve 28 days"</li>
+        <li><strong>Anomaly detection</strong> -- "March showed an unusual 40% spike in returns. Cross-referencing with the customer feedback data, this correlates with the firmware update released on March 3"</li>
+      </ul>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>Power move:</strong> Upload a spreadsheet and ask Claude to "tell me the three most
+          surprising things in this data and explain why they matter for our business." Claude
+          often surfaces insights that would take hours to find manually.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE 3: RESEARCH PIPELINE BUILDER
+         ======================================== -->
+    <section class="section" id="pipeline-builder">
+      <div class="pipeline-builder">
+        <h3>Interactive: Research Pipeline Builder</h3>
+        <p class="pipeline-instruction">
+          A solid research workflow follows a specific sequence. Click the cards below in the order
+          you think is correct to build the pipeline. Click all 5 to check your answer.
+        </p>
+
+        <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">
+          Your sequence:
+        </div>
+        <div class="pipeline-slots" id="pipelineSlots">
+          <div class="pipeline-slot" id="slot-0">1</div>
+          <div class="pipeline-slot" id="slot-1">2</div>
+          <div class="pipeline-slot" id="slot-2">3</div>
+          <div class="pipeline-slot" id="slot-3">4</div>
+          <div class="pipeline-slot" id="slot-4">5</div>
+        </div>
+
+        <div class="pipeline-cards" id="pipelineCards">
+          <!-- Rendered by JS in random order -->
+        </div>
+
+        <div class="pipeline-result" id="pipelineResult">
+          <h4 id="pipelineResultTitle"></h4>
+          <p id="pipelineResultText"></p>
+          <div class="pipeline-prompts" id="pipelinePrompts"></div>
+        </div>
+
+        <button class="pipeline-reset-btn" id="pipelineResetBtn" onclick="resetPipeline()" style="display:none;">
+          &#8634; Try Again
+        </button>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 5: PROMPT TEMPLATES FOR TEAMS
+         ======================================== -->
+    <section class="section" id="prompt-templates">
+      <h2 class="section-heading">5. Prompt Templates for Teams</h2>
+
+      <p>
+        A <span class="key-concept">prompt template</span> is a reusable, parameterized prompt designed
+        for a specific task. Instead of every team member writing ad-hoc prompts (with wildly
+        varying quality), templates ensure consistent, high-quality outputs across your organization.
+      </p>
+
+      <h3>Template Anatomy</h3>
+
+      <p>
+        Every effective template has four components:
+      </p>
+
+      <div class="step-list">
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Context</h4>
+            <p>Background information that sets the stage. This includes the persona, the domain,
+            and any relevant constraints. Example: <em>"You are a senior proposal writer for a
+            technology consulting firm..."</em></p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Specific Task</h4>
+            <p>The exact action you want Claude to perform, with clear parameters. Example:
+            <em>"Write a response to the following RFP section: [PASTE RFP SECTION]"</em></p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Format</h4>
+            <p>How the output should be structured. Example: <em>"Structure the response with:
+            (1) Understanding of the requirement, (2) Our approach, (3) Relevant experience,
+            (4) Timeline and deliverables."</em></p>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-content">
+            <h4>Constraints</h4>
+            <p>Guardrails and quality standards. Example: <em>"Keep the total response under 500 words.
+            Do not make claims about capabilities we have not demonstrated. Use active voice."</em></p>
+          </div>
+        </div>
+      </div>
+
+      <h3>Templates by Function</h3>
+
+      <div class="template-card">
+        <div class="template-function">Sales</div>
+        <h4>RFP Response Generator</h4>
+        <div class="code-block">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="str">You are a senior proposal writer for [COMPANY]. Our key
+differentiators are: [LIST 3-5 DIFFERENTIATORS].
+
+Write a compelling response to this RFP section:
+[PASTE RFP SECTION]
+
+Structure: (1) Understanding, (2) Approach, (3) Experience,
+(4) Deliverables. Keep under 500 words. Use active voice.
+Highlight our differentiators naturally -- never list them
+as bullet points. Include a brief relevant case study.</span></code></div>
+      </div>
+
+      <div class="template-card">
+        <div class="template-function">Marketing</div>
+        <h4>Social Media Post Series</h4>
+        <div class="code-block">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="str">You are a social media strategist for [BRAND] in the
+[INDUSTRY] space. Our tone is [TONE: professional yet
+approachable / bold and provocative / warm and educational].
+
+Create a 5-post series for [PLATFORM] about [TOPIC].
+
+For each post:
+- Hook (first line that stops the scroll)
+- Body (2-3 sentences, value-driven)
+- CTA (clear next step)
+- 3-5 relevant hashtags
+- Best posting time recommendation
+
+Vary the format: 1 story, 1 statistic, 1 question,
+1 tip, 1 case study.</span></code></div>
+      </div>
+
+      <div class="template-card">
+        <div class="template-function">Finance</div>
+        <h4>Earnings Call Summary</h4>
+        <div class="code-block">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="str">You are a financial analyst summarizing an earnings call.
+
+Summarize the following transcript: [PASTE or UPLOAD]
+
+Structure:
+1. KEY METRICS: Revenue, EPS, margins vs. consensus
+2. GUIDANCE: Forward-looking statements and targets
+3. STRATEGIC HIGHLIGHTS: Major announcements
+4. RISK FACTORS: Concerns raised by management or analysts
+5. ANALYST SENTIMENT: Tone of Q&amp;A questions
+6. ACTIONABLE TAKEAWAYS: 3 things an investor should know
+
+Use precise financial language. Include specific numbers.
+Flag any guidance changes vs. prior quarter.</span></code></div>
+      </div>
+
+      <div class="template-card">
+        <div class="template-function">HR</div>
+        <h4>Job Description Generator</h4>
+        <div class="code-block">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="str">You are an HR specialist writing inclusive, compelling job
+descriptions for [COMPANY].
+
+Create a job description for: [ROLE TITLE]
+Department: [DEPARTMENT]
+Level: [JUNIOR / MID / SENIOR / LEAD]
+Location: [LOCATION / REMOTE / HYBRID]
+
+Include:
+- Engaging opening paragraph (why this role matters)
+- 5-7 key responsibilities (start with impact verbs)
+- Required qualifications (be specific, avoid wish lists)
+- Preferred qualifications (clearly marked as preferred)
+- What we offer (compensation philosophy, benefits, culture)
+
+Avoid gendered language. Do not require unnecessary
+credentials. Focus on skills over years of experience.</span></code></div>
+      </div>
+
+      <div class="template-card">
+        <div class="template-function">Engineering</div>
+        <h4>Technical Spec Writer</h4>
+        <div class="code-block">
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code><span class="str">You are a senior software engineer writing a technical
+specification for peer review.
+
+Feature: [FEATURE DESCRIPTION]
+Context: [RELEVANT SYSTEM CONTEXT]
+
+Write a technical spec with:
+1. OVERVIEW: Problem statement and proposed solution
+2. GOALS / NON-GOALS: Explicit scope boundaries
+3. DESIGN: Architecture, data model, API contracts
+4. ALTERNATIVES CONSIDERED: Other approaches and why not
+5. ROLLOUT PLAN: Feature flags, migration, monitoring
+6. OPEN QUESTIONS: Decisions needing team input
+
+Be specific enough that another engineer could implement
+from this spec. Include diagrams where helpful (describe
+them as Mermaid code). Flag any security considerations.</span></code></div>
+      </div>
+
+      <h3>Quality Testing Before Distribution</h3>
+
+      <p>
+        Before sharing a template with your team, run it through a quality validation process:
+      </p>
+
+      <ol>
+        <li><strong>Diverse inputs test</strong> -- run the template with 5+ different inputs that span the expected range</li>
+        <li><strong>Edge case test</strong> -- try unusual or minimal inputs. Does the template still produce useful output?</li>
+        <li><strong>Consistency test</strong> -- run the same input 3 times. Are the outputs structurally consistent?</li>
+        <li><strong>Stakeholder review</strong> -- have someone from the target audience evaluate the outputs for accuracy and usefulness</li>
+        <li><strong>Version the template</strong> -- track changes and improvements over time with clear version numbers</li>
+      </ol>
+
+      <div class="callout important">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Common mistake:</strong> Teams often create templates that are too vague ("Write a good email about [TOPIC]")
+          or too rigid ("Write exactly 3 paragraphs with exactly 50 words each"). The best templates give Claude
+          clear structure while leaving room for judgment on details like length, tone nuances, and level of
+          technical depth.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 6: END-OF-MODULE QUIZ
+         ======================================== -->
+    <section class="section" id="final-quiz">
+      <div class="final-quiz">
+        <h3>End-of-Module Quiz</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 24px;">
+          Test your understanding of browser power user techniques. Answer all 6 questions,
+          then submit to see your score. You need at least 4 correct to pass.
+        </p>
+
+        <div id="finalQuizQuestions">
+          <!-- Rendered by JS -->
+        </div>
+
+        <button class="final-submit-btn" id="finalSubmitBtn" onclick="submitFinalQuiz()" disabled>
+          Submit Answers
+        </button>
+
+        <div class="final-result" id="finalResult">
+          <h4 id="finalResultTitle"></h4>
+          <p id="finalResultText"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         MODULE NAVIGATION
+         ======================================== -->
+    <nav class="module-nav">
+      <a href="04-claude-cowork.html" class="nav-link prev">
+        <span class="nav-dir">&larr; Previous</span>
+        <span class="nav-title">Module 04: Claude Cowork</span>
+      </a>
+      <a href="11-code-deep-dive.html" class="nav-link next">
+        <span class="nav-dir">Next &rarr;</span>
+        <span class="nav-title">Module 11: Claude Code Deep Dive</span>
+      </a>
+    </nav>
+
+  </div>
+</main>
+
+<!-- ============================================
+     JAVASCRIPT
+     ============================================ -->
+<script>
+(function() {
+  'use strict';
+
+  // ==========================================
+  // THEME MANAGEMENT
+  // ==========================================
+  var THEME_KEY = 'claude-training-theme';
+
+  function getTheme() {
+    return localStorage.getItem(THEME_KEY) || 'light';
+  }
+
+  function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem(THEME_KEY, theme);
+    var icon = document.getElementById('themeIcon');
+    if (icon) {
+      icon.textContent = theme === 'dark' ? '\u2600' : '\u263E';
+    }
+  }
+
+  // Initialize theme
+  setTheme(getTheme());
+
+  document.getElementById('themeToggle').addEventListener('click', function() {
+    var current = getTheme();
+    setTheme(current === 'dark' ? 'light' : 'dark');
+  });
+
+  // ==========================================
+  // SIDEBAR MOBILE TOGGLE
+  // ==========================================
+  var hamburger = document.getElementById('hamburger');
+  var sidebar = document.getElementById('sidebar');
+  var overlay = document.getElementById('sidebarOverlay');
+
+  function toggleSidebar() {
+    var isOpen = sidebar.classList.contains('open');
+    sidebar.classList.toggle('open');
+    hamburger.classList.toggle('open');
+    if (isOpen) {
+      overlay.classList.remove('show');
+    } else {
+      overlay.classList.add('show');
+    }
+  }
+
+  hamburger.addEventListener('click', toggleSidebar);
+  overlay.addEventListener('click', toggleSidebar);
+
+  // ==========================================
+  // SIDEBAR SECTION COLLAPSING
+  // ==========================================
+  var sectionToggles = document.querySelectorAll('.sidebar-section-toggle');
+  for (var i = 0; i < sectionToggles.length; i++) {
+    (function(btn) {
+      btn.addEventListener('click', function() {
+        var sectionName = this.getAttribute('data-section');
+        var linksList = document.getElementById('nav-' + sectionName);
+        var isCollapsed = this.classList.contains('collapsed');
+
+        if (isCollapsed) {
+          this.classList.remove('collapsed');
+          linksList.classList.remove('collapsed');
+          linksList.style.maxHeight = linksList.scrollHeight + 'px';
+        } else {
+          this.classList.add('collapsed');
+          linksList.style.maxHeight = linksList.scrollHeight + 'px';
+          linksList.offsetHeight; // Force reflow
+          linksList.classList.add('collapsed');
+        }
+      });
+
+      // Initialize: set max-height so transitions work
+      var sectionName = btn.getAttribute('data-section');
+      var linksList = document.getElementById('nav-' + sectionName);
+      if (linksList) {
+        linksList.style.maxHeight = linksList.scrollHeight + 'px';
+      }
+    })(sectionToggles[i]);
+  }
+
+  // ==========================================
+  // SCROLLSPY
+  // ==========================================
+  var sidebarLinks = document.querySelectorAll('.sidebar-link');
+  var sections = [];
+
+  for (var j = 0; j < sidebarLinks.length; j++) {
+    var targetId = sidebarLinks[j].getAttribute('data-target');
+    var section = document.getElementById(targetId);
+    if (section) {
+      sections.push({ el: section, link: sidebarLinks[j], id: targetId });
+    }
+  }
+
+  function updateScrollspy() {
+    var scrollPos = window.scrollY + 100;
+    var active = null;
+
+    for (var k = sections.length - 1; k >= 0; k--) {
+      if (sections[k].el.offsetTop <= scrollPos) {
+        active = sections[k];
+        break;
+      }
+    }
+
+    for (var l = 0; l < sidebarLinks.length; l++) {
+      sidebarLinks[l].classList.remove('active');
+    }
+    if (active) {
+      active.link.classList.add('active');
+    }
+
+    updateSidebarProgress();
+  }
+
+  var scrollTimer = null;
+  window.addEventListener('scroll', function() {
+    if (scrollTimer) { return; }
+    scrollTimer = setTimeout(function() {
+      scrollTimer = null;
+      updateScrollspy();
+    }, 50);
+  });
+  updateScrollspy();
+
+  // Close mobile sidebar on link click
+  for (var m = 0; m < sidebarLinks.length; m++) {
+    sidebarLinks[m].addEventListener('click', function() {
+      if (window.innerWidth <= 1024) {
+        sidebar.classList.remove('open');
+        hamburger.classList.remove('open');
+        overlay.classList.remove('show');
+      }
+    });
+  }
+
+  // ==========================================
+  // SIDEBAR PROGRESS
+  // ==========================================
+  function updateSidebarProgress() {
+    var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    var scrolled = window.scrollY;
+    var pct = docHeight > 0 ? Math.min(100, (scrolled / docHeight) * 100) : 0;
+
+    var fill = document.getElementById('sidebarProgressFill');
+    if (fill) {
+      fill.style.width = pct + '%';
+    }
+  }
+
+  // ==========================================
+  // COPY TO CLIPBOARD
+  // ==========================================
+  window.copyCode = function(btn) {
+    var block = btn.closest('.code-block');
+    var codeEl = block.cloneNode(true);
+    var labelEl = codeEl.querySelector('.code-label');
+    var btnEl = codeEl.querySelector('.copy-btn');
+    if (labelEl) { labelEl.parentNode.removeChild(labelEl); }
+    if (btnEl) { btnEl.parentNode.removeChild(btnEl); }
+
+    var text = codeEl.textContent.trim();
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function() {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(function() {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      })['catch'](function() {
+        btn.textContent = 'Failed';
+        setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+      });
+    } else {
+      // Fallback for older browsers
+      var textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.left = '-9999px';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+      } catch (e) {
+        btn.textContent = 'Failed';
+      }
+      document.body.removeChild(textarea);
+      setTimeout(function() {
+        btn.textContent = 'Copy';
+        btn.classList.remove('copied');
+      }, 2000);
+    }
+  };
+
+  // ==========================================
+  // PERSONA DATA
+  // ==========================================
+  var personaData = {
+    finance: {
+      prompt: "You are a senior financial analyst at a Fortune 500 investment firm. You specialize in equity valuation, DCF modeling, and earnings analysis. Always use precise financial terminology. Support all claims with quantitative reasoning. Present analysis in structured sections with clear metrics. Flag any assumptions explicitly.",
+      standardResponse: "For Q4, you should focus on finishing strong. Look at your goals and prioritize the most important ones. Make sure your team is aligned and working on the right things. Review what worked in Q3 and double down on those areas. Communication is key -- keep everyone informed about priorities and deadlines.",
+      personaResponse: "<div class='response-heading'>Q4 Strategic Priorities -- Financial Perspective:</div><div class='response-item'><div class='response-item-title'>1. Revenue Recognition Acceleration (Impact: +2-3% top-line)</div><div class='response-sub'>- Pull forward $2.4M in pipeline deals at >80% probability<br>- Focus on enterprise contracts with Dec 31 fiscal year-end buyers</div></div><div class='response-item'><div class='response-item-title'>2. Working Capital Optimization (Impact: +15-20bps margin)</div><div class='response-sub'>- Reduce DSO from 45 &rarr; 38 days through AR collection sprint<br>- Negotiate extended payment terms with top 3 vendors (target: Net 60)</div></div><div class='response-item'><div class='response-item-title'>3. Expense Management (Impact: preserve 28% EBITDA margin)</div><div class='response-sub'>- Freeze discretionary spend through Dec 31<br>- Defer non-critical capex to Q1 (estimated $800K deferral)</div></div><div class='response-item'><div class='response-item-title'>Key Risk:</div><div class='response-sub'>FX headwinds from EUR weakness could impact international revenue by ~$1.2M. <em>Recommend hedging strategy review.</em></div></div>"
+    },
+    healthcare: {
+      prompt: "You are a clinical research advisor specializing in evidence-based medicine and healthcare operations. Always cite relevant clinical studies and guidelines. Use accessible language while maintaining medical accuracy. Flag any information that requires physician consultation. Focus on patient outcomes and quality metrics.",
+      standardResponse: "For Q4, you should focus on finishing strong. Look at your goals and prioritize the most important ones. Make sure your team is aligned and working on the right things. Review what worked in Q3 and double down on those areas. Communication is key -- keep everyone informed about priorities and deadlines.",
+      personaResponse: "<div class='response-heading'>Q4 Healthcare Operations Priorities:</div><div class='response-item'><div class='response-item-title'>1. Patient Satisfaction (HCAHPS) Improvement</div><div class='response-sub'>- Target: Move from 78th &rarr; 85th percentile<br>- Per Studer Group research, hourly rounding reduces call light usage by 38% and improves satisfaction scores by 12 points<br>- Action: Implement bedside shift reports by Nov 1</div></div><div class='response-item'><div class='response-item-title'>2. Readmission Rate Reduction (CMS penalty threshold: >15.5%)</div><div class='response-sub'>- Current rate: 14.8% -- dangerously close to penalty zone<br>- Evidence: Coleman et al. (JAMA, 2006) showed care transitions intervention reduced 30-day readmissions by 30%<br>- Action: Launch post-discharge follow-up calls within 48 hours</div></div><div class='response-item'><div class='response-item-title'>3. Quality Reporting Compliance (Q4 submission deadline: Jan 15)</div><div class='response-sub'>- Complete MIPS data submission for all eligible clinicians<br>- Review quality measure performance against benchmarks</div></div><div class='response-item'><em>Note: Clinical protocol changes should be reviewed by your CMO and quality committee before implementation.</em></div>"
+    },
+    legal: {
+      prompt: "You are a legal research associate specializing in M&A due diligence and contract analysis. Identify potential risks, liabilities, and regulatory considerations. Always note jurisdiction-specific variations. Never provide specific legal advice -- frame as research findings and flag items for attorney review. Use structured analysis with clear issue spotting.",
+      standardResponse: "For Q4, you should focus on your most important priorities. Review your goals and make sure you're on track. Communicate with your team about what needs to get done before year-end. Look at your progress so far and adjust your plans accordingly.",
+      personaResponse: "<div class='response-heading'>Q4 Legal Department Priorities -- Risk-Adjusted Framework:</div><div class='response-item'><div class='response-item-title'>1. Year-End Contract Renewals (Risk: Medium-High)</div><div class='response-sub'>- 12 enterprise contracts expire Dec 31 -- review auto-renewal clauses<br>- <strong>Issue spotted:</strong> 3 contracts contain MFN clauses triggered by Q3 pricing changes -- requires renegotiation<br>- <em>Recommend: Attorney review of Sections 4.2(b) and 7.1 in the Acme Corp and TechVenture agreements</em></div></div><div class='response-item'><div class='response-item-title'>2. Regulatory Compliance Audit (Risk: High)</div><div class='response-sub'>- New FTC click-to-cancel rule effective Q1 -- all subscription agreements need amendment<br>- EU AI Act transitional provisions require AI system inventory by Jan 31<br>- <em>Recommend: Engage outside counsel for EU AI Act compliance gap analysis</em></div></div><div class='response-item'><div class='response-item-title'>3. M&amp;A Pipeline Due Diligence</div><div class='response-sub'>- Target acquisition (Project Falcon) -- complete antitrust review<br>- Key concern: combined market share may trigger HSR filing requirement (threshold: $111.4M, 2024)<br>- <em>Note: This analysis is for informational purposes only and does not constitute legal advice.</em></div></div>"
+    },
+    retail: {
+      prompt: "You are a retail strategy consultant specializing in omnichannel customer experience, conversion optimization, and competitive positioning. Focus on data-driven recommendations with clear ROI projections. Use retail-specific KPIs (conversion rate, AOV, LTV, CAC, NPS). Reference industry benchmarks from NRF, Forrester, and McKinsey.",
+      standardResponse: "For Q4, focus on your goals and make sure your team is aligned. The holiday season is important so plan ahead. Look at what worked last year and try to improve on it. Make sure you have enough inventory and that your marketing is ready to go.",
+      personaResponse: "<div class='response-heading'>Q4 Retail Strategy -- Holiday Readiness Playbook:</div><div class='response-item'><div class='response-item-title'>1. Conversion Rate Optimization (Target: 3.2% &rarr; 3.8%, +$2.1M revenue)</div><div class='response-sub'>- Implement one-click checkout -- Baymard Institute shows 18% cart abandonment reduction<br>- A/B test urgency messaging (\"Only 3 left!\") -- McKinsey reports 9% conversion lift<br>- Mobile-first: 72% of holiday traffic is mobile (NRF 2025), but your mobile CVR lags desktop by 1.4pp</div></div><div class='response-item'><div class='response-item-title'>2. AOV Growth Initiative (Target: $85 &rarr; $95)</div><div class='response-sub'>- Launch \"Complete the Look\" AI-powered recommendations -- Forrester estimates 10-15% AOV lift<br>- Free shipping threshold at $100 (currently $75) -- drives +$12 AOV per Shopify benchmarks<br>- Bundle deals: \"Gift Sets\" category targeting $100+ price point</div></div><div class='response-item'><div class='response-item-title'>3. Inventory Positioning</div><div class='response-sub'>- BOPIS (Buy Online, Pick Up In Store) drove 30% of holiday revenue last year -- expand to all locations<br>- Pre-position top 50 SKUs based on predictive demand model<br>- Safety stock: +25% for categories trending >20% YoY on Google Trends</div></div><div class='response-item'><div class='response-item-title'>ROI Projection:</div><div class='response-sub'>Combined initiatives target +$4.8M incremental holiday revenue (8.5% lift vs. prior year)</div></div>"
+    }
+  };
+
+  // ==========================================
+  // PERSONA WORKSHOP
+  // ==========================================
+  function updatePersonaDisplay(industry) {
+    var data = personaData[industry];
+    if (!data) { return; }
+
+    var promptTextarea = document.getElementById('personaPromptText');
+    if (promptTextarea) {
+      promptTextarea.value = data.prompt;
+    }
+
+    var standardEl = document.getElementById('standardResponse');
+    if (standardEl) {
+      standardEl.innerHTML = '<div class="persona-contrast-label generic">Generic Response</div>' +
+        '<p>' + data.standardResponse + '</p>';
+    }
+
+    var personaEl = document.getElementById('personaResponse');
+    if (personaEl) {
+      personaEl.innerHTML = '<div class="persona-contrast-label persona">With ' +
+        industry.charAt(0).toUpperCase() + industry.slice(1) + ' Persona</div>' +
+        data.personaResponse;
+    }
+  }
+
+  window.updatePersona = function() {
+    var select = document.getElementById('personaSelect');
+    updatePersonaDisplay(select.value);
+  };
+
+  window.switchResponseTab = function(tab, btnEl) {
+    var tabs = document.querySelectorAll('.response-tab');
+    for (var t = 0; t < tabs.length; t++) {
+      tabs[t].classList.remove('active');
+    }
+    btnEl.classList.add('active');
+
+    var standardContent = document.getElementById('standardResponse');
+    var personaContent = document.getElementById('personaResponse');
+
+    if (tab === 'standard') {
+      standardContent.classList.add('active');
+      personaContent.classList.remove('active');
+    } else {
+      standardContent.classList.remove('active');
+      personaContent.classList.add('active');
+    }
+  };
+
+  // Initialize persona display
+  updatePersonaDisplay('finance');
+
+  // ==========================================
+  // ARTIFACT GALLERY DATA
+  // ==========================================
+  var artifactData = [
+    {
+      name: 'Mermaid Flowchart',
+      type: 'Business Process',
+      icon: '&#128296;',
+      cssClass: 't1',
+      prompt: 'Create a Mermaid flowchart showing our\ncustomer support escalation process:\n\n1. Customer submits ticket\n2. Auto-categorize (billing, technical, general)\n3. Billing -> billing team\n4. Technical -> L1 support\n5. If L1 cannot resolve in 30 min -> L2\n6. If L2 cannot resolve in 2 hrs -> Engineering\n7. General -> FAQ bot, if unresolved -> L1\n\nUse color coding for priority levels.',
+      preview: '<strong>Rendered Flowchart Preview:</strong><div class="preview-box">graph TD\n  A[Customer Submits Ticket] --> B{Auto-Categorize}\n  B -->|Billing| C[Billing Team]\n  B -->|Technical| D[L1 Support]\n  B -->|General| E[FAQ Bot]\n  D -->|Unresolved 30min| F[L2 Support]\n  F -->|Unresolved 2hrs| G[Engineering]\n  E -->|Unresolved| D\n  C --> H[Resolved]\n  D --> H\n  F --> H\n  G --> H\n\n  style A fill:#3B82F6,color:#fff\n  style B fill:#F59E0B,color:#fff\n  style G fill:#EF4444,color:#fff\n  style H fill:#10B981,color:#fff</div>'
+    },
+    {
+      name: 'SVG Data Chart',
+      type: 'Revenue Comparison',
+      icon: '&#128200;',
+      cssClass: 't2',
+      prompt: 'Create an SVG bar chart comparing quarterly\nrevenue for three products:\n\nProduct A: Q1=$2.1M, Q2=$2.4M, Q3=$2.8M, Q4=$3.2M\nProduct B: Q1=$1.8M, Q2=$1.6M, Q3=$1.9M, Q4=$2.1M\nProduct C: Q1=$0.9M, Q2=$1.2M, Q3=$1.5M, Q4=$1.8M\n\nUse a clean, modern design with a legend.\nColor scheme: blues and teals.',
+      preview: '<strong>Rendered Chart Preview:</strong><div class="preview-visual"><div style="display:flex;align-items:flex-end;justify-content:center;gap:4px;height:140px;padding-bottom:24px;position:relative;"><div style="position:absolute;bottom:20px;left:0;right:0;border-top:1px dashed #E2E8F0;"></div><div style="text-align:center"><div class="preview-bar" style="height:66px;background:#3B82F6;"></div><div class="preview-bar-label">Q1</div></div><div style="text-align:center"><div class="preview-bar" style="height:75px;background:#3B82F6;"></div><div class="preview-bar-label">Q2</div></div><div style="text-align:center"><div class="preview-bar" style="height:88px;background:#3B82F6;"></div><div class="preview-bar-label">Q3</div></div><div style="text-align:center"><div class="preview-bar" style="height:100px;background:#3B82F6;"></div><div class="preview-bar-label">Q4</div></div><div style="width:16px"></div><div style="text-align:center"><div class="preview-bar" style="height:56px;background:#06B6D4;"></div><div class="preview-bar-label">Q1</div></div><div style="text-align:center"><div class="preview-bar" style="height:50px;background:#06B6D4;"></div><div class="preview-bar-label">Q2</div></div><div style="text-align:center"><div class="preview-bar" style="height:59px;background:#06B6D4;"></div><div class="preview-bar-label">Q3</div></div><div style="text-align:center"><div class="preview-bar" style="height:66px;background:#06B6D4;"></div><div class="preview-bar-label">Q4</div></div></div><div style="display:flex;gap:16px;justify-content:center;margin-top:8px;font-size:0.75rem;"><span><span style="display:inline-block;width:10px;height:10px;background:#3B82F6;border-radius:2px;margin-right:4px;"></span>Product A</span><span><span style="display:inline-block;width:10px;height:10px;background:#06B6D4;border-radius:2px;margin-right:4px;"></span>Product B</span></div></div>'
+    },
+    {
+      name: 'Markdown Report',
+      type: 'Executive Summary',
+      icon: '&#128196;',
+      cssClass: 't3',
+      prompt: 'Create an executive summary artifact for our\nQ3 performance review.\n\nKey data points:\n- Revenue: $12.4M (up 18% YoY)\n- Customer count: 2,847 (up 12%)\n- Churn rate: 4.2% (down from 5.1%)\n- NPS: 72 (up from 65)\n- Biggest win: Enterprise deal with Acme Corp ($1.2M ARR)\n- Biggest risk: Engineering team at 92% capacity\n\nFormat as a clean, scannable one-page briefing.',
+      preview: '<strong>Executive Summary Preview:</strong><div class="preview-box"><strong>Q3 PERFORMANCE REVIEW -- EXECUTIVE BRIEFING</strong>\n\nSITUATION\nQ3 delivered strong results with $12.4M revenue (+18%\nYoY), driven by enterprise segment growth and improved\nretention. Trajectory suggests Q4 target is achievable\nwith focused execution.\n\nKEY METRICS\n  Revenue:    $12.4M (+18% YoY)  [ON TRACK]\n  Customers:  2,847  (+12% YoY)  [ON TRACK]\n  Churn:      4.2%   (from 5.1%) [IMPROVED]\n  NPS:        72     (from 65)   [IMPROVED]\n\nHIGHLIGHTS\n- Acme Corp enterprise deal: $1.2M ARR\n- Churn reduction saved est. $890K in annual revenue\n\nRISK FACTORS\n- Engineering capacity at 92% -- limits feature velocity\n- Key person risk on infrastructure team\n\nRECOMMENDATION\nApprove 3 engineering headcount for Q4 to maintain\ndelivery velocity and reduce burnout risk.</div>'
+    },
+    {
+      name: 'Code Application',
+      type: 'Interactive Calculator',
+      icon: '&#128187;',
+      cssClass: 't4',
+      prompt: 'Create an interactive compound interest\ncalculator as an HTML artifact.\n\nInputs:\n- Initial investment (currency input)\n- Monthly contribution\n- Annual interest rate (%)\n- Investment period (years)\n\nOutputs:\n- Final balance\n- Total contributions\n- Total interest earned\n- Year-by-year breakdown table\n\nUse a clean, modern UI with a growth chart.\nMake it responsive.',
+      preview: '<strong>Application Preview:</strong><div class="preview-box"><strong>Compound Interest Calculator</strong>\n\nInitial Investment:  [$10,000     ]\nMonthly Contribution:[$500        ]\nAnnual Interest Rate:[  7%        ]\nPeriod:              [ 20 years   ]\n\n[  Calculate  ]\n\n---------------------------------\nFinal Balance:       $284,892\nTotal Contributions: $130,000\nTotal Interest:      $154,892\n---------------------------------\n\nYear | Balance   | Interest\n  1  | $16,470   | $  910\n  2  | $23,373   | $1,343\n  3  | $30,733   | $1,800\n ... | ...       | ...\n 20  | $284,892  | $17,421</div>'
+    },
+    {
+      name: 'Sequence Diagram',
+      type: 'API Call Flow',
+      icon: '&#128260;',
+      cssClass: 't5',
+      prompt: 'Create a Mermaid sequence diagram showing\nthe authentication flow for our API:\n\n1. Client sends credentials to Auth Service\n2. Auth Service validates against User DB\n3. Auth Service returns JWT token\n4. Client calls API Gateway with JWT\n5. API Gateway validates token with Auth Service\n6. API Gateway routes to Microservice\n7. Microservice returns data\n8. Include token refresh flow when JWT expires\n\nShow error cases with red coloring.',
+      preview: '<strong>Sequence Diagram Preview:</strong><div class="preview-box">sequenceDiagram\n  participant C as Client\n  participant AG as API Gateway\n  participant AS as Auth Service\n  participant DB as User DB\n  participant MS as Microservice\n\n  C->>AS: POST /auth/login (credentials)\n  AS->>DB: Validate credentials\n  DB-->>AS: User record\n  AS-->>C: 200 OK (JWT + refresh token)\n\n  C->>AG: GET /api/data (Bearer JWT)\n  AG->>AS: Validate token\n  AS-->>AG: Token valid\n  AG->>MS: Forward request\n  MS-->>AG: Response data\n  AG-->>C: 200 OK (data)\n\n  Note over C,AS: Token Refresh Flow\n  C->>AS: POST /auth/refresh (refresh_token)\n  AS-->>C: New JWT token</div>'
+    },
+    {
+      name: 'ER Diagram',
+      type: 'Database Schema',
+      icon: '&#128451;',
+      cssClass: 't6',
+      prompt: 'Create a Mermaid ER diagram for an e-commerce\ndatabase with the following entities:\n\n- Users (id, email, name, created_at)\n- Products (id, name, price, category_id, stock)\n- Categories (id, name, parent_id)\n- Orders (id, user_id, status, total, created_at)\n- OrderItems (id, order_id, product_id, quantity, price)\n- Reviews (id, user_id, product_id, rating, comment)\n\nShow all relationships with cardinality.\nCategories can be nested (self-referencing).',
+      preview: '<strong>ER Diagram Preview:</strong><div class="preview-box">erDiagram\n  USERS ||--o{ ORDERS : places\n  USERS ||--o{ REVIEWS : writes\n  PRODUCTS ||--o{ ORDER_ITEMS : "ordered in"\n  PRODUCTS ||--o{ REVIEWS : "reviewed in"\n  CATEGORIES ||--o{ PRODUCTS : contains\n  CATEGORIES ||--o{ CATEGORIES : "parent of"\n  ORDERS ||--|{ ORDER_ITEMS : contains\n\n  USERS {\n    int id PK\n    string email UK\n    string name\n    datetime created_at\n  }\n  PRODUCTS {\n    int id PK\n    string name\n    decimal price\n    int category_id FK\n    int stock\n  }\n  ORDERS {\n    int id PK\n    int user_id FK\n    string status\n    decimal total\n    datetime created_at\n  }</div>'
+    }
+  ];
+
+  // ==========================================
+  // ARTIFACT GALLERY RENDERING
+  // ==========================================
+  function renderArtifactGrid() {
+    var grid = document.getElementById('artifactGrid');
+    var html = '';
+
+    for (var a = 0; a < artifactData.length; a++) {
+      var item = artifactData[a];
+      html += '<div class="artifact-card ' + item.cssClass + '" data-artifact-idx="' + a + '" onclick="showArtifactDetail(' + a + ')">';
+      html += '<span class="artifact-icon">' + item.icon + '</span>';
+      html += '<div class="artifact-name">' + item.name + '</div>';
+      html += '<div class="artifact-type">' + item.type + '</div>';
+      html += '</div>';
+    }
+
+    grid.innerHTML = html;
+  }
+
+  window.showArtifactDetail = function(idx) {
+    var item = artifactData[idx];
+    var detail = document.getElementById('artifactDetail');
+    var title = document.getElementById('artifactDetailTitle');
+    var promptText = document.getElementById('artifactPromptText');
+    var previewContent = document.getElementById('artifactPreviewContent');
+
+    title.textContent = item.name + ' -- ' + item.type;
+    promptText.textContent = item.prompt;
+    previewContent.innerHTML = item.preview;
+
+    // Update active card
+    var cards = document.querySelectorAll('.artifact-card');
+    for (var c = 0; c < cards.length; c++) {
+      cards[c].classList.remove('active');
+    }
+    cards[idx].classList.add('active');
+
+    detail.classList.add('active');
+
+    // Scroll to detail if needed
+    setTimeout(function() {
+      detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
+  };
+
+  window.closeArtifactDetail = function() {
+    var detail = document.getElementById('artifactDetail');
+    detail.classList.remove('active');
+
+    var cards = document.querySelectorAll('.artifact-card');
+    for (var c = 0; c < cards.length; c++) {
+      cards[c].classList.remove('active');
+    }
+  };
+
+  renderArtifactGrid();
+
+  // ==========================================
+  // RESEARCH PIPELINE BUILDER
+  // ==========================================
+  var pipelineSteps = [
+    {
+      id: 0,
+      label: 'Define Research Question',
+      prompt: '"I need to understand [specific question]. Help me refine this into 3 focused sub-questions that we can answer with the available documents."'
+    },
+    {
+      id: 1,
+      label: 'Gather Source Documents',
+      prompt: '"I am uploading [X] documents related to [topic]. For each document, give me a one-line summary of what it contains and its relevance to our research question."'
+    },
+    {
+      id: 2,
+      label: 'Analyze Individual Sources',
+      prompt: '"For each uploaded document, extract the key findings, data points, and conclusions relevant to our research question. Note the page/section for each finding."'
+    },
+    {
+      id: 3,
+      label: 'Cross-Document Synthesis',
+      prompt: '"Compare findings across all documents. Where do they agree? Where do they contradict? What patterns emerge? Create a synthesis matrix."'
+    },
+    {
+      id: 4,
+      label: 'Present Findings',
+      prompt: '"Create an executive briefing that presents our synthesized findings. Include: key conclusions, supporting evidence with citations, confidence levels, and recommended next steps."'
+    }
+  ];
+
+  var correctOrder = [0, 1, 2, 3, 4];
+  var userOrder = [];
+  var pipelineSubmitted = false;
+  var shuffledSteps = [];
+
+  function shuffleArray(arr) {
+    var shuffled = arr.slice();
+    for (var s = shuffled.length - 1; s > 0; s--) {
+      var r = Math.floor(Math.random() * (s + 1));
+      var tmp = shuffled[s];
+      shuffled[s] = shuffled[r];
+      shuffled[r] = tmp;
+    }
+    return shuffled;
+  }
+
+  function renderPipelineCards() {
+    shuffledSteps = shuffleArray(pipelineSteps);
+    var container = document.getElementById('pipelineCards');
+    var html = '';
+
+    for (var p = 0; p < shuffledSteps.length; p++) {
+      var step = shuffledSteps[p];
+      html += '<div class="pipeline-card" data-step-id="' + step.id + '" id="pcard-' + step.id + '" onclick="selectPipelineCard(' + step.id + ')">';
+      html += step.label;
+      html += '</div>';
+    }
+
+    container.innerHTML = html;
+  }
+
+  window.selectPipelineCard = function(stepId) {
+    if (pipelineSubmitted) { return; }
+
+    var card = document.getElementById('pcard-' + stepId);
+    if (card.classList.contains('used')) { return; }
+
+    card.classList.add('used');
+    userOrder.push(stepId);
+
+    var slotIdx = userOrder.length - 1;
+    var slot = document.getElementById('slot-' + slotIdx);
+    slot.classList.add('filled');
+    slot.textContent = userOrder.length;
+
+    // If all 5 selected, check the order
+    if (userOrder.length === 5) {
+      pipelineSubmitted = true;
+      checkPipelineOrder();
+    }
+  };
+
+  function checkPipelineOrder() {
+    var isCorrect = true;
+    for (var i = 0; i < 5; i++) {
+      var slot = document.getElementById('slot-' + i);
+      if (userOrder[i] === correctOrder[i]) {
+        slot.classList.add('correct-slot');
+        slot.classList.remove('filled');
+      } else {
+        slot.classList.add('wrong-slot');
+        slot.classList.remove('filled');
+        isCorrect = false;
+      }
+    }
+
+    var result = document.getElementById('pipelineResult');
+    var resultTitle = document.getElementById('pipelineResultTitle');
+    var resultText = document.getElementById('pipelineResultText');
+    var resetBtn = document.getElementById('pipelineResetBtn');
+
+    result.classList.add('show');
+
+    if (isCorrect) {
+      result.classList.add('correct');
+      result.classList.remove('incorrect');
+      resultTitle.textContent = 'Correct! Perfect research pipeline.';
+      resultText.textContent = 'You identified the right sequence. Here are the recommended prompts for each step:';
+    } else {
+      result.classList.add('incorrect');
+      result.classList.remove('correct');
+      resultTitle.textContent = 'Not quite -- but close!';
+      resultText.textContent = 'The correct order is shown below. Notice how each step builds on the previous one. Here are the recommended prompts:';
+      resetBtn.style.display = 'inline-flex';
+    }
+
+    // Show prompts for each step in correct order
+    var promptsContainer = document.getElementById('pipelinePrompts');
+    var promptsHtml = '';
+    for (var j = 0; j < pipelineSteps.length; j++) {
+      var step = pipelineSteps[j];
+      promptsHtml += '<div class="pipeline-prompt-item">';
+      promptsHtml += '<div class="pipeline-prompt-step">Step ' + (j + 1) + ': ' + step.label + '</div>';
+      promptsHtml += '<div class="pipeline-prompt-text">' + step.prompt + '</div>';
+      promptsHtml += '</div>';
+    }
+    promptsContainer.innerHTML = promptsHtml;
+  }
+
+  window.resetPipeline = function() {
+    userOrder = [];
+    pipelineSubmitted = false;
+
+    // Reset slots
+    for (var i = 0; i < 5; i++) {
+      var slot = document.getElementById('slot-' + i);
+      slot.className = 'pipeline-slot';
+      slot.textContent = (i + 1);
+    }
+
+    // Reset result
+    var result = document.getElementById('pipelineResult');
+    result.classList.remove('show', 'correct', 'incorrect');
+    document.getElementById('pipelinePrompts').innerHTML = '';
+    document.getElementById('pipelineResetBtn').style.display = 'none';
+
+    // Re-render cards in new random order
+    renderPipelineCards();
+  };
+
+  renderPipelineCards();
+
+  // ==========================================
+  // FINAL QUIZ
+  // ==========================================
+  var FINAL_QUIZ_KEY = 'claude-training-module-10';
+
+  var finalQuizData = [
+    {
+      question: "What is the primary benefit of using Claude Projects for a consulting engagement?",
+      options: [
+        "Projects make Claude respond faster",
+        "Projects provide persistent context so Claude remembers client details across conversations",
+        "Projects enable voice input",
+        "Projects automatically generate slide decks"
+      ],
+      correct: 1
+    },
+    {
+      question: "Which artifact type would you use to visualize a database schema?",
+      options: [
+        "SVG graphic",
+        "Mermaid ER diagram",
+        "React component",
+        "Markdown document"
+      ],
+      correct: 1
+    },
+    {
+      question: "What is the 'Persona Pattern' for system prompts?",
+      options: [
+        "Using Claude to roleplay as a famous person",
+        "Defining Claude's role, expertise, and behavior standards for a specific use case",
+        "Creating a fictional character for creative writing",
+        "A pattern for generating user personas for UX research"
+      ],
+      correct: 1
+    },
+    {
+      question: "When building a competitive analysis with Claude, what technique ensures claims are traceable?",
+      options: [
+        "Using longer prompts",
+        "Asking Claude to cite which uploaded document supports each claim",
+        "Using Opus instead of Sonnet",
+        "Uploading only one document at a time"
+      ],
+      correct: 1
+    },
+    {
+      question: "What are the four components of a well-structured prompt template?",
+      options: [
+        "Who, What, When, Where",
+        "Context, Specific Task, Format, Constraints",
+        "Introduction, Body, Conclusion, References",
+        "Model, Temperature, Tokens, System"
+      ],
+      correct: 1
+    },
+    {
+      question: "Before distributing a prompt template to your team, what should you do?",
+      options: [
+        "Get legal approval",
+        "Test it against diverse inputs to validate consistent quality",
+        "Convert it to a PDF",
+        "Translate it into multiple languages"
+      ],
+      correct: 1
+    }
+  ];
+
+  var finalQuizSelections = [];
+  var finalQuizSubmitted = false;
+
+  for (var qi = 0; qi < finalQuizData.length; qi++) {
+    finalQuizSelections.push(null);
+  }
+
+  function renderFinalQuiz() {
+    var container = document.getElementById('finalQuizQuestions');
+    var html = '';
+
+    for (var q = 0; q < finalQuizData.length; q++) {
+      var quiz = finalQuizData[q];
+      html += '<div class="final-quiz-question" data-fq="' + q + '">';
+      html += '<div class="fq-number">Question ' + (q + 1) + ' of ' + finalQuizData.length + '</div>';
+      html += '<div class="fq-text">' + quiz.question + '</div>';
+      html += '<ul class="fq-options">';
+
+      for (var o = 0; o < quiz.options.length; o++) {
+        html += '<li class="fq-option" data-fq-val="' + o + '" onclick="selectFinalOption(' + q + ', this)">';
+        html += '<input type="radio" name="fq-' + q + '" value="' + o + '">';
+        html += '<span>' + quiz.options[o] + '</span>';
+        html += '</li>';
+      }
+
+      html += '</ul>';
+      html += '</div>';
+    }
+
+    container.innerHTML = html;
+  }
+
+  window.selectFinalOption = function(qIdx, el) {
+    if (finalQuizSubmitted) { return; }
+
+    // Deselect siblings
+    var parentQ = el.closest('.final-quiz-question');
+    var options = parentQ.querySelectorAll('.fq-option');
+    for (var i = 0; i < options.length; i++) {
+      options[i].querySelector('input').checked = false;
+      options[i].style.background = '';
+    }
+
+    // Select this one
+    el.querySelector('input').checked = true;
+    finalQuizSelections[qIdx] = parseInt(el.getAttribute('data-fq-val'), 10);
+
+    // Enable submit if all answered
+    var allAnswered = true;
+    for (var j = 0; j < finalQuizSelections.length; j++) {
+      if (finalQuizSelections[j] === null) {
+        allAnswered = false;
+        break;
+      }
+    }
+    document.getElementById('finalSubmitBtn').disabled = !allAnswered;
+  };
+
+  window.submitFinalQuiz = function() {
+    if (finalQuizSubmitted) { return; }
+    finalQuizSubmitted = true;
+
+    var score = 0;
+
+    for (var idx = 0; idx < finalQuizSelections.length; idx++) {
+      var sel = finalQuizSelections[idx];
+      var questionEl = document.querySelector('.final-quiz-question[data-fq="' + idx + '"]');
+      var options = questionEl.querySelectorAll('.fq-option');
+
+      for (var oi = 0; oi < options.length; oi++) {
+        var opt = options[oi];
+        var val = parseInt(opt.getAttribute('data-fq-val'), 10);
+        opt.style.pointerEvents = 'none';
+
+        if (val === finalQuizData[idx].correct) {
+          if (sel === val) {
+            opt.classList.add('selected-correct');
+            score++;
+          } else {
+            opt.classList.add('reveal-correct');
+          }
+        } else if (val === sel) {
+          opt.classList.add('selected-wrong');
+        }
+      }
+    }
+
+    // Show result
+    var result = document.getElementById('finalResult');
+    var title = document.getElementById('finalResultTitle');
+    var text = document.getElementById('finalResultText');
+
+    result.classList.add('show');
+
+    if (score >= 4) {
+      result.classList.add('pass');
+      result.classList.remove('fail');
+      title.textContent = 'Passed! ' + score + ' / ' + finalQuizData.length + ' correct';
+      text.textContent = 'Excellent work! You have a strong grasp of browser power user techniques. ' +
+        'Your progress has been saved. You are ready to apply these skills with your team -- ' +
+        'start by creating a persona and a prompt template for your most common use case.';
+    } else {
+      result.classList.add('fail');
+      result.classList.remove('pass');
+      title.textContent = score + ' / ' + finalQuizData.length + ' correct -- Review needed';
+      text.textContent = 'You need at least 4 correct answers to pass. Review the sections above, ' +
+        'paying special attention to Projects, the Persona Pattern, and the template anatomy. Then try again.';
+    }
+
+    // Save progress
+    var progressData = {
+      score: score,
+      total: finalQuizData.length,
+      completed: score >= 4,
+      timestamp: new Date().toISOString()
+    };
+    localStorage.setItem(FINAL_QUIZ_KEY, JSON.stringify(progressData));
+
+    // Disable submit button
+    document.getElementById('finalSubmitBtn').disabled = true;
+    document.getElementById('finalSubmitBtn').textContent = 'Submitted';
+  };
+
+  renderFinalQuiz();
+
+  // ==========================================
+  // LOAD EXISTING PROGRESS
+  // ==========================================
+  function loadExistingProgress() {
+    var saved = localStorage.getItem(FINAL_QUIZ_KEY);
+    if (saved) {
+      try {
+        var data = JSON.parse(saved);
+        if (data.completed) {
+          var fill = document.getElementById('sidebarProgressFill');
+          if (fill) {
+            fill.style.width = '100%';
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+  }
+  loadExistingProgress();
+
+})();
+</script>
+</body>
+</html>

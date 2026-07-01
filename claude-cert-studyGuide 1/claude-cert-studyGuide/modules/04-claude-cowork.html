@@ -1,0 +1,2710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 04: Claude Cowork | Claude AI Training</title>
+<style>
+/* ============================================
+   CSS CUSTOM PROPERTIES & PREMIUM DESIGN SYSTEM
+   ============================================ */
+:root {
+  --primary: #7C3AED;
+  --primary-light: #A78BFA;
+  --primary-dark: #5B21B6;
+  --accent: #06B6D4;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  --bg: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --bg-code: #F1F5F9;
+  --text: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --border: #E2E8F0;
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -1px rgba(0,0,0,0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.03);
+  --shadow-glow: 0 0 20px rgba(124, 58, 237, 0.15);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --transition: 0.2s ease;
+  --transition-spring: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --sidebar-width: 280px;
+  --content-max: 800px;
+}
+
+[data-theme="dark"] {
+  --bg: #0B0F1A;
+  --bg-card: #141926;
+  --bg-code: #1A2035;
+  --text: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --border: #1E293B;
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.2);
+  --shadow: 0 1px 3px rgba(0,0,0,0.25), 0 1px 2px rgba(0,0,0,0.15);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.3), 0 2px 4px -1px rgba(0,0,0,0.2);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.35), 0 4px 6px -2px rgba(0,0,0,0.2);
+  --shadow-glow: 0 0 25px rgba(124, 58, 237, 0.25);
+}
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 24px;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  min-height: 100vh;
+  transition: background var(--transition), color var(--transition);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================
+   THEME TOGGLE
+   ============================================ */
+.theme-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: all var(--transition-spring);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+.theme-toggle:hover {
+  box-shadow: var(--shadow-glow);
+  transform: scale(1.08);
+}
+
+/* ============================================
+   SIDEBAR
+   ============================================ */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  z-index: 900;
+  transition: transform 0.3s ease, background var(--transition);
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-md);
+}
+
+.sidebar-header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.sidebar-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+  margin-bottom: 12px;
+  transition: color var(--transition);
+}
+.sidebar-back:hover { color: var(--primary-dark); }
+
+.sidebar-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.sidebar-module-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.sidebar-nav {
+  padding: 12px 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.sidebar-section {
+  margin-bottom: 4px;
+}
+
+.sidebar-section-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 20px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  text-align: left;
+  transition: color var(--transition);
+}
+.sidebar-section-toggle:hover { color: var(--text); }
+.sidebar-section-toggle .chevron {
+  transition: transform 0.2s ease;
+  font-size: 0.65rem;
+}
+.sidebar-section-toggle.collapsed .chevron {
+  transform: rotate(-90deg);
+}
+
+.sidebar-links {
+  list-style: none;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.sidebar-links.collapsed {
+  max-height: 0 !important;
+}
+
+.sidebar-link {
+  display: block;
+  padding: 7px 20px 7px 32px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: all var(--transition);
+  line-height: 1.4;
+}
+.sidebar-link:hover {
+  color: var(--text);
+  background: var(--bg);
+}
+.sidebar-link.active {
+  color: var(--primary);
+  border-left-color: var(--primary);
+  background: rgba(124, 58, 237, 0.05);
+  font-weight: 600;
+}
+[data-theme="dark"] .sidebar-link.active {
+  background: rgba(124, 58, 237, 0.12);
+}
+
+.sidebar-progress {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sidebar-progress-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.sidebar-progress-track {
+  height: 6px;
+  background: var(--bg-code);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.sidebar-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 3px;
+  transition: width 0.5s ease;
+  width: 0%;
+}
+
+/* Hamburger button (mobile) */
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1001;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+  transition: all var(--transition);
+}
+.hamburger span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--text);
+  margin: 4px auto;
+  transition: all 0.3s ease;
+  border-radius: 1px;
+}
+.hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(4px, 4px); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(4px, -4px); }
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 899;
+}
+
+/* ============================================
+   MAIN CONTENT
+   ============================================ */
+.main-content {
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+  transition: margin var(--transition);
+}
+
+.content-wrapper {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 40px 32px 80px;
+}
+
+/* Module Header */
+.module-header {
+  margin-bottom: 48px;
+}
+.module-header .breadcrumb {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+.module-header .breadcrumb a {
+  color: var(--primary);
+  text-decoration: none;
+}
+.module-header .breadcrumb a:hover { text-decoration: underline; }
+
+.module-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.module-badge .number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+  box-shadow: var(--shadow-md);
+}
+.module-badge .label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.module-header h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, var(--text), var(--primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.module-header .description {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 640px;
+}
+
+.module-meta {
+  display: flex;
+  gap: 16px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.module-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  background: var(--bg-code);
+  padding: 6px 14px;
+  border-radius: 20px;
+  box-shadow: var(--shadow-xs);
+}
+
+/* ============================================
+   SECTIONS
+   ============================================ */
+.section {
+  margin-bottom: 56px;
+  scroll-margin-top: 24px;
+}
+
+.section-heading {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+  line-height: 1.3;
+}
+
+.section h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-top: 32px;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.section h4 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-top: 24px;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.section p {
+  margin-bottom: 16px;
+  color: var(--text-secondary);
+}
+
+.section ul, .section ol {
+  margin-bottom: 16px;
+  padding-left: 24px;
+}
+.section li {
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+}
+.section li strong {
+  color: var(--text);
+}
+
+/* ============================================
+   CARDS WITH TOP GRADIENT ACCENT BAR
+   ============================================ */
+.accent-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  margin: 24px 0;
+  position: relative;
+  overflow: hidden;
+  transition: border-color var(--transition), box-shadow var(--transition);
+  box-shadow: var(--shadow);
+}
+.accent-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+}
+.accent-card:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-md);
+}
+.accent-card h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.accent-card p {
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+.accent-card p:last-child {
+  margin-bottom: 0;
+}
+
+/* ============================================
+   ROLE CARDS
+   ============================================ */
+.role-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 20px 0;
+}
+.role-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: all var(--transition-spring);
+  box-shadow: var(--shadow);
+}
+.role-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+}
+.role-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.role-card.owner::before { background: linear-gradient(90deg, #EF4444, #F97316); }
+.role-card.admin::before { background: linear-gradient(90deg, var(--primary), var(--primary-light)); }
+.role-card.member::before { background: linear-gradient(90deg, var(--accent), #22D3EE); }
+.role-card.viewer::before { background: linear-gradient(90deg, var(--text-muted), #94A3B8); }
+
+.role-card h4 {
+  margin: 0 0 8px 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.role-card p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ============================================
+   CODE BLOCKS
+   ============================================ */
+.code-block {
+  background: #1E293B;
+  color: #E2E8F0;
+  border-radius: var(--radius-sm);
+  padding: 20px 24px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  overflow-x: auto;
+  position: relative;
+  margin: 16px 0 20px;
+  tab-size: 2;
+  box-shadow: var(--shadow-md);
+}
+.code-block .code-label {
+  position: absolute;
+  top: 8px;
+  left: 16px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #64748B;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+.code-block.has-label {
+  padding-top: 36px;
+}
+.code-block .copy-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: #94A3B8;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  transition: all var(--transition);
+}
+.code-block .copy-btn:hover { background: rgba(255,255,255,0.2); color: white; }
+.code-block .copy-btn.copied { background: var(--success); color: white; }
+
+/* Syntax highlighting classes */
+.kw { color: #C084FC; }
+.str { color: #6EE7B7; }
+.fn { color: #7DD3FC; }
+.cm { color: #64748B; }
+.num { color: #FDBA74; }
+.op { color: #FCA5A5; }
+.type { color: #67E8F9; }
+.param { color: #FDE68A; }
+.prop { color: #F0ABFC; }
+.punc { color: #94A3B8; }
+
+/* Inline code */
+code {
+  background: var(--bg-code);
+  color: var(--primary);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 0.88em;
+}
+[data-theme="dark"] code {
+  background: #1E293B;
+}
+.code-block code {
+  background: none;
+  color: inherit;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+  white-space: pre-wrap;
+  display: block;
+}
+
+/* ============================================
+   CALLOUT BOXES
+   ============================================ */
+.callout {
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  margin: 20px 0;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  box-shadow: var(--shadow-xs);
+}
+.callout-icon {
+  flex-shrink: 0;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+.callout-content { flex: 1; }
+.callout-content p { margin-bottom: 6px; color: inherit; }
+.callout-content p:last-child { margin-bottom: 0; }
+
+.callout.info {
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  color: #1E40AF;
+}
+.callout.tip {
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  color: #166534;
+}
+.callout.warning {
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  color: #92400E;
+}
+.callout.important {
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  color: #991B1B;
+}
+
+[data-theme="dark"] .callout.info {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: #93C5FD;
+}
+[data-theme="dark"] .callout.tip {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #6EE7B7;
+}
+[data-theme="dark"] .callout.warning {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #FCD34D;
+}
+[data-theme="dark"] .callout.important {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #FCA5A5;
+}
+
+/* ============================================
+   COMPARISON TABLE
+   ============================================ */
+.comparison-table-wrapper {
+  overflow-x: auto;
+  margin: 20px 0;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.comparison-table th {
+  background: var(--primary);
+  color: white;
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+.comparison-table th:first-child {
+  border-radius: var(--radius-sm) 0 0 0;
+}
+.comparison-table th:last-child {
+  border-radius: 0 var(--radius-sm) 0 0;
+}
+.comparison-table td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+.comparison-table tr:nth-child(even) td {
+  background: var(--bg);
+}
+.comparison-table tr:last-child td:first-child {
+  border-radius: 0 0 0 var(--radius-sm);
+}
+.comparison-table tr:last-child td:last-child {
+  border-radius: 0 0 var(--radius-sm) 0;
+}
+.comparison-table .best-cell {
+  color: var(--success);
+  font-weight: 600;
+}
+.comparison-table .good-cell {
+  color: var(--accent);
+  font-weight: 500;
+}
+.comparison-table .na-cell {
+  color: var(--text-muted);
+}
+
+/* ============================================
+   INTERACTIVE: DECISION MATRIX QUIZ
+   ============================================ */
+.quiz-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.quiz-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+}
+.quiz-container h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.quiz-score-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 12px 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+}
+.quiz-score-bar .score-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.quiz-score-track {
+  flex: 1;
+  height: 8px;
+  background: var(--bg-code);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.quiz-score-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--success));
+  border-radius: 4px;
+  transition: width 0.4s ease;
+  width: 0%;
+}
+.quiz-score-text {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  min-width: 50px;
+  text-align: right;
+}
+
+.decision-question {
+  margin-bottom: 16px;
+  padding: 20px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--border);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.decision-question.correct { border-color: var(--success); box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.15); }
+.decision-question.incorrect { border-color: var(--error); box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.12); }
+
+.dq-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  font-weight: 700;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+  margin-right: 10px;
+}
+
+.dq-text {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+
+.dq-buttons {
+  display: flex;
+  gap: 10px;
+}
+.dq-btn {
+  flex: 1;
+  padding: 10px 18px;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-spring);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  text-align: center;
+  user-select: none;
+}
+.dq-btn:hover:not(.disabled) {
+  border-color: var(--primary-light);
+  background: rgba(124, 58, 237, 0.05);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.dq-btn.correct-answer {
+  border-color: var(--success);
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+[data-theme="dark"] .dq-btn.correct-answer {
+  color: #6EE7B7;
+}
+.dq-btn.wrong-answer {
+  border-color: var(--error);
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+}
+.dq-btn.disabled {
+  cursor: default;
+  opacity: 0.7;
+  transform: none !important;
+  box-shadow: none !important;
+}
+.dq-btn.disabled:not(.correct-answer):not(.wrong-answer) {
+  opacity: 0.5;
+}
+
+.dq-feedback {
+  margin-top: 12px;
+  font-size: 0.85rem;
+  padding: 10px 14px;
+  border-radius: 8px;
+  display: none;
+  line-height: 1.5;
+}
+.dq-feedback.show { display: block; }
+.dq-feedback.correct {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+.dq-feedback.incorrect {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+}
+[data-theme="dark"] .dq-feedback.correct { color: #6EE7B7; }
+[data-theme="dark"] .dq-feedback.incorrect { color: #FCA5A5; }
+
+/* ============================================
+   INTERACTIVE: SETUP CHECKLIST
+   ============================================ */
+.checklist-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.checklist-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--success));
+}
+.checklist-container h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.checklist-progress-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 12px 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+}
+.checklist-progress-bar .progress-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.checklist-progress-track {
+  flex: 1;
+  height: 8px;
+  background: var(--bg-code);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.checklist-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--success));
+  border-radius: 4px;
+  transition: width 0.4s ease;
+  width: 0%;
+}
+.checklist-progress-text {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  min-width: 50px;
+  text-align: right;
+}
+
+.checklist-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px;
+  margin-bottom: 8px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  transition: all var(--transition);
+  cursor: pointer;
+}
+.checklist-item:hover {
+  border-color: var(--primary-light);
+}
+.checklist-item.checked {
+  border-color: var(--success);
+  background: rgba(16, 185, 129, 0.05);
+}
+[data-theme="dark"] .checklist-item.checked {
+  background: rgba(16, 185, 129, 0.08);
+}
+
+.checklist-checkbox {
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-spring);
+  margin-top: 1px;
+}
+.checklist-item.checked .checklist-checkbox {
+  background: var(--success);
+  border-color: var(--success);
+  color: white;
+}
+.checklist-checkbox .check-icon {
+  display: none;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: white;
+}
+.checklist-item.checked .check-icon {
+  display: block;
+}
+
+.checklist-content {
+  flex: 1;
+}
+.checklist-content .cl-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.checklist-content .cl-tip {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  display: none;
+}
+.checklist-item.checked .cl-tip {
+  display: block;
+  color: var(--text-secondary);
+}
+
+.checklist-complete {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: var(--radius-sm);
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  text-align: center;
+  display: none;
+}
+.checklist-complete.show { display: block; }
+.checklist-complete h4 {
+  color: var(--success);
+  margin: 0 0 6px 0;
+  font-size: 1.1rem;
+}
+.checklist-complete p {
+  color: var(--text-secondary);
+  margin: 0;
+  font-size: 0.95rem;
+}
+[data-theme="dark"] .checklist-complete h4 { color: #6EE7B7; }
+
+/* ============================================
+   INTERACTIVE: END-OF-MODULE QUIZ
+   ============================================ */
+.final-quiz {
+  background: var(--bg-card);
+  border: 2px solid var(--primary-light);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 32px 0;
+  box-shadow: var(--shadow-glow);
+}
+.final-quiz h3 {
+  margin-top: 0;
+}
+
+.final-quiz-question {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.final-quiz-question .fq-number {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+.final-quiz-question .fq-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+.fq-options { list-style: none; padding: 0; }
+.fq-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 12px;
+  margin-bottom: 4px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+.fq-option:hover { background: rgba(124, 58, 237, 0.05); }
+.fq-option input[type="radio"] {
+  accent-color: var(--primary);
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+.fq-option.selected-correct {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+.fq-option.selected-wrong {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+}
+.fq-option.reveal-correct {
+  background: rgba(16, 185, 129, 0.08);
+  color: #059669;
+  font-weight: 600;
+}
+[data-theme="dark"] .fq-option.selected-correct { color: #6EE7B7; }
+[data-theme="dark"] .fq-option.selected-wrong { color: #FCA5A5; }
+[data-theme="dark"] .fq-option.reveal-correct { color: #6EE7B7; }
+
+.final-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 32px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-spring);
+  margin-top: 8px;
+  box-shadow: var(--shadow-md);
+}
+.final-submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+.final-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.final-result {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: var(--radius-sm);
+  display: none;
+}
+.final-result.show { display: block; }
+.final-result.pass {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.final-result.fail {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.final-result h4 {
+  margin-top: 0;
+  margin-bottom: 6px;
+  font-size: 1.1rem;
+}
+.final-result p {
+  margin-bottom: 0;
+  font-size: 0.95rem;
+}
+.final-result.pass h4 { color: var(--success); }
+.final-result.fail h4 { color: var(--warning); }
+
+/* ============================================
+   WORKFLOW DIAGRAM
+   ============================================ */
+.workflow-diagram {
+  margin: 24px 0;
+  padding: 28px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow-x: auto;
+  box-shadow: var(--shadow);
+}
+.workflow-diagram svg {
+  display: block;
+  margin: 0 auto;
+}
+
+/* ============================================
+   NAVIGATION FOOTER
+   ============================================ */
+.module-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 16px;
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 2px solid var(--border);
+}
+.nav-link {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: all var(--transition-spring);
+  min-width: 0;
+  flex: 1;
+  max-width: 50%;
+  box-shadow: var(--shadow-xs);
+}
+.nav-link:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+.nav-link.next { align-items: flex-end; text-align: right; }
+.nav-link .nav-dir {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--primary);
+}
+.nav-link .nav-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Key concept highlight */
+.key-concept {
+  display: inline-block;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(6, 182, 212, 0.1));
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  color: var(--primary);
+}
+[data-theme="dark"] .key-concept {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(6, 182, 212, 0.15));
+  border-color: rgba(124, 58, 237, 0.35);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 1024px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .hamburger {
+    display: flex;
+  }
+  .sidebar-overlay.show {
+    display: block;
+  }
+  .main-content {
+    margin-left: 0;
+  }
+  .theme-toggle {
+    right: 16px;
+  }
+}
+
+@media (max-width: 640px) {
+  .content-wrapper {
+    padding: 24px 16px 60px;
+  }
+  .module-header h1 {
+    font-size: 1.6rem;
+  }
+  .section-heading {
+    font-size: 1.3rem;
+  }
+  .role-grid {
+    grid-template-columns: 1fr;
+  }
+  .dq-buttons {
+    flex-direction: column;
+  }
+  .module-nav {
+    flex-direction: column;
+  }
+  .nav-link {
+    max-width: 100%;
+  }
+  .nav-link.next {
+    align-items: flex-start;
+    text-align: left;
+  }
+}
+
+/* ============================================
+   SCROLLBAR STYLING
+   ============================================ */
+.sidebar::-webkit-scrollbar,
+.code-block::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.sidebar::-webkit-scrollbar-track,
+.code-block::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+.code-block::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.section {
+  animation: fadeInUp 0.4s ease both;
+}
+</style>
+</head>
+<body>
+<!-- ============================================
+     THEME TOGGLE
+     ============================================ -->
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+  <span id="themeIcon">&#9790;</span>
+</button>
+
+<!-- ============================================
+     HAMBURGER (mobile)
+     ============================================ -->
+<button class="hamburger" id="hamburger" aria-label="Toggle sidebar">
+  <span></span>
+  <span></span>
+  <span></span>
+</button>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ============================================
+     SIDEBAR
+     ============================================ -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="../index.html" class="sidebar-back">&larr; Back to Hub</a>
+    <div class="sidebar-title">Module 04</div>
+    <div class="sidebar-module-name">Claude Cowork</div>
+  </div>
+
+  <div class="sidebar-nav">
+    <!-- Section: Overview -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="overview">
+        Overview <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-overview">
+        <li><a href="#what-is-cowork" class="sidebar-link" data-target="what-is-cowork">What Is Claude Cowork?</a></li>
+        <li><a href="#setting-up" class="sidebar-link" data-target="setting-up">Setting Up Your Workspace</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Working -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="working">
+        Workflows <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-working">
+        <li><a href="#collaborative-workflows" class="sidebar-link" data-target="collaborative-workflows">Collaborative Workflows</a></li>
+        <li><a href="#governance" class="sidebar-link" data-target="governance">Governance &amp; Controls</a></li>
+        <li><a href="#decision-framework" class="sidebar-link" data-target="decision-framework">When to Use What</a></li>
+      </ul>
+    </div>
+
+    <!-- Section: Exercises -->
+    <div class="sidebar-section">
+      <button class="sidebar-section-toggle" data-section="exercises">
+        Exercises <span class="chevron">&#9660;</span>
+      </button>
+      <ul class="sidebar-links" id="nav-exercises">
+        <li><a href="#setup-checklist" class="sidebar-link" data-target="setup-checklist">Setup Checklist</a></li>
+        <li><a href="#decision-quiz" class="sidebar-link" data-target="decision-quiz">Decision Matrix Quiz</a></li>
+        <li><a href="#final-quiz" class="sidebar-link" data-target="final-quiz">End-of-Module Quiz</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sidebar-progress">
+    <div class="sidebar-progress-label">Module Progress</div>
+    <div class="sidebar-progress-track">
+      <div class="sidebar-progress-fill" id="sidebarProgressFill"></div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================
+     MAIN CONTENT
+     ============================================ -->
+<main class="main-content">
+  <div class="content-wrapper">
+
+    <!-- Module Header -->
+    <header class="module-header">
+      <div class="breadcrumb">
+        <a href="../index.html">Training Hub</a> &raquo; Module 04
+      </div>
+      <div class="module-badge">
+        <span class="number">4</span>
+        <span class="label">Collaboration</span>
+      </div>
+      <h1>Claude Cowork -- Team AI Collaboration</h1>
+      <p class="description">
+        Learn how Claude Cowork transforms AI from a personal tool into a team capability. Shared context, governance controls, and collaborative workflows -- all in one workspace.
+      </p>
+      <div class="module-meta">
+        <span class="module-meta-item">&#9201; ~30 min</span>
+        <span class="module-meta-item">&#128218; Beginner</span>
+        <span class="module-meta-item">&#127891; Everyone</span>
+        <span class="module-meta-item">&#127919; 3 Interactive Exercises</span>
+      </div>
+    </header>
+
+    <!-- ========================================
+         SECTION 1: WHAT IS CLAUDE COWORK?
+         ======================================== -->
+    <section class="section" id="what-is-cowork">
+      <h2 class="section-heading">1. What Is Claude Cowork?</h2>
+
+      <p>
+        <strong>Claude Cowork</strong> is Anthropic's collaborative AI workspace designed for teams and organizations.
+        While Claude.ai in the browser is built for individual use and Claude Code is built for software engineers
+        in the terminal, Cowork is purpose-built for <span class="key-concept">team collaboration</span> with
+        shared context, governance, and enterprise-grade controls.
+      </p>
+
+      <p>
+        Think of it this way: if Claude.ai is your personal AI assistant and Claude Code is your AI pair programmer,
+        then Claude Cowork is your <strong>team's shared AI colleague</strong> -- one that knows your company's
+        standards, processes, and goals, and works consistently across every team member.
+      </p>
+
+      <h3>How Cowork Differs from Claude.ai (Browser)</h3>
+
+      <p>
+        The browser version of Claude is designed for individual productivity. You open it, type a question, get an
+        answer, and move on. Every conversation is yours alone. Cowork takes a fundamentally different approach:
+      </p>
+
+      <ul>
+        <li><strong>Shared context:</strong> Upload company documents, brand guidelines, and process documentation that every team member's conversations can reference.</li>
+        <li><strong>Team management:</strong> Invite colleagues, assign roles, and control who can do what within the workspace.</li>
+        <li><strong>Governance:</strong> Audit logs, usage policies, and compliance controls that satisfy enterprise security requirements.</li>
+        <li><strong>Consistency:</strong> Custom instructions at the workspace level ensure everyone gets responses that follow your company's standards.</li>
+      </ul>
+
+      <h3>How Cowork Differs from Claude Code</h3>
+
+      <p>
+        Claude Code is a CLI-based agentic tool that reads files, writes code, and runs commands on your local machine.
+        It is built specifically for software development workflows. Cowork is not a CLI and does not interact with
+        your filesystem. Instead, it focuses on:
+      </p>
+
+      <ul>
+        <li><strong>Collaborative document creation</strong> rather than code generation</li>
+        <li><strong>Team-wide knowledge sharing</strong> rather than individual codebase understanding</li>
+        <li><strong>Business workflows</strong> (proposals, reports, research) rather than engineering tasks</li>
+        <li><strong>Governance and compliance</strong> rather than development tooling</li>
+      </ul>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>The key value proposition:</strong> One AI assistant that knows your team's context, standards, and goals -- ensuring consistent, high-quality output across every person in your organization.</p>
+        </div>
+      </div>
+
+      <h3>Common Use Cases</h3>
+
+      <div class="accent-card">
+        <h4>Team Document Creation</h4>
+        <p>Multiple team members collaborating on proposals, reports, and presentations with consistent brand voice and messaging.</p>
+      </div>
+
+      <div class="accent-card">
+        <h4>Collaborative Research</h4>
+        <p>Teams pooling insights through shared conversations, building on each other's findings with persistent context about the research domain.</p>
+      </div>
+
+      <div class="accent-card">
+        <h4>Standardized Processes</h4>
+        <p>Ensuring every team member follows the same procedures -- from customer onboarding scripts to compliance checklists -- with shared prompt templates.</p>
+      </div>
+
+      <div class="accent-card">
+        <h4>Cross-Functional Alignment</h4>
+        <p>Breaking down silos by giving different departments (marketing, legal, sales) a shared AI workspace that understands the full business context.</p>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 2: SETTING UP YOUR WORKSPACE
+         ======================================== -->
+    <section class="section" id="setting-up">
+      <h2 class="section-heading">2. Setting Up Your Workspace</h2>
+
+      <p>
+        Getting started with Cowork involves creating a workspace, inviting your team, and configuring the shared
+        context that makes Cowork powerful. A well-configured workspace is the foundation for team-wide AI adoption.
+      </p>
+
+      <h3>Creating a Workspace</h3>
+
+      <p>
+        A workspace is your team's home base in Cowork. Choose a name that reflects its purpose -- this could
+        be your department ("Marketing Team"), a project ("Q2 Product Launch"), or your entire organization.
+        You can create multiple workspaces for different purposes.
+      </p>
+
+      <h3>Roles and Permissions</h3>
+
+      <p>
+        Cowork uses a role-based access model to control what each team member can do. Understanding these roles
+        is essential for proper workspace governance.
+      </p>
+
+      <div class="role-grid">
+        <div class="role-card owner">
+          <h4>Owner</h4>
+          <p>Full control over the workspace. Can delete the workspace, transfer ownership, and manage billing. Typically the person who created the workspace or a designated administrator.</p>
+        </div>
+        <div class="role-card admin">
+          <h4>Admin</h4>
+          <p>Can manage team members, modify workspace settings, upload shared context, set usage policies, and view audit logs. Cannot delete the workspace or transfer ownership.</p>
+        </div>
+        <div class="role-card member">
+          <h4>Member</h4>
+          <p>Can use Claude within the workspace, create and participate in conversations, and access shared context. Cannot modify workspace settings or manage other users.</p>
+        </div>
+        <div class="role-card viewer">
+          <h4>Viewer</h4>
+          <p>Read-only access. Can view conversations and shared resources but cannot create new conversations or interact with Claude. Useful for stakeholders who need visibility.</p>
+        </div>
+      </div>
+
+      <h3>Setting Shared Context</h3>
+
+      <p>
+        Shared context is what makes Cowork fundamentally more powerful than individual Claude sessions.
+        By uploading your organization's documents, you give Claude persistent knowledge that applies to
+        every conversation in the workspace.
+      </p>
+
+      <p>
+        <strong>What to upload:</strong>
+      </p>
+
+      <ul>
+        <li><strong>Brand guidelines:</strong> Tone of voice, writing style, visual identity standards</li>
+        <li><strong>Product documentation:</strong> Feature descriptions, pricing, technical specifications</li>
+        <li><strong>Process documents:</strong> SOPs, checklists, approval workflows</li>
+        <li><strong>Company policies:</strong> HR policies, compliance requirements, security standards</li>
+        <li><strong>Templates:</strong> Email templates, report formats, proposal structures</li>
+      </ul>
+
+      <div class="callout info">
+        <span class="callout-icon">&#9432;</span>
+        <div class="callout-content">
+          <p><strong>Best practice:</strong> Start small. Upload your most important 3-5 documents first, test conversations against them, then gradually expand. Overwhelming the context with too many documents at once can reduce relevance.</p>
+        </div>
+      </div>
+
+      <h3>Custom Instructions</h3>
+
+      <p>
+        Workspace-level custom instructions tell Claude how to behave for every conversation in the workspace.
+        These are different from individual Claude.ai instructions -- they apply to the entire team.
+      </p>
+
+      <div class="code-block has-label">
+        <span class="code-label">Example workspace instructions</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<code>You are an AI assistant for Acme Corp's marketing team.
+
+Always follow our brand voice:
+- Professional but approachable
+- Data-driven claims with sources
+- Avoid superlatives (no "best", "fastest", "revolutionary")
+- Use active voice
+
+When creating content:
+- Reference our brand guidelines document
+- Follow our content calendar priorities
+- Include relevant metrics where available
+- Flag any claims that need fact-checking
+
+For compliance:
+- Never make promises about future features
+- Always include required disclaimers
+- Follow FTC guidelines for sponsored content</code></div>
+
+      <h3>Organizing by Department or Project</h3>
+
+      <p>
+        Most organizations benefit from creating separate workspaces for different purposes:
+      </p>
+
+      <ul>
+        <li><strong>Department workspaces:</strong> Marketing, Sales, Legal, HR -- each with their own context and instructions</li>
+        <li><strong>Project workspaces:</strong> Product launches, client engagements, research initiatives -- scoped to specific goals</li>
+        <li><strong>Cross-functional workspaces:</strong> For initiatives that span multiple teams, combining context from each</li>
+      </ul>
+
+      <div class="callout warning">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Avoid workspace sprawl.</strong> Creating too many workspaces makes it hard for team members to find the right one. Start with one per major team or initiative, and split only when the shared context would meaningfully differ.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE: WORKSPACE SETUP CHECKLIST
+         ======================================== -->
+    <section class="section" id="setup-checklist">
+      <h2 class="section-heading">Workspace Setup Checklist</h2>
+
+      <p>
+        Use this interactive checklist to walk through the key steps for setting up a productive Cowork
+        workspace. Check each item to reveal best-practice tips.
+      </p>
+
+      <div class="checklist-container">
+        <h3>Your Cowork Setup Guide</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 20px;">Check off each step as you plan your workspace. Tips will appear as you go.</p>
+
+        <div class="checklist-progress-bar">
+          <span class="progress-label">Progress</span>
+          <div class="checklist-progress-track">
+            <div class="checklist-progress-fill" id="checklistProgressFill"></div>
+          </div>
+          <span class="checklist-progress-text" id="checklistProgressText">0 / 8</span>
+        </div>
+
+        <div id="checklistItems">
+          <!-- Items rendered by JS -->
+        </div>
+
+        <div class="checklist-complete" id="checklistComplete">
+          <h4>Setup Complete!</h4>
+          <p>You have planned all the essential steps for a productive Cowork workspace. Remember: start with the basics and iterate as your team's needs evolve.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 3: COLLABORATIVE WORKFLOWS
+         ======================================== -->
+    <section class="section" id="collaborative-workflows">
+      <h2 class="section-heading">3. Collaborative Workflows</h2>
+
+      <p>
+        The real power of Cowork emerges when teams use it together. Here are the key collaboration
+        patterns that organizations are using effectively.
+      </p>
+
+      <h3>Shared Conversations</h3>
+
+      <p>
+        Unlike individual Claude sessions, Cowork conversations can include multiple team members.
+        Everyone sees the same thread, can add to the conversation, and benefits from the accumulated context.
+      </p>
+
+      <p>
+        <strong>When to use shared conversations:</strong>
+      </p>
+
+      <ul>
+        <li>Collaborative brainstorming sessions where multiple perspectives are needed</li>
+        <li>Document drafting where different team members own different sections</li>
+        <li>Decision-making processes where everyone needs to see the reasoning</li>
+        <li>Training scenarios where a senior team member demonstrates effective prompting</li>
+      </ul>
+
+      <h3>Handoff Patterns</h3>
+
+      <p>
+        One of the most powerful collaboration patterns is the <span class="key-concept">handoff</span> -- starting
+        a task with Claude, building up context, and then passing the conversation to a colleague who continues
+        the work.
+      </p>
+
+      <!-- Handoff Workflow Diagram -->
+      <div class="workflow-diagram">
+        <svg viewBox="0 0 700 200" width="100%" height="200" xmlns="http://www.w3.org/2000/svg" style="max-width:700px;">
+          <defs>
+            <marker id="arrowP" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+              <polygon points="0 0, 10 3.5, 0 7" fill="#7C3AED"/>
+            </marker>
+            <marker id="arrowG" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+              <polygon points="0 0, 10 3.5, 0 7" fill="#10B981"/>
+            </marker>
+          </defs>
+
+          <!-- Step 1: Start -->
+          <rect x="10" y="60" width="140" height="70" rx="14" fill="#7C3AED" opacity="0.12" stroke="#7C3AED" stroke-width="2"/>
+          <text x="80" y="88" text-anchor="middle" fill="#7C3AED" font-weight="700" font-size="14" font-family="system-ui">Alice starts</text>
+          <text x="80" y="108" text-anchor="middle" fill="#7C3AED" font-size="11" font-family="system-ui" opacity="0.8">Research &amp; outline</text>
+
+          <!-- Arrow -->
+          <line x1="150" y1="95" x2="188" y2="95" stroke="#7C3AED" stroke-width="2" marker-end="url(#arrowP)"/>
+
+          <!-- Step 2: Build context -->
+          <rect x="190" y="60" width="140" height="70" rx="14" fill="#06B6D4" opacity="0.12" stroke="#06B6D4" stroke-width="2"/>
+          <text x="260" y="88" text-anchor="middle" fill="#06B6D4" font-weight="700" font-size="14" font-family="system-ui">Context builds</text>
+          <text x="260" y="108" text-anchor="middle" fill="#06B6D4" font-size="11" font-family="system-ui" opacity="0.8">Claude learns domain</text>
+
+          <!-- Arrow -->
+          <line x1="330" y1="95" x2="368" y2="95" stroke="#06B6D4" stroke-width="2" marker-end="url(#arrowP)"/>
+
+          <!-- Step 3: Handoff -->
+          <rect x="370" y="60" width="140" height="70" rx="14" fill="#F59E0B" opacity="0.12" stroke="#F59E0B" stroke-width="2"/>
+          <text x="440" y="88" text-anchor="middle" fill="#F59E0B" font-weight="700" font-size="14" font-family="system-ui">Handoff</text>
+          <text x="440" y="108" text-anchor="middle" fill="#F59E0B" font-size="11" font-family="system-ui" opacity="0.8">Share to Bob</text>
+
+          <!-- Arrow -->
+          <line x1="510" y1="95" x2="548" y2="95" stroke="#F59E0B" stroke-width="2" marker-end="url(#arrowG)"/>
+
+          <!-- Step 4: Continue -->
+          <rect x="550" y="60" width="140" height="70" rx="14" fill="#10B981" opacity="0.12" stroke="#10B981" stroke-width="2"/>
+          <text x="620" y="88" text-anchor="middle" fill="#10B981" font-weight="700" font-size="14" font-family="system-ui">Bob continues</text>
+          <text x="620" y="108" text-anchor="middle" fill="#10B981" font-size="11" font-family="system-ui" opacity="0.8">Draft &amp; refine</text>
+
+          <!-- Labels -->
+          <text x="80" y="155" text-anchor="middle" fill="#7C3AED" font-size="11" font-family="system-ui" font-weight="600">Mon morning</text>
+          <text x="260" y="155" text-anchor="middle" fill="#06B6D4" font-size="11" font-family="system-ui" font-weight="600">3 turns deep</text>
+          <text x="440" y="155" text-anchor="middle" fill="#F59E0B" font-size="11" font-family="system-ui" font-weight="600">Mon afternoon</text>
+          <text x="620" y="155" text-anchor="middle" fill="#10B981" font-size="11" font-family="system-ui" font-weight="600">Full context retained</text>
+        </svg>
+      </div>
+
+      <p>
+        The critical benefit of handoffs is that <strong>Claude retains all the context</strong> from the previous
+        contributor. Bob does not need Alice to write a summary or re-explain the background -- Claude already
+        understands the full conversation history.
+      </p>
+
+      <h3>Review Cycles</h3>
+
+      <p>
+        Teams can use Claude as a collaborative reviewer in their workflows:
+      </p>
+
+      <ul>
+        <li><strong>First draft + AI review:</strong> A team member writes a draft, then asks Claude to review it against the workspace's guidelines and standards.</li>
+        <li><strong>Peer review augmentation:</strong> Before sending a document to a human reviewer, have Claude flag issues to catch the easy ones first.</li>
+        <li><strong>Consistency checking:</strong> Ask Claude to compare a new document against previously approved examples in the shared context to ensure consistency.</li>
+      </ul>
+
+      <h3>Template Sharing</h3>
+
+      <p>
+        <span class="key-concept">Prompt templates</span> are reusable starting points that encode your team's
+        best practices into structured prompts. Instead of every team member figuring out how to ask Claude
+        for help from scratch, templates provide a consistent, optimized starting point.
+      </p>
+
+      <p>
+        Examples of useful templates:
+      </p>
+
+      <ul>
+        <li><strong>Customer email response:</strong> A template that includes the customer's issue, your product context, and tone guidelines</li>
+        <li><strong>Meeting summary:</strong> A template that structures meeting notes into action items, decisions, and follow-ups</li>
+        <li><strong>Competitive analysis:</strong> A template that guides Claude through a structured comparison framework</li>
+        <li><strong>Job description writer:</strong> A template that ensures all job posts follow company format and diversity language</li>
+      </ul>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>Template tip:</strong> The best templates are not just prompts -- they include examples of good output. Show Claude what a great customer email or meeting summary looks like, and it will consistently produce similar quality.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 4: GOVERNANCE & ENTERPRISE CONTROLS
+         ======================================== -->
+    <section class="section" id="governance">
+      <h2 class="section-heading">4. Governance and Enterprise Controls</h2>
+
+      <p>
+        For organizations adopting AI at scale, governance is not optional -- it is a requirement. Cowork
+        provides the controls that enterprise IT, legal, and compliance teams need to feel confident
+        about team-wide AI adoption.
+      </p>
+
+      <h3>Usage Policies</h3>
+
+      <p>
+        Workspace administrators can define clear policies about what employees can and cannot use Claude for.
+        These policies are visible to all members and help prevent misuse.
+      </p>
+
+      <ul>
+        <li><strong>Approved use cases:</strong> Content creation, research summarization, process documentation</li>
+        <li><strong>Restricted use cases:</strong> Sharing personally identifiable information (PII), making legal commitments, generating financial advice</li>
+        <li><strong>Prohibited use cases:</strong> Sharing trade secrets, bypassing compliance processes, creating misleading content</li>
+      </ul>
+
+      <h3>Content Filtering and Moderation</h3>
+
+      <p>
+        Cowork includes configurable content filtering that administrators can tune to match their organization's
+        needs. This ensures Claude's responses align with company standards even when users make ambiguous
+        or inappropriate requests.
+      </p>
+
+      <h3>Audit Logs</h3>
+
+      <p>
+        Enterprise audit logging tracks <strong>who</strong> used Claude, <strong>what</strong> they asked about,
+        and <strong>when</strong> the interaction occurred. This is critical for:
+      </p>
+
+      <ul>
+        <li><strong>Compliance evidence:</strong> Demonstrating to regulators that AI usage follows approved policies</li>
+        <li><strong>Usage analysis:</strong> Understanding how teams use Claude to optimize training and templates</li>
+        <li><strong>Incident response:</strong> If an issue arises, audit logs provide the forensic trail needed for investigation</li>
+        <li><strong>Cost accountability:</strong> Tracking usage by team, project, or individual for budget planning</li>
+      </ul>
+
+      <div class="callout important">
+        <span class="callout-icon">&#9888;</span>
+        <div class="callout-content">
+          <p><strong>Critical for regulated industries:</strong> If your organization operates under HIPAA, SOC 2, GDPR, or similar frameworks, audit logs are not just a nice-to-have -- they are a compliance requirement. Work with your compliance team to configure logging before rolling out Cowork.</p>
+        </div>
+      </div>
+
+      <h3>Cost Management</h3>
+
+      <p>
+        Cowork provides tools to keep AI spending predictable and accountable:
+      </p>
+
+      <ul>
+        <li><strong>Budgets:</strong> Set monthly spending limits per workspace or per team</li>
+        <li><strong>Quotas:</strong> Limit the number of messages per user to prevent runaway usage</li>
+        <li><strong>Alerts:</strong> Get notified when spending approaches budget thresholds (e.g., 75% and 90%)</li>
+        <li><strong>Usage dashboards:</strong> Visual breakdowns of spending by team, project, and use case</li>
+      </ul>
+
+      <h3>Compliance Considerations</h3>
+
+      <p>
+        Different regulatory frameworks have different requirements for AI usage:
+      </p>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Framework</th>
+              <th>Key Requirement</th>
+              <th>How Cowork Helps</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>HIPAA</strong></td>
+              <td>Protected health information (PHI) safeguards</td>
+              <td>Data handling policies, access controls, audit trails</td>
+            </tr>
+            <tr>
+              <td><strong>SOC 2</strong></td>
+              <td>Security, availability, and confidentiality controls</td>
+              <td>Role-based access, encryption, monitoring</td>
+            </tr>
+            <tr>
+              <td><strong>GDPR</strong></td>
+              <td>Data subject rights, processing transparency</td>
+              <td>Usage policies, data retention controls, audit logs</td>
+            </tr>
+            <tr>
+              <td><strong>FedRAMP</strong></td>
+              <td>US government cloud security standards</td>
+              <td>SSO integration, centralized identity management</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>SSO Integration and Identity Management</h3>
+
+      <p>
+        Enterprise deployments integrate with existing identity providers through SSO (Single Sign-On).
+        This means team members use their existing corporate credentials to access Cowork -- no separate
+        accounts to manage, and automatic deprovisioning when someone leaves the organization.
+      </p>
+
+      <div class="callout info">
+        <span class="callout-icon">&#9432;</span>
+        <div class="callout-content">
+          <p><strong>Note:</strong> SSO integration supports SAML 2.0 and OIDC providers including Okta, Azure AD, Google Workspace, and OneLogin. Work with your IT team to configure SSO before inviting team members.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         SECTION 5: DECISION FRAMEWORK
+         ======================================== -->
+    <section class="section" id="decision-framework">
+      <h2 class="section-heading">5. When to Use What -- A Decision Framework</h2>
+
+      <p>
+        With Claude available through the browser, the CLI (Claude Code), and Cowork, choosing the right
+        surface for your task is important. Here is a practical guide.
+      </p>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Need</th>
+              <th>Browser</th>
+              <th>Code</th>
+              <th>Cowork</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Individual writing/research</strong></td>
+              <td class="best-cell">Best</td>
+              <td class="na-cell">--</td>
+              <td class="good-cell">Good</td>
+            </tr>
+            <tr>
+              <td><strong>Team document creation</strong></td>
+              <td class="na-cell">--</td>
+              <td class="na-cell">--</td>
+              <td class="best-cell">Best</td>
+            </tr>
+            <tr>
+              <td><strong>Software development</strong></td>
+              <td class="na-cell">--</td>
+              <td class="best-cell">Best</td>
+              <td class="na-cell">--</td>
+            </tr>
+            <tr>
+              <td><strong>Enterprise governance</strong></td>
+              <td class="na-cell">--</td>
+              <td class="na-cell">--</td>
+              <td class="best-cell">Best</td>
+            </tr>
+            <tr>
+              <td><strong>Quick personal tasks</strong></td>
+              <td class="best-cell">Best</td>
+              <td class="good-cell">Good</td>
+              <td class="na-cell">--</td>
+            </tr>
+            <tr>
+              <td><strong>Shared prompt libraries</strong></td>
+              <td class="na-cell">--</td>
+              <td class="na-cell">--</td>
+              <td class="best-cell">Best</td>
+            </tr>
+            <tr>
+              <td><strong>Code review &amp; debugging</strong></td>
+              <td class="na-cell">--</td>
+              <td class="best-cell">Best</td>
+              <td class="na-cell">--</td>
+            </tr>
+            <tr>
+              <td><strong>Client-facing deliverables</strong></td>
+              <td class="good-cell">Good</td>
+              <td class="na-cell">--</td>
+              <td class="best-cell">Best</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>The Simple Decision Rule</h3>
+
+      <p>
+        When choosing which Claude surface to use, ask yourself three questions:
+      </p>
+
+      <ol>
+        <li><strong>Am I writing code?</strong> If yes, use <strong>Claude Code</strong>.</li>
+        <li><strong>Does this involve my team, shared context, or governance?</strong> If yes, use <strong>Cowork</strong>.</li>
+        <li><strong>Is this a quick personal task?</strong> If yes, use the <strong>Browser</strong>.</li>
+      </ol>
+
+      <div class="callout tip">
+        <span class="callout-icon">&#128161;</span>
+        <div class="callout-content">
+          <p><strong>Remember:</strong> The surfaces are complementary, not competing. A software team might use Claude Code for development, Cowork for documentation and team processes, and the browser for individual research. The goal is to use the right tool for each task.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE: DECISION MATRIX QUIZ
+         ======================================== -->
+    <section class="section" id="decision-quiz">
+      <h2 class="section-heading">Decision Matrix Quiz</h2>
+
+      <p>
+        Test your understanding of when to use Claude Browser vs. Claude Cowork. For each scenario,
+        decide which surface is the better fit.
+      </p>
+
+      <div class="quiz-container">
+        <h3>Browser vs. Cowork -- Choose Wisely</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 20px;">Read each scenario and click the correct answer. Immediate feedback will appear.</p>
+
+        <div class="quiz-score-bar">
+          <span class="score-label">Score</span>
+          <div class="quiz-score-track">
+            <div class="quiz-score-fill" id="decisionQuizScoreFill"></div>
+          </div>
+          <span class="quiz-score-text" id="decisionQuizScoreText">0 / 10</span>
+        </div>
+
+        <div id="decisionQuizQuestions">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         INTERACTIVE: END-OF-MODULE QUIZ
+         ======================================== -->
+    <section class="section" id="final-quiz">
+      <h2 class="section-heading">End-of-Module Quiz</h2>
+
+      <p>
+        Complete this quiz to finish Module 04. Your score will be saved to track your progress
+        through the training program. You need at least 3 out of 4 to pass.
+      </p>
+
+      <div class="final-quiz" id="finalQuizContainer">
+        <h3>Module 04: Assessment</h3>
+
+        <!-- Question 1 -->
+        <div class="final-quiz-question" data-fq="0">
+          <div class="fq-number">Question 1 of 4</div>
+          <div class="fq-text">
+            What is the primary advantage of Claude Cowork over using Claude.ai individually?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="0" data-fq-val="a" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="a"> It is faster at generating responses
+            </li>
+            <li class="fq-option" data-fq-idx="0" data-fq-val="b" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="b"> It provides shared team context, governance, and collaboration features
+            </li>
+            <li class="fq-option" data-fq-idx="0" data-fq-val="c" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="c"> It has access to more AI models
+            </li>
+            <li class="fq-option" data-fq-idx="0" data-fq-val="d" onclick="selectFinalOption(0, this)">
+              <input type="radio" name="fq0" value="d"> It is free for teams
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="final-quiz-question" data-fq="1">
+          <div class="fq-number">Question 2 of 4</div>
+          <div class="fq-text">
+            Which workspace role can manage team members and modify workspace settings?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="1" data-fq-val="a" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="a"> Viewer
+            </li>
+            <li class="fq-option" data-fq-idx="1" data-fq-val="b" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="b"> Member
+            </li>
+            <li class="fq-option" data-fq-idx="1" data-fq-val="c" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="c"> Admin
+            </li>
+            <li class="fq-option" data-fq-idx="1" data-fq-val="d" onclick="selectFinalOption(1, this)">
+              <input type="radio" name="fq1" value="d"> Only the Owner
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="final-quiz-question" data-fq="2">
+          <div class="fq-number">Question 3 of 4</div>
+          <div class="fq-text">
+            For a quick personal brainstorming session about your weekend plans, which Claude surface is most appropriate?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="2" data-fq-val="a" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="a"> Claude Cowork with team governance
+            </li>
+            <li class="fq-option" data-fq-idx="2" data-fq-val="b" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="b"> Claude.ai Browser
+            </li>
+            <li class="fq-option" data-fq-idx="2" data-fq-val="c" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="c"> Claude Code CLI
+            </li>
+            <li class="fq-option" data-fq-idx="2" data-fq-val="d" onclick="selectFinalOption(2, this)">
+              <input type="radio" name="fq2" value="d"> All surfaces are equally good
+            </li>
+          </ul>
+        </div>
+
+        <!-- Question 4 -->
+        <div class="final-quiz-question" data-fq="3">
+          <div class="fq-number">Question 4 of 4</div>
+          <div class="fq-text">
+            Why are audit logs important for enterprise Claude adoption?
+          </div>
+          <ul class="fq-options">
+            <li class="fq-option" data-fq-idx="3" data-fq-val="a" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="a"> They make Claude respond faster
+            </li>
+            <li class="fq-option" data-fq-idx="3" data-fq-val="b" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="b"> They provide accountability, compliance evidence, and usage tracking
+            </li>
+            <li class="fq-option" data-fq-idx="3" data-fq-val="c" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="c"> They improve the quality of Claude's responses
+            </li>
+            <li class="fq-option" data-fq-idx="3" data-fq-val="d" onclick="selectFinalOption(3, this)">
+              <input type="radio" name="fq3" value="d"> They are only needed for government customers
+            </li>
+          </ul>
+        </div>
+
+        <button class="final-submit-btn" id="finalSubmitBtn" onclick="submitFinalQuiz()" disabled>
+          Submit Answers
+        </button>
+
+        <div class="final-result" id="finalResult">
+          <h4 id="finalResultTitle"></h4>
+          <p id="finalResultText"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         NAVIGATION FOOTER
+         ======================================== -->
+    <nav class="module-nav">
+      <a href="03-claude-code-intro.html" class="nav-link prev">
+        <span class="nav-dir">&larr; Previous</span>
+        <span class="nav-title">Module 03: Claude Code Introduction</span>
+      </a>
+      <a href="10-browser-power-user.html" class="nav-link next">
+        <span class="nav-dir">Next &rarr;</span>
+        <span class="nav-title">Module 10: Browser Power User</span>
+      </a>
+    </nav>
+
+  </div>
+</main>
+
+<!-- ============================================
+     JAVASCRIPT
+     ============================================ -->
+<script>
+(function() {
+  'use strict';
+
+  // ==========================================
+  // THEME MANAGEMENT
+  // ==========================================
+  var THEME_KEY = 'claude-training-theme';
+
+  function getTheme() {
+    return localStorage.getItem(THEME_KEY) || 'light';
+  }
+
+  function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem(THEME_KEY, theme);
+    var icon = document.getElementById('themeIcon');
+    if (icon) {
+      icon.textContent = theme === 'dark' ? '\u2600' : '\u263E';
+    }
+  }
+
+  // Initialize theme
+  setTheme(getTheme());
+
+  document.getElementById('themeToggle').addEventListener('click', function() {
+    var current = getTheme();
+    setTheme(current === 'dark' ? 'light' : 'dark');
+  });
+
+  // ==========================================
+  // SIDEBAR MOBILE TOGGLE
+  // ==========================================
+  var hamburger = document.getElementById('hamburger');
+  var sidebar = document.getElementById('sidebar');
+  var overlay = document.getElementById('sidebarOverlay');
+
+  function toggleSidebar() {
+    var isOpen = sidebar.classList.contains('open');
+    sidebar.classList.toggle('open');
+    hamburger.classList.toggle('open');
+    if (isOpen) {
+      overlay.classList.remove('show');
+    } else {
+      overlay.classList.add('show');
+    }
+  }
+
+  hamburger.addEventListener('click', toggleSidebar);
+  overlay.addEventListener('click', toggleSidebar);
+
+  // ==========================================
+  // SIDEBAR SECTION COLLAPSING
+  // ==========================================
+  var sectionToggles = document.querySelectorAll('.sidebar-section-toggle');
+  for (var t = 0; t < sectionToggles.length; t++) {
+    (function(btn) {
+      btn.addEventListener('click', function() {
+        var sectionName = this.getAttribute('data-section');
+        var linksList = document.getElementById('nav-' + sectionName);
+        var isCollapsed = this.classList.contains('collapsed');
+
+        if (isCollapsed) {
+          this.classList.remove('collapsed');
+          linksList.classList.remove('collapsed');
+          linksList.style.maxHeight = linksList.scrollHeight + 'px';
+        } else {
+          this.classList.add('collapsed');
+          linksList.style.maxHeight = linksList.scrollHeight + 'px';
+          // Force reflow
+          linksList.offsetHeight;
+          linksList.classList.add('collapsed');
+        }
+      });
+
+      // Initialize: set max-height so transitions work
+      var sectionName = btn.getAttribute('data-section');
+      var linksList = document.getElementById('nav-' + sectionName);
+      if (linksList) {
+        linksList.style.maxHeight = linksList.scrollHeight + 'px';
+      }
+    })(sectionToggles[t]);
+  }
+
+  // ==========================================
+  // SCROLLSPY
+  // ==========================================
+  var sidebarLinks = document.querySelectorAll('.sidebar-link');
+  var sections = [];
+
+  for (var s = 0; s < sidebarLinks.length; s++) {
+    var targetId = sidebarLinks[s].getAttribute('data-target');
+    var sectionEl = document.getElementById(targetId);
+    if (sectionEl) {
+      sections.push({ el: sectionEl, link: sidebarLinks[s], id: targetId });
+    }
+  }
+
+  function updateScrollspy() {
+    var scrollPos = window.scrollY + 100;
+    var active = null;
+
+    for (var i = sections.length - 1; i >= 0; i--) {
+      if (sections[i].el.offsetTop <= scrollPos) {
+        active = sections[i];
+        break;
+      }
+    }
+
+    for (var j = 0; j < sidebarLinks.length; j++) {
+      sidebarLinks[j].classList.remove('active');
+    }
+    if (active) {
+      active.link.classList.add('active');
+    }
+
+    // Update progress based on scroll
+    updateSidebarProgress();
+  }
+
+  var scrollTimer = null;
+  window.addEventListener('scroll', function() {
+    if (scrollTimer) return;
+    scrollTimer = setTimeout(function() {
+      scrollTimer = null;
+      updateScrollspy();
+    }, 50);
+  });
+  updateScrollspy();
+
+  // Close mobile sidebar on link click
+  for (var k = 0; k < sidebarLinks.length; k++) {
+    sidebarLinks[k].addEventListener('click', function() {
+      if (window.innerWidth <= 1024) {
+        sidebar.classList.remove('open');
+        hamburger.classList.remove('open');
+        overlay.classList.remove('show');
+      }
+    });
+  }
+
+  // ==========================================
+  // SIDEBAR PROGRESS
+  // ==========================================
+  function updateSidebarProgress() {
+    var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    var scrolled = window.scrollY;
+    var pct = docHeight > 0 ? Math.min(100, (scrolled / docHeight) * 100) : 0;
+
+    var fill = document.getElementById('sidebarProgressFill');
+    if (fill) {
+      fill.style.width = pct + '%';
+    }
+  }
+
+  // ==========================================
+  // COPY TO CLIPBOARD
+  // ==========================================
+  window.copyCode = function(btn) {
+    var block = btn.closest('.code-block');
+    var codeEl = block.cloneNode(true);
+    var labelEl = codeEl.querySelector('.code-label');
+    var btnEl = codeEl.querySelector('.copy-btn');
+    if (labelEl) labelEl.remove();
+    if (btnEl) btnEl.remove();
+
+    var text = codeEl.textContent.trim();
+
+    navigator.clipboard.writeText(text).then(function() {
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() {
+        btn.textContent = 'Copy';
+        btn.classList.remove('copied');
+      }, 2000);
+    }).catch(function() {
+      btn.textContent = 'Failed';
+      setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+    });
+  };
+
+  // ==========================================
+  // WORKSPACE SETUP CHECKLIST
+  // ==========================================
+  var checklistData = [
+    {
+      title: 'Create workspace and choose a name',
+      tip: 'Pick a descriptive name that reflects the team or project. Examples: "Marketing Team", "Q2 Product Launch", "Engineering Platform". You can always rename it later.'
+    },
+    {
+      title: 'Invite team members and assign roles',
+      tip: 'Start with a small pilot group (3-5 people). Assign Admin to team leads who will manage settings, Member to active users, and Viewer to stakeholders who need visibility.'
+    },
+    {
+      title: 'Upload brand guidelines document',
+      tip: 'Your brand guide is the single most impactful shared context document. It ensures every response Claude generates matches your organization\'s voice and style.'
+    },
+    {
+      title: 'Upload product/service documentation',
+      tip: 'Include product descriptions, pricing pages, and technical specs. This prevents Claude from guessing or hallucinating details about your offerings.'
+    },
+    {
+      title: 'Write workspace-level custom instructions',
+      tip: 'Keep instructions concise and specific. Focus on: tone of voice, formatting preferences, compliance rules, and any domain-specific terminology the team uses.'
+    },
+    {
+      title: 'Create first shared prompt template',
+      tip: 'Start with the task your team does most frequently (e.g., drafting customer emails). Include an example of excellent output so Claude has a reference.'
+    },
+    {
+      title: 'Set usage policy guidelines',
+      tip: 'Document what the workspace should and should not be used for. This protects the organization and sets clear expectations for team members.'
+    },
+    {
+      title: 'Run a pilot conversation with the team',
+      tip: 'Have 2-3 team members test the workspace together. Note where Claude\'s responses miss the mark and adjust shared context or instructions accordingly.'
+    }
+  ];
+
+  var checklistState = [];
+  for (var ci = 0; ci < checklistData.length; ci++) {
+    checklistState.push(false);
+  }
+
+  function renderChecklist() {
+    var container = document.getElementById('checklistItems');
+    var html = '';
+
+    for (var i = 0; i < checklistData.length; i++) {
+      var item = checklistData[i];
+      html += '<div class="checklist-item" data-cl-idx="' + i + '" onclick="toggleChecklistItem(' + i + ')">';
+      html += '<div class="checklist-checkbox"><span class="check-icon">&#10003;</span></div>';
+      html += '<div class="checklist-content">';
+      html += '<div class="cl-title">' + (i + 1) + '. ' + item.title + '</div>';
+      html += '<div class="cl-tip">' + item.tip + '</div>';
+      html += '</div>';
+      html += '</div>';
+    }
+
+    container.innerHTML = html;
+  }
+
+  window.toggleChecklistItem = function(idx) {
+    checklistState[idx] = !checklistState[idx];
+
+    var itemEl = document.querySelector('.checklist-item[data-cl-idx="' + idx + '"]');
+    if (checklistState[idx]) {
+      itemEl.classList.add('checked');
+    } else {
+      itemEl.classList.remove('checked');
+    }
+
+    // Count checked
+    var checked = 0;
+    for (var i = 0; i < checklistState.length; i++) {
+      if (checklistState[i]) checked++;
+    }
+
+    // Update progress
+    var pct = (checked / checklistData.length) * 100;
+    var progressFill = document.getElementById('checklistProgressFill');
+    var progressText = document.getElementById('checklistProgressText');
+    progressFill.style.width = pct + '%';
+    progressText.textContent = checked + ' / ' + checklistData.length;
+
+    // Show completion message
+    var completeEl = document.getElementById('checklistComplete');
+    if (checked === checklistData.length) {
+      completeEl.classList.add('show');
+    } else {
+      completeEl.classList.remove('show');
+    }
+  };
+
+  renderChecklist();
+
+  // ==========================================
+  // DECISION MATRIX QUIZ
+  // ==========================================
+  var decisionData = [
+    {
+      scenario: 'Your marketing team needs to create consistent social media posts following brand guidelines',
+      correct: 'cowork',
+      explanation: 'Cowork lets you share brand guidelines as persistent context across the whole team, ensuring consistency.'
+    },
+    {
+      scenario: 'You personally want to brainstorm ideas for a blog post',
+      correct: 'browser',
+      explanation: 'Individual brainstorming is best in the Browser -- you do not need team context or governance for personal ideation.'
+    },
+    {
+      scenario: 'Your legal department needs to review contracts with strict audit trail requirements',
+      correct: 'cowork',
+      explanation: 'Cowork provides audit logs and governance controls required for legal compliance.'
+    },
+    {
+      scenario: 'You want to quickly translate a paragraph to Spanish',
+      correct: 'browser',
+      explanation: 'Simple, one-off translation tasks do not need team infrastructure -- Browser is fastest.'
+    },
+    {
+      scenario: 'Your sales team needs standardized proposal templates that follow company messaging',
+      correct: 'cowork',
+      explanation: 'Cowork\'s shared context and templates ensure every sales rep produces on-brand proposals.'
+    },
+    {
+      scenario: 'You want to analyze a personal spreadsheet for insights',
+      correct: 'browser',
+      explanation: 'Personal data analysis in Browser keeps your data private and does not need team features.'
+    },
+    {
+      scenario: 'Your HR department needs to create job descriptions that comply with company diversity guidelines',
+      correct: 'cowork',
+      explanation: 'Cowork\'s shared guidelines ensure all job descriptions meet company standards automatically.'
+    },
+    {
+      scenario: 'You are writing a personal cover letter',
+      correct: 'browser',
+      explanation: 'A personal cover letter is an individual task -- no need for team collaboration features.'
+    },
+    {
+      scenario: 'Your customer support team needs consistent, approved response templates',
+      correct: 'cowork',
+      explanation: 'Cowork enables shared templates with governance approval, ensuring all support responses meet quality standards.'
+    },
+    {
+      scenario: 'You want to quickly summarize an article you are reading',
+      correct: 'browser',
+      explanation: 'Quick individual summaries are fastest in the Browser -- no team overhead needed.'
+    }
+  ];
+
+  var decisionState = {
+    answered: 0,
+    correct: 0
+  };
+
+  function renderDecisionQuiz() {
+    var container = document.getElementById('decisionQuizQuestions');
+    var html = '';
+
+    for (var i = 0; i < decisionData.length; i++) {
+      var q = decisionData[i];
+      html += '<div class="decision-question" id="dq-' + i + '">';
+      html += '<div class="dq-text"><span class="dq-number">' + (i + 1) + '</span>' + q.scenario + '</div>';
+      html += '<div class="dq-buttons">';
+      html += '<button class="dq-btn" data-dq="' + i + '" data-choice="browser" onclick="answerDecisionQuiz(' + i + ',\'browser\')">Browser</button>';
+      html += '<button class="dq-btn" data-dq="' + i + '" data-choice="cowork" onclick="answerDecisionQuiz(' + i + ',\'cowork\')">Cowork</button>';
+      html += '</div>';
+      html += '<div class="dq-feedback" id="dq-feedback-' + i + '"></div>';
+      html += '</div>';
+    }
+
+    container.innerHTML = html;
+  }
+
+  window.answerDecisionQuiz = function(qIdx, choice) {
+    var question = decisionData[qIdx];
+    var questionEl = document.getElementById('dq-' + qIdx);
+    var feedbackEl = document.getElementById('dq-feedback-' + qIdx);
+    var buttons = questionEl.querySelectorAll('.dq-btn');
+
+    // Prevent re-answering
+    if (questionEl.classList.contains('correct') || questionEl.classList.contains('incorrect')) {
+      return;
+    }
+
+    decisionState.answered++;
+
+    var isCorrect = choice === question.correct;
+
+    for (var b = 0; b < buttons.length; b++) {
+      var btn = buttons[b];
+      btn.classList.add('disabled');
+      var btnChoice = btn.getAttribute('data-choice');
+      if (btnChoice === question.correct) {
+        btn.classList.add('correct-answer');
+      }
+      if (btnChoice === choice && !isCorrect) {
+        btn.classList.add('wrong-answer');
+      }
+    }
+
+    if (isCorrect) {
+      decisionState.correct++;
+      questionEl.classList.add('correct');
+      feedbackEl.className = 'dq-feedback show correct';
+      feedbackEl.textContent = 'Correct! ' + question.explanation;
+    } else {
+      questionEl.classList.add('incorrect');
+      feedbackEl.className = 'dq-feedback show incorrect';
+      feedbackEl.textContent = 'Not quite. ' + question.explanation;
+    }
+
+    // Update score
+    var scoreFill = document.getElementById('decisionQuizScoreFill');
+    var scoreText = document.getElementById('decisionQuizScoreText');
+    var pct = (decisionState.correct / decisionData.length) * 100;
+    scoreFill.style.width = pct + '%';
+    scoreText.textContent = decisionState.correct + ' / ' + decisionData.length;
+  };
+
+  renderDecisionQuiz();
+
+  // ==========================================
+  // FINAL QUIZ
+  // ==========================================
+  var FINAL_QUIZ_KEY = 'claude-training-module-04';
+
+  var finalQuizAnswers = ['b', 'c', 'b', 'b'];
+  var finalQuizSelections = [null, null, null, null];
+  var finalQuizSubmitted = false;
+
+  window.selectFinalOption = function(qIdx, el) {
+    if (finalQuizSubmitted) return;
+
+    // Deselect siblings
+    var parentQ = el.closest('.final-quiz-question');
+    var options = parentQ.querySelectorAll('.fq-option');
+    for (var o = 0; o < options.length; o++) {
+      options[o].querySelector('input').checked = false;
+      options[o].style.background = '';
+    }
+
+    // Select this one
+    el.querySelector('input').checked = true;
+    finalQuizSelections[qIdx] = el.getAttribute('data-fq-val');
+
+    // Enable submit if all answered
+    var allAnswered = true;
+    for (var a = 0; a < finalQuizSelections.length; a++) {
+      if (finalQuizSelections[a] === null) {
+        allAnswered = false;
+        break;
+      }
+    }
+    document.getElementById('finalSubmitBtn').disabled = !allAnswered;
+  };
+
+  window.submitFinalQuiz = function() {
+    if (finalQuizSubmitted) return;
+    finalQuizSubmitted = true;
+
+    var score = 0;
+
+    for (var idx = 0; idx < finalQuizSelections.length; idx++) {
+      var sel = finalQuizSelections[idx];
+      var questionEl = document.querySelector('.final-quiz-question[data-fq="' + idx + '"]');
+      var options = questionEl.querySelectorAll('.fq-option');
+
+      for (var o = 0; o < options.length; o++) {
+        var opt = options[o];
+        var val = opt.getAttribute('data-fq-val');
+        opt.style.pointerEvents = 'none';
+
+        if (val === finalQuizAnswers[idx]) {
+          if (sel === val) {
+            opt.classList.add('selected-correct');
+            score++;
+          } else {
+            opt.classList.add('reveal-correct');
+          }
+        } else if (val === sel) {
+          opt.classList.add('selected-wrong');
+        }
+      }
+    }
+
+    // Show result
+    var result = document.getElementById('finalResult');
+    var title = document.getElementById('finalResultTitle');
+    var text = document.getElementById('finalResultText');
+
+    result.classList.add('show');
+
+    if (score >= 3) {
+      result.classList.add('pass');
+      result.classList.remove('fail');
+      title.textContent = 'Passed! ' + score + ' / 4 correct';
+      text.textContent = 'Great work! You understand how Claude Cowork enables team collaboration with shared context and governance. ' +
+        'Your progress has been saved. Move on to Module 10: Browser Power User to continue your training.';
+    } else {
+      result.classList.add('fail');
+      result.classList.remove('pass');
+      title.textContent = score + ' / 4 correct -- Review needed';
+      text.textContent = 'You need at least 3 correct answers to pass. Review the material above and try again. ' +
+        'Pay special attention to the differences between Browser, Code, and Cowork use cases.';
+    }
+
+    // Save progress
+    var progressData = {
+      score: score,
+      total: 4,
+      completed: score >= 3,
+      timestamp: new Date().toISOString()
+    };
+    localStorage.setItem(FINAL_QUIZ_KEY, JSON.stringify(progressData));
+
+    // Disable submit button
+    document.getElementById('finalSubmitBtn').disabled = true;
+    document.getElementById('finalSubmitBtn').textContent = 'Submitted';
+  };
+
+  // Check for existing progress
+  function loadExistingProgress() {
+    var saved = localStorage.getItem(FINAL_QUIZ_KEY);
+    if (saved) {
+      try {
+        var data = JSON.parse(saved);
+        if (data.completed) {
+          var fill = document.getElementById('sidebarProgressFill');
+          if (fill) {
+            fill.style.width = '100%';
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+  }
+  loadExistingProgress();
+
+})();
+</script>
+</body>
+</html>
