@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#141726"/>
+      <stop offset="1" stop-color="#090B14"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <g fill="#CC785C">
+    <g id="petals">
+      <ellipse cx="256" cy="136" rx="33" ry="92.5"/>
+    </g>
+    <use href="#petals" transform="rotate(30 256 256)"/>
+    <use href="#petals" transform="rotate(60 256 256)"/>
+    <use href="#petals" transform="rotate(90 256 256)"/>
+    <use href="#petals" transform="rotate(120 256 256)"/>
+    <use href="#petals" transform="rotate(150 256 256)"/>
+    <use href="#petals" transform="rotate(180 256 256)"/>
+    <use href="#petals" transform="rotate(210 256 256)"/>
+    <use href="#petals" transform="rotate(240 256 256)"/>
+    <use href="#petals" transform="rotate(270 256 256)"/>
+    <use href="#petals" transform="rotate(300 256 256)"/>
+    <use href="#petals" transform="rotate(330 256 256)"/>
+  </g>
+  <g fill="#E0957A">
+    <g id="acc">
+      <ellipse cx="256" cy="191" rx="24" ry="37.5"/>
+    </g>
+    <use href="#acc" transform="rotate(30 256 256)"/>
+    <use href="#acc" transform="rotate(60 256 256)"/>
+    <use href="#acc" transform="rotate(90 256 256)"/>
+    <use href="#acc" transform="rotate(120 256 256)"/>
+    <use href="#acc" transform="rotate(150 256 256)"/>
+    <use href="#acc" transform="rotate(180 256 256)"/>
+    <use href="#acc" transform="rotate(210 256 256)"/>
+    <use href="#acc" transform="rotate(240 256 256)"/>
+    <use href="#acc" transform="rotate(270 256 256)"/>
+    <use href="#acc" transform="rotate(300 256 256)"/>
+    <use href="#acc" transform="rotate(330 256 256)"/>
+  </g>
+  <circle cx="256" cy="256" r="21" fill="#090B14"/>
+</svg>
