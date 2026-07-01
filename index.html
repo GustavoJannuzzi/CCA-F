@@ -180,7 +180,7 @@ img { max-width: 100%; height: auto; }
 
 /* ===== MOBILE / RESPONSIVE (UX) ===== */
 @media (max-width: 768px) {
-  .menu-toggle { display: flex !important; align-items: center; justify-content: center; top: calc(env(safe-area-inset-top) + 10px); left: calc(env(safe-area-inset-left) + 12px); }
+  .menu-toggle { display: flex !important; align-items: center; justify-content: center; top: max(18px, calc(env(safe-area-inset-top) + 8px)); left: max(14px, calc(env(safe-area-inset-left) + 12px)); }
   .sidebar-backdrop.show { display: block; }
 
   /* sidebar off-canvas, respeitando o topo seguro (notch/status bar) */
