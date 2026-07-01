@@ -752,7 +752,22 @@ Ferramentas: get_order_details, process_refund"""</span>)</pre>
   Ex.: 'onde está meu pedido', 'status do pedido #12345'"</span></pre>
     </div>
     <p>Regra de ouro: se dois devs discordariam sobre qual ferramenta usar para um input, a descrição está ruim. Adicione formatos de entrada, exemplos, casos extremos e um "NÃO use para → use X". Cuidado também com o <strong>system prompt</strong>: instruções sensíveis a palavra-chave podem sobrescrever descrições boas.</p>
-    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>Misrouting entre ferramentas similares → <strong>expandir as descrições</strong> (primeiro passo, baixo esforço, alta alavancagem). As distratoras "adicionar few-shot", "camada de roteamento por keywords" e "consolidar numa tool só" são overhead ou over-engineering que não atacam a causa raiz.</p></div>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div>
+      <p style="margin:0 0 8px"><strong>Misrouting</strong> é quando o Claude erra a escolha e chama a ferramenta errada. Acontece quando você tem duas tools parecidas.</p>
+      <p style="margin:0 0 8px"><strong>Por que acontece?</strong> O Claude escolhe qual ferramenta chamar lendo a <code>description</code> dela — não o nome, não o código, só o texto da descrição. Então, se ele erra, a causa raiz quase sempre é: as descrições estão <strong>fracas / ambíguas / parecidas demais</strong>.</p>
+      <p style="margin:0 0 4px"><strong>A correção (resposta certa):</strong> <strong>expandir as descrições</strong> — primeiro passo, baixo esforço, alta alavancagem. Deixe explícito:</p>
+      <ul class="bullets" style="margin-bottom:8px">
+        <li>pra que serve (input, formato)</li>
+        <li>exemplos de quando usar</li>
+        <li>quando NÃO usar ("para status de pedido, use <code>lookup_order</code>")</li>
+      </ul>
+      <p style="margin:0 0 4px"><strong>Distratoras (PEGADINHAS):</strong></p>
+      <ul class="bullets" style="margin:0">
+        <li>"adicionar few-shot" (dar ao modelo poucos exemplos de entrada→saída) → só adiciona overhead, não conserta a descrição</li>
+        <li>"camada de roteamento por keywords" → over-engineering</li>
+        <li>"consolidar numa tool só" → over-engineering desnecessário</li>
+      </ul>
+    </div>
   </div>
 
   <!-- 2.2 -->
