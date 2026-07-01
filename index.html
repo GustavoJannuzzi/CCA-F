@@ -223,6 +223,15 @@ img { max-width: 100%; height: auto; }
   .quiz-actions { flex-direction: column; }
   .quiz-actions .btn { width: 100%; }
 }
+
+/* ===== iOS WEB-APP (tela de início / standalone) =====
+   Em standalone o iOS coloca o conteúdo atrás da status bar, e o
+   env(safe-area-inset-top) muitas vezes retorna 0 (bug). Detectamos o modo
+   standalone via JS (classe .standalone no <html>) e garantimos um recuo
+   mínimo que sempre passa do relógio; se o env() funcionar, o max() usa o maior. */
+html.standalone .menu-toggle { top: max(56px, calc(env(safe-area-inset-top) + 8px)) !important; }
+html.standalone .main { padding-top: max(104px, calc(env(safe-area-inset-top) + 64px)) !important; }
+html.standalone .sidebar-logo { padding-top: max(56px, calc(env(safe-area-inset-top) + 16px)) !important; }
 .menu-toggle { display: none; position: fixed; top: 16px; left: 16px; z-index: 200; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; cursor: pointer; font-size: 18px; }
 
 /* DIAGRAMS & CODE EXAMPLES */
@@ -1824,6 +1833,13 @@ Pontos: 450 | Reclamação: cobrança dupla
 </main>
 
 <script>
+// Detecta modo web-app (tela de início do iOS ou PWA) para ajustar o layout à status bar.
+(function () {
+  var isStandalone = (window.navigator.standalone === true) ||
+    (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+  if (isStandalone) document.documentElement.classList.add('standalone');
+})();
+
 const QUESTIONS = [
   {id:"O1",domain:1,scenario:"Cenário 1: Customer Support",
    question:"Dados de produção mostram que em 12% dos casos, seu agente pula get_customer e chama lookup_order usando apenas o nome do cliente, levando a contas incorretas e reembolsos errados. Qual mudança abordaria mais efetivamente esse problema?",
