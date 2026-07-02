@@ -432,7 +432,7 @@ html.standalone .sidebar-logo { padding-top: max(56px, calc(env(safe-area-inset-
         <td><span class="wb wb-sdk">🧩 Agent SDK</span></td>
         <td>A biblioteca para você <strong>construir seu próprio agente</strong> em código (a app do Customer Support, do Multi-Agent Research...).</td>
         <td>O loop agêntico, os hooks, a orquestração coordenador-subagente, a definição de subagentes. Você escreve a lógica.</td>
-        <td>Loop com <code>stop_reason</code>, <code>PostToolUse</code> hooks, <code>Task</code> tool, <code>allowedTools</code>, <code>AgentDefinition</code>, <code>fork_session</code></td>
+        <td>Loop com <code>stop_reason</code>, hooks <code>PreToolUse</code>/<code>PostToolUse</code>, <code>Task</code> tool, <code>allowedTools</code>, <code>AgentDefinition</code>, <code>--fork-session</code></td>
       </tr>
       <tr>
         <td><span class="wb wb-api">🔌 Claude API</span></td>
@@ -478,6 +478,7 @@ html.standalone .sidebar-logo { padding-top: max(56px, calc(env(safe-area-inset-
 
     <div class="block-label">⚙️ Como funciona</div>
     <p>A cada resposta da API você inspeciona <code>stop_reason</code>. Se for <code>"tool_use"</code>, o Claude quer usar uma ferramenta — você executa, anexa o resultado ao histórico e chama de novo. Se for <code>"end_turn"</code>, ele terminou — você mostra a resposta. <strong>É a API que decide, não uma árvore de decisão sua.</strong></p>
+    <p style="margin-top:8px"><strong>Por que reenviar tudo?</strong> A Claude API é <em>stateless</em> — não guarda memória entre chamadas. Você reenvia o array <code>messages</code> inteiro a cada volta, e cada <code>tool_result</code> carrega o <code>tool_use_id</code> que o casa com a chamada correspondente (mais um <code>is_error</code> opcional). Esse "reenviar o histórico" é o que o Domínio 5 chama de gerenciar contexto.</p>
     <div class="code-ex">
       <div class="code-title">🐍 Loop agêntico mínimo (Agent SDK / API)</div>
       <pre><span class="hl-key">while</span> <span class="hl-val">True</span>:
@@ -626,9 +627,9 @@ Ferramentas: get_order_details, process_refund"""</span>)</pre>
     <div class="scenario-framing">No <em>Customer Support Agent</em>, a política diz: nunca processar reembolso sem verificar o cliente primeiro. Em 12% dos casos o agente pula <code>get_customer</code> e chama <code>process_refund</code> direto — risco financeiro real.</div>
 
     <div class="block-label">⚙️ Como funciona</div>
-    <p>Um <strong>gate programático</strong> bloqueia <code>process_refund</code> e <code>lookup_order</code> até que <code>get_customer</code> tenha retornado um ID verificado. Isso é código — uma garantia determinística — não uma instrução no prompt que o modelo "deveria" seguir.</p>
+    <p>Um <strong>gate programático</strong> — um hook <code>PreToolUse</code>, que roda <em>antes</em> da ferramenta — bloqueia <code>process_refund</code> e <code>lookup_order</code> até que <code>get_customer</code> tenha retornado um ID verificado. Isso é código — uma garantia determinística — não uma instrução no prompt que o modelo "deveria" seguir.</p>
     <div class="code-ex">
-      <div class="code-title">Gate de pré-requisito (Agent SDK)</div>
+      <div class="code-title">🧩 PreToolUse — gate de pré-requisito (Agent SDK)</div>
       <pre><span class="hl-key">def</span> antes_da_ferramenta(tool, state):
     <span class="hl-key">if</span> tool.name == <span class="hl-str">"process_refund"</span> <span class="hl-key">and</span> <span class="hl-key">not</span> state.customer_verified:
         <span class="hl-key">return</span> bloquear(<span class="hl-str">"Verifique o cliente com get_customer primeiro"</span>)
@@ -640,28 +641,58 @@ Ferramentas: get_order_details, process_refund"""</span>)</pre>
 
   <!-- 1.5 -->
   <div class="content-block" id="d1-1.5">
-    <div class="task-header"><span class="task-id">1.5</span><span class="task-title">Hooks do Agent SDK (interceptação & normalização)</span></div>
+    <div class="task-header"><span class="task-id">1.5</span><span class="task-title">Hooks do Agent SDK — PreToolUse (bloqueia) vs PostToolUse (transforma)</span></div>
     <div class="where-badges">
       <span class="wb wb-sdk">🧩 Agent SDK</span>
       <span class="wb wb-cli">🖥️ Claude Code</span>
       <span class="wb wb-api wb-off">🔌 Claude API</span>
       <span class="wb wb-mcp wb-off">🌐 MCP</span>
     </div>
-    <div class="concept-line"><strong>Em uma frase:</strong> hooks são pontos de interceptação determinísticos. <code>PostToolUse</code> transforma o <em>resultado</em> de uma ferramenta antes do modelo ver; hooks de interceptação de chamada bloqueiam <em>ações</em> que violam regras de negócio.</div>
+    <div class="concept-line"><strong>Em uma frase:</strong> hooks são pontos de interceptação <strong>determinísticos</strong> ligados a eventos do agente. Os dois que mais caem: <code>PreToolUse</code> roda <em>antes</em> da ferramenta e pode <strong>bloquear/negar</strong> a ação; <code>PostToolUse</code> roda <em>depois</em> e <strong>transforma o resultado</strong> antes do modelo ver.</div>
 
     <div class="block-label">📦 O cenário</div>
-    <div class="scenario-framing">No <em>Customer Support Agent</em>, suas ferramentas MCP retornam datas em formatos diferentes (Unix timestamp, ISO 8601, código numérico). Um <code>PostToolUse</code> normaliza tudo para um formato só antes do agente raciocinar — e outro hook bloqueia reembolsos acima de R$500, redirecionando para escalação humana.</div>
+    <div class="scenario-framing">No <em>Customer Support Agent</em>, duas regras. (1) Reembolso acima de R$500 <strong>não pode</strong> ser processado sem aprovação humana — precisa ser barrado <em>antes</em> de executar → <code>PreToolUse</code>. (2) Suas ferramentas MCP retornam datas em formatos diferentes (Unix, ISO 8601, código numérico) — normalize tudo <em>depois</em> que a ferramenta responde → <code>PostToolUse</code>.</div>
 
-    <div class="block-label">⚙️ Como funciona</div>
+    <div class="block-label">⚙️ Como funciona — a linha do tempo importa</div>
+    <div class="diagram-box">
+      <div class="diagram-label">⏱️ Onde cada hook entra</div>
+      <pre>
+  modelo pede a ferramenta
+        │
+        ▼
+   ┌────────────┐  pode NEGAR aqui  (permissionDecision: "deny")
+   │ PreToolUse │──✗──▶ ação bloqueada → escala p/ humano
+   └────────────┘  ← reembolso &gt; R$500, gate de verificação
+        │ (permitido)
+        ▼
+   FERRAMENTA EXECUTA   (dinheiro sai, query roda…)
+        │
+        ▼
+   ┌────────────┐  transforma/apara o RESULTADO
+   │ PostToolUse│──▶ datas normalizadas, 45 campos → 5
+   └────────────┘  ← nunca bloqueia: a ação já aconteceu
+        │
+        ▼
+   resultado limpo entra no contexto do modelo</pre>
+    </div>
     <div class="code-ex">
-      <div class="code-title">PostToolUse — normalizar datas heterogêneas</div>
+      <div class="code-title">🚫 PreToolUse — bloqueia ANTES (nega a ação)</div>
+      <pre><span class="hl-key">def</span> pre_tool_use(tool_name, tool_input):
+    <span class="hl-key">if</span> tool_name == <span class="hl-str">"process_refund"</span> <span class="hl-key">and</span> tool_input[<span class="hl-str">"amount"</span>] &gt; <span class="hl-val">500</span>:
+        <span class="hl-key">return</span> {<span class="hl-str">"hookSpecificOutput"</span>: {
+            <span class="hl-key">"hookEventName"</span>: <span class="hl-str">"PreToolUse"</span>,
+            <span class="hl-key">"permissionDecision"</span>: <span class="hl-str">"deny"</span>,   <span class="hl-cmt"># allow | deny | ask | defer</span>
+            <span class="hl-key">"permissionDecisionReason"</span>: <span class="hl-str">"&gt; R$500 exige aprovação humana"</span>}}</pre>
+    </div>
+    <div class="code-ex">
+      <div class="code-title">🧹 PostToolUse — transforma DEPOIS (o resultado)</div>
       <pre><span class="hl-key">def</span> post_tool_use(tool_name, result):
     <span class="hl-key">if</span> <span class="hl-str">"date"</span> <span class="hl-key">in</span> result:
         result[<span class="hl-str">"date"</span>] = para_iso8601(result[<span class="hl-str">"date"</span>])  <span class="hl-cmt"># formato único</span>
-    <span class="hl-key">return</span> result</pre>
+    <span class="hl-key">return</span> result  <span class="hl-cmt"># resultado limpo p/ o modelo</span></pre>
     </div>
-    <p>O ponto-chave do exame: hook = <strong>garantia determinística</strong>; prompt = <strong>conformidade probabilística</strong>. Quando a regra de negócio exige compliance garantido, escolha hook.</p>
-    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>"Bloquear reembolsos acima de um limite" ou "garantir que uma regra seja sempre aplicada" → hook de interceptação. Hooks também são ótimos para <strong>aparar tool results verbosos</strong> (ligação com o Domínio 5).</p></div>
+    <p style="margin-top:12px">O ponto-chave do exame: hook = <strong>garantia determinística</strong>; prompt = <strong>conformidade probabilística</strong>. E o <em>timing</em> decide qual hook: se precisa <strong>impedir</strong> algo, é <code>PreToolUse</code> (antes); se é <strong>ajustar o que voltou</strong>, é <code>PostToolUse</code> (depois). No <span class="wb wb-cli" style="padding:1px 8px">🖥️ Claude Code</span> os mesmos hooks vivem no <code>settings.json</code>.</p>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p><strong>Bloquear</strong> uma ação (reembolso acima do limite, gate de verificação) → <code>PreToolUse</code> com <code>permissionDecision: "deny"</code>, porque roda <em>antes</em> de executar. <code>PostToolUse</code> roda <em>depois</em> — serve para <strong>normalizar/aparar</strong> tool results verbosos (ligação com o Domínio 5), nunca para impedir a ação (que já aconteceu).</p></div>
   </div>
 
   <!-- 1.6 -->
@@ -701,7 +732,7 @@ Ferramentas: get_order_details, process_refund"""</span>)</pre>
       <span class="wb wb-api wb-off">🔌 Claude API</span>
       <span class="wb wb-mcp wb-off">🌐 MCP</span>
     </div>
-    <div class="concept-line"><strong>Em uma frase:</strong> <code>--resume &lt;nome&gt;</code> continua uma sessão nomeada; <code>fork_session</code> cria ramos paralelos a partir de uma base comum. Mas quando os tool results estão obsoletos, <strong>começar uma sessão nova com um resumo estruturado é mais confiável</strong> que retomar.</div>
+    <div class="concept-line"><strong>Em uma frase:</strong> <code>--resume &lt;nome&gt;</code> (ou <code>-c</code>/<code>--continue</code>) continua uma sessão; <code>--fork-session</code> ao retomar cria um <em>novo</em> id (preservando o original), e <code>/fork</code> abre um subagente que herda a conversa. Mas quando os tool results estão obsoletos, <strong>começar uma sessão nova com um resumo estruturado é mais confiável</strong> que retomar.</div>
 
     <div class="block-label">📦 O cenário</div>
     <div class="scenario-framing">No <em>Developer Productivity</em>, você analisou um codebase ontem. Hoje os arquivos mudaram. Retomar a sessão antiga traz resultados de ferramentas obsoletos (o conteúdo já não bate). Forkar é útil para comparar duas abordagens de refatoração a partir da mesma análise base.</div>
@@ -710,7 +741,7 @@ Ferramentas: get_order_details, process_refund"""</span>)</pre>
     <div class="two-col">
       <div><div class="col-header" style="color:var(--success)">✅ Resume / fork</div><ul class="bullets">
         <li><code>--resume</code>: contexto anterior ainda majoritariamente válido</li>
-        <li><code>fork_session</code>: explorar caminhos divergentes da mesma base</li>
+        <li><code>--fork-session</code> / <code>/fork</code>: explorar caminhos divergentes da mesma base</li>
       </ul></div>
       <div><div class="col-header" style="color:var(--warning)">🆕 Sessão nova + resumo</div><ul class="bullets">
         <li>Quando tool results estão obsoletos/contaminados</li>
@@ -779,7 +810,7 @@ Ferramentas: get_order_details, process_refund"""</span>)</pre>
       <span class="wb wb-api wb-off">🔌 Claude API</span>
       <span class="wb wb-cli wb-off">🖥️ Claude Code</span>
     </div>
-    <div class="concept-line"><strong>Em uma frase:</strong> a flag <code>isError</code> comunica falha ao agente — mas um erro genérico ("Operation failed") impede recuperação inteligente. Retorne <strong>metadados estruturados</strong>: categoria, se é retryável, e descrição legível.</div>
+    <div class="concept-line"><strong>Em uma frase:</strong> a flag <code>isError</code> comunica falha ao agente — mas um erro genérico ("Operation failed") impede recuperação inteligente. Retorne <strong>metadados estruturados</strong>: categoria, se é retryável, e descrição legível. <em>Atenção: só <code>isError</code> é campo do protocolo MCP — o resto é convenção sua, dentro do conteúdo do resultado.</em></div>
 
     <div class="block-label">📦 O cenário</div>
     <div class="scenario-framing">Sua ferramenta <code>process_refund</code> pode falhar por motivos muito diferentes: timeout (transitório), input inválido (validação), valor acima da política (negócio), sem permissão. O agente precisa saber qual é para decidir: tentar de novo? explicar ao cliente? escalar?</div>
@@ -788,9 +819,9 @@ Ferramentas: get_order_details, process_refund"""</span>)</pre>
     <div class="code-ex">
       <div class="code-title">Erro estruturado</div>
       <pre>{
-  <span class="hl-key">"isError"</span>: <span class="hl-val">true</span>,
-  <span class="hl-key">"errorCategory"</span>: <span class="hl-str">"business"</span>,   <span class="hl-cmt"># transient | validation | business | permission</span>
-  <span class="hl-key">"isRetryable"</span>: <span class="hl-val">false</span>,
+  <span class="hl-key">"isError"</span>: <span class="hl-val">true</span>,              <span class="hl-cmt"># ← único campo do PROTOCOLO MCP</span>
+  <span class="hl-key">"errorCategory"</span>: <span class="hl-str">"business"</span>,  <span class="hl-cmt"># daqui p/ baixo = convenção SUA, no conteúdo:</span>
+  <span class="hl-key">"isRetryable"</span>: <span class="hl-val">false</span>,        <span class="hl-cmt">#   transient | validation | business | permission</span>
   <span class="hl-key">"message"</span>: <span class="hl-str">"Reembolso acima de R$500 exige aprovação humana"</span>
 }</pre>
     </div>
@@ -911,9 +942,9 @@ Ferramentas: get_order_details, process_refund"""</span>)</pre>
   CLAUDE.md  (raiz)            ← TIME (versionado ✓)
   .claude/CLAUDE.md            ← TIME (versionado ✓)
   backend/CLAUDE.md            ← específico do diretório
-       └─ @import ../docs/standards.md   ← reusa padrão compartilhado</pre>
+       └─ @../docs/standards.md   ← importa padrão compartilhado</pre>
     </div>
-    <p><code>@import</code> mantém o arquivo modular (uma fonte de verdade compartilhada). Para arquivos enormes, prefira dividir em <code>.claude/rules/</code> (ver 3.3). Use <code>/memory</code> para ver quais arquivos de memória estão carregados e diagnosticar comportamento inconsistente.</p>
+    <p>A sintaxe de import é <code>@caminho</code> (ex.: <code>@../docs/standards.md</code>) — <strong>não</strong> existe uma palavra-chave <code>@import</code>. Ela mantém o arquivo modular (uma fonte de verdade compartilhada). Para arquivos enormes, prefira dividir em <code>.claude/rules/</code> (ver 3.3). Use <code>/memory</code> para ver quais arquivos de memória estão carregados e diagnosticar comportamento inconsistente.</p>
     <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>"Membro novo do time não recebe as instruções" → estão no <strong>nível de usuário</strong>, deviam estar no <strong>nível de projeto</strong> (versionado). Esse é o diagnóstico de hierarquia mais cobrado.</p></div>
   </div>
 
@@ -1527,7 +1558,8 @@ Pontos: 450 | Reclamação: cobrança dupla
       <tr><td>tool_choice — pode chamar ou retornar texto</td><td><code>"auto"</code></td></tr>
       <tr><td>tool_choice — DEVE chamar alguma ferramenta</td><td><code>"any"</code></td></tr>
       <tr><td>tool_choice — DEVE chamar ferramenta específica</td><td><code>{"type":"tool","name":"X"}</code></td></tr>
-      <tr><td>Interceptar resultados de ferramentas</td><td><code>PostToolUse</code> hook</td></tr>
+      <tr><td>Bloquear/negar uma ação antes de executar</td><td><code>PreToolUse</code> hook (deny)</td></tr>
+      <tr><td>Interceptar/transformar resultados de ferramentas</td><td><code>PostToolUse</code> hook</td></tr>
       <tr><td>Batch API — economia de custo</td><td>50%</td></tr>
       <tr><td>Batch API — janela de processamento</td><td>até 24 horas</td></tr>
       <tr><td>Batch API — SLA de latência</td><td>Não garantido</td></tr>
@@ -1539,6 +1571,7 @@ Pontos: 450 | Reclamação: cobrança dupla
     <table class="ref-table">
       <tr><th>Situação</th><th class="tag-wrong">Resposta Errada</th><th class="tag-correct">Resposta Correta</th></tr>
       <tr><td>Enforçar sequência de ferramentas crítica</td><td class="tag-wrong">System prompt</td><td class="tag-correct">Hook programático</td></tr>
+      <tr><td>Bloquear ação acima de um limite (ex: refund &gt; $500)</td><td class="tag-wrong">PostToolUse (roda depois)</td><td class="tag-correct">PreToolUse (nega antes de executar)</td></tr>
       <tr><td>Melhorar seleção de ferramentas similares</td><td class="tag-wrong">Few-shot examples</td><td class="tag-correct">Expandir tool descriptions</td></tr>
       <tr><td>Calibrar escalation do agente</td><td class="tag-wrong">Score de confiança</td><td class="tag-correct">Few-shot com critérios explícitos</td></tr>
       <tr><td>Processar verificação pré-merge</td><td class="tag-wrong">Message Batches API</td><td class="tag-correct">Synchronous API</td></tr>
@@ -1643,7 +1676,7 @@ Pontos: 450 | Reclamação: cobrança dupla
     <div class="task-header" style="margin-top:16px"><span class="task-id">1.5</span><span class="task-title">Aplicar Agent SDK hooks para interceptar tool calls e normalizar dados</span></div>
     <ul class="bullets">
       <li><code>PostToolUse</code> hooks interceptam resultados de ferramentas para transformá-los antes do modelo processar (ex: normalizar Unix timestamp, ISO 8601 e códigos numéricos vindos de MCP tools diferentes).</li>
-      <li>Hooks que interceptam tool calls de saída para impor regras de negócio (ex: bloquear refund acima de $500 e redirecionar para escalação).</li>
+      <li>Para <strong>bloquear</strong> uma ação que viola regra de negócio (ex: refund acima de $500), use <code>PreToolUse</code> — roda <em>antes</em> da ferramenta e pode negar (<code>permissionDecision: "deny"</code>). <code>PostToolUse</code> roda depois, então não serve para bloquear.</li>
       <li>Escolha hooks quando a regra exige garantia determinística; prompt serve para compliance apenas probabilístico.</li>
     </ul>
     <div class="task-header" style="margin-top:16px"><span class="task-id">1.6</span><span class="task-title">Projetar estratégias de decomposição de tarefas para workflows complexos</span></div>
@@ -1654,7 +1687,7 @@ Pontos: 450 | Reclamação: cobrança dupla
     </ul>
     <div class="task-header" style="margin-top:16px"><span class="task-id">1.7</span><span class="task-title">Gerenciar estado de sessão, retomada e forking</span></div>
     <ul class="bullets">
-      <li><code>--resume &lt;session-name&gt;</code> retoma uma conversa específica; <code>fork_session</code> cria branches independentes a partir de uma baseline compartilhada para explorar abordagens divergentes.</li>
+      <li><code>--resume &lt;session-name&gt;</code> (ou <code>-c</code>/<code>--continue</code>) retoma uma conversa; <code>--fork-session</code> cria um novo id ao retomar (preservando o original) e <code>/fork</code> abre um subagente que herda a conversa — para explorar abordagens divergentes.</li>
       <li>Ao retomar após mudanças em arquivos, avise o agente sobre o que mudou para re-análise direcionada.</li>
       <li>Começar uma sessão nova com um resumo estruturado é mais confiável do que dar <code>--resume</code> arrastando tool results desatualizados.</li>
     </ul>
@@ -1671,7 +1704,7 @@ Pontos: 450 | Reclamação: cobrança dupla
     <div class="task-header" style="margin-top:16px"><span class="task-id">2.2</span><span class="task-title">Implementar respostas de erro estruturadas para MCP tools</span></div>
     <ul class="bullets">
       <li>O flag <code>isError</code> comunica falhas ao agente. Distinga erros transient (timeout, indisponibilidade), de validation (input inválido), de business (violação de política) e de permission.</li>
-      <li>Retorne metadados: <code>errorCategory</code>, <code>isRetryable</code> boolean e descrição legível. Erro genérico ("Operation failed") impede o agente de decidir a recuperação.</li>
+      <li>Retorne metadados <strong>dentro do conteúdo do resultado</strong> — só <code>isError</code> é campo do protocolo MCP; <code>errorCategory</code>, <code>isRetryable</code> boolean e descrição legível são convenção da sua app. Erro genérico ("Operation failed") impede o agente de decidir a recuperação.</li>
       <li>Subagents fazem recuperação local para falhas transitórias e só propagam ao coordinator o que não conseguem resolver. Distinga access failure (precisa decidir retry) de resultado vazio válido (query com zero matches).</li>
     </ul>
     <div class="task-header" style="margin-top:16px"><span class="task-id">2.3</span><span class="task-title">Distribuir tools entre agents e configurar tool choice</span></div>
@@ -1699,7 +1732,7 @@ Pontos: 450 | Reclamação: cobrança dupla
     <div class="task-header"><span class="task-id">3.1</span><span class="task-title">Configurar CLAUDE.md com hierarquia, escopo e organização modular</span></div>
     <ul class="bullets">
       <li>Hierarquia: user-level (<code>~/.claude/CLAUDE.md</code>), project-level (<code>.claude/CLAUDE.md</code> ou <code>CLAUDE.md</code> na raiz) e directory-level (subpastas). O user-level NÃO é compartilhado com o time via version control.</li>
-      <li><code>@import</code> referencia arquivos externos para manter o CLAUDE.md modular. <code>.claude/rules/</code> organiza regras por tópico em vez de um CLAUDE.md monolítico.</li>
+      <li><code>@caminho</code> (ex.: <code>@../docs/standards.md</code>, sem a palavra "import") referencia arquivos externos para manter o CLAUDE.md modular. <code>.claude/rules/</code> organiza regras por tópico em vez de um CLAUDE.md monolítico.</li>
       <li>Use <code>/memory</code> para ver quais arquivos de memória estão carregados e diagnosticar comportamento inconsistente.</li>
     </ul>
     <div class="task-header" style="margin-top:16px"><span class="task-id">3.2</span><span class="task-title">Criar e configurar slash commands e skills customizados</span></div>
