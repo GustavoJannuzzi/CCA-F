@@ -1,0 +1,33 @@
+{
+  "// nota": "settings.json do PROJETO (versionado). Hooks e permissões do time.",
+
+  "permissions": {
+    "allow": ["Read", "Grep", "Glob", "Edit"],
+    "// ask": "Bash pede confirmação; útil para não rodar comandos sem revisar",
+    "ask": ["Bash"]
+  },
+
+  "hooks": {
+    "// PostToolUse": "roda DEPOIS da ferramenta. Ideal para automatizar lint",
+    "// depois de editar um arquivo. Isto é GARANTIA — não uma instrução de prompt.",
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          { "type": "command", "command": "npx eslint --fix \"$CLAUDE_FILE_PATHS\"" }
+        ]
+      }
+    ],
+
+    "// PreToolUse": "roda ANTES. Use para BLOQUEAR/negar uma ação (ex.: barrar",
+    "// um comando perigoso). No exame: bloquear = PreToolUse; transformar = PostToolUse.",
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "./.claude/scripts/checar-comando.sh" }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "// nota": "MCP DO TIME: fica em .mcp.json na RAIZ do projeto e é versionado,",
+  "// nota2": "para todos do time terem o mesmo servidor. MCP pessoal/experimental",
+  "// nota3": "iria em ~/.claude.json. Deploy/hospedagem do MCP está FORA do escopo do exame.",
+
+  "mcpServers": {
+    "crm": {
+      "command": "python",
+      "args": ["-m", "crm_mcp_server"],
+      "env": {
+        "// CRM_API_KEY": "referencie via env; nunca comite segredos",
+        "CRM_API_KEY": "${CRM_API_KEY}"
+      }
+    }
+  }
+}

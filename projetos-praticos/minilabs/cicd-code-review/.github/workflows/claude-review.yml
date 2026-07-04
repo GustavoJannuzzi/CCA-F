@@ -1,0 +1,43 @@
+name: Claude PR Review
+
+# Dispara em cada PR. Em CI não há humano no terminal -> tudo headless.
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # precisa do histórico para gerar o diff do PR
+
+      - name: Instalar Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Rodar review headless
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          # diff do PR contra a base
+          git diff origin/${{ github.base_ref }}...HEAD > /tmp/pr.diff
+
+          # -p / --print  : NÃO-INTERATIVO (não trava esperando input) -> a chave em CI
+          # --output-format json : saída estruturada p/ o passo seguinte parsear
+          # --max-turns   : teto de turnos = controle de custo
+          claude -p "$(cat prompt-review.md)
+
+          DIFF A REVISAR:
+          $(cat /tmp/pr.diff)" \
+            --output-format json \
+            --max-turns 6 \
+            > review.json
+
+      - name: Publicar comentário no PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # extrai o texto do JSON e posta como comentário
+          jq -r '.result' review.json > review.md
+          gh pr comment ${{ github.event.pull_request.number }} --body-file review.md
