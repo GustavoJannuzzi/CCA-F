@@ -104,6 +104,8 @@ ul.bullets li::before { content: "▸"; position: absolute; left: 0; color: var(
 .trap-box { background: rgba(248,113,113,.07); border: 1px solid rgba(248,113,113,.2); border-radius: 8px; padding: 12px 16px; margin-top: 14px; }
 .trap-box-header { font-size: 11px; font-weight: 700; color: var(--error); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
 .trap-box p { font-size: 13px; color: var(--text2); margin: 0; }
+.trap-box p + p { margin-top: 7px; }
+.trap-box p strong { color: var(--text); }
 code { background: rgba(56,189,248,.1); color: var(--accent); padding: 1px 6px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 12px; }
 .tip-box { background: rgba(124,106,247,.08); border: 1px solid rgba(124,106,247,.2); border-radius: 8px; padding: 12px 16px; margin-top: 14px; }
 .tip-box-header { font-size: 11px; font-weight: 700; color: var(--secondary); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
@@ -288,6 +290,23 @@ html.standalone .sidebar-logo { padding-top: max(56px, calc(env(safe-area-inset-
 .block-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; margin: 18px 0 8px; color: var(--text3); }
 .scenario-framing { font-size: 13px; color: var(--text2); background: rgba(124,106,247,.05); border: 1px solid rgba(124,106,247,.15); border-radius: 8px; padding: 12px 16px; margin-bottom: 8px; line-height: 1.55; }
 .scenario-framing em { color: var(--secondary); font-style: normal; font-weight: 600; }
+
+/* MODELO MENTAL — card expansível (colapsado por padrão; não infla o scroll) */
+details.mental-model { margin: 14px 0 0; border: 1px solid rgba(204,120,92,.28); border-radius: 8px; background: rgba(204,120,92,.05); }
+details.mental-model > summary { list-style: none; cursor: pointer; padding: 11px 15px; font-size: 12.5px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 6px; user-select: none; border-radius: 8px; }
+details.mental-model > summary::-webkit-details-marker { display: none; }
+details.mental-model > summary:hover { background: rgba(204,120,92,.09); }
+details.mental-model[open] > summary { border-bottom: 1px solid rgba(204,120,92,.18); border-radius: 8px 8px 0 0; }
+.mm-hint { font-weight: 400; color: var(--text3); font-size: 12px; }
+.mm-chevron { margin-left: auto; font-size: 10px; color: var(--text3); transition: transform .2s; }
+details.mental-model[open] .mm-chevron { transform: rotate(180deg); }
+.mm-body { padding: 12px 15px 14px; font-size: 13px; color: var(--text2); line-height: 1.62; }
+.mm-body p { margin: 0 0 10px; }
+.mm-body p:last-child { margin-bottom: 0; }
+.mm-body code { font-size: 11.5px; }
+.mm-body strong { color: var(--text); }
+.mm-analogy { border-left: 3px solid var(--primary); padding: 8px 12px; background: rgba(204,120,92,.07); border-radius: 0 6px 6px 0; margin: 4px 0 12px; color: var(--text2); }
+.mm-analogy strong { color: var(--primary); }
 </style>
 </head>
 <body>
@@ -538,6 +557,16 @@ html.standalone .sidebar-logo { padding-top: max(56px, calc(env(safe-area-inset-
     </div>
     <div class="concept-line"><strong>Em uma frase:</strong> o loop agêntico é o ciclo "mando pro Claude → ele pede uma ferramenta → eu executo → devolvo o resultado → ele decide o próximo passo", repetindo até ele terminar. Quem controla esse ciclo é o campo <code>stop_reason</code>.</div>
 
+    <details class="mental-model">
+      <summary>🧠 Modelo mental<span class="mm-hint"> · por que a API não "roda" sozinha</span><span class="mm-chevron">▾</span></summary>
+      <div class="mm-body">
+        <p>A Claude API é uma <strong>função sem memória</strong>: você manda o histórico, ela devolve <em>uma</em> resposta e esquece tudo. Ela não "executa" nem "continua trabalhando" — responde uma vez e para.</p>
+        <p>O <strong>agente não é a API</strong> — é o <strong>loop que você constrói em volta dela</strong>. Você é o motor: chama, lê o <code>stop_reason</code>, executa a ferramenta, chama de novo. O Claude decide <em>o quê</em> fazer; seu código faz acontecer, repetidamente, até o <code>stop_reason</code> dizer <code>end_turn</code>.</p>
+        <div class="mm-analogy"><strong>Analogia:</strong> o Claude é um consultor brilhante ao telefone, mas com amnésia entre as ligações. A cada chamada você relê o caso inteiro (o array <code>messages</code>), ele diz o próximo passo, você executa e liga de novo com o resultado. O loop é você discando outra vez.</div>
+        <p>Um chatbot é <em>um</em> turno (pergunta→resposta). Um agente é a <em>mesma</em> API dentro de um <code>while</code> que realimenta os resultados. Mesmo motor, invólucro diferente.</p>
+      </div>
+    </details>
+
     <div class="block-label">📦 O cenário</div>
     <div class="scenario-framing">Você está construindo o <em>Customer Support Resolution Agent</em> (Cenário 1) com o Agent SDK. O cliente escreve "meu pedido veio errado". Você não sabe de antemão quantas ferramentas o agente vai precisar chamar — ele decide na hora: buscar o cliente, depois o pedido, depois avaliar reembolso. O loop é o que permite essa autonomia.</div>
 
@@ -583,7 +612,7 @@ html.standalone .sidebar-logo { padding-top: max(56px, calc(env(safe-area-inset-
         <li>Usar um limite fixo de iterações como mecanismo <em>primário</em> de parada</li>
       </ul></div>
     </div>
-    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>Se a questão diz "o loop para cedo / resposta incompleta", a resposta é <strong>usar <code>stop_reason</code></strong>, não parsear o texto da resposta. Analisar linguagem natural para decidir parada e caps arbitrários de iteração são as distratoras clássicas.</p></div>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p><strong>Se a questão mostra:</strong> o loop do agente para cedo ou entrega resposta incompleta.</p><p><strong>Resposta certa:</strong> controlar a parada pelo campo <code>stop_reason</code> — parar só quando for <code>end_turn</code>. É o sinal oficial da API.</p><p><strong>Pegadinhas:</strong> procurar no texto frases tipo "tarefa concluída" para decidir parar (o modelo pode dizer isso e ainda querer chamar ferramenta); usar um limite fixo de iterações como mecanismo <em>principal</em> de parada.</p></div>
     <div class="docs-box">
       <div class="docs-box-header">📚 Documentação oficial</div>
       <ul>
@@ -603,6 +632,16 @@ html.standalone .sidebar-logo { padding-top: max(56px, calc(env(safe-area-inset-
       <span class="wb wb-mcp wb-off">🌐 MCP</span>
     </div>
     <div class="concept-line"><strong>Em uma frase:</strong> um agente <em>coordenador</em> decompõe a tarefa e delega pedaços a <em>subagentes</em> especializados (hub-and-spoke). Toda comunicação passa pelo coordenador — subagentes não conversam entre si.</div>
+
+    <details class="mental-model">
+      <summary>🧠 Modelo mental<span class="mm-hint"> · 1 agente vs um time de agentes</span><span class="mm-chevron">▾</span></summary>
+      <div class="mm-body">
+        <p>O padrão é <strong>um agente só</strong>: um contexto, um loop de ferramentas, faz tudo. Multi-agente é um <strong>coordenador</strong> que fatia o trabalho e entrega pedaços a <strong>subagentes especializados</strong> — cada um com seu <em>próprio</em> contexto do zero.</p>
+        <p>Por que dividir? Dois motivos: <strong>especialização</strong> (um agente "busca" e outro "sintetiza" focam melhor que um generalista) e <strong>isolamento de contexto</strong> (a exploração verbosa do subagente fica no contexto <em>dele</em>; só um resumo limpo volta ao coordenador — protege o contexto principal, ligação com o D5).</p>
+        <p><strong>Hub-and-spoke:</strong> tudo passa pelo coordenador; subagentes não falam entre si. Controle centralizado e depurável — se a cobertura saiu errada, você olha a <em>decomposição do coordenador</em>, não os subagentes.</p>
+        <p><strong>Quando NÃO usar:</strong> tarefa simples e linear roda melhor num agente único — multi-agente adiciona orquestração e latência. Só vale quando as subtarefas são independentes ou especializadas.</p>
+      </div>
+    </details>
 
     <div class="block-label">📦 O cenário</div>
     <div class="scenario-framing">Você está construindo o <em>Multi-Agent Research System</em> (Cenário 3): um coordenador delega para um subagente que busca na web, um que analisa documentos, um que sintetiza e um que gera o relatório. O coordenador decide quais subagentes acionar conforme a complexidade da pergunta.</div>
@@ -640,7 +679,7 @@ html.standalone .sidebar-logo { padding-top: max(56px, calc(env(safe-area-inset-
         <li>Tarefa simples e linear não precisa de coordenador</li>
       </ul></div>
     </div>
-    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>Questão clássica: "todos os subagentes tiveram sucesso, mas o relatório cobriu só parte do tópico". A causa é <strong>decomposição estreita do coordenador</strong> — não culpe os subagentes (que fizeram bem o que foi pedido). Olhe o log do coordenador.</p></div>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p><strong>Se a questão mostra:</strong> todos os subagentes tiveram sucesso, mas o resultado final cobriu só parte do tópico.</p><p><strong>Resposta certa:</strong> a causa é a <strong>decomposição estreita do coordenador</strong> — ele não atribuiu as subtarefas certas. Olhe o log do coordenador.</p><p><strong>Pegadinha:</strong> culpar os subagentes (busca, análise, síntese). Eles fizeram bem o que foi pedido — o erro está em <em>quem distribuiu</em> o trabalho.</p></div>
     <div class="docs-box">
       <div class="docs-box-header">📚 Documentação oficial</div>
       <ul>
@@ -692,7 +731,7 @@ Ferramentas: get_order_details, process_refund"""</span>)</pre>
       </ul></div>
     </div>
     <p style="margin-top:8px">Boa prática: passe metadados estruturados (URL da fonte, nome do doc, página) junto do conteúdo, para preservar a atribuição na síntese. E escreva prompts de coordenador com <strong>objetivos e critérios de qualidade</strong>, não um passo-a-passo rígido — isso deixa o subagente se adaptar.</p>
-    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>"Subagente responde: não tenho informações" → passar contexto explícito no prompt da Task. "Como paralelizar?" → múltiplas <code>Task</code> em UMA resposta (não turnos consecutivos, não threads). E lembre: <code>allowedTools</code> precisa incluir <code>"Task"</code> para o coordenador poder spawnar.</p></div>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p><strong>Se o subagente responde "não tenho essa informação":</strong> o contexto não foi passado — ele começa do zero. Resposta: colocar tudo que ele precisa <em>dentro</em> do prompt da <code>Task</code>.</p><p><strong>Se a questão pergunta como paralelizar:</strong> emitir múltiplas <code>Task</code> numa <strong>única</strong> resposta do coordenador. Pegadinhas: turnos consecutivos (isso é sequencial) e "usar threads" (não é assim que o runtime paraleliza).</p><p><strong>Lembre:</strong> <code>allowedTools</code> precisa incluir <code>"Task"</code> para o coordenador poder spawnar subagente.</p></div>
     <div class="docs-box">
       <div class="docs-box-header">📚 Documentação oficial</div>
       <ul>
@@ -726,7 +765,7 @@ Ferramentas: get_order_details, process_refund"""</span>)</pre>
     <span class="hl-key">return</span> permitir()</pre>
     </div>
     <p><strong>Handoff estruturado:</strong> ao escalar no meio do processo para um humano (que não vê o histórico da conversa), compile um resumo: ID do cliente, causa-raiz, valor, ação recomendada.</p>
-    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>"Em X% dos casos o agente pula a verificação apesar do system prompt" → <strong>pré-requisito programático / hook</strong>. As distratoras "reforçar o system prompt" e "adicionar few-shot" dependem de conformidade probabilística — insuficiente quando o erro tem consequência financeira.</p></div>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p><strong>Se a questão mostra:</strong> em X% dos casos o agente pula uma etapa obrigatória (ex.: verificar o cliente antes de reembolsar) apesar de o system prompt mandar.</p><p><strong>Resposta certa:</strong> enforcement programático — um hook <code>PreToolUse</code> que bloqueia até o pré-requisito ser cumprido. Garantia determinística.</p><p><strong>Pegadinhas:</strong> "reforçar o system prompt" e "adicionar few-shot" — ambos dependem de conformidade probabilística do modelo, insuficiente quando o erro tem consequência financeira ou irreversível.</p></div>
     <div class="docs-box">
       <div class="docs-box-header">📚 Documentação oficial</div>
       <ul>
@@ -749,6 +788,15 @@ Ferramentas: get_order_details, process_refund"""</span>)</pre>
       <span class="wb wb-mcp wb-off">🌐 MCP</span>
     </div>
     <div class="concept-line"><strong>Em uma frase:</strong> hooks são pontos de interceptação <strong>determinísticos</strong> ligados a eventos do agente. Os dois que mais caem: <code>PreToolUse</code> roda <em>antes</em> da ferramenta e pode <strong>bloquear/negar</strong> a ação; <code>PostToolUse</code> roda <em>depois</em> e <strong>transforma o resultado</strong> antes do modelo ver.</div>
+
+    <details class="mental-model">
+      <summary>🧠 Modelo mental<span class="mm-hint"> · garantia (código) vs pedido (prompt)</span><span class="mm-chevron">▾</span></summary>
+      <div class="mm-body">
+        <p>Um hook é um <strong>trecho do SEU código</strong> que o runtime executa automaticamente num ponto fixo do loop — em volta de uma tool call. Não é algo que o modelo "escolhe" seguir: dispara sempre, garantido.</p>
+        <p>O reframe que vale para o exame inteiro: um <strong>prompt é um pedido</strong> que o modelo atende <em>na maioria das vezes</em> (probabilístico); um <strong>hook é uma garantia</strong> imposta por código (determinístico). Quando uma regra <em>precisa</em> valer (dinheiro, segurança, ordem obrigatória), você não pede com jeitinho no prompt — força com hook.</p>
+        <p>O <strong>timing decide qual hook:</strong> <code>PreToolUse</code> roda <em>antes</em> → pode bloquear/negar (gate). <code>PostToolUse</code> roda <em>depois</em> → a ação já aconteceu, então só dá para transformar/aparar o resultado, nunca bloquear.</p>
+      </div>
+    </details>
 
     <div class="block-label">📦 O cenário</div>
     <div class="scenario-framing">No <em>Customer Support Agent</em>, duas regras. (1) Reembolso acima de R$500 <strong>não pode</strong> ser processado sem aprovação humana — precisa ser barrado <em>antes</em> de executar → <code>PreToolUse</code>. (2) Suas ferramentas MCP retornam datas em formatos diferentes (Unix, ISO 8601, código numérico) — normalize tudo <em>depois</em> que a ferramenta responde → <code>PostToolUse</code>.</div>
@@ -792,7 +840,7 @@ Ferramentas: get_order_details, process_refund"""</span>)</pre>
     <span class="hl-key">return</span> result  <span class="hl-cmt"># resultado limpo p/ o modelo</span></pre>
     </div>
     <p style="margin-top:12px">O ponto-chave do exame: hook = <strong>garantia determinística</strong>; prompt = <strong>conformidade probabilística</strong>. E o <em>timing</em> decide qual hook: se precisa <strong>impedir</strong> algo, é <code>PreToolUse</code> (antes); se é <strong>ajustar o que voltou</strong>, é <code>PostToolUse</code> (depois). No <span class="wb wb-cli" style="padding:1px 8px">🖥️ Claude Code</span> os mesmos hooks vivem no <code>settings.json</code>.</p>
-    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p><strong>Bloquear</strong> uma ação (reembolso acima do limite, gate de verificação) → <code>PreToolUse</code> com <code>permissionDecision: "deny"</code>, porque roda <em>antes</em> de executar. <code>PostToolUse</code> roda <em>depois</em> — serve para <strong>normalizar/aparar</strong> tool results verbosos (ligação com o Domínio 5), nunca para impedir a ação (que já aconteceu).</p></div>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p><strong>Se a questão pede para bloquear/impedir uma ação</strong> (reembolso acima do limite, gate de verificação): <code>PreToolUse</code> com <code>permissionDecision: "deny"</code> — roda <em>antes</em> de executar.</p><p><strong>Se pede para ajustar o que a ferramenta retornou</strong> (normalizar datas, aparar 40 campos para 5): <code>PostToolUse</code> — roda <em>depois</em> (ligação com o Domínio 5).</p><p><strong>Pegadinha:</strong> usar <code>PostToolUse</code> para bloquear. Não dá — quando ele roda, a ação já aconteceu.</p></div>
     <div class="docs-box">
       <div class="docs-box-header">📚 Documentação oficial</div>
       <ul>
@@ -827,7 +875,7 @@ Ferramentas: get_order_details, process_refund"""</span>)</pre>
         <li>Gera subtarefas conforme dependências aparecem</li>
       </ul></div>
     </div>
-    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>Revisão de muitos arquivos numa passagem só → resultado inconsistente por <strong>diluição de atenção</strong>. A resposta é dividir em passagens (por-arquivo + integração), não "usar uma janela de contexto maior" (ver 4.6).</p></div>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p><strong>Se a questão mostra:</strong> revisão de muitos arquivos numa passagem só, com resultado inconsistente.</p><p><strong>Resposta certa:</strong> dividir em passagens (uma por arquivo + uma de integração). O problema é <strong>diluição de atenção</strong>.</p><p><strong>Pegadinha:</strong> "usar uma janela de contexto maior" — janela maior não resolve qualidade de atenção (mesmo tema em 4.6).</p></div>
     <div class="docs-box">
       <div class="docs-box-header">📚 Documentação oficial</div>
       <ul>
@@ -861,7 +909,7 @@ Ferramentas: get_order_details, process_refund"""</span>)</pre>
         <li>Injeta um resumo estruturado em vez de arrastar lixo</li>
       </ul></div>
     </div>
-    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>"O contexto degradou / o Claude cita 'padrões típicos' em vez das classes específicas" → <strong>nova sessão com resumo estruturado</strong>, NÃO <code>--resume</code>. Ao retomar após mudanças, informe explicitamente quais arquivos mudaram para re-análise direcionada.</p></div>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p><strong>Se a questão mostra:</strong> o contexto degradou / o Claude cita "padrões típicos" em vez das classes específicas que já tinha descoberto.</p><p><strong>Resposta certa:</strong> começar uma <strong>sessão nova com um resumo estruturado</strong> — mais confiável que arrastar tool results obsoletos.</p><p><strong>Pegadinha:</strong> <code>--resume</code> (retomar a sessão antiga). Ao retomar após mudanças em arquivos, avise explicitamente o que mudou, para re-análise direcionada.</p></div>
     <div class="docs-box">
       <div class="docs-box-header">📚 Documentação oficial</div>
       <ul>
@@ -956,7 +1004,7 @@ Ferramentas: get_order_details, process_refund"""</span>)</pre>
 }</pre>
     </div>
     <p>Distinga também <strong>falha de acesso</strong> (timeout — precisa decisão de retry) de <strong>resultado vazio válido</strong> (consulta funcionou, não achou nada). Em multi-agente: subagentes resolvem falhas transitórias localmente e só propagam ao coordenador o que não conseguem resolver, junto com resultados parciais e o que foi tentado.</p>
-    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>"Erro genérico impede o agente de decidir" → metadados estruturados (<code>errorCategory</code> + <code>isRetryable</code>). <code>isRetryable: false</code> + mensagem amigável para violações de regra de negócio evita tentativas inúteis.</p></div>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p><strong>Se a questão mostra:</strong> um erro genérico ("Operation failed") que impede o agente de decidir o que fazer (tentar de novo? escalar? explicar ao cliente?).</p><p><strong>Resposta certa:</strong> retornar metadados estruturados no conteúdo — <code>errorCategory</code> (transient/validation/business/permission) + <code>isRetryable</code>. Lembre: só <code>isError</code> é campo do protocolo MCP; o resto é convenção sua.</p><p><strong>Aplicação:</strong> para violação de regra de negócio, <code>isRetryable: false</code> + mensagem amigável — evita retry inútil.</p></div>
     <div class="docs-box">
       <div class="docs-box-header">📚 Documentação oficial</div>
       <ul>
@@ -987,7 +1035,7 @@ Ferramentas: get_order_details, process_refund"""</span>)</pre>
       <tr><td><code>"any"</code></td><td>DEVE chamar alguma ferramenta (qualquer)</td><td>Garantir saída estruturada</td></tr>
       <tr><td><code>{"type":"tool","name":"X"}</code></td><td>DEVE chamar a ferramenta X</td><td>Forçar uma etapa primeiro (ex.: <code>extract_metadata</code>)</td></tr>
     </table>
-    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>"85% das verificações são simples, 15% complexas" → ferramenta com escopo (<code>verify_fact</code>) para o caso comum, mantendo o caminho do coordenador para o resto = princípio do <strong>menor privilégio</strong>. Dar todas as ferramentas (over-provisioning) ou batch de verificações (cria bloqueio) são distratoras.</p></div>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p><strong>Se a questão mostra:</strong> "85% dos casos são simples, 15% complexos" (ex.: fact-checks que geram round-trips ao coordenador).</p><p><strong>Resposta certa:</strong> dar uma ferramenta com escopo (<code>verify_fact</code>) para o caso comum e manter o caminho do coordenador para o resto = princípio do <strong>menor privilégio</strong>.</p><p><strong>Pegadinhas:</strong> dar todas as ferramentas ao agente (over-provisioning degrada a seleção); juntar as verificações num batch (cria bloqueio/dependência).</p></div>
     <div class="docs-box">
       <div class="docs-box-header">📚 Documentação oficial</div>
       <ul>
@@ -1007,6 +1055,16 @@ Ferramentas: get_order_details, process_refund"""</span>)</pre>
     </div>
     <div class="concept-line"><strong>Em uma frase:</strong> MCP conecta o Claude ao seu backend. Config do <strong>time</strong> vai em <code>.mcp.json</code> (raiz do projeto, versionado); config <strong>pessoal/experimental</strong> em <code>~/.claude.json</code>. Tokens vêm de variáveis de ambiente, nunca hardcoded.</div>
 
+    <details class="mental-model">
+      <summary>🧠 Modelo mental<span class="mm-hint"> · o que é MCP e por que ele existe</span><span class="mm-chevron">▾</span></summary>
+      <div class="mm-body">
+        <p>MCP (Model Context Protocol) é um <strong>padrão aberto</strong> para conectar o Claude aos seus sistemas (banco, GitHub, Jira…).</p>
+        <div class="mm-analogy"><strong>Analogia:</strong> é uma <strong>porta USB-C para ferramentas</strong>. Em vez de programar cada integração dentro de cada app, um sistema expõe um <em>servidor MCP</em> uma vez, e qualquer cliente compatível (Claude Code, sua app com SDK) pluga e usa.</div>
+        <p>Um servidor expõe duas coisas: <strong>tools</strong> (ações com efeito colateral — rodar query, criar issue) e <strong>resources</strong> (dados passivos para leitura — schemas, catálogos). O cliente enxerga tudo e o Claude passa a poder usar.</p>
+        <p><strong>O que ele substitui:</strong> sem MCP, você escreveria código de tool custom dentro de cada agente. O MCP desacopla "quem fornece a ferramenta" de "quem usa" — por isso prefira um servidor da comunidade (ex.: Jira) a reimplementar.</p>
+      </div>
+    </details>
+
     <div class="block-label">📦 O cenário</div>
     <div class="scenario-framing">No <em>Developer Productivity</em>, o time integra o servidor MCP do GitHub. Todo dev que clonar o repo deve receber a config automaticamente — por isso ela vai versionada no <code>.mcp.json</code>, com o token vindo do ambiente de cada um.</div>
 
@@ -1024,7 +1082,7 @@ Ferramentas: get_order_details, process_refund"""</span>)</pre>
 }</pre>
     </div>
     <p><strong>Resources vs Tools</strong> (sempre cai): <em>resource</em> = leitura passiva de catálogo (listar schemas de banco, hierarquia de docs); <em>tool</em> = ação com efeito colateral (rodar query, criar registro). Expor catálogos como resources reduz chamadas exploratórias. Ferramentas de todos os servidores configurados ficam disponíveis simultaneamente. Prefira servidores MCP da comunidade (ex.: Jira) a reimplementar.</p>
-    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>Config do time em <code>~/.claude.json</code> = colegas não recebem (erro clássico). Deve ser <code>.mcp.json</code> na raiz. "Ler catálogo para decidir" = resource; "mudar o estado do sistema" = tool. Se o agente prefere Grep nativo a uma tool MCP melhor, <strong>melhore a descrição da tool MCP</strong>.</p></div>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p><strong>Escopo (mais cobrado):</strong> config de MCP do time em <code>~/.claude.json</code> → colegas não recebem ao clonar. Certo: <code>.mcp.json</code> na raiz do projeto (versionado).</p><p><strong>Resource vs tool:</strong> "ler catálogo/schema para decidir" = <em>resource</em> (leitura passiva); "mudar o estado do sistema" = <em>tool</em> (ação com efeito colateral).</p><p><strong>Pegadinha:</strong> se o agente prefere o <code>Grep</code> nativo a uma tool MCP melhor, a correção é <strong>melhorar a descrição da tool MCP</strong> — não remover o Grep.</p></div>
     <div class="docs-box">
       <div class="docs-box-header">📚 Documentação oficial</div>
       <ul>
@@ -1058,7 +1116,7 @@ Ferramentas: get_order_details, process_refund"""</span>)</pre>
       <tr><td>Rodar os testes</td><td>Bash</td><td>Read</td></tr>
     </table>
     <p style="margin-top:8px">Fluxo de exploração incremental: <strong>Grep</strong> acha o entry point → <strong>Read</strong> segue imports e traça o fluxo → <strong>Edit</strong> faz a mudança com contexto completo. Não leia todos os arquivos de cara.</p>
-    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>Grep × Glob é a confusão mais cobrada. Conteúdo → Grep; nome/extensão → Glob. Quando <code>Edit</code> não acha âncora única, o fallback é <code>Read + Write</code>.</p></div>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p><strong>Confusão mais cobrada — Grep × Glob:</strong> busca por <strong>conteúdo</strong> (imports, nome de função, uma string) → <code>Grep</code>. Busca por <strong>nome/caminho</strong> (<code>**/*.test.tsx</code>) → <code>Glob</code>.</p><p><strong>Fallback do Edit:</strong> quando <code>Edit</code> falha porque o texto não é único, use <code>Read + Write</code> (não Bash com <code>sed</code>).</p></div>
     <div class="docs-box">
       <div class="docs-box-header">📚 Documentação oficial</div>
       <ul>
@@ -1088,6 +1146,15 @@ Ferramentas: get_order_details, process_refund"""</span>)</pre>
     </div>
     <div class="concept-line"><strong>Em uma frase:</strong> o <code>CLAUDE.md</code> dá contexto/instruções ao Claude Code, em 3 níveis: usuário (<code>~/.claude/CLAUDE.md</code>, só seu), projeto (<code>CLAUDE.md</code> na raiz ou <code>.claude/CLAUDE.md</code>, do time) e diretório (subpastas). Sempre carregado.</div>
 
+    <details class="mental-model">
+      <summary>🧠 Modelo mental<span class="mm-hint"> · memória em camadas, como a cascata do CSS</span><span class="mm-chevron">▾</span></summary>
+      <div class="mm-body">
+        <p>O <code>CLAUDE.md</code> é um markdown puro <strong>carregado automaticamente no contexto do Claude Code a cada sessão</strong> — é como você dá instruções e convenções persistentes sem repetir toda vez.</p>
+        <p>Pense nele como <strong>memória em camadas, tipo a cascata do CSS</strong>. Três escopos se somam: <strong>usuário</strong> (<code>~/.claude/CLAUDE.md</code>, só você, não versionado), <strong>projeto</strong> (<code>CLAUDE.md</code> na raiz ou <code>.claude/CLAUDE.md</code>, do time, versionado) e <strong>diretório</strong> (subpasta, específico local). Todos carregados juntos.</p>
+        <p>A <strong>regra-mãe do domínio inteiro:</strong> config do time é versionada; config pessoal não. Quase toda questão de "bug" do D3 é isso — alguém pôs instrução do time no escopo de usuário, e os colegas não recebem.</p>
+      </div>
+    </details>
+
     <div class="block-label">📦 O cenário</div>
     <div class="scenario-framing">No <em>Code Generation</em> (Cenário 2), um novo dev não recebe as convenções do time. Causa: alguém colocou as instruções em <code>~/.claude/CLAUDE.md</code> (escopo pessoal, não versionado). Instruções do time têm que estar no nível de projeto.</div>
 
@@ -1102,7 +1169,7 @@ Ferramentas: get_order_details, process_refund"""</span>)</pre>
        └─ @../docs/standards.md   ← importa padrão compartilhado</pre>
     </div>
     <p>A sintaxe de import é <code>@caminho</code> (ex.: <code>@../docs/standards.md</code>) — <strong>não</strong> existe uma palavra-chave <code>@import</code>. Ela mantém o arquivo modular (uma fonte de verdade compartilhada). Para arquivos enormes, prefira dividir em <code>.claude/rules/</code> (ver 3.3). Use <code>/memory</code> para ver quais arquivos de memória estão carregados e diagnosticar comportamento inconsistente.</p>
-    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>"Membro novo do time não recebe as instruções" → estão no <strong>nível de usuário</strong>, deviam estar no <strong>nível de projeto</strong> (versionado). Esse é o diagnóstico de hierarquia mais cobrado.</p></div>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p><strong>Se a questão mostra:</strong> um membro novo do time não recebe as instruções/convenções do projeto.</p><p><strong>Resposta certa:</strong> as instruções estão no <strong>nível de usuário</strong> (<code>~/.claude/</code>, não versionado) e deveriam estar no <strong>nível de projeto</strong> (<code>CLAUDE.md</code> na raiz, versionado). Diagnóstico de hierarquia mais cobrado.</p></div>
     <div class="docs-box">
       <div class="docs-box-header">📚 Documentação oficial</div>
       <ul>
@@ -1141,7 +1208,7 @@ Ferramentas: get_order_details, process_refund"""</span>)</pre>
 Analise o módulo indicado e retorne só um resumo estruturado.</pre>
     </div>
     <p><code>context: fork</code> é o ponto-chave: a skill roda num sub-contexto isolado, então output verboso (análise, brainstorm) não contamina a sessão principal. <strong>Skill</strong> = invocação sob demanda para um workflow; <strong>CLAUDE.md</strong> = padrões universais sempre carregados.</p>
-    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>"Comando disponível a todos ao clonar" → <code>.claude/commands/</code> (versionado), não <code>~/.claude/commands/</code> nem <code>CLAUDE.md</code> nem um <code>config.json</code> inexistente. "Isolar output verboso" → <code>context: fork</code>.</p></div>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p><strong>Se a questão pede um comando disponível a todos ao clonar o repo:</strong> <code>.claude/commands/</code> (versionado no projeto).</p><p><strong>Pegadinhas:</strong> <code>~/.claude/commands/</code> (é pessoal), pôr no <code>CLAUDE.md</code> (não vira comando) e um <code>config.json</code> com array "commands" (não existe).</p><p><strong>Se pede isolar output verboso de uma skill:</strong> <code>context: fork</code>.</p></div>
     <div class="docs-box">
       <div class="docs-box-header">📚 Documentação oficial</div>
       <ul>
@@ -1177,7 +1244,7 @@ Analise o módulo indicado e retorne só um resumo estruturado.</pre>
 Use describe/it. Mocke só dependências externas. Cubra os casos-limite.</pre>
     </div>
     <p>Vantagem sobre <code>CLAUDE.md</code> por subdiretório: o glob alcança arquivos do mesmo tipo <strong>espalhados pelo codebase</strong> — um <code>CLAUDE.md</code> de pasta só vale para aquela pasta.</p>
-    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>"Aplicar convenções a arquivos de teste espalhados, automaticamente" → <code>.claude/rules/</code> com glob. As distratoras: <code>CLAUDE.md</code> raiz (depende de inferência), skills (exigem invocação manual), <code>CLAUDE.md</code> por subpasta (não pega arquivos espalhados).</p></div>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p><strong>Se a questão pede:</strong> aplicar convenções a arquivos de um tipo (ex.: testes) espalhados pelo codebase, automaticamente.</p><p><strong>Resposta certa:</strong> <code>.claude/rules/</code> com <code>paths:</code> (glob) — carrega só quando você edita arquivos que batem com o padrão.</p><p><strong>Pegadinhas:</strong> <code>CLAUDE.md</code> raiz (depende de o modelo inferir), skills (exigem invocação manual), <code>CLAUDE.md</code> por subpasta (não pega arquivos espalhados por várias pastas).</p></div>
     <div class="docs-box">
       <div class="docs-box-header">📚 Documentação oficial</div>
       <ul>
@@ -1210,7 +1277,7 @@ Use describe/it. Mocke só dependências externas. Cubra os casos-limite.</pre>
       <tr><td>Corrigir bug com stack trace claro</td><td></td><td>✅ sem surpresas</td></tr>
     </table>
     <p style="margin-top:8px">Combine: plan mode para investigar, execução direta para implementar o plano. Use o <strong>subagente Explore</strong> para isolar a descoberta verbosa e devolver só resumos (preserva o contexto principal).</p>
-    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>Tarefa com implicação arquitetural / múltiplas abordagens → plan mode. A distratora "começar direto e mudar para plan mode se aparecer complexidade" ignora que a complexidade <strong>já está no enunciado</strong>.</p></div>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p><strong>Se a questão mostra:</strong> tarefa com implicação arquitetural, múltiplas abordagens válidas ou edição multi-arquivo em larga escala.</p><p><strong>Resposta certa:</strong> plan mode (explorar e projetar antes de mexer no código).</p><p><strong>Pegadinha:</strong> "começar direto e mudar para plan mode se aparecer complexidade" — ignora que a complexidade <strong>já está no enunciado</strong>.</p></div>
     <div class="docs-box">
       <div class="docs-box-header">📚 Documentação oficial</div>
       <ul>
@@ -1269,7 +1336,7 @@ Use describe/it. Mocke só dependências externas. Cubra os casos-limite.</pre>
       <tr style="background:var(--card-bg)"><td style="padding:7px 10px">Tentação de reescrever prompt com mais texto</td><td style="padding:7px 10px;color:#f97316">Distratora — troque por exemplos concretos</td></tr>
     </table>
 
-    <div class="trap-box" style="margin-top:14px"><div class="trap-box-header">⚠️ No exame</div><p>Prosa gera resultado inconsistente → 2-3 exemplos input/output (não "explicar melhor em texto"). Bug em caso-limite → forneça um caso de teste específico com entrada e saída esperada. "Reescrever o prompt com mais detalhes" é sempre distratora quando o problema é ambiguidade de interpretação.</p></div>
+    <div class="trap-box" style="margin-top:14px"><div class="trap-box-header">⚠️ No exame</div><p><strong>Se a saída é inconsistente a cada execução:</strong> dar 2-3 exemplos input/output concretos (fixam o comportamento).</p><p><strong>Se há bug em caso-limite:</strong> fornecer um caso de teste específico com entrada e saída esperada.</p><p><strong>Pegadinha recorrente:</strong> "reescrever o prompt com mais detalhes em prosa" — não resolve ambiguidade de interpretação; exemplos resolvem.</p></div>
     <div class="docs-box">
       <div class="docs-box-header">📚 Documentação oficial</div>
       <ul>
@@ -1302,7 +1369,7 @@ claude <span class="hl-str">"Analyze this PR for security issues"</span>
 claude -p <span class="hl-str">"Analyze this PR"</span> --output-format json --json-schema schema.json</pre>
     </div>
     <p><strong>Isolamento de sessão</strong>: a mesma sessão que <em>gerou</em> o código é pior para <em>revisá-lo</em> (carrega o raciocínio da geração). Use uma instância independente para revisar (liga com 4.6). Ao re-rodar revisões após novos commits, inclua os achados anteriores no contexto e peça para reportar só o que é novo/não resolvido — evita comentários duplicados.</p>
-    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>Job trava no CI → flag <code>-p</code>. As distratoras (<code>CLAUDE_HEADLESS=true</code>, <code>--batch</code>) são features <strong>inexistentes</strong>; redirecionar <code>/dev/null</code> é gambiarra que não resolve a sintaxe do Claude Code.</p></div>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p><strong>Se a questão mostra:</strong> o job de CI trava / fica suspenso aguardando input interativo.</p><p><strong>Resposta certa:</strong> a flag <code>-p</code> (<code>--print</code>) — modo não-interativo.</p><p><strong>Pegadinhas:</strong> <code>CLAUDE_HEADLESS=true</code> e <code>--batch</code> (features inexistentes); redirecionar <code>&lt; /dev/null</code> (gambiarra que não resolve a questão da flag).</p></div>
     <div class="docs-box">
       <div class="docs-box-header">📚 Documentação oficial</div>
       <ul>
@@ -1352,7 +1419,7 @@ claude -p <span class="hl-str">"Analyze this PR"</span> --output-format json --j
    - ausência de documentação (ausência ≠ erro)</span></pre>
     </div>
     <p>Categorias com alto falso positivo derrubam a confiança nas categorias boas — vale desativar temporariamente a categoria ruim enquanto melhora o prompt dela. Defina severidade com exemplos de código concretos para cada nível.</p>
-    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>Falsos positivos altos → critérios categóricos explícitos. "Peça ao modelo só reportar alta confiança" / "seja conservador" são as distratoras — instruções vagas não calibram precisão.</p></div>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p><strong>Se a questão mostra:</strong> muitos falsos positivos numa revisão/classificação automática.</p><p><strong>Resposta certa:</strong> critérios categóricos explícitos — diga exatamente o que reportar e o que ignorar.</p><p><strong>Pegadinhas:</strong> "seja conservador" e "só reporte alta confiança" — instruções vagas não calibram precisão.</p></div>
     <div class="docs-box">
       <div class="docs-box-header">📚 Documentação oficial</div>
       <ul>
@@ -1382,7 +1449,7 @@ claude -p <span class="hl-str">"Analyze this PR"</span> --output-format json --j
       <tr><td>Casos ambíguos que regras não cobrem</td><td>Campo ausente no documento → nullable (4.3)</td></tr>
       <tr><td>Formato que a prosa não descreve bem</td><td>Sequência crítica de ferramentas → hooks (1.4)</td></tr>
     </table>
-    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>Few-shot é forte para <strong>ambiguidade e formato</strong>, e também para calibrar escalação (1.5/5.2). Mas NÃO use few-shot para misrouting de tools (use descrições) nem para campos ausentes (use nullable).</p></div>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p><strong>Few-shot é a resposta quando:</strong> a saída fica inconsistente mesmo após instruções detalhadas, há casos ambíguos que regras não cobrem, ou o formato é difícil de descrever em prosa (também calibra escalação — 5.2).</p><p><strong>Few-shot NÃO é a resposta quando:</strong> há misrouting entre tools parecidas (use descrições — 2.1) ou o campo não existe no documento (use nullable — 4.3).</p></div>
     <div class="docs-box">
       <div class="docs-box-header">📚 Documentação oficial</div>
       <ul>
@@ -1402,6 +1469,15 @@ claude -p <span class="hl-str">"Analyze this PR"</span> --output-format json --j
     </div>
     <div class="concept-line"><strong>Em uma frase:</strong> <code>tool_use</code> com JSON schema é a forma mais confiável de garantir saída estruturada — elimina erros de <em>sintaxe</em>. Mas NÃO previne erros <em>semânticos</em> (line items que não somam ao total, valor no campo errado).</div>
 
+    <details class="mental-model">
+      <summary>🧠 Modelo mental<span class="mm-hint"> · por que usar uma "ferramenta" para extrair JSON</span><span class="mm-chevron">▾</span></summary>
+      <div class="mm-body">
+        <p>O truque: para obrigar o Claude a devolver JSON estruturado, você define uma <strong>tool</strong> cujo <em>input schema</em> É o formato que você quer, e força o Claude a "chamá-la". Você nunca executa nada — só lê o JSON já validado do bloco <code>tool_use</code>. <strong>A tool call é um contrato de JSON, não uma ação.</strong></p>
+        <p>Por que isso ganha do "por favor, responda em JSON" na prosa: o schema é imposto pela API, então você nunca recebe texto solto, cercas de markdown ou JSON quebrado. Elimina o erro de <strong>sintaxe</strong> por completo.</p>
+        <p>O limite crítico (muito cobrado): garante sintaxe, <strong>não semântica</strong>. O schema não sabe que <code>line_items</code> têm que somar ao <code>total</code>, nem que o valor caiu no campo certo. Para isso, você valida depois (4.4).</p>
+      </div>
+    </details>
+
     <div class="block-label">📦 O cenário</div>
     <div class="scenario-framing">No <em>Structured Data Extraction</em>, você define uma ferramenta de extração cujo input é o schema desejado, e lê os dados do bloco <code>tool_use</code> da resposta. Campos que podem não existir no documento devem ser <strong>nullable</strong> — senão o modelo inventa valor para satisfazer o "required".</div>
 
@@ -1416,7 +1492,7 @@ claude -p <span class="hl-str">"Analyze this PR"</span> --output-format json --j
 }</pre>
     </div>
     <p><code>tool_choice</code> aqui: <code>"any"</code> garante saída estruturada quando há vários schemas e o tipo do doc é desconhecido; forçar <code>{"type":"tool","name":"..."}</code> garante que uma extração rode antes de etapas de enriquecimento.</p>
-    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>Campo que pode faltar no documento → <strong>nullable</strong> (não required, senão fabrica). Schema rígido elimina erro de sintaxe mas não semântico — para semântica, valide (4.4). Enum com <code>"other"</code> + detalhe para categorias extensíveis; <code>"unclear"</code> para ambíguos.</p></div>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p><strong>Se a questão mostra:</strong> um campo que pode não existir no documento fonte.</p><p><strong>Resposta certa:</strong> torná-lo <strong>nullable</strong> (<code>["string","null"]</code>). Se ficar <code>required</code> e faltar, o modelo <em>fabrica</em> um valor para satisfazer o schema.</p><p><strong>Lembre:</strong> schema rígido elimina erro de sintaxe, mas não semântico — para semântica, valide (4.4). Para categorias extensíveis, enum com <code>"other"</code> + campo de detalhe; <code>"unclear"</code> para ambíguos.</p></div>
     <div class="docs-box">
       <div class="docs-box-header">📚 Documentação oficial</div>
       <ul>
@@ -1456,7 +1532,7 @@ claude -p <span class="hl-str">"Analyze this PR"</span> --output-format json --j
       </ul></div>
     </div>
     <p>Padrões úteis: extrair <code>calculated_total</code> junto de <code>stated_total</code> para flagar divergência; <code>conflict_detected</code> para fonte inconsistente; <code>detected_pattern</code> para analisar falsos positivos depois.</p>
-    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>Distinga erro de <strong>estrutura</strong> (retry resolve) de <strong>informação ausente</strong> (retry não resolve — use nullable). Esse é o par mais cobrado do 4.4.</p></div>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p><strong>A chave (par mais cobrado):</strong> distinguir erro de <strong>estrutura</strong> de <strong>informação ausente</strong>.</p><p><strong>Retry-com-feedback resolve:</strong> formato/estrutura errados (data DD/MM vs MM/DD, itens que não somam ao total).</p><p><strong>Retry NÃO resolve:</strong> informação que simplesmente não está na fonte → use nullable (4.3).</p></div>
     <div class="docs-box">
       <div class="docs-box-header">📚 Documentação oficial</div>
       <ul>
@@ -1477,6 +1553,17 @@ claude -p <span class="hl-str">"Analyze this PR"</span> --output-format json --j
     </div>
     <div class="concept-line"><strong>Em uma frase:</strong> a Message Batches API dá <strong>50% de desconto</strong>, janela de até <strong>24h</strong> e <strong>sem SLA de latência</strong>. Ótima para cargas tolerantes a atraso; péssima para fluxos bloqueantes.</div>
 
+    <details class="mental-model">
+      <summary>🧠 Modelo mental<span class="mm-hint"> · os 3 modos de falar com a API</span><span class="mm-chevron">▾</span></summary>
+      <div class="mm-body">
+        <p>Toda chamada ao Claude acontece em um de <strong>3 modos</strong>:</p>
+        <p><strong>1 · Síncrono</strong> (padrão): você manda 1 request e espera a resposta na mesma conexão — segundos de latência, preço cheio. Para qualquer coisa interativa ou bloqueante.</p>
+        <p><strong>2 · Streaming:</strong> igual ao síncrono, mas a resposta chega token a token (o efeito "digitando"). Mesmo preço e latência — é só <em>percepção</em>, não throughput. Não confunda com batch.</p>
+        <p><strong>3 · Batch</strong> (Message Batches API): você entrega milhares de requests de uma vez e volta depois — sem SLA de latência (até 24h), mas <strong>50% mais barato</strong>. Os resultados podem voltar fora de ordem, então cada request leva um <code>custom_id</code> para casar resposta↔pergunta.</p>
+        <div class="mm-analogy"><strong>A regra:</strong> "tem alguém esperando o resultado?" Sim → síncrono. Não (job noturno, offline) → batch. Você troca a garantia de latência pelo desconto.</div>
+      </div>
+    </details>
+
     <div class="block-label">📦 O cenário</div>
     <div class="scenario-framing">No <em>CI/CD</em>, há dois fluxos: (1) check pré-merge bloqueante (dev espera) e (2) relatório de dívida técnica gerado overnight. O gestor quer migrar os dois para batch pelo desconto. Só o (2) deve ir para batch.</div>
 
@@ -1492,7 +1579,7 @@ claude -p <span class="hl-str">"Analyze this PR"</span> --output-format json --j
       </ul></div>
     </div>
     <p>Batch não suporta tool calling multi-turno num mesmo request. Em falhas, reenvie só os <code>custom_id</code> que falharam (ex.: dividindo docs que estouraram o contexto). Refine o prompt num set de amostra antes de processar o volume todo.</p>
-    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>Migrar fluxo bloqueante para batch = errado (sem SLA). "Polling porque geralmente é rápido" não vale para bloqueante. Reprocessar falhas = só os <code>custom_id</code> que falharam, não o lote inteiro.</p></div>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p><strong>Se a questão mostra:</strong> dois fluxos — um <strong>bloqueante</strong> (ex.: check pré-merge, o dev está esperando para poder mergear) e um <strong>tolerante a atraso</strong> (ex.: relatório noturno) — e alguém propõe migrar <em>os dois</em> para batch pela economia de 50%.</p><p><strong>Resposta certa:</strong> só o fluxo tolerante a atraso vai para batch. O <strong>bloqueante continua síncrono</strong> — batch não tem SLA de latência (pode levar até 24h) e você não pode deixar o merge esperando isso. Ou seja: <em>migrar o fluxo bloqueante para batch é a resposta errada.</em></p><p><strong>Pegadinhas:</strong> "migrar os dois e usar polling porque <em>geralmente</em> é rápido" ("geralmente" não é garantia para algo que trava o merge); "migrar os dois com fallback de timeout para síncrono" (overengineering). Ao reprocessar falhas, reenvie só os <code>custom_id</code> que falharam, não o lote inteiro.</p></div>
     <div class="docs-box">
       <div class="docs-box-header">📚 Documentação oficial</div>
       <ul>
@@ -1526,7 +1613,7 @@ claude -p <span class="hl-str">"Analyze this PR"</span> --output-format json --j
         <li>Consenso de 3 runs — suprime bugs detectados intermitentemente</li>
       </ul></div>
     </div>
-    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>Revisão inconsistente em muitos arquivos → dividir em passagens focadas. "Modelo com janela maior" é a distratora favorita — o problema é diluição de atenção, não tamanho de janela.</p></div>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p><strong>Se a questão mostra:</strong> revisão inconsistente de um PR com muitos arquivos (detalhada em uns, superficial em outros, feedback contraditório).</p><p><strong>Resposta certa:</strong> dividir em passagens focadas (por arquivo + uma de integração) e usar um revisor independente do gerador.</p><p><strong>Pegadinhas:</strong> "modelo com janela de contexto maior" (o problema é diluição de atenção, não tamanho de janela); "consenso de 3 runs" (suprime bugs detectados de forma intermitente).</p></div>
     <div class="docs-box">
       <div class="docs-box-header">📚 Documentação oficial</div>
       <ul>
@@ -1555,6 +1642,15 @@ claude -p <span class="hl-str">"Analyze this PR"</span> --output-format json --j
     </div>
     <div class="concept-line"><strong>Em uma frase:</strong> resumir progressivamente apaga números, datas e valores exatos. Extraia os fatos transacionais para um bloco "case facts" que vai em todo prompt, fora do histórico resumido — e cuide do efeito "lost in the middle".</div>
 
+    <details class="mental-model">
+      <summary>🧠 Modelo mental<span class="mm-hint"> · a janela é um recurso escasso que degrada</span><span class="mm-chevron">▾</span></summary>
+      <div class="mm-body">
+        <p>A janela de contexto é <strong>tudo que o modelo vê numa chamada</strong>: system prompt + histórico inteiro + resultados de ferramentas. É finita e — o ponto — o modelo <strong>relê tudo a cada chamada</strong> (a API é stateless).</p>
+        <p>Dois modos de falha para internalizar: <strong>(1) ela enche</strong> — tool results verbosos (40 campos quando só 5 importam) e históricos longos espremem o que importa; você apara/compacta. <strong>(2) "lost in the middle"</strong> — mesmo dentro da janela, o modelo lê bem o começo e o fim, mas pode ignorar o meio. Por isso fatos críticos vão no <em>início</em>, com headers explícitos.</p>
+        <p>O reframe: não trate o contexto como memória grátis. Resumir progressivamente <strong>apaga silenciosamente</strong> números e datas exatas. Mantenha os fatos transacionais num bloco "case facts" persistente, que entra em todo prompt, fora do histórico resumido.</p>
+      </div>
+    </details>
+
     <div class="block-label">📦 O cenário</div>
     <div class="scenario-framing">No <em>Customer Support Agent</em>, numa sessão longa, "cobrado R$249,90 em 15/03, pedido ORD-789" vira "o cliente teve problemas recentes". Você perde o que importa para resolver o caso.</div>
 
@@ -1567,7 +1663,7 @@ Pontos: 450 | Reclamação: cobrança dupla
 <span class="hl-ok">---FIM---</span>   <span class="hl-cmt"># atualizado a cada tool call, incluído em todo prompt</span></pre>
     </div>
     <p><strong>Lost in the middle:</strong> o modelo lê bem o início e o fim de inputs longos, mas pode ignorar o meio. Coloque achados críticos no <strong>início</strong>, com headers explícitos. E apare tool results verbosos (40+ campos quando só 5 importam) com um hook <code>PostToolUse</code> antes que acumulem.</p>
-    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>Perda de precisão em sessão longa → bloco de fatos persistente fora do resumo. Achados importantes "no meio" sendo ignorados → reposicionar no início com headers. Tool result gigante → aparar para os campos relevantes.</p></div>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p><strong>Se há perda de precisão numa sessão longa</strong> (números, datas e valores viram "problemas recentes"): bloco "case facts" persistente, incluído em todo prompt, fora do histórico resumido.</p><p><strong>Se achados importantes "no meio" são ignorados</strong> (lost in the middle): reposicionar no início, com headers explícitos.</p><p><strong>Se tool results gigantes enchem o contexto:</strong> aparar para os campos relevantes (hook <code>PostToolUse</code>).</p></div>
     <div class="docs-box">
       <div class="docs-box-header">📚 Documentação oficial</div>
       <ul>
@@ -1597,7 +1693,7 @@ Pontos: 450 | Reclamação: cobrança dupla
 
     <div class="block-label">⚙️ Como funciona</div>
     <p>A correção é adicionar <strong>critérios explícitos de escalação com few-shot</strong> ao system prompt, mostrando quando escalar vs resolver. Honre pedido explícito de humano <em>imediatamente</em> (sem investigar antes). Quando a busca retorna múltiplos clientes, peça um identificador adicional em vez de chutar por heurística.</p>
-    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>Calibrar escalação → critérios explícitos + few-shot. As distratoras: <strong>score de confiança</strong> (o LLM já está confiante errado nos casos difíceis), <strong>classificador treinado</strong> (over-engineering antes de tentar prompt) e <strong>sentimento</strong> (não correlaciona com complexidade).</p></div>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p><strong>Se a questão pede:</strong> calibrar quando o agente escala vs resolve sozinho (ex.: resolução travada abaixo da meta).</p><p><strong>Resposta certa:</strong> critérios explícitos de escalação + few-shot no system prompt.</p><p><strong>Pegadinhas:</strong> <strong>score de confiança</strong> auto-reportado (o modelo já erra "confiante" nos casos difíceis); <strong>classificador treinado</strong> (over-engineering antes de tentar prompt); <strong>análise de sentimento</strong> (não correlaciona com complexidade).</p></div>
     <div class="docs-box">
       <div class="docs-box-header">📚 Documentação oficial</div>
       <ul>
@@ -1633,7 +1729,7 @@ Pontos: 450 | Reclamação: cobrança dupla
         <li>Terminar todo o workflow por uma falha</li>
       </ul></div>
     </div>
-    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>Timeout de subagente → contexto de erro estruturado ao coordenador. Distinga <strong>falha de acesso</strong> (timeout, precisa decisão) de <strong>resultado vazio válido</strong> (consulta ok, sem matches).</p></div>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p><strong>Se a questão mostra:</strong> um subagente falha (ex.: timeout na busca) e você precisa decidir como reportar ao coordenador.</p><p><strong>Resposta certa:</strong> contexto de erro estruturado — tipo de falha, query tentada, resultados parciais e alternativas. O coordenador decide a recuperação.</p><p><strong>Pegadinhas:</strong> status genérico ("search unavailable"); marcar falha como sucesso (vazio = ok); derrubar o workflow inteiro. Distinga <strong>falha de acesso</strong> (timeout, precisa decisão) de <strong>resultado vazio válido</strong> (consulta ok, sem matches).</p></div>
     <div class="docs-box">
       <div class="docs-box-header">📚 Documentação oficial</div>
       <ul>
@@ -1663,7 +1759,7 @@ Pontos: 450 | Reclamação: cobrança dupla
       <li><strong>Manifesto de estado</strong>: cada agente exporta estado para um local conhecido; o coordenador recarrega no resume (recuperação de crash)</li>
       <li><strong><code>/compact</code></strong>: comprime o contexto quando enche de descoberta verbosa</li>
     </ul>
-    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>"Sistema crasha após 8 de 20 arquivos convertidos" → manifesto JSON de progresso (cada agente escreve estado após cada item). Degradação em sessão longa → scratchpad + delegação a subagentes + <code>/compact</code>.</p></div>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p><strong>Se o sistema crasha no meio</strong> (ex.: 8 de 20 arquivos convertidos): manifesto JSON de progresso — cada agente grava o estado após cada item, para retomar de onde parou.</p><p><strong>Se há degradação de qualidade numa sessão longa</strong> de exploração: scratchpad para persistir achados + delegar exploração verbosa a subagentes + <code>/compact</code>.</p></div>
     <div class="docs-box">
       <div class="docs-box-header">📚 Documentação oficial</div>
       <ul>
@@ -1694,7 +1790,7 @@ Pontos: 450 | Reclamação: cobrança dupla
       <li>Modelo emite <strong>confiança por campo</strong>; calibre os limiares com um set rotulado</li>
       <li>Roteie baixa confiança / fonte contraditória para revisão humana</li>
     </ul>
-    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>Ver 97% agregado e automatizar = a armadilha. Sempre segmente por tipo de documento e por campo. Score de confiança aqui é útil <em>se calibrado com dados rotulados</em> (diferente da escalação em 5.2, onde confiança auto-reportada não serve).</p></div>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p><strong>Se a questão mostra:</strong> precisão agregada alta (ex.: 97%) e a tentação de remover a revisão humana.</p><p><strong>Resposta certa:</strong> segmentar a precisão por <strong>tipo de documento E por campo</strong> antes de automatizar — a média esconde um segmento ruim (ex.: fatura manuscrita errando 40%). Use amostragem estratificada.</p><p><strong>Nuance:</strong> aqui o score de confiança <em>é</em> útil se calibrado com dados rotulados — diferente da escalação (5.2), onde a confiança auto-reportada não serve.</p></div>
     <div class="docs-box">
       <div class="docs-box-header">📚 Documentação oficial</div>
       <ul>
@@ -1724,7 +1820,7 @@ Pontos: 450 | Reclamação: cobrança dupla
       <li>Análise entrega valores conflitantes <strong>anotados</strong>; o coordenador decide como reconciliar</li>
       <li>Renderize cada tipo de conteúdo no formato certo (financeiro = tabela, notícia = prosa)</li>
     </ul>
-    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p>Estatísticas conflitantes de fontes credíveis → preservar ambas com atribuição (não escolher uma). Exigir datas nos outputs evita que diferença temporal seja lida como contradição.</p></div>
+    <div class="trap-box"><div class="trap-box-header">⚠️ No exame</div><p><strong>Se a questão mostra:</strong> fontes credíveis com estatísticas conflitantes na síntese.</p><p><strong>Resposta certa:</strong> preservar ambas com atribuição à fonte — não escolher um valor arbitrário.</p><p><strong>Aplicação:</strong> exigir data de publicação nos outputs evita que diferença temporal (censo 2018 vs estimativa 2023) seja lida como contradição.</p></div>
     <div class="docs-box">
       <div class="docs-box-header">📚 Documentação oficial</div>
       <ul>
